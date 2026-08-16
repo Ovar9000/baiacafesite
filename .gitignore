@@ -22,3 +22,21 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Audit, diagnostic, and testing scripts
+diagnose.js
+optimize-critical.js
+run-audit.js
+run-preview-audit.js
+test-desktop-preset.js
+test-e2e.js
+trace-audit.js
+*.report.html
+audit-*.json
+lighthouse-*.json
+
