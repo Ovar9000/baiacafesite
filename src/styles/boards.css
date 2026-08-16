@@ -40,7 +40,7 @@
 
 .boards-title .script-accent {
   font-size: 1.2em;
-  color: var(--hot-pink);
+  color: #FFA6C9;
   transform: rotate(-3deg);
   margin: 0 4px;
 }
@@ -89,6 +89,7 @@
   border-radius: 50%;
 }
 
+.metric-text .metric-label,
 .metric-text h6 {
   font-family: var(--font-mono);
   font-size: 0.725rem;
@@ -139,8 +140,9 @@
 
 .cottage-badge-tag {
   display: inline-block;
-  background: #0284c7;
-  color: var(--white);
+  background: #0c4a6e;
+  color: #7dd3fc;
+  border: 1px solid #0284c7;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 800;

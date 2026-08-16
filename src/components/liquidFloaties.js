@@ -1,8 +1,7 @@
-/* ==========================================================================
-   BAIA CAFE — Liquid Glass Floaties Parallax Controller
-   ========================================================================== */
-
 export function initLiquidFloaties() {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) return;
+
   const floaties = document.querySelectorAll('.glass-floatie');
   if (!floaties.length) return;
 
@@ -16,5 +15,5 @@ export function initLiquidFloaties() {
       const rotate = (idx % 2 === 0 ? 1 : -1) * (mouseX * 0.15);
       floatie.style.transform = `translate(${mouseX * speed}px, ${mouseY * speed}px) rotate(${rotate}deg)`;
     });
-  });
+  }, { passive: true });
 }

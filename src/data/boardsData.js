@@ -1,9 +1,9 @@
 export const boardsData = [
   {
     id: "board-skimboard",
-    name: "BAIA Signature Shore Skimboard",
-    type: "Skimboard",
-    image: "./images/skimboard.jpg",
+    name: "BAIA Shore Skimboard",
+    type: "Recreational Gear",
+    image: "./images/skimboard.webp",
     length: "41\"",
     level: "All Levels / Shorebreak Gliding",
     isFree: true,
@@ -13,15 +13,15 @@ export const boardsData = [
     features: [
       "Custom BAIA electric-blue graphic",
       "High-traction deck grip pad",
-      "Free to use for all BAIA cafe guests"
+      "Complimentary for all cafe guests to enjoy on the shore"
     ],
     tag: "✨ Free for Guests"
   },
   {
     id: "gear-sea-mask",
     name: "HD Tempered Glass Snorkeling Mask",
-    type: "Snorkeling Gear",
-    image: "./images/SeaMask.jpg",
+    type: "Recreational Gear",
+    image: "./images/SeaMask.webp",
     length: "Universal Fit",
     level: "All Swimmers / Reef Snorkeling",
     isFree: false,
@@ -40,7 +40,7 @@ export const boardsData = [
     id: "board-surfboard-9",
     name: "Classic Shore Cruiser 9'0\"",
     type: "Surfboard",
-    image: "./images/Baia%20skimboard%20and%20coffee.jpg",
+    image: "./images/Baia%20skimboard%20and%20coffee.webp",
     length: "9'0\"",
     level: "Beginner to Intermediate",
     isFree: false,
@@ -59,9 +59,9 @@ export const boardsData = [
 export const cottageData = {
   title: "Barangay Laurente Floating Cottage",
   subtitle: "Official Booking Partner: BAIA Café (@thebaiacafe)",
-  hours: "7:00 AM – 6:00 PM",
-  image: "./images/Cottage%20rental.jpg",
-  cottagePhoto: "./images/Cottage.jpg",
+  hours: "11:00 AM – 6:00 PM (Cafe open until 10:00 PM)",
+  image: "./images/Cottage%20rental.webp",
+  cottagePhoto: "./images/Cottage.webp",
   rates: [
     {
       group: "Small Group",
@@ -78,8 +78,8 @@ export const cottageData = {
   ],
   features: [
     "Floating cottage over clear shallow turquoise waters",
-    "Direct reef adventure & snorkeling access",
-    "Life jacket provided for every guest",
+    "Direct reef exploration & snorkeling access",
+    "Life jackets provided for every guest",
     "Certified lifeguard on duty for your safety",
     "No corkage fee — bring your own food & favorite BAIA drinks"
   ],

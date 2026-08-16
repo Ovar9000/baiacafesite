@@ -2,10 +2,9 @@ class CartStore {
   constructor() {
     this.items = [];
     this.isDrawerOpen = false;
-    this.orderType = 'shore-delivery';
-    this.shoreSpot = 'Shore Towels / Umbrellas';
+    this.orderType = 'Dine-In at Cafe';
     this.customerName = '';
-    this.customerPhone = '';
+    this.customerNotes = '';
     this.listeners = new Set();
     this.toasts = [];
   }
@@ -44,7 +43,6 @@ class CartStore {
   addItem(item) {
     const key = this.getItemKey(item);
     const existingIndex = this.items.findIndex(i => i.key === key);
-
     const price = item.calculatedPrice || item.price || item.priceM || 0;
 
     if (existingIndex > -1) {
@@ -58,12 +56,11 @@ class CartStore {
       });
     }
 
-    this.showToast('Added to Shore Order', `${item.name} (${this.formatCurrency(price)})`, '☕');
-    this.notify();
+    this.showToast('Added to Order List', `${item.name} (${this.formatCurrency(price)})`, '☕');
+    this.openDrawer();
   }
 
   addDoubleTroubleBundle() {
-    // Card 3 bundle: Smash Burger (230) + Sea Salt Latte (180) + Chili BBQ Fries (155) = 565 with 85 discount -> 480
     const bundleKey = 'bundle-double-trouble';
     const existing = this.items.find(i => i.key === bundleKey);
     if (existing) {
@@ -72,7 +69,7 @@ class CartStore {
       this.items.push({
         id: 'bundle-double-trouble',
         key: bundleKey,
-        name: '⚡ Double Trouble Shore Combo',
+        name: '⚡ Double Trouble Combo Deal',
         description: 'BAIA Smash Burger + Sea Salt Latte (Iced) + Chili BBQ Fries',
         quantity: 1,
         unitPrice: 480,
@@ -81,8 +78,8 @@ class CartStore {
         isBundle: true
       });
     }
-    this.showToast('Beach Combo Added!', 'Double Trouble Bundle (₱480) added to cart', '🍔');
-    this.notify();
+    this.showToast('Combo Deal Added!', 'Double Trouble Bundle (₱480) added to your order list', '🍔');
+    this.openDrawer();
   }
 
   updateQuantity(key, delta) {
@@ -121,16 +118,38 @@ class CartStore {
       }
     });
 
-    const deliveryFee = this.orderType === 'shore-delivery' ? 0 : 0; // Free delivery to shore!
-    const grandTotal = subtotal + deliveryFee;
+    const grandTotal = subtotal;
 
     return {
       subtotal,
       savings,
-      deliveryFee,
       grandTotal,
       itemCount: this.getItemCount()
     };
+  }
+
+  generateOrderMessage() {
+    if (this.items.length === 0) return '';
+    const totals = this.getTotals();
+    const lines = [
+      'Hi BAIA Cafe! 👋 I’d like to place an order ahead via messenger:',
+      '',
+      ...this.items.map(i => {
+        const meta = [];
+        if (i.temp) meta.push(i.temp);
+        if (i.size) meta.push(`Size ${i.size}`);
+        const metaStr = meta.length > 0 ? ` (${meta.join(', ')})` : '';
+        return `• ${i.quantity}x ${i.name}${metaStr} — ${this.formatCurrency(i.unitPrice * i.quantity)}`;
+      }),
+      '',
+      totals.savings > 0 ? `Bundle Savings: -${this.formatCurrency(totals.savings)}` : null,
+      `Estimated Total: ${this.formatCurrency(totals.grandTotal)}`,
+      `Order Type: ${this.orderType}`,
+      '',
+      'Thank you!'
+    ].filter(Boolean);
+
+    return lines.join('\n');
   }
 
   formatCurrency(val) {
@@ -146,6 +165,27 @@ class CartStore {
     };
     this.toasts.push(toast);
     this.notify();
+
+    const toastContainer = document.getElementById('toast-container');
+    if (toastContainer) {
+      const toastEl = document.createElement('div');
+      toastEl.className = 'toast-item';
+      toastEl.setAttribute('role', 'alert');
+      toastEl.innerHTML = `
+        <div class="toast-icon" aria-hidden="true">${icon}</div>
+        <div class="toast-content">
+          <h4>${title}</h4>
+          <p>${message}</p>
+        </div>
+      `;
+      toastContainer.appendChild(toastEl);
+
+      setTimeout(() => {
+        toastEl.style.opacity = '0';
+        toastEl.style.transform = 'translateY(12px)';
+        setTimeout(() => toastEl.remove(), 400);
+      }, 3500);
+    }
 
     setTimeout(() => {
       this.toasts = this.toasts.filter(t => t.id !== toast.id);

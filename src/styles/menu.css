@@ -166,8 +166,23 @@
   color: var(--deep-navy);
 }
 
+.menu-no-results {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-muted);
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1.5px dashed rgba(22,37,92,0.15);
+}
+
+.menu-no-results h3 {
+  font-size: 1.25rem;
+  color: var(--deep-navy);
+  margin-bottom: 8px;
+}
+
 /* -------------------------------------------------------------
-   ACCORDION CATEGORY GROUPS (Default Collapsed for Compact Mobile)
+   ACCORDION CATEGORY GROUPS
    ------------------------------------------------------------- */
 .menu-accordion-wrapper {
   display: flex;
@@ -315,6 +330,12 @@
   box-shadow: 0 8px 20px rgba(22, 37, 92, 0.08);
 }
 
+.menu-card-main {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
 .card-header-row {
   display: flex;
   align-items: flex-start;
@@ -377,16 +398,24 @@
   font-size: 0.88rem;
   color: #475569;
   line-height: 1.45;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   flex-grow: 1;
+}
+
+.card-footer-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #e2e8f0;
 }
 
 .card-footer-tags {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding-top: 10px;
-  border-top: 1px dashed #e2e8f0;
+  gap: 6px;
+  flex-wrap: wrap;
   font-family: var(--font-mono);
   font-size: 0.725rem;
   color: #64748b;
@@ -403,6 +432,28 @@
   padding: 2px 8px;
   border-radius: 4px;
   color: #334155;
+}
+
+.btn-add-item {
+  background: var(--golden-amber);
+  color: var(--deep-navy);
+  border: none;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(245, 166, 35, 0.35);
+  transition: transform var(--duration-fast) var(--ease-spring), box-shadow var(--duration-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-add-item:hover {
+  transform: translateY(-1px) scale(1.04);
+  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.5);
 }
 
 /* Official Physical Menu Board Disclaimer */
@@ -446,6 +497,18 @@
   color: var(--white);
   position: relative;
   overflow: hidden;
+}
+
+.atmosphere-header-block {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 32px auto;
+}
+
+.atmosphere-subtitle {
+  color: var(--cream);
+  opacity: 0.9;
+  font-size: 1rem;
 }
 
 .atmosphere-grid {

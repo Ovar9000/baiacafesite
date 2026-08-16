@@ -1,11 +1,11 @@
 /* ==========================================================================
-   BAIA CAFE — Location, Sunset & Footer
+   BAIA CAFE — Location, Sunset Hub & Unified Footer
    ========================================================================== */
 
 .site-footer {
   background: var(--deep-navy);
   color: var(--white);
-  padding: 80px 0 40px 0;
+  padding: 72px 0 36px 0;
   border-top: 4px solid var(--golden-amber);
   position: relative;
   overflow: hidden;
@@ -13,23 +13,23 @@
 
 .footer-top-grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: var(--space-xl);
-  margin-bottom: 64px;
+  grid-template-columns: 1.15fr 1.05fr 0.9fr;
+  gap: 36px;
+  align-items: start;
+  margin-bottom: 52px;
 }
 
-/* Column 1: Brand & Bay Hours */
+/* Column 1: Brand & Operating Hours */
 .footer-col-brand {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  gap: 14px;
 }
 
 .footer-brand-lockup {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
 }
 
 .footer-logo-img {
@@ -37,8 +37,6 @@
   height: 44px !important;
   min-width: 44px !important;
   min-height: 44px !important;
-  max-width: 44px !important;
-  max-height: 44px !important;
   border-radius: 10px;
   object-fit: cover;
   flex-shrink: 0;
@@ -51,53 +49,87 @@
   font-weight: 900;
   font-size: 1.5rem;
   color: var(--white);
+  line-height: 1;
 }
 
-.footer-tagline {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+.footer-brand-desc {
+  font-size: 0.9rem;
+  line-height: 1.5;
   color: var(--cream);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 20px;
+  opacity: 0.92;
+  max-width: 380px;
+}
+
+.footer-location-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  color: var(--cream);
+  width: fit-content;
+}
+
+.footer-location-badge .loc-map-link {
+  color: var(--amber-contrast);
+  font-weight: 800;
+  text-decoration: none;
+  border-bottom: 1px solid var(--golden-amber);
+}
+
+.footer-location-badge .loc-map-link:hover {
+  color: var(--white);
 }
 
 .footer-hours-box {
-  background: rgba(255, 255, 255, 0.06);
-  border-left: 3px solid var(--golden-amber);
-  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3.5px solid var(--golden-amber);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 14px 18px;
+  margin-top: 4px;
 }
 
-.footer-hours-box h5 {
+.hours-title {
   font-family: var(--font-mono);
   font-size: 0.75rem;
+  font-weight: 800;
   text-transform: uppercase;
-  color: var(--golden-amber);
+  color: var(--amber-contrast);
+  letter-spacing: 0.08em;
   margin-bottom: 4px;
 }
 
-.footer-hours-box p {
-  font-size: 0.9rem;
+.hours-schedule {
+  font-size: 0.925rem;
+  font-weight: 700;
   color: var(--white);
-  font-weight: 600;
 }
 
-/* Column 2: Sunset Countdown & Bay Vibe */
+.footer-kitchen-note {
+  font-size: 0.775rem !important;
+  color: rgba(245, 233, 214, 0.8) !important;
+  margin-top: 4px;
+  line-height: 1.35;
+}
+
+/* Column 2: Sunset Hub & Live Shore Vibe Card */
 .footer-col-vibe {
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 
 .sunset-countdown-card {
-  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-lg);
-  padding: 20px;
+  background: linear-gradient(145deg, #182e75 0%, #0d1a42 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-xl);
+  padding: 22px 24px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .sunset-header {
@@ -110,25 +142,62 @@
   font-family: var(--font-mono);
   font-size: 0.75rem;
   text-transform: uppercase;
-  color: var(--golden-amber);
+  color: var(--amber-contrast);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.sunset-target {
+  font-size: 0.75rem;
+  color: var(--cream);
+  font-family: var(--font-mono);
   font-weight: 700;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.sunset-time-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }
 
 .sunset-time-display {
   font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 900;
   color: var(--white);
   letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.sunset-time-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--amber-contrast);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
 }
 
 .sunset-note {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--cream);
-  opacity: 0.85;
+  line-height: 1.45;
+  opacity: 0.9;
 }
 
-/* Column 3: Newsletter & Community */
+.sunset-spot-footer {
+  border-top: 1px dashed rgba(255, 255, 255, 0.15);
+  padding-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.775rem;
+  color: var(--cream);
+}
+
+/* Column 3: Community & Social Links */
 .footer-col-newsletter {
   display: flex;
   flex-direction: column;
@@ -137,35 +206,51 @@
 .footer-col-title {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   text-transform: uppercase;
   letter-spacing: -0.01em;
   color: var(--white);
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .footer-newsletter-p {
-  font-size: 0.88rem;
+  font-size: 0.875rem;
   color: var(--cream);
-  opacity: 0.85;
+  opacity: 0.88;
   margin-bottom: 16px;
   line-height: 1.4;
 }
 
+.footer-buttons-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-social-btn {
+  justify-content: center;
+  padding: 12px 18px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-align: center;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+}
+
 /* Footer Bottom Strip */
 .footer-bottom-row {
-  padding-top: 32px;
+  padding-top: 28px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 14px;
 }
 
 .footer-copy-text {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .footer-social-links {
@@ -191,6 +276,9 @@
 @media (max-width: 1024px) {
   .footer-top-grid {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 32px;
+  }
+  .sunset-countdown-card {
+    max-width: 480px;
   }
 }

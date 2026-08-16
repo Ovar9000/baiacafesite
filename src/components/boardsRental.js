@@ -32,7 +32,7 @@ export function initBoardsRental() {
           <div class="cottage-actions">
             <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow">
               <span>Book Cottage via Instagram</span>
-              <span>↗</span>
+              <span aria-hidden="true">↗</span>
             </a>
             <a href="tel:+639171234567" class="btn-secondary-pill">
               <span>Call BAIA Desk</span>
@@ -41,7 +41,14 @@ export function initBoardsRental() {
         </div>
 
         <div class="cottage-image-frame">
-          <img src="${cottageData.image}" alt="Barangay Laurente Floating Cottage with BAIA Cafe booking partner" />
+          <img 
+            src="${cottageData.image}" 
+            alt="Barangay Laurente Floating Cottage with BAIA Cafe booking partner" 
+            width="1200" 
+            height="630" 
+            loading="lazy" 
+            decoding="async" 
+          />
         </div>
       </div>
     `;
@@ -77,7 +84,6 @@ export function initBoardsRental() {
         </a>
       `;
     } else {
-      // Rental Gear (Snorkeling Mask)
       pricingBoxHtml = `
         <div class="gear-price-row">
           <div class="price-val">₱${item.ratePrice}</div>
@@ -95,11 +101,11 @@ export function initBoardsRental() {
       <div class="board-card" data-board-id="${item.id}">
         <div>
           <div class="board-photo-frame">
-            <img src="${item.image}" alt="${item.name}" loading="lazy" />
+            <img src="${item.image}" alt="${item.name}" width="900" height="1200" loading="lazy" decoding="async" />
           </div>
           <div class="board-top-row">
             <span class="board-type-tag">${item.type}</span>
-            <span class="board-badge" style="${item.isFree ? 'background: #10B981; color: #fff;' : (item.status === 'soon' ? 'background: var(--golden-amber); color: var(--deep-navy);' : 'background: var(--electric-blue); color: #fff;')}">${item.tag}</span>
+            <span class="board-badge" style="${item.isFree ? 'background: #064e3b; color: #6ee7b7; border: 1px solid #059669;' : (item.status === 'soon' ? 'background: #78350f; color: #fde68a; border: 1px solid #d97706;' : 'background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6;')}">${item.tag}</span>
           </div>
           <h4 class="board-name">${item.name}</h4>
           <p class="board-level">Specification: <strong>${item.level}</strong></p>

@@ -4,7 +4,7 @@ let canvas = null;
 let ctx = null;
 let animationFrameId = null;
 let isRainingActive = false;
-const maxDrops = 180;
+const maxDrops = 140;
 const drops = [];
 const splashes = [];
 
@@ -61,24 +61,23 @@ class Splash {
   draw() {
     if (!ctx) return;
     ctx.beginPath();
-    ctx.ellipse(this.x, this.y, this.radius * 1.8, this.radius * 0.6, 0, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(230, 245, 255, ${Math.max(0, this.opacity)})`;
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(220, 235, 255, ${Math.max(0, this.opacity)})`;
     ctx.lineWidth = 1;
     ctx.stroke();
   }
 }
 
 function loop() {
-  if (!isRainingActive || !canvas || !ctx) return;
+  if (!isRainingActive || !ctx || !canvas) return;
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Update & draw drops
   drops.forEach(d => {
     d.update();
     d.draw();
   });
 
-  // Update & draw splashes
   for (let i = splashes.length - 1; i >= 0; i--) {
     const s = splashes[i];
     s.update();
@@ -92,30 +91,40 @@ function loop() {
 }
 
 export function initWeatherEasterEgg() {
-  canvas = document.getElementById('weather-canvas');
-  if (!canvas) return;
-
-  ctx = canvas.getContext('2d');
-
-  function resizeCanvas() {
+  // Defer canvas sizing to after critical paint
+  const setupCanvas = () => {
+    canvas = document.getElementById('weather-canvas');
     if (!canvas) return;
+
+    ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-  }
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
 
-  // Populate drop pool
-  drops.length = 0;
-  for (let i = 0; i < maxDrops; i++) {
-    const d = new Drop();
-    d.y = Math.random() * (canvas.height || window.innerHeight);
-    drops.push(d);
+    window.addEventListener('resize', () => {
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }, { passive: true });
+
+    drops.length = 0;
+    for (let i = 0; i < maxDrops; i++) {
+      const d = new Drop();
+      d.y = Math.random() * canvas.height;
+      drops.push(d);
+    }
+  };
+
+  if (typeof requestIdleCallback !== 'undefined') {
+    requestIdleCallback(setupCanvas, { timeout: 2000 });
+  } else {
+    setTimeout(setupCanvas, 1000);
   }
 }
 
-// Strictly controlled by live Weather API for Laurente, San Pascual, Masbate
 export function setLiveRainState(isRaining, weatherDescription = '') {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) return;
+
   if (!canvas) canvas = document.getElementById('weather-canvas');
   if (!canvas) return;
 

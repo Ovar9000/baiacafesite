@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "lighthouse": "^12.8.2",
     "vite": "^5.4.2"
   },
   "dependencies": {

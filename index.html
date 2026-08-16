@@ -4,171 +4,372 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BAIA Cafe — Coffee + Food + Good Vibes | Beachfront Bay Showcase</title>
+  
+  <!-- Primary SEO Meta Tags -->
+  <title>BAIA Cafe — Beachfront Specialty Coffee, Smash Burgers & Shore Recreation in Masbate</title>
   <meta name="description"
-    content="Welcome to BAIA Cafe: artisanal Asin Tibuok lattes, smash burgers, and fresh board rentals by the bay. Experience our beachside cafe, floating cottage bookings, and coastal vibe." />
+    content="Experience BAIA Cafe on Laurente shoreline, Masbate: artisanal Asin Tibuok lattes, handcrafted double smash burgers, fresh fruit sodas, and beach recreation. Dine-in, beach takeout, or message ahead via Facebook Messenger & Instagram DM. Open daily 11:00 AM – 10:00 PM." />
+  <meta name="keywords"
+    content="BAIA Cafe, Masbate cafe, specialty coffee Masbate, Asin Tibuok latte, smash burger, Laurente beach, skimboarding, floating cottage Masbate, order on facebook messenger, instagram order" />
+  <meta name="author" content="BAIA Cafe" />
   <meta name="theme-color" content="#1F3AE0" />
+  <link rel="canonical" href="https://thebaiacafe.ph/" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
-  <!-- Google Fonts -->
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://thebaiacafe.ph/" />
+  <meta property="og:title" content="BAIA Cafe — Beachfront Specialty Coffee, Smash Burgers & Good Vibes" />
+  <meta property="og:description"
+    content="Artisanal Asin Tibuok lattes, handcrafted double smash burgers, fresh fruit sodas, and shore recreation right on Laurente beach, Masbate. Orders & pickups handled via Facebook Messenger & Instagram DM." />
+  <meta property="og:image" content="https://thebaiacafe.ph/images/Baia%20skimboard%20and%20coffee.webp" />
+  <meta property="og:image:width" content="1179" />
+  <meta property="og:image:height" content="1176" />
+  <meta property="og:image:alt" content="BAIA iced specialty coffee and custom skimboard on the shoreline sand" />
+  <meta property="og:site_name" content="BAIA Cafe" />
+  <meta property="og:locale" content="en_PH" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://thebaiacafe.ph/" />
+  <meta name="twitter:title" content="BAIA Cafe — Beachfront Specialty Coffee & Good Vibes" />
+  <meta name="twitter:description"
+    content="Artisanal Asin Tibuok lattes, handcrafted double smash burgers, and shore recreation on Laurente beach, Masbate. Message ahead on Facebook Messenger & Instagram DM." />
+  <meta name="twitter:image" content="https://thebaiacafe.ph/images/Baia%20skimboard%20and%20coffee.webp" />
+
+  <!-- Preload Critical Hero Asset & Google Fonts -->
+  <link rel="preload" as="image" href="./images/Baia%20skimboard%20and%20coffee.webp" type="image/webp" fetchpriority="high" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;500;600;700;800;900&family=Playpen+Sans:wght@700;800&family=Space+Grotesk:wght@500;700&display=swap"
-    rel="stylesheet" />
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;600;800;900&family=Space+Grotesk:wght@700;900&display=swap"
+    media="print"
+    onload="this.media='all'" />
+  <noscript>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;600;800;900&family=Space+Grotesk:wght@700;900&display=swap" />
+  </noscript>
 
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="./src/styles/main.css" />
-  <link rel="stylesheet" href="./src/styles/hero.css" />
-  <link rel="stylesheet" href="./src/styles/floaties.css" />
-  <link rel="stylesheet" href="./src/styles/weather.css" />
-  <link rel="stylesheet" href="./src/styles/divider.css" />
-  <link rel="stylesheet" href="./src/styles/story.css" />
-  <link rel="stylesheet" href="./src/styles/promo-grid.css" />
-  <link rel="stylesheet" href="./src/styles/menu.css" />
-  <link rel="stylesheet" href="./src/styles/boards.css" />
-  <link rel="stylesheet" href="./src/styles/footer.css" />
+  <!-- Critical Above-The-Fold CSS -->
+  <style id="critical-hero-css">
+    :root {
+      --electric-blue: #1F3AE0;
+      --electric-blue-dark: #162BB5;
+      --electric-blue-glow: rgba(31, 58, 224, 0.4);
+      --deep-navy: #16255C;
+      --deep-navy-dark: #0E1A45;
+      --cream: #F5E9D6;
+      --sand-light: #FAF4EB;
+      --hot-pink: #9F1239;
+      --hot-pink-bright: #E8237A;
+      --golden-amber: #F5A623;
+      --amber-contrast: #FFE699;
+      --white: #FFFFFF;
+      --text-dark: #16255C;
+      --text-muted: #5A6987;
+      --font-headline: 'Outfit', sans-serif;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --font-script: 'Caveat', cursive;
+      --font-fun: 'Playpen Sans', cursive;
+      --font-mono: 'Space Grotesk', monospace;
+      --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px;
+      --radius-sm: 8px; --radius-md: 14px; --radius-lg: 20px; --radius-xl: 32px; --radius-pill: 9999px;
+      --shadow-sm: 0 2px 8px rgba(22, 37, 92, 0.06);
+      --shadow-md: 0 8px 24px rgba(22, 37, 92, 0.1);
+      --shadow-lg: 0 16px 40px rgba(22, 37, 92, 0.16);
+      --shadow-xl: 0 24px 60px rgba(22, 37, 92, 0.22);
+      --max-width: 1440px;
+      --container-padding: 20px;
+      --header-height: 80px;
+      --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration-fast: 0.2s;
+      --duration-normal: 0.35s;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; -webkit-font-smoothing: antialiased; overflow-x: hidden; max-width: 100vw; }
+    body { font-family: var(--font-body); background-color: var(--electric-blue); color: var(--white); line-height: 1.5; overflow-x: hidden; max-width: 100vw; position: relative; }
+    .container { width: 100%; max-width: var(--max-width); margin-left: auto; margin-right: auto; padding-left: var(--container-padding); padding-right: var(--container-padding); }
+    img { max-width: 100%; height: auto; display: block; }
+    svg { display: block; max-width: 100%; }
+    .wordmark { font-family: var(--font-display); font-weight: 900; letter-spacing: -0.04em; text-transform: uppercase; }
+    .script-accent { font-family: var(--font-script); font-weight: 700; font-size: 1.35em; line-height: 0.9; display: inline-block; transform: rotate(-3deg); }
+    .script-accent.pink { color: #ff6b9d; }
+    .site-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height); z-index: 100; background: rgba(31, 58, 224, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
+    .nav-container { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .brand-logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--white); }
+    .brand-logo-img { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; border: 1.5px solid rgba(255,255,255,0.35); }
+    .brand-text-block { display: flex; flex-direction: column; }
+    .brand-title { font-size: 1.4rem; line-height: 1; color: var(--white); }
+    .brand-subtitle { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; color: var(--amber-contrast); text-transform: uppercase; }
+    .main-nav-links { display: flex; align-items: center; gap: 18px; list-style: none; }
+    .nav-link { color: var(--cream); text-decoration: none; font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; text-transform: uppercase; padding: 6px 10px; border-radius: var(--radius-sm); }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .audio-toggle-btn { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); color: var(--white); padding: 0 14px; height: 38px; border-radius: var(--radius-pill); font-family: var(--font-display); font-weight: 800; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .nav-phone-link { display: inline-flex; align-items: center; gap: 6px; color: var(--cream); text-decoration: none; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; padding: 0 12px; height: 38px; border-radius: var(--radius-pill); border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.15); }
+    .nav-cart-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--golden-amber); color: var(--deep-navy); border: none; font-family: var(--font-display); font-weight: 900; font-size: 0.85rem; text-transform: uppercase; padding: 0 16px; height: 38px; border-radius: var(--radius-pill); cursor: pointer; }
+    .cart-count-badge { background: var(--hot-pink); color: var(--white); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 900; width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+    .hero-section { min-height: 100vh; padding-top: calc(var(--header-height) + 32px); padding-bottom: 64px; display: flex; align-items: center; position: relative; background: radial-gradient(circle at 80% 20%, #2f4eed 0%, var(--electric-blue) 70%); }
+    .hero-grid { display: grid; grid-template-columns: 1.15fr 0.95fr; align-items: center; gap: var(--space-xl); position: relative; z-index: 2; width: 100%; }
+    .hero-content { display: flex; flex-direction: column; align-items: flex-start; max-width: 640px; width: 100%; }
+    .hero-headline { font-family: var(--font-headline); font-weight: 900; font-size: clamp(2.4rem, 5.5vw, 4.4rem); line-height: 0.98; letter-spacing: -0.04em; text-transform: uppercase; color: var(--white); margin-bottom: var(--space-md); }
+    .hero-headline .headline-row { display: block; }
+    .hero-subtitle { font-size: 1.1rem; line-height: 1.6; color: var(--cream); margin-bottom: var(--space-lg); max-width: 520px; }
+    .hero-cta-group { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-xl); flex-wrap: wrap; }
+    .btn-primary-glow { display: inline-flex; align-items: center; gap: 10px; background: var(--golden-amber); color: var(--deep-navy); font-family: var(--font-display); font-weight: 900; font-size: 1.05rem; text-transform: uppercase; text-decoration: none; padding: 16px 32px; border-radius: var(--radius-pill); box-shadow: 0 8px 24px rgba(245, 166, 35, 0.45); border: none; cursor: pointer; }
+    .btn-secondary-pill { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: var(--white); font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; text-transform: uppercase; text-decoration: none; padding: 16px 28px; border-radius: var(--radius-pill); border: 2px solid rgba(255, 255, 255, 0.35); cursor: pointer; }
+    .hero-trust-pill-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .trust-pill-highlight { background: rgba(245, 166, 35, 0.2); border: 1px solid var(--golden-amber); color: var(--amber-contrast); font-family: var(--font-mono); font-size: 0.8rem; font-weight: 800; padding: 4px 12px; border-radius: var(--radius-pill); }
+    .trust-pill-sub { background: rgba(255, 255, 255, 0.12); color: var(--cream); font-family: var(--font-mono); font-size: 0.775rem; font-weight: 700; padding: 4px 12px; border-radius: var(--radius-pill); }
+    .hero-recreation-sublink { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.875rem; color: var(--cream); margin-top: 14px; }
+    .recreation-anchor { display: inline-flex; align-items: center; min-height: 32px; padding: 4px 12px; background: rgba(245, 166, 35, 0.15); color: var(--amber-contrast); font-weight: 800; text-decoration: none; border: 1px solid var(--golden-amber); border-radius: var(--radius-pill); }
+    .hero-mascot-wrapper { display: flex; align-items: center; gap: 16px; background: rgba(22, 37, 92, 0.4); backdrop-filter: blur(8px); padding: 12px 20px; border-radius: var(--radius-lg); border: 1px solid rgba(255, 255, 255, 0.15); max-width: 400px; width: 100%; }
+    .mascot-illustration { width: 48px; height: 48px; background: var(--cream); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 2px solid var(--deep-navy); }
+    .hero-shore-strip { margin-top: var(--space-lg); display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 24px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(14px); border: 1.5px solid rgba(255, 255, 255, 0.25); border-radius: var(--radius-lg); padding: 14px 22px; width: 100%; max-width: 520px; }
+    .shore-strip-item { display: flex; align-items: center; gap: 8px; }
+    .strip-label { font-family: var(--font-mono); font-size: 0.725rem; font-weight: 800; text-transform: uppercase; color: var(--golden-amber); }
+    .strip-value { font-family: var(--font-body); font-weight: 800; font-size: 0.85rem; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hero-visual-container { display: flex; justify-content: center; align-items: center; perspective: 1200px; position: relative; width: 100%; min-height: 480px; }
+    .hero-3d-card { position: relative; width: 100%; max-width: 440px; height: 480px; min-height: 480px; transform-style: preserve-3d; }
+    .hero-image-frame { width: 100%; height: 100%; border-radius: var(--radius-xl); overflow: hidden; position: relative; border: 4px solid var(--white); background: #0f172a; }
+    .hero-image-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center 65%; display: block; }
+    .floating-order-badge { position: absolute; top: -24px; right: -24px; width: 120px; height: 120px; background: var(--golden-amber); color: var(--deep-navy); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid var(--white); z-index: 10; cursor: pointer; }
+    .floating-flavor-pill { position: absolute; bottom: 24px; left: -20px; background: rgba(22, 37, 92, 0.85); backdrop-filter: blur(10px); color: var(--white); padding: 10px 18px; border-radius: var(--radius-pill); border: 2px solid rgba(255, 255, 255, 0.25); display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+    .flavor-tag { background: var(--hot-pink); color: var(--white); font-family: var(--font-mono); font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: var(--radius-pill); }
+  </style>
+
+  <!-- Master Stylesheet and Main Entry Module -->
+  <link rel="stylesheet" href="/src/styles/main.css" />
+  <script type="module" src="/src/main.js"></script>
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": ["CafeOrCoffeeShop", "Restaurant", "LocalBusiness"],
+    "name": "BAIA Cafe",
+    "alternateName": "The BAIA Cafe Masbate",
+    "image": "https://thebaiacafe.ph/images/Baia%20skimboard%20and%20coffee.webp",
+    "logo": "https://thebaiacafe.ph/images/Logo.webp",
+    "url": "https://thebaiacafe.ph/",
+    "telephone": "+639171234567",
+    "priceRange": "₱105 - ₱480",
+    "servesCuisine": [
+      "Specialty Coffee",
+      "Artisanal Burgers",
+      "Filipino Beach Food",
+      "Beverages",
+      "Waffles & Desserts"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Barangay Laurente",
+      "addressLocality": "Masbate City",
+      "addressRegion": "Masbate",
+      "postalCode": "5400",
+      "addressCountry": "PH"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 12.371,
+      "longitude": 123.630
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "opens": "11:00",
+        "closes": "22:00"
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "128",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "hasMenu": {
+      "@type": "Menu",
+      "name": "BAIA Cafe Shore Menu",
+      "hasMenuSection": [
+        {
+          "@type": "MenuSection",
+          "name": "House Specialty Coffee",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Asin Tibuok Latte",
+              "description": "Artisanal Bohol sea salt, caramel notes, creamy espresso",
+              "offers": {
+                "@type": "Offer",
+                "price": "180",
+                "priceCurrency": "PHP"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Sea Salt Latte",
+              "description": "Smooth iced latte crowned with savory sea salt foam",
+              "offers": {
+                "@type": "Offer",
+                "price": "180",
+                "priceCurrency": "PHP"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Gourmet Burgers",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "BAIA Smash Burger",
+              "description": "Crispy double smash patty, secret BAIA sauce, pickles and seasoned fries",
+              "offers": {
+                "@type": "Offer",
+                "price": "230",
+                "priceCurrency": "PHP"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Beachside Combos",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Double Trouble Shore Combo",
+              "description": "BAIA Smash Burger + Sea Salt Latte (Iced) + Chili BBQ Fries",
+              "offers": {
+                "@type": "Offer",
+                "price": "480",
+                "priceCurrency": "PHP"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+  </script>
 </head>
 
 <body>
+  <!-- Skip to Main Content Link for Keyboard / Screen Readers -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
   <!-- Grain Noise Overlay -->
-  <div class="grain-overlay"></div>
+  <div class="grain-overlay" aria-hidden="true"></div>
 
   <!-- Dynamic Weather Simulation Canvas (Easter Egg) -->
-  <canvas id="weather-canvas"></canvas>
+  <canvas id="weather-canvas" aria-hidden="true"></canvas>
 
-  <!-- Toast Container -->
-  <div class="toast-container" id="toast-container"></div>
+  <!-- Live Toast Notification Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
-  <!-- Site Navigation Header (Non-Overflowing Aligned) -->
-  <header class="site-header" id="site-header">
+  <!-- Site Navigation Header -->
+  <header class="site-header" id="site-header" role="banner">
     <div class="container nav-container">
-      <!-- Left: Logo Lockup -->
-      <a href="#hero" class="brand-logo-link" aria-label="BAIA Cafe Home">
-        <img src="./images/Logo.jpg" alt="BAIA Cafe Logo" class="brand-logo-img" />
+      <!-- Left: Brand Logo Lockup -->
+      <a href="#hero" class="brand-logo-link">
+        <img src="./images/Logo.webp" alt="BAIA Cafe Circular Brand Logo" width="42" height="42" class="brand-logo-img" />
         <div class="brand-text-block">
           <span class="brand-title wordmark">BAIA</span>
-          <span class="brand-subtitle">COFFEE • FOOD • BOARDS</span>
+          <span class="brand-subtitle">COFFEE • FOOD • SHORE</span>
         </div>
       </a>
 
       <!-- Center Nav Links -->
-      <ul class="main-nav-links">
-        <li><a href="#about" class="nav-link">About</a></li>
-        <li><a href="#promos" class="nav-link">Favorites</a></li>
-        <li><a href="#menu" class="nav-link">Menu</a></li>
-        <li><a href="#boards" class="nav-link">Rentals</a></li>
-        <li><a href="#atmosphere" class="nav-link">Atmosphere</a></li>
-        <li><a href="#location" class="nav-link">Location</a></li>
-      </ul>
+      <nav class="main-nav-wrapper" aria-label="Primary Navigation">
+        <ul class="main-nav-links">
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#promos" class="nav-link">Favorites</a></li>
+          <li><a href="#menu" class="nav-link">Menu</a></li>
+          <li><a href="#reviews" class="nav-link">Reviews</a></li>
+          <li><a href="#boards" class="nav-link">Recreation</a></li>
+          <li><a href="#atmosphere" class="nav-link">Atmosphere</a></li>
+          <li><a href="#location" class="nav-link">Location</a></li>
+        </ul>
+      </nav>
 
       <!-- Right Nav Controls -->
       <div class="nav-actions">
-        <button class="audio-toggle-btn" id="audio-toggle-btn" title="Toggle ocean waves sound">
-          <span>🔈 Bay Sound</span>
+        <button class="audio-toggle-btn" id="audio-toggle-btn" title="Toggle Bay Sound ocean waves">
+          <span aria-hidden="true">🔈</span>
+          <span class="audio-btn-label">Bay Sound</span>
         </button>
 
-        <a href="tel:+639171234567" class="nav-phone-link">
-          <span>📞 +63 917 123 4567</span>
+        <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="nav-phone-link" aria-label="Message BAIA Cafe on Facebook Messenger">
+          <span aria-hidden="true">💬</span>
+          <span class="nav-phone-text">Messenger</span>
         </a>
 
-        <a href="#location" class="visit-baia-pill">
-          <span>Visit Us</span>
-          <span>📍</span>
-        </a>
+        <!-- Header Cart Trigger Button -->
+        <button class="nav-cart-btn" data-open-cart aria-label="View current order list">
+          <span aria-hidden="true">🛍️</span>
+          <span class="nav-cart-text">Order List</span>
+          <span class="cart-count-badge">0</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <main>
-    <!-- 1. HERO SECTION (14 Liquid Frosted Glass Floaties) -->
-    <section class="hero-section" id="hero">
+  <!-- MAIN CONTENT CONTAINER -->
+  <main id="main-content">
+
+    <!-- 1. HERO SECTION (Above the fold conversion engine) -->
+    <section class="hero-section" id="hero" aria-label="Welcome to BAIA Cafe">
       <div class="section-floaties-layer" aria-hidden="true">
-        <!-- 1. Flower Floatie -->
         <div class="glass-floatie frost-white anim-1 size-lg" style="top: 14%; left: 5%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" /></svg>
         </div>
-        <!-- 2. Wave Floatie -->
         <div class="glass-floatie frost-white anim-2 size-md shape-wave" style="top: 28%; left: 18%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" /></svg>
         </div>
-        <!-- 3. Palm Floatie -->
         <div class="glass-floatie frost-white anim-3 size-lg" style="top: 72%; left: 4%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" /></svg>
         </div>
-        <!-- 4. Sparkle Pill -->
         <div class="glass-floatie frost-white anim-1 size-pill" style="top: 84%; left: 22%;">
-          <span>✦ Est. Shore</span>
+          <span>✦ Est. Laurente</span>
         </div>
-        <!-- 5. Coffee Mug -->
         <div class="glass-floatie frost-white anim-2 size-md" style="top: 10%; left: 46%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M18 5H4a1 1 0 0 0-1 1v8a6 6 0 0 0 6 6h4a6 6 0 0 0 6-6V6a1 1 0 0 0-1-1zm3 2h-1v5h1a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M18 5H4a1 1 0 0 0-1 1v8a6 6 0 0 0 6 6h4a6 6 0 0 0 6-6V6a1 1 0 0 0-1-1zm3 2h-1v5h1a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" /></svg>
         </div>
-        <!-- 6. Flower Floatie (Large) -->
         <div class="glass-floatie frost-white anim-4 size-xl shape-flower" style="top: 16%; right: 10%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" /></svg>
         </div>
-        <!-- 7. Palm Floatie Far Right -->
         <div class="glass-floatie frost-white anim-1 size-md" style="top: 45%; right: 4%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" /></svg>
         </div>
-        <!-- 8. Wave Floatie Mid Right -->
         <div class="glass-floatie frost-white anim-2 size-lg shape-wave" style="top: 66%; right: 18%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
-        </div>
-        <!-- 9. Teardrop Droplet -->
-        <div class="glass-floatie frost-white anim-3 size-sm shape-teardrop" style="bottom: 10%; right: 32%;"></div>
-        <!-- 10. Mini Flower Floatie -->
-        <div class="glass-floatie frost-white anim-1 size-sm" style="top: 48%; left: 34%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
-        </div>
-        <!-- 11. Palm Floatie Low Mid -->
-        <div class="glass-floatie frost-white anim-4 size-md" style="bottom: 14%; left: 46%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
-        </div>
-        <!-- 12. Coffee Cup Top Right -->
-        <div class="glass-floatie frost-white anim-2 size-sm" style="top: 8%; right: 30%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M18 5H4a1 1 0 0 0-1 1v8a6 6 0 0 0 6 6h4a6 6 0 0 0 6-6V6a1 1 0 0 0-1-1zm3 2h-1v5h1a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
-          </svg>
-        </div>
-        <!-- 13. Sparkle Pill Right -->
-        <div class="glass-floatie frost-white anim-1 size-pill" style="top: 80%; right: 6%;">
-          <span>🌴 BAIA</span>
-        </div>
-        <!-- 14. Wave Floatie Left -->
-        <div class="glass-floatie frost-white anim-3 size-sm shape-wave" style="top: 40%; left: 8%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" /></svg>
         </div>
       </div>
 
       <div class="container hero-grid">
         <!-- Hero Left Column -->
         <div class="hero-content">
+          <!-- Trust Badge Above Headline -->
+          <div class="hero-trust-pill-group">
+            <span class="trust-pill-highlight">⭐ 4.9/5 Rating (128+ Reviews)</span>
+            <span class="trust-pill-sub">Open Daily 11:00 AM – 10:00 PM</span>
+          </div>
+
+          <!-- Single H1 Title for Entire Page -->
           <h1 class="hero-headline">
             <span class="headline-row">COFFEE, FOOD & GOOD VIBES</span>
             <span class="headline-row">
@@ -177,29 +378,35 @@
           </h1>
 
           <p class="hero-subtitle">
-            Artisanal Asin Tibuok lattes, handcrafted double smash burgers, and custom skimboards right on the
-            shoreline. Your home base for sun, swell, and good taste.
+            Artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers, and shore recreation right on the
+            beach sand in Barangay Laurente. Dine-in, beach takeout, or message ahead via Facebook Messenger & Instagram DM.
           </p>
 
+          <!-- Primary Above-The-Fold CTAs -->
           <div class="hero-cta-group">
-            <a href="#menu" class="btn-primary-glow">
-              <span>View Menu & Flavors</span>
-              <span>→</span>
-            </a>
-            <a href="#boards" class="btn-secondary-pill">
-              <span>Explore Rentals</span>
+            <button class="btn-primary-glow" data-open-cart>
+              <span>💬 Message to Order Ahead</span>
+              <span aria-hidden="true">→</span>
+            </button>
+            <a href="#menu" class="btn-secondary-pill">
+              <span>Explore Menu</span>
             </a>
           </div>
 
-          <!-- Illustrated Surfer Mascot -->
-          <div class="hero-mascot-wrapper" id="hero-mascot">
+          <!-- Recreation & Skimboard Sub-Action Link -->
+          <div class="hero-recreation-sublink">
+            <span>🏄 Complimentary Skimboards for Cafe Guests & Floating Cottage:</span>
+            <a href="#boards" class="recreation-anchor">View Shore Recreation →</a>
+          </div>
+
+          <!-- Illustrated Surfer Mascot Quick Interaction -->
+          <div class="hero-mascot-wrapper" id="hero-mascot" role="button" tabindex="0">
             <div class="mascot-illustration">
-              <svg viewBox="0 0 64 64" width="46" height="46">
+              <svg viewBox="0 0 64 64" width="46" height="46" aria-hidden="true">
                 <path d="M6 46 Q32 54 58 46 Q32 38 6 46 Z" fill="#F5A623" stroke="#16255C" stroke-width="2" />
                 <circle cx="34" cy="18" r="7" fill="#F5E9D6" stroke="#16255C" stroke-width="2" />
                 <path d="M28 15 Q34 11 40 15 L43 14" stroke="#16255C" stroke-width="2" fill="none" />
-                <path d="M34 25 L32 38 L24 45 M32 38 L40 45" stroke="#16255C" stroke-width="2.5" stroke-linecap="round"
-                  fill="none" />
+                <path d="M34 25 L32 38 L24 45 M32 38 L40 45" stroke="#16255C" stroke-width="2.5" stroke-linecap="round" fill="none" />
                 <path d="M33 28 L44 26 L48 20" stroke="#16255C" stroke-width="2" stroke-linecap="round" fill="none" />
                 <rect x="42" y="18" width="16" height="3" rx="1.5" fill="#FFFFFF" stroke="#16255C" stroke-width="1.5" />
                 <rect x="45" y="11" width="4" height="7" rx="1" fill="#E8237A" />
@@ -207,51 +414,56 @@
               </svg>
             </div>
             <div class="mascot-text">
-              <h4>🏄‍♂️ Coffee by the Bay</h4>
-              <p>Fresh brews & board rentals daily</p>
+              <p class="mascot-title"><strong>🏄‍♂️ Coffee by the Bay</strong></p>
+              <p>Fresh brews & free guest skimboards daily</p>
             </div>
           </div>
 
-          <!-- Integrated Live Shore Telemetry 2x2 Grid (Synced to Masbate API) -->
-          <div class="hero-shore-strip" id="hero-shore-strip">
+          <!-- Trust Signals Strip: Real Hours, Location & Messaging Orders -->
+          <div class="hero-shore-strip" id="hero-shore-strip" aria-label="Cafe Key Details and Shore Telemetry">
             <div class="shore-strip-item">
               <span class="strip-label">📍 Spot</span>
               <span class="strip-value">Laurente, Masbate</span>
             </div>
             <div class="shore-strip-item">
-              <span class="strip-label">🌡️ Bay</span>
+              <span class="strip-label">⏰ Hours</span>
+              <span class="strip-value">11 AM – 10 PM (Kitchen 9 PM)</span>
+            </div>
+            <div class="shore-strip-item">
+              <span class="strip-label">💬 Orders</span>
+              <span class="strip-value">FB & IG Message</span>
+            </div>
+            <div class="shore-strip-item">
+              <span class="strip-label">🌊 Bay</span>
               <span class="strip-value" id="shore-live-weather">☀️ Sunny Bay 29°C</span>
-            </div>
-            <div class="shore-strip-item">
-              <span class="strip-label">🌊 Swell</span>
-              <span class="strip-value" id="shore-live-swell">1.0m Clean</span>
-            </div>
-            <div class="shore-strip-item">
-              <span class="strip-label">💨 Wind</span>
-              <span class="strip-value" id="shore-live-wind">Offshore 8kts</span>
             </div>
           </div>
         </div>
 
-        <!-- Hero Right Column: 3D Visual Centerpiece (Real Shop Photography) -->
+        <!-- Hero Right Column: 3D Visual Centerpiece -->
         <div class="hero-visual-container">
           <div class="hero-3d-card" id="hero-3d-card">
             <div class="hero-image-frame">
-              <img src="./images/Baia%20skimboard%20and%20coffee.jpg"
-                alt="BAIA Hazelnut Iced Coffee and custom branded skimboard on the beach sand" />
+              <img 
+                src="./images/Baia%20skimboard%20and%20coffee.webp"
+                alt="BAIA Hazelnut Iced Coffee and custom branded skimboard on the beach sand at Laurente shore"
+                width="440"
+                height="480"
+                fetchpriority="high"
+              />
             </div>
 
-            <!-- Floating 3D Showcase Badge -->
-            <a href="#menu" class="floating-order-badge" id="floating-quick-order" title="Explore Menu">
-              <span class="badge-text-top">Explore</span>
-              <span class="badge-text-main">BAIA Menu</span>
-              <span class="badge-icon">☕</span>
-            </a>
+            <!-- Floating 3D Quick Order Badge -->
+            <button class="floating-order-badge" data-open-cart title="Order Ahead via FB / IG Message">
+              <span class="badge-text-top">💬 Order Ahead</span>
+              <span class="badge-text-main" style="font-size: 0.75rem; line-height: 1.1;">FB & IG Message</span>
+              <span class="badge-icon" aria-hidden="true">☕</span>
+            </button>
 
             <!-- Floating Flavor Tag -->
             <div class="floating-flavor-pill">
-              <span class="flavor-tag">Specialty</span>
-              <span>Iced Hazelnut & Skimboard</span>
+              <span class="flavor-tag">House Special</span>
+              <span>Sea Salt Latte & Skimboard</span>
             </div>
           </div>
         </div>
@@ -266,63 +478,20 @@
       </div>
     </div>
 
-    <!-- 3. STORY & "TEAM BAIA" POLAROID SECTION (10 Light Blue Frosted Floaties) -->
-    <section class="story-section" id="about">
+    <!-- 3. STORY & "TEAM BAIA" POLAROID SECTION -->
+    <section class="story-section" id="about" aria-label="About BAIA Cafe">
       <div class="section-floaties-layer" aria-hidden="true">
-        <!-- 1. Flower Floatie -->
         <div class="glass-floatie frost-blue anim-1 size-lg" style="top: 8%; left: 6%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" /></svg>
         </div>
-        <!-- 2. Wave Floatie -->
         <div class="glass-floatie frost-blue anim-2 size-md shape-wave" style="top: 28%; left: 32%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" /></svg>
         </div>
-        <!-- 3. Palm Floatie -->
         <div class="glass-floatie frost-blue anim-3 size-xl" style="top: 12%; right: 10%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" /></svg>
         </div>
-        <!-- 4. Coffee Cup Floatie -->
-        <div class="glass-floatie frost-blue anim-4 size-sm" style="top: 52%; left: 4%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M18 5H4a1 1 0 0 0-1 1v8a6 6 0 0 0 6 6h4a6 6 0 0 0 6-6V6a1 1 0 0 0-1-1zm3 2h-1v5h1a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
-          </svg>
-        </div>
-        <!-- 5. Glass Pill -->
         <div class="glass-floatie frost-blue anim-1 size-pill" style="bottom: 14%; left: 24%;">
           <span>🌊 Laurente Shore</span>
-        </div>
-        <!-- 6. Teardrop Floatie -->
-        <div class="glass-floatie frost-blue anim-2 size-md shape-teardrop" style="top: 48%; right: 6%;"></div>
-        <!-- 7. Wave Floatie Right -->
-        <div class="glass-floatie frost-blue anim-3 size-lg shape-wave" style="bottom: 12%; right: 28%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
-        </div>
-        <!-- 8. Palm Floatie Bottom Left -->
-        <div class="glass-floatie frost-blue anim-4 size-md" style="bottom: 8%; left: 6%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
-        </div>
-        <!-- 9. Flower Floatie Mid -->
-        <div class="glass-floatie frost-blue anim-1 size-sm shape-flower" style="top: 75%; left: 45%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
-        </div>
-        <!-- 10. Glass Pill Right -->
-        <div class="glass-floatie frost-blue anim-2 size-pill" style="bottom: 8%; right: 8%;">
-          <span>✦ 100% Arabica</span>
         </div>
       </div>
 
@@ -331,12 +500,12 @@
         <div class="story-text-block">
           <span class="story-badge">Coffee by the Bay</span>
           <h2 class="story-headline">
-            Crafted for <span class="script-accent">Vitamin Sea Deficient</span> & Sunset and Chill Sessions
+            Crafted for <span class="script-accent">Vitamin Sea Deficient</span> & Sunset Chill Sessions
           </h2>
           <p class="story-body">
-            BAIA was born from a simple shore philosophy: great coffee, nourishing meals, and the freedom of the open
-            ocean belong together. Located right on the beach, we serve everything from artisanal Bohol Asin Tibuok
-            lattes to juicy smash burgers and skimboard rentals.
+            BAIA was born from a simple shore philosophy: great coffee, satisfying fresh meals, and the relaxation of the open
+            ocean belong together. Located right on the beach in Barangay Laurente, we serve everything from artisanal Bohol Asin Tibuok
+            lattes to juicy double smash burgers and refreshing fruit sodas.
           </p>
 
           <div class="story-stats-grid">
@@ -346,17 +515,17 @@
             </div>
             <div class="stat-item">
               <span class="stat-num">Daily</span>
-              <span class="stat-label">Fresh Food & Skimboards</span>
+              <span class="stat-label">Fresh Burgers & Free Skimboards</span>
             </div>
             <div class="stat-item">
-              <span class="stat-num">7am–9pm</span>
+              <span class="stat-num">11am–10pm</span>
               <span class="stat-label">Beachfront Service</span>
             </div>
           </div>
 
           <a href="#atmosphere" class="btn-story-pill">
             <span>Explore Beach Vibe</span>
-            <span>→</span>
+            <span aria-hidden="true">→</span>
           </a>
         </div>
 
@@ -364,21 +533,21 @@
         <div class="polaroid-gallery-wrapper">
           <div class="polaroid-card polaroid-1">
             <div class="polaroid-img-box">
-              <img src="./images/crew.jpg" alt="Team BAIA cafe crew wearing brand aprons" />
+              <img src="./images/crew.webp" alt="Team BAIA cafe crew wearing brand aprons by the beach" width="720" height="960" loading="lazy" decoding="async" />
             </div>
             <p class="polaroid-caption">Team baia crew ☕</p>
           </div>
 
           <div class="polaroid-card polaroid-2">
             <div class="polaroid-img-box">
-              <img src="./images/beachandchill.jpg" alt="BAIA beachfront lounge chairs on sand" />
+              <img src="./images/beachandchill.webp" alt="BAIA beachfront lounge chairs and umbrellas on white sand" width="1200" height="800" loading="lazy" decoding="async" />
             </div>
             <p class="polaroid-caption">Shoreline chill spot 🌴</p>
           </div>
 
           <div class="polaroid-card polaroid-3">
             <div class="polaroid-img-box">
-              <img src="./images/twilight.jpg" alt="Twilight lanterns on the beach by the waves" />
+              <img src="./images/twilight.webp" alt="Twilight fairy lanterns on the beach by the calming waves" width="800" height="1200" loading="lazy" decoding="async" />
             </div>
             <p class="polaroid-caption">Evening glow ✨</p>
           </div>
@@ -390,94 +559,45 @@
       </div>
     </section>
 
-    <!-- 4. PROMO / SIGNATURE SHOWCASE TILES (10 White Frosted Floaties) -->
-    <section class="promo-grid-section" id="promos">
-      <div class="section-floaties-layer" aria-hidden="true">
-        <!-- 1. Flower Floatie -->
-        <div class="glass-floatie frost-white anim-1 size-lg" style="top: 10%; left: 4%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
-        </div>
-        <!-- 2. Wave Floatie -->
-        <div class="glass-floatie frost-white anim-2 size-md shape-wave" style="top: 24%; left: 28%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
-        </div>
-        <!-- 3. Palm Floatie -->
-        <div class="glass-floatie frost-white anim-3 size-xl" style="top: 14%; right: 6%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
-        </div>
-        <!-- 4. Coffee Cup Floatie -->
-        <div class="glass-floatie frost-white anim-4 size-sm" style="top: 55%; left: 6%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M18 5H4a1 1 0 0 0-1 1v8a6 6 0 0 0 6 6h4a6 6 0 0 0 6-6V6a1 1 0 0 0-1-1zm3 2h-1v5h1a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
-          </svg>
-        </div>
-        <!-- 5. Glass Pill Center -->
-        <div class="glass-floatie frost-white anim-1 size-pill" style="bottom: 14%; left: 40%;">
-          <span>🔥 Smash Burger</span>
-        </div>
-        <!-- 6. Teardrop Floatie -->
-        <div class="glass-floatie frost-white anim-2 size-md shape-teardrop" style="top: 50%; right: 8%;"></div>
-        <!-- 7. Wave Floatie Right -->
-        <div class="glass-floatie frost-white anim-3 size-lg shape-wave" style="bottom: 10%; right: 24%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
-        </div>
-        <!-- 8. Palm Floatie Bottom Left -->
-        <div class="glass-floatie frost-white anim-4 size-md" style="bottom: 8%; left: 10%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
-        </div>
-        <!-- 9. Flower Floatie Mid -->
-        <div class="glass-floatie frost-white anim-1 size-sm shape-flower" style="top: 78%; left: 62%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
-        </div>
-        <!-- 10. Glass Pill Right -->
-        <div class="glass-floatie frost-white anim-2 size-pill" style="bottom: 8%; right: 4%;">
-          <span>✦ Fruit Soda</span>
-        </div>
-      </div>
-
+    <!-- 4. PROMO / SIGNATURE SHOWCASE TILES -->
+    <section class="promo-grid-section" id="promos" aria-label="House Signatures and Specials">
       <div class="container">
         <div class="promo-header-block">
           <span class="promo-section-tag">✦ Daily Specials & Shore Favorites ✦</span>
-          <h2 class="promo-section-title">House Signatures</h2>
+          <h2 class="promo-section-title">House Signatures & Deals</h2>
         </div>
 
         <div class="promo-grid">
-          <!-- CARD 1: Ready-to-Sip (Real Refreshers Photo) -->
-          <div class="poster-card card-ready-sip">
+          <!-- CARD 1: Ready-to-Sip (Fruit Sodas & Frappes) -->
+          <article class="poster-card card-ready-sip">
             <div class="card-top-content">
               <span class="card-script-title">Ready-to-Sip</span>
               <h3 class="card-main-title">FRUIT SODAS & FRAPPES</h3>
               <p class="card-body-text">
-                Sunset Fizz (Peach), Crimson Pop, Island Fizz, and whipped frappes crafted for tropical days.
+                Sunset Fizz (Peach), Crimson Pop (Strawberry), Island Fizz, and whipped frappes crafted for tropical days.
               </p>
             </div>
             <div class="card-image-box">
-              <img src="./images/Tripleorder.jpg" alt="Trio of BAIA iced sodas and blueberry frappes on cafe table" />
+              <img 
+                src="./images/Tripleorder.webp" 
+                alt="Trio of BAIA iced fruit sodas and blueberry frappes on cafe table" 
+                width="1200" 
+                height="682" 
+                loading="lazy" 
+                decoding="async" 
+              />
             </div>
             <div class="card-action-bar">
-              <span style="font-weight: 800; font-size: 0.95rem; color: var(--golden-amber);">From ₱135</span>
-              <a href="#menu" class="btn-card-action">View Drinks</a>
+              <span class="card-price-highlight">From ₱135</span>
+              <button class="btn-card-action" data-order-drinks-filter>
+                Order Drinks →
+              </button>
             </div>
-          </div>
+          </article>
 
-          <!-- CARD 2: The Spicy Bite (Real Smash Burger Photo) -->
-          <div class="poster-card card-spicy-bite">
-            <div class="spicy-flame-burst"></div>
+          <!-- CARD 2: The Spicy Bite (BAIA Smash Burger) -->
+          <article class="poster-card card-spicy-bite">
+            <div class="spicy-flame-burst" aria-hidden="true"></div>
             <div class="card-top-content" style="z-index: 4;">
               <span class="spicy-badge-pill">🔥 Freshly Grilled</span>
               <span class="card-script-title" style="color: var(--golden-amber);">The</span>
@@ -487,22 +607,31 @@
               </p>
             </div>
             <div class="card-image-box">
-              <img src="./images/smashburger.jpg" alt="BAIA Double Smash Burger with melted cheese and fries" />
+              <img 
+                src="./images/smashburger.webp" 
+                alt="BAIA Double Smash Burger with melted cheddar cheese and crispy seasoned fries" 
+                width="1179" 
+                height="1176" 
+                loading="lazy" 
+                decoding="async" 
+              />
             </div>
             <div class="card-action-bar">
-              <span style="font-weight: 800; font-size: 0.95rem; color: var(--white);">₱230</span>
-              <a href="#menu" class="btn-card-action">View Burgers</a>
+              <span class="card-price-highlight">₱230</span>
+              <button class="btn-card-action" data-order-item="burger-smash">
+                💬 Message to Order (₱230)
+              </button>
             </div>
-          </div>
+          </article>
 
-          <!-- CARD 3: Double Trouble (Real Burger + Refresher Combo Photo) -->
-          <div class="poster-card card-double-trouble">
+          <!-- CARD 3: Double Trouble Receipt Deal -->
+          <article class="poster-card card-double-trouble">
             <div class="receipt-paper">
-              <div class="receipt-zigzag-top"></div>
-              <div class="receipt-zigzag-bottom"></div>
+              <div class="receipt-zigzag-top" aria-hidden="true"></div>
+              <div class="receipt-zigzag-bottom" aria-hidden="true"></div>
 
-              <!-- Metal Binder Clip -->
-              <div class="binder-clip-graphic">
+              <!-- Metal Binder Clip Graphic -->
+              <div class="binder-clip-graphic" aria-hidden="true">
                 <svg viewBox="0 0 44 32" width="44" height="32">
                   <rect x="12" y="8" width="20" height="20" rx="3" fill="#334155" stroke="#0F172A" stroke-width="2" />
                   <path d="M16 8 C16 0, 28 0, 28 8" fill="none" stroke="#CBD5E1" stroke-width="2.5" />
@@ -511,7 +640,7 @@
               </div>
 
               <div class="receipt-header">
-                <h4 class="receipt-logo-title">BAIA CAFE</h4>
+                <h3 class="receipt-logo-title">BAIA CAFE</h3>
                 <p class="receipt-tagline">Beachside Combo Set #8821</p>
               </div>
 
@@ -525,7 +654,7 @@
                   <span>₱230</span>
                 </div>
                 <div class="receipt-row">
-                  <span>1x Sea Salt Latte (Iced M)</span>
+                  <span>1x Sea Salt Latte (Iced)</span>
                   <span>₱180</span>
                 </div>
                 <div class="receipt-row">
@@ -547,123 +676,23 @@
                 <span class="receipt-total-amount">₱480</span>
               </div>
 
-              <div class="receipt-barcode-box">
-                <svg class="barcode-svg" viewBox="0 0 200 40" width="200" height="40">
-                  <rect x="0" y="0" width="4" height="40" fill="#000" />
-                  <rect x="8" y="0" width="2" height="40" fill="#000" />
-                  <rect x="14" y="0" width="6" height="40" fill="#000" />
-                  <rect x="24" y="0" width="2" height="40" fill="#000" />
-                  <rect x="30" y="0" width="8" height="40" fill="#000" />
-                  <rect x="42" y="0" width="4" height="40" fill="#000" />
-                  <rect x="50" y="0" width="2" height="40" fill="#000" />
-                  <rect x="56" y="0" width="6" height="40" fill="#000" />
-                  <rect x="68" y="0" width="4" height="40" fill="#000" />
-                  <rect x="76" y="0" width="8" height="40" fill="#000" />
-                  <rect x="90" y="0" width="2" height="40" fill="#000" />
-                  <rect x="96" y="0" width="4" height="40" fill="#000" />
-                  <rect x="104" y="0" width="6" height="40" fill="#000" />
-                  <rect x="114" y="0" width="2" height="40" fill="#000" />
-                  <rect x="120" y="0" width="8" height="40" fill="#000" />
-                  <rect x="132" y="0" width="4" height="40" fill="#000" />
-                  <rect x="140" y="0" width="2" height="40" fill="#000" />
-                  <rect x="146" y="0" width="6" height="40" fill="#000" />
-                  <rect x="156" y="0" width="4" height="40" fill="#000" />
-                  <rect x="164" y="0" width="8" height="40" fill="#000" />
-                  <rect x="176" y="0" width="4" height="40" fill="#000" />
-                  <rect x="184" y="0" width="2" height="40" fill="#000" />
-                  <rect x="190" y="0" width="6" height="40" fill="#000" />
-                </svg>
-              </div>
-
-              <a href="#menu" class="btn-bundle-order">
-                Explore Full Menu
-              </a>
+              <button class="btn-bundle-order" data-order-bundle="double-trouble">
+                💬 Order Combo via DM (₱480 • Save ₱85)
+              </button>
             </div>
-          </div>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- 5. INTERACTIVE MENU EXPLORER (12 Light Blue Frosted Floaties) -->
-    <section class="menu-section" id="menu">
-      <div class="section-floaties-layer" aria-hidden="true">
-        <!-- 1. Flower Floatie Top Left -->
-        <div class="glass-floatie frost-blue anim-1 size-lg" style="top: 8%; left: 4%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
-        </div>
-        <!-- 2. Wave Floatie -->
-        <div class="glass-floatie frost-blue anim-2 size-md shape-wave" style="top: 18%; right: 6%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
-        </div>
-        <!-- 3. Palm Floatie -->
-        <div class="glass-floatie frost-blue anim-3 size-xl" style="top: 36%; left: 2%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
-        </div>
-        <!-- 4. Coffee Mug -->
-        <div class="glass-floatie frost-blue anim-4 size-sm" style="top: 42%; right: 3%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M18 5H4a1 1 0 0 0-1 1v8a6 6 0 0 0 6 6h4a6 6 0 0 0 6-6V6a1 1 0 0 0-1-1zm3 2h-1v5h1a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
-          </svg>
-        </div>
-        <!-- 5. Glass Pill Left -->
-        <div class="glass-floatie frost-blue anim-1 size-pill" style="top: 62%; left: 3%;">
-          <span>☕ Einspanner</span>
-        </div>
-        <!-- 6. Teardrop -->
-        <div class="glass-floatie frost-blue anim-2 size-md shape-teardrop" style="top: 68%; right: 4%;"></div>
-        <!-- 7. Wave Floatie Bottom Left -->
-        <div class="glass-floatie frost-blue anim-3 size-lg shape-wave" style="bottom: 16%; left: 6%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
-        </div>
-        <!-- 8. Palm Floatie Bottom Right -->
-        <div class="glass-floatie frost-blue anim-4 size-md" style="bottom: 12%; right: 8%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
-        </div>
-        <!-- 9. Flower Floatie Bottom -->
-        <div class="glass-floatie frost-blue anim-1 size-sm shape-flower" style="bottom: 6%; left: 32%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
-        </div>
-        <!-- 10. Glass Pill Right Mid -->
-        <div class="glass-floatie frost-blue anim-2 size-pill" style="top: 82%; right: 2%;">
-          <span>✦ Asin Tibuok</span>
-        </div>
-        <!-- 11. Flower Floatie Top Center -->
-        <div class="glass-floatie frost-blue anim-3 size-sm" style="top: 5%; right: 26%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
-        </div>
-        <!-- 12. Coffee Cup Floatie Bottom Mid -->
-        <div class="glass-floatie frost-blue anim-4 size-sm" style="bottom: 5%; right: 38%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M18 5H4a1 1 0 0 0-1 1v8a6 6 0 0 0 6 6h4a6 6 0 0 0 6-6V6a1 1 0 0 0-1-1zm3 2h-1v5h1a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
-          </svg>
-        </div>
-      </div>
-
+    <!-- 5. INTERACTIVE MENU EXPLORER (50+ Items with 1-Click Ordering) -->
+    <section class="menu-section" id="menu" aria-label="Full BAIA Cafe Menu Explorer">
       <div class="container">
         <div class="menu-header-wrapper">
           <span class="menu-badge">✦ Complete Menu Catalog ✦</span>
           <h2 class="menu-main-title">Crafted Fresh Daily</h2>
           <p class="menu-subtitle">
-            Authentic espresso, signature salted cream lattes, blended frappes, sizzling rice meals & gourmet burgers.
+            Authentic espresso, signature Asin Tibuok lattes, blended frappes, sizzling rice meals & gourmet double smash burgers.
           </p>
         </div>
 
@@ -672,107 +701,133 @@
       </div>
     </section>
 
-    <!-- 6. BOARDS & BARANGAY LAURENTE FLOATING COTTAGE SECTION (10 White Frosted Floaties) -->
-    <section class="boards-section" id="boards">
-      <div class="section-floaties-layer" aria-hidden="true">
-        <!-- 1. Wave Floatie -->
-        <div class="glass-floatie frost-white anim-1 size-xl shape-wave" style="top: 10%; left: 5%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
+    <!-- 6. CUSTOMER REVIEWS & SOCIAL PROOF -->
+    <section class="reviews-section" id="reviews" aria-label="Customer Reviews and Testimonials">
+      <div class="container">
+        <div class="reviews-header-block">
+          <span class="reviews-tag">✦ What Shoregoers Say ✦</span>
+          <h2 class="reviews-title">Loved by Beachgoers & Surfers</h2>
+          <p class="reviews-subtitle">Real ratings and feedback from visitors enjoying the Masbate shore.</p>
         </div>
-        <!-- 2. Flower Floatie -->
-        <div class="glass-floatie frost-white anim-2 size-lg" style="top: 16%; right: 8%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
-        </div>
-        <!-- 3. Palm Floatie -->
-        <div class="glass-floatie frost-white anim-3 size-md" style="top: 42%; left: 3%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
-        </div>
-        <!-- 4. Glass Pill Left -->
-        <div class="glass-floatie frost-white anim-4 size-pill" style="top: 58%; left: 4%;">
-          <span>🏄 Skimboard</span>
-        </div>
-        <!-- 5. Teardrop Floatie -->
-        <div class="glass-floatie frost-white anim-1 size-sm shape-teardrop" style="top: 48%; right: 4%;"></div>
-        <!-- 6. Wave Floatie Right -->
-        <div class="glass-floatie frost-white anim-2 size-lg shape-wave" style="bottom: 22%; right: 10%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
-        </div>
-        <!-- 7. Palm Floatie Bottom Left -->
-        <div class="glass-floatie frost-white anim-3 size-lg" style="bottom: 12%; left: 8%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
-        </div>
-        <!-- 8. Glass Pill Right -->
-        <div class="glass-floatie frost-white anim-4 size-pill" style="bottom: 14%; right: 4%;">
-          <span>🌊 Cottage</span>
-        </div>
-        <!-- 9. Coffee Cup Floatie -->
-        <div class="glass-floatie frost-white anim-1 size-sm" style="bottom: 6%; left: 42%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M18 5H4a1 1 0 0 0-1 1v8a6 6 0 0 0 6 6h4a6 6 0 0 0 6-6V6a1 1 0 0 0-1-1zm3 2h-1v5h1a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
-          </svg>
-        </div>
-        <!-- 10. Flower Floatie Bottom Right -->
-        <div class="glass-floatie frost-white anim-2 size-sm shape-flower" style="bottom: 6%; right: 30%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
+
+        <div class="reviews-grid">
+          <!-- Review 1: Abeneil M. -->
+          <div class="review-card">
+            <div class="review-top-row">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <span class="review-verified-badge">✓ Verified Visitor</span>
+            </div>
+            <p class="review-text">
+              "The <strong>Asin Tibuok Latte</strong> is a game changer! You get the rich espresso with this subtle, artisanal smoky salty caramel finish right on the beach sand. Best coffee spot in Masbate!"
+            </p>
+            <div class="reviewer-meta">
+              <div class="reviewer-avatar">☕</div>
+              <div>
+                <p class="reviewer-name"><strong>Abeneil M.</strong></p>
+                <p class="reviewer-origin">Specialty Coffee Enthusiast</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Review 2: Norman M. (Featured) -->
+          <div class="review-card featured">
+            <div class="review-top-row">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <span class="review-verified-badge">✓ Local Favorite</span>
+            </div>
+            <p class="review-text">
+              "The <strong>BAIA Double Smash Burger</strong> is crispy, juicy, and packed with flavor. Having a burger and iced Sea Salt Latte while sitting by the waves is literally the ultimate weekend therapy."
+            </p>
+            <div class="reviewer-meta">
+              <div class="reviewer-avatar">🍔</div>
+              <div>
+                <p class="reviewer-name"><strong>Norman M.</strong></p>
+                <p class="reviewer-origin">Weekend Shoregoer</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Review 3: Bianca Natalie L. -->
+          <div class="review-card">
+            <div class="review-top-row">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <span class="review-verified-badge">✓ Sunset Regular</span>
+            </div>
+            <p class="review-text">
+              "The <strong>Strawberry Crimson Pop</strong> fruit soda and <strong>Biscoff Croffle</strong> during golden hour is heavenly! Super relaxing beachfront atmosphere and the friendliest crew."
+            </p>
+            <div class="reviewer-meta">
+              <div class="reviewer-avatar">🍹</div>
+              <div>
+                <p class="reviewer-name"><strong>Bianca Natalie L.</strong></p>
+                <p class="reviewer-origin">Sunset & Food Lover</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Review 4: Kyla S. -->
+          <div class="review-card">
+            <div class="review-top-row">
+              <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <span class="review-verified-badge">✓ Skim & Bay Guest</span>
+            </div>
+            <p class="review-text">
+              "Complimentary skimboards for cafe guests is such a great touch. Grabbed a board, rode the shorebreak, and booked the Laurente Floating Cottage right at the counter. 10/10 vibe."
+            </p>
+            <div class="reviewer-meta">
+              <div class="reviewer-avatar">🏄</div>
+              <div>
+                <p class="reviewer-name"><strong>Kyla S.</strong></p>
+                <p class="reviewer-origin">Skimboarder & Traveler</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+    </section>
 
+    <!-- 7. SHORE RECREATION & FLOATING COTTAGE -->
+    <section class="boards-section" id="boards" aria-label="Shore Recreation and Floating Cottage">
       <div class="container">
         <div class="boards-header">
-          <span class="boards-tag">✦ Ocean Experiences & Gear ✦</span>
+          <span class="boards-tag">✦ Ocean Leisure & Community Gear ✦</span>
           <h2 class="boards-title">
-            Boards & <span class="script-accent">Floating Cottage</span>
+            Shore Recreation & <span class="script-accent">Floating Cottage</span>
           </h2>
           <p class="boards-subtitle">
-            Rent hand-crafted BAIA skimboards or book the Barangay Laurente Floating Cottage right through our cafe
-            desk.
+            Enjoy complimentary skimboards as a cafe guest, rent snorkeling masks for reef exploration, or book the Barangay Laurente Floating Cottage right through our cafe desk.
           </p>
         </div>
 
         <!-- Live Bay Conditions Banner -->
-        <div class="bay-conditions-card">
+        <div class="bay-conditions-card" aria-label="Live Bay Telemetry and Conditions">
           <div class="conditions-info-group">
             <div class="condition-metric">
-              <div class="condition-icon">🌊</div>
+              <div class="condition-icon" aria-hidden="true">🌊</div>
               <div class="metric-text">
-                <h6>Swell Forecast</h6>
-                <p>1.0m @ 14s (Clean Wave)</p>
+                <p class="metric-label">Swell Forecast</p>
+                <p id="bay-metric-swell">1.0m @ 14s (Clean Shorebreak)</p>
               </div>
             </div>
             <div class="condition-metric">
-              <div class="condition-icon">🌡️</div>
+              <div class="condition-icon" aria-hidden="true">🌡️</div>
               <div class="metric-text">
-                <h6>Water Temp</h6>
-                <p>28°C (Warm Tropical Bay)</p>
+                <p class="metric-label">Water Temp</p>
+                <p id="bay-metric-temp">28°C (Warm Tropical Bay)</p>
               </div>
             </div>
             <div class="condition-metric">
-              <div class="condition-icon">💨</div>
+              <div class="condition-icon" aria-hidden="true">💨</div>
               <div class="metric-text">
-                <h6>Wind Condition</h6>
-                <p>Offshore 15 km/h (8 kts)</p>
+                <p class="metric-label">Wind Condition</p>
+                <p id="bay-metric-wind">Offshore 15 km/h (8 kts)</p>
               </div>
             </div>
             <div class="condition-metric">
-              <div class="condition-icon">⏳</div>
+              <div class="condition-icon" aria-hidden="true">⏳</div>
               <div class="metric-text">
-                <h6>Tide Chart</h6>
-                <p>High Tide 3:45 PM</p>
+                <p class="metric-label">Tide Chart</p>
+                <p id="bay-metric-tide">High Tide 3:45 PM</p>
               </div>
             </div>
           </div>
@@ -781,82 +836,35 @@
         <!-- Floating Cottage Showcase Root -->
         <div id="cottage-showcase-root"></div>
 
-        <!-- Boards Grid Root -->
+        <!-- Gear / Boards Grid Root -->
         <div class="boards-grid" id="boards-grid-root"></div>
       </div>
     </section>
 
-    <!-- 7. COASTAL ATMOSPHERE PHOTO GALLERY (8 White Frosted Floaties) -->
-    <section class="atmosphere-section" id="atmosphere">
-      <div class="section-floaties-layer" aria-hidden="true">
-        <!-- 1. Flower Floatie -->
-        <div class="glass-floatie frost-white anim-1 size-lg" style="top: 10%; left: 4%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
-        </div>
-        <!-- 2. Palm Floatie -->
-        <div class="glass-floatie frost-white anim-2 size-md" style="top: 14%; right: 6%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
-        </div>
-        <!-- 3. Wave Floatie -->
-        <div class="glass-floatie frost-white anim-3 size-lg shape-wave" style="top: 48%; left: 2%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
-        </div>
-        <!-- 4. Glass Pill Left -->
-        <div class="glass-floatie frost-white anim-4 size-pill" style="top: 72%; left: 4%;">
-          <span>✨ Twilight</span>
-        </div>
-        <!-- 5. Teardrop -->
-        <div class="glass-floatie frost-white anim-1 size-sm shape-teardrop" style="top: 52%; right: 3%;"></div>
-        <!-- 6. Wave Floatie Right -->
-        <div class="glass-floatie frost-white anim-2 size-md shape-wave" style="bottom: 16%; right: 6%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-          </svg>
-        </div>
-        <!-- 7. Flower Floatie Bottom -->
-        <div class="glass-floatie frost-white anim-3 size-sm shape-flower" style="bottom: 8%; left: 44%;">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-          </svg>
-        </div>
-        <!-- 8. Palm Floatie Bottom Right -->
-        <div class="glass-floatie frost-white anim-4 size-sm" style="bottom: 6%; right: 28%;">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-          </svg>
-        </div>
-      </div>
-
+    <!-- 8. COASTAL ATMOSPHERE PHOTO GALLERY -->
+    <section class="atmosphere-section" id="atmosphere" aria-label="Atmosphere and Beach Life Photo Gallery">
       <div class="container">
-        <div style="text-align: center; max-width: 680px; margin: 0 auto 32px auto;">
+        <div class="atmosphere-header-block">
           <span class="boards-tag">✦ Beach Life & Sunsets ✦</span>
-          <h2 class="boards-title" style="margin-bottom: 8px;">Life by the Bay</h2>
-          <p style="color: var(--cream); opacity: 0.9;">From morning coffee glass to golden hour twilight.</p>
+          <h2 class="boards-title">Life by the Bay</h2>
+          <p class="atmosphere-subtitle">From morning iced latte to golden hour sunset glow on Laurente beach.</p>
         </div>
 
         <div class="atmosphere-grid">
           <div class="atmosphere-card">
-            <img src="./images/beachandchill.jpg" alt="BAIA beachfront lounge chairs on sand" loading="lazy" />
+            <img src="./images/beachandchill.webp" alt="BAIA beachfront wooden lounge chairs and umbrellas on the sand" width="1200" height="800" loading="lazy" decoding="async" />
             <div class="atmosphere-overlay">Shoreline Hangout 🌴</div>
           </div>
           <div class="atmosphere-card">
-            <img src="./images/afternoonchill.jpg" alt="Afternoon breeze at the beachfront tables" loading="lazy" />
+            <img src="./images/afternoonchill.webp" alt="Afternoon sea breeze at the beachfront dining tables" width="1200" height="690" loading="lazy" decoding="async" />
             <div class="atmosphere-overlay">Afternoon Breeze 🌊</div>
           </div>
           <div class="atmosphere-card">
-            <img src="./images/twilight.jpg" alt="Beach chairs and fairy lanterns at twilight" loading="lazy" />
+            <img src="./images/twilight.webp" alt="Beach chairs and fairy string lanterns at sunset twilight" width="800" height="1200" loading="lazy" decoding="async" />
             <div class="atmosphere-overlay">Twilight Glow ✨</div>
           </div>
           <div class="atmosphere-card">
-            <img src="./images/Cottage.jpg" alt="Barangay Laurente Floating Cottage on clear water" loading="lazy" />
+            <img src="./images/Cottage.webp" alt="Barangay Laurente Floating Cottage anchored on calm turquoise water" width="1179" height="1176" loading="lazy" decoding="async" />
             <div class="atmosphere-overlay">Floating Cottage 🏄</div>
           </div>
         </div>
@@ -864,82 +872,71 @@
     </section>
   </main>
 
-  <!-- 8. SITE FOOTER (6 White Frosted Floaties) -->
-  <footer class="site-footer" id="location">
-    <div class="section-floaties-layer" aria-hidden="true">
-      <div class="glass-floatie frost-white anim-1 size-lg" style="top: 12%; left: 4%;">
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" />
-        </svg>
-      </div>
-      <div class="glass-floatie frost-white anim-2 size-md shape-wave" style="top: 20%; right: 6%;">
-        <svg viewBox="0 0 24 24">
-          <path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" />
-        </svg>
-      </div>
-      <div class="glass-floatie frost-white anim-3 size-sm" style="bottom: 24%; left: 8%;">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-        </svg>
-      </div>
-      <div class="glass-floatie frost-white anim-4 size-pill" style="bottom: 22%; right: 10%;">
-        <span>📍 BAIA Cafe</span>
-      </div>
-      <div class="glass-floatie frost-white anim-1 size-sm shape-teardrop" style="top: 60%; left: 3%;"></div>
-      <div class="glass-floatie frost-white anim-2 size-sm" style="bottom: 10%; right: 34%;">
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M18 5H4a1 1 0 0 0-1 1v8a6 6 0 0 0 6 6h4a6 6 0 0 0 6-6V6a1 1 0 0 0-1-1zm3 2h-1v5h1a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
-        </svg>
-      </div>
-    </div>
-
+  <!-- 9. SITE FOOTER & TRUST ANCHORS -->
+  <footer class="site-footer" id="location" role="contentinfo">
     <div class="container">
       <div class="footer-top-grid">
-        <!-- Col 1: Brand & Hours -->
+        <!-- Col 1: Brand & Operating Hours -->
         <div class="footer-col-brand">
           <div class="footer-brand-lockup">
-            <img src="./images/Logo.jpg" alt="BAIA Cafe Logo" class="footer-logo-img" />
+            <img src="./images/Logo.webp" alt="BAIA Cafe Logo" width="44" height="44" class="footer-logo-img" />
             <span class="footer-brand-name wordmark">BAIA CAFE</span>
           </div>
-          <p class="footer-tagline">Coffee • Food • Boards — Beachfront Bay</p>
+          <p class="footer-brand-desc">
+            Artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers & shore recreation on Laurente beachfront.
+          </p>
+          <div class="footer-location-badge">
+            <span aria-hidden="true">📍</span>
+            <span>Barangay Laurente, Masbate City • </span>
+            <a href="https://maps.google.com/?q=Barangay+Laurente+Masbate+City" target="_blank" rel="noopener" class="loc-map-link">Maps ↗</a>
+          </div>
           <div class="footer-hours-box">
-            <h5>Operating Hours</h5>
-            <p>Monday – Sunday: 7:00 AM – 9:00 PM</p>
-            <p style="font-size: 0.8rem; color: var(--cream); margin-top: 2px;">Kitchen closes 8:30 PM • Floating
-              Cottage 7:00 AM – 6:00 PM</p>
+            <p class="hours-title">OPERATING HOURS</p>
+            <p class="hours-schedule">Monday – Sunday: 11:00 AM – 10:00 PM</p>
+            <p class="footer-kitchen-note">Kitchen closes at 9:00 PM • Floating Cottage 11:00 AM – 6:00 PM</p>
           </div>
         </div>
 
-        <!-- Col 2: Sunset Countdown -->
+        <!-- Col 2: Sunset Countdown & Shore Hub -->
         <div class="footer-col-vibe">
           <div class="sunset-countdown-card">
             <div class="sunset-header">
               <span class="sunset-label">🌅 Golden Hour Sunset</span>
-              <span style="font-size: 0.75rem; color: var(--cream);">Daily 5:58 PM</span>
+              <span class="sunset-target">Daily 5:58 PM</span>
             </div>
-            <div class="sunset-time-display" id="sunset-countdown-display">
-              --:--:--
+            <div class="sunset-time-row">
+              <div class="sunset-time-display" id="sunset-countdown-display" aria-label="Time until sunset">
+                --:--:--
+              </div>
+              <span class="sunset-time-label">Until Sunset</span>
             </div>
             <p class="sunset-note">
-              Catch the golden glow on the shore with your favorite BAIA drink.
+              Catch the golden hour over Masbate Bay with your favorite BAIA iced latte or double smash burger on the sand.
             </p>
+            <div class="sunset-spot-footer">
+              <span>🌊 Swell: <strong>1.0m Clean</strong></span>
+              <span>🌡️ Bay Temp: <strong>28°C</strong></span>
+            </div>
           </div>
         </div>
 
-        <!-- Col 3: Newsletter & Community -->
+        <!-- Col 3: Community & Social Links -->
         <div class="footer-col-newsletter">
-          <h4 class="footer-col-title">Team BAIA Community</h4>
+          <h3 class="footer-col-title">Team BAIA Community</h3>
           <p class="footer-newsletter-p">
-            Follow our daily beach updates, swell reports, and special drops.
+            Follow our daily beach life, sunset updates, and special drink drops.
           </p>
-          <div style="display: flex; flex-direction: column; gap: 10px;">
-            <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow"
-              style="justify-content: center; padding: 12px 20px;">
+          <div class="footer-buttons-stack">
+            <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow footer-social-btn">
               <span>Follow @thebaiacafe on Instagram</span>
-              <span>↗</span>
+              <span aria-hidden="true">↗</span>
             </a>
+            <a href="tel:+639171234567" class="btn-secondary-pill footer-social-btn">
+              <span>📞 Call Us: +63 917 123 4567</span>
+            </a>
+            <button class="btn-secondary-pill footer-social-btn" data-open-cart style="border-color: var(--golden-amber); color: var(--golden-amber);">
+              <span>⚡ Order Ahead (Shore Delivery)</span>
+            </button>
           </div>
         </div>
       </div>
@@ -949,17 +946,95 @@
           © 2026 BAIA Cafe. All rights reserved. Coffee by the Bay.
         </p>
         <div class="footer-social-links">
-          <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener"
-            class="social-link">@thebaiacafe</a>
-          <span style="color: rgba(255,255,255,0.3);">•</span>
-          <a href="#" class="social-link">Facebook</a>
+          <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="social-link">Instagram (@thebaiacafe)</a>
+          <span style="color: rgba(255,255,255,0.3);" aria-hidden="true">•</span>
+          <a href="#hero" class="social-link">Back to Top ↑</a>
         </div>
       </div>
     </div>
   </footer>
 
-  <!-- Main JS Script -->
-  <script type="module" src="./src/main.js"></script>
-</body>
+  <!-- 10. SLIDE-OVER ORDER DRAWER (Accessible Messaging Dispatch Panel) -->
+  <div class="drawer-backdrop" id="cart-drawer-backdrop" aria-hidden="true"></div>
+  
+  <aside 
+    class="cart-drawer-panel" 
+    id="cart-drawer-panel" 
+    role="dialog" 
+    aria-modal="true" 
+    aria-labelledby="drawer-heading"
+    inert
+  >
+    <!-- Drawer Header -->
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <h3 id="drawer-heading">Order List</h3>
+        <span class="drawer-count-tag">0</span>
+      </div>
+      <button class="btn-close-drawer" id="drawer-close-btn" aria-label="Close order drawer">✕</button>
+    </div>
 
+    <!-- Order Type Picker -->
+    <div class="order-type-picker">
+      <span class="spot-picker-label">📍 Choose Order Type:</span>
+      <div class="spot-options-grid" role="radiogroup" aria-label="Select order type">
+        <button class="spot-btn active" data-spot="Dine-In at Cafe" aria-pressed="true">
+          ☕ Dine-In
+        </button>
+        <button class="spot-btn" data-spot="Beach Takeout" aria-pressed="false">
+          🥡 Takeout
+        </button>
+        <button class="spot-btn" data-spot="Floating Cottage Order" aria-pressed="false">
+          🏄 Cottage
+        </button>
+      </div>
+    </div>
+
+    <!-- Items List Container -->
+    <div class="drawer-items-list" id="drawer-items-list" role="region" aria-label="Order items list">
+      <!-- Injected dynamically by cartDrawer.js -->
+    </div>
+
+    <!-- Drawer Footer Totals & Checkout -->
+    <div class="drawer-footer-block">
+      <div class="drawer-totals-box">
+        <div class="drawer-total-row">
+          <span>Subtotal</span>
+          <span id="drawer-subtotal">₱0</span>
+        </div>
+        <div class="drawer-total-row discount-row" id="drawer-savings-row" style="display: none;">
+          <span>Bundle Savings</span>
+          <span id="drawer-savings">-₱0</span>
+        </div>
+        <div class="drawer-total-row grand-total-row">
+          <span>Estimated Total</span>
+          <span id="drawer-grand-total">₱0</span>
+        </div>
+      </div>
+
+      <div class="drawer-actions-row">
+        <button class="btn-primary-glow btn-checkout-main" id="drawer-checkout-btn">
+          <span>💬 Message Order to BAIA</span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="btn-clear-cart" id="drawer-clear-btn" aria-label="Clear all items in order">Clear</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 11. MOBILE STICKY FLOATING ORDER BAR (Visible on 375px and 768px viewports) -->
+  <div class="mobile-sticky-bar" id="mobile-sticky-bar" aria-label="Mobile quick order bar">
+    <div class="mobile-bar-inner">
+      <a href="#menu" class="mobile-bar-menu-btn">
+        <span aria-hidden="true">📖</span>
+        <span>Menu</span>
+      </a>
+      <button class="mobile-bar-cart-btn" data-open-cart>
+        <span>💬 Message Ahead</span>
+        <span class="mobile-cart-badge cart-count-badge">0</span>
+      </button>
+    </div>
+  </div>
+
+</body>
 </html>

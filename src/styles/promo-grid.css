@@ -22,7 +22,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: var(--golden-amber);
+  color: var(--amber-contrast);
   margin-bottom: 12px;
 }
 
@@ -135,9 +135,17 @@
   z-index: 3;
 }
 
+.card-price-highlight {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: var(--golden-amber);
+}
+
 .btn-card-action {
   background: var(--golden-amber);
   color: var(--deep-navy);
+  font-family: var(--font-display);
   font-weight: 900;
   font-size: 0.85rem;
   text-transform: uppercase;
@@ -146,6 +154,7 @@
   border: 2px solid var(--white);
   text-decoration: none;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.35);
   transition: all var(--duration-fast);
 }
 
@@ -329,19 +338,6 @@
   font-weight: 900;
   color: var(--electric-blue);
   letter-spacing: -0.03em;
-}
-
-.receipt-barcode-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 8px;
-}
-
-.barcode-svg {
-  width: 100%;
-  max-width: 220px;
-  height: 40px;
 }
 
 .btn-bundle-order {

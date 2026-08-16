@@ -1,4 +1,5 @@
 import { menuData } from '../data/menuData.js';
+import { cartStore } from './cartStore.js';
 
 export function initMenuExplorer() {
   const container = document.getElementById('menu-explorer-root');
@@ -6,14 +7,13 @@ export function initMenuExplorer() {
 
   let activeBoard = 'drinks'; // 'drinks' | 'food'
   let searchQuery = '';
-  // Set of opened category IDs (default: empty = all collapsed for compact mobile viewing)
-  let openCategories = new Set();
+  let openCategories = new Set(['house-special', 'burgers']);
 
   const categoryIcons = {
     // Drinks
     'classic': '☕',
     'house-special': '⭐',
-    'signature': '🌊',
+    'signature-coffee': '🌊',
     'blended': '🥤',
     'non-coffee': '🍵',
     'fruit-soda': '🍹',
@@ -21,10 +21,11 @@ export function initMenuExplorer() {
     // Food
     'mirindal': '🧇',
     'burgers': '🍔',
-    'sandwiches': '🥪',
+    'bread-sandwich': '🥪',
     'rice-meals': '🍚',
     'pub': '🍗',
-    'pasta': '🍝'
+    'pasta': '🍝',
+    'sides': '🍚'
   };
 
   function getTotalBoardItemsCount() {
@@ -66,19 +67,31 @@ export function initMenuExplorer() {
 
     container.innerHTML = `
       <!-- Board Switcher Tabs -->
-      <div class="board-switcher" id="menu-board-switcher">
-        <button class="board-tab-btn ${activeBoard === 'drinks' ? 'active' : ''}" data-board="drinks">
-          ☕ Board 2 — Drinks & Espresso
+      <div class="board-switcher" id="menu-board-switcher" role="tablist" aria-label="Menu Boards">
+        <button 
+          role="tab" 
+          aria-selected="${activeBoard === 'drinks'}" 
+          class="board-tab-btn ${activeBoard === 'drinks' ? 'active' : ''}" 
+          data-board="drinks"
+          id="tab-drinks"
+        >
+          ☕ Board 2 — Drinks & Espresso (${menuData.drinks.reduce((s, c) => s + c.items.length, 0)} items)
         </button>
-        <button class="board-tab-btn ${activeBoard === 'food' ? 'active' : ''}" data-board="food">
-          🍔 Board 1 — Food & Rice Meals
+        <button 
+          role="tab" 
+          aria-selected="${activeBoard === 'food'}" 
+          class="board-tab-btn ${activeBoard === 'food' ? 'active' : ''}" 
+          data-board="food"
+          id="tab-food"
+        >
+          🍔 Board 1 — Food & Smash Burgers (${menuData.food.reduce((s, c) => s + c.items.length, 0)} items)
         </button>
       </div>
 
       <!-- Search Field & Expand/Collapse Toggle -->
       <div class="menu-controls-row">
         <div class="search-input-wrapper">
-          <svg class="search-icon-svg" viewBox="0 0 24 24" width="20" height="20">
+          <svg class="search-icon-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
             <path d="M21.71 20.29l-5.4-5.39A7.9 7.9 0 0 0 18 10a8 8 0 1 0-8 8 7.9 7.9 0 0 0 4.9-1.69l5.39 5.4a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42zM4 10a6 6 0 1 1 6 6 6 6 0 0 1-6-6z"/>
           </svg>
           <input 
@@ -87,13 +100,14 @@ export function initMenuExplorer() {
             placeholder="Search ${activeBoard === 'drinks' ? 'lattes, frappes, fruit sodas, iced teas...' : 'smash burgers, waffles, rice meals, pasta...'}"
             value="${searchQuery}"
             id="menu-search-field"
+            aria-label="Search menu items"
           />
         </div>
 
         <div class="menu-accordion-actions">
-          <span class="total-items-badge">${totalCount} Items • Tap a category to view</span>
+          <span class="total-items-badge">${totalCount} Items • Tap category to expand</span>
           <button class="toggle-all-btn" id="toggle-all-categories-btn">
-            ${allExpanded ? 'Collapse All Categories' : 'Expand All Categories'}
+            ${allExpanded ? 'Collapse All' : 'Expand All'}
           </button>
         </div>
       </div>
@@ -101,34 +115,35 @@ export function initMenuExplorer() {
       <!-- Collapsible Accordion Category Groups -->
       <div class="menu-accordion-wrapper">
         ${groupedItems.length === 0 ? `
-          <div style="text-align: center; padding: 48px; color: var(--text-muted); background: #FFFFFF; border-radius: 16px; border: 1.5px dashed rgba(22,37,92,0.15);">
-            <h3 style="font-size: 1.25rem; color: var(--deep-navy); margin-bottom: 8px;">No items match "${searchQuery}"</h3>
-            <p style="font-size: 0.9rem;">Try searching for another keyword or clear your search.</p>
+          <div class="menu-no-results">
+            <h3>No items match "${searchQuery}"</h3>
+            <p>Try another search or browse by switching boards above.</p>
           </div>
         ` : groupedItems.map(group => {
-          // If searching, automatically expand matching categories
           const isOpen = isSearching ? true : openCategories.has(group.id);
 
           return `
             <div class="menu-accordion-card ${isOpen ? 'is-open' : ''}" id="cat-card-${group.id}">
               <button class="category-accordion-btn" data-category-id="${group.id}" aria-expanded="${isOpen}">
                 <div class="category-title-left">
-                  <span class="category-icon-emoji">${group.icon}</span>
-                  <span class="category-title-text">${group.name}</span>
+                  <span class="category-icon-emoji" aria-hidden="true">${group.icon}</span>
+                  <h3 class="category-title-text">${group.name}</h3>
                   <span class="category-count-pill">${group.items.length} ${group.items.length === 1 ? 'item' : 'items'}</span>
                 </div>
                 <div class="category-toggle-indicator">
                   <span>${isOpen ? 'Hide' : 'View'}</span>
-                  <span class="chevron-icon">▼</span>
+                  <span class="chevron-icon" aria-hidden="true">▼</span>
                 </div>
               </button>
 
-              <div class="category-accordion-body">
+              <div class="category-accordion-body" ${isOpen ? '' : 'hidden'}>
                 <div class="category-items-grid">
                   ${group.items.map(item => {
                     let priceDisplay = item.price ? `₱${item.price}` : '';
+                    let itemPrice = item.price;
                     if (group.hasSizes || (!item.price && item.priceM)) {
                       priceDisplay = `M ₱${item.priceM} / L ₱${item.priceL}`;
+                      itemPrice = item.priceM;
                     }
 
                     let modifierTag = '';
@@ -137,8 +152,8 @@ export function initMenuExplorer() {
                     else if (item.subcategory) modifierTag = item.subcategory;
 
                     return `
-                      <div class="menu-card" data-item-id="${item.id}">
-                        <div>
+                      <article class="menu-card" data-item-id="${item.id}">
+                        <div class="menu-card-main">
                           <div class="card-header-row">
                             <div class="item-name-group">
                               <h4 class="item-name">${item.name}</h4>
@@ -152,11 +167,23 @@ export function initMenuExplorer() {
                           <p class="item-desc">${item.description || 'Crafted fresh daily on the shore with premium ingredients.'}</p>
                         </div>
 
-                        <div class="card-footer-tags">
-                          <span class="item-cat-tag">${group.name}</span>
-                          ${modifierTag ? `<span class="item-mod-tag">${modifierTag}</span>` : ''}
+                        <div class="card-footer-action-row">
+                          <div class="card-footer-tags">
+                            <span class="item-cat-tag">${group.name}</span>
+                            ${modifierTag ? `<span class="item-mod-tag">${modifierTag}</span>` : ''}
+                          </div>
+                          <button 
+                            class="btn-add-item" 
+                            data-add-id="${item.id}"
+                            data-add-name="${item.name}"
+                            data-add-price="${itemPrice}"
+                            data-add-desc="${item.description || ''}"
+                            aria-label="Add ${item.name} to order"
+                          >
+                            <span>+ Order</span>
+                          </button>
                         </div>
-                      </div>
+                      </article>
                     `;
                   }).join('')}
                 </div>
@@ -166,11 +193,11 @@ export function initMenuExplorer() {
         }).join('')}
       </div>
 
-      <!-- Official Physical Menu Board Disclaimer -->
+      <!-- Official Physical Menu Board Notice -->
       <div class="menu-disclaimer-card">
-        <div class="disclaimer-icon">⚠️</div>
+        <div class="disclaimer-icon" aria-hidden="true">⚠️</div>
         <div class="disclaimer-text">
-          <h5>BAIA Cafe Board Notice</h5>
+          <p><strong>BAIA CAFE SHORE NOTICE</strong></p>
           <p>${menuData.boardDisclaimer}</p>
         </div>
       </div>
@@ -184,8 +211,12 @@ export function initMenuExplorer() {
     container.querySelectorAll('.board-tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         activeBoard = btn.dataset.board;
-        openCategories.clear();
         searchQuery = '';
+        if (activeBoard === 'drinks') {
+          openCategories = new Set(['house-special', 'classic']);
+        } else {
+          openCategories = new Set(['burgers', 'rice-meals']);
+        }
         render();
       });
     });
@@ -203,7 +234,7 @@ export function initMenuExplorer() {
       });
     });
 
-    // Toggle All Categories (Expand All / Collapse All)
+    // Toggle All Categories
     const toggleAllBtn = document.getElementById('toggle-all-categories-btn');
     if (toggleAllBtn) {
       toggleAllBtn.addEventListener('click', () => {
@@ -231,6 +262,24 @@ export function initMenuExplorer() {
         }
       });
     }
+
+    // Add to Order buttons
+    container.querySelectorAll('.btn-add-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.addId;
+        const name = btn.dataset.addName;
+        const price = parseFloat(btn.dataset.addPrice) || 0;
+        const description = btn.dataset.addDesc;
+
+        cartStore.addItem({
+          id,
+          name,
+          price,
+          description
+        });
+      });
+    });
   }
 
   // Initial render
