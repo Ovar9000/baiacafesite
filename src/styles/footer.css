@@ -32,33 +32,18 @@
   margin-bottom: 16px;
 }
 
-.footer-glyphs {
-  display: grid !important;
-  grid-template-columns: repeat(2, 1fr) !important;
-  gap: 3px !important;
-  width: 38px !important;
-  height: 38px !important;
-  min-width: 38px !important;
-  min-height: 38px !important;
-  max-width: 38px !important;
-  max-height: 38px !important;
-  background: var(--cream) !important;
-  padding: 5px !important;
-  border-radius: 10px !important;
-  overflow: hidden !important;
-  flex-shrink: 0 !important;
-}
-
-.footer-glyphs svg,
-.footer-glyphs .glyph-svg {
-  width: 12px !important;
-  height: 12px !important;
-  min-width: 12px !important;
-  min-height: 12px !important;
-  max-width: 12px !important;
-  max-height: 12px !important;
-  fill: var(--deep-navy) !important;
-  display: block !important;
+.footer-logo-img {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
 }
 
 .footer-brand-name {

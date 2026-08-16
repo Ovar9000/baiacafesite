@@ -5,23 +5,54 @@ export const boardsData = [
     type: "Skimboard",
     image: "./images/skimboard.jpg",
     length: "41\"",
-    level: "All Levels / Shorebreak Cruising",
-    rateHourly: 150,
-    rateDaily: 500,
-    features: ["Custom BAIA electric-blue graphic", "High-traction foam deck pad", "Shore wave gliding"],
-    tag: "Beach Favorite"
+    level: "All Levels / Shorebreak Gliding",
+    isFree: true,
+    priceDisplay: "FREE",
+    priceSubtext: "Complimentary for Cafe Guests",
+    status: "available",
+    features: [
+      "Custom BAIA electric-blue graphic",
+      "High-traction deck grip pad",
+      "Free to use for all BAIA cafe guests"
+    ],
+    tag: "✨ Free for Guests"
   },
   {
-    id: "board-longboard-9",
+    id: "gear-sea-mask",
+    name: "HD Tempered Glass Snorkeling Mask",
+    type: "Snorkeling Gear",
+    image: "./images/SeaMask.jpg",
+    length: "Universal Fit",
+    level: "All Swimmers / Reef Snorkeling",
+    isFree: false,
+    ratePrice: 50,
+    priceDisplay: "₱50",
+    priceSubtext: "/ day rental",
+    status: "available",
+    features: [
+      "Tempered HD anti-fog crystal lens",
+      "180° panoramic marine reef view",
+      "Soft food-grade silicone leakproof seal"
+    ],
+    tag: "Reef Adventure"
+  },
+  {
+    id: "board-surfboard-9",
     name: "Classic Shore Cruiser 9'0\"",
     type: "Surfboard",
     image: "./images/Baia%20skimboard%20and%20coffee.jpg",
     length: "9'0\"",
     level: "Beginner to Intermediate",
-    rateHourly: 350,
-    rateDaily: 1200,
-    features: ["Single fin + stabilizers", "High buoyancy EPS foam", "Includes leash & wax"],
-    tag: "Most Popular"
+    isFree: false,
+    status: "soon",
+    priceDisplay: "Coming Soon",
+    priceSubtext: "In shaping & production",
+    features: [
+      "Custom shaped high-buoyancy EPS foam",
+      "Single fin + stabilizers with leash",
+      "Designed for Laurente bay swells"
+    ],
+    tag: "✦ Coming Soon ✦"
   }
 ];
 
@@ -53,7 +84,7 @@ export const cottageData = {
     "No corkage fee — bring your own food & favorite BAIA drinks"
   ],
   rentals: [
-    { item: "Snorkeling Goggles", price: 50 }
+    { item: "Snorkeling Goggles / Mask", price: 50 }
   ],
   guidelines: [
     "Meet-up & jump-off point is BAIA Café",
