@@ -1,0 +1,381 @@
+/* ==========================================================================
+   BAIA CAFE — 3 Poster-Style Promo Showcase Cards Grid
+   ========================================================================== */
+
+.promo-grid-section {
+  background: var(--electric-blue);
+  padding: 80px 0 100px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.promo-header-block {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 56px auto;
+}
+
+.promo-section-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--golden-amber);
+  margin-bottom: 12px;
+}
+
+.promo-section-title {
+  font-family: var(--font-headline);
+  font-weight: 900;
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  color: var(--white);
+}
+
+.promo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  align-items: stretch;
+}
+
+/* Individual Poster Card Container */
+.poster-card {
+  position: relative;
+  background: var(--deep-navy);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 20px 48px rgba(10, 20, 60, 0.35);
+  display: flex;
+  flex-direction: column;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  transition: transform 0.35s var(--ease-spring), box-shadow 0.35s ease;
+}
+
+.poster-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 30px 64px rgba(10, 20, 60, 0.45);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* -------------------------------------------------------------
+   CARD 1: Ready-to-Sip (Drinks Poster)
+   ------------------------------------------------------------- */
+.card-ready-sip {
+  background: linear-gradient(180deg, #1e3a8a 0%, var(--deep-navy) 100%);
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-top-content {
+  padding: 32px 28px 16px 28px;
+  position: relative;
+  z-index: 3;
+}
+
+.card-script-title {
+  font-family: var(--font-script);
+  font-size: 2rem;
+  color: var(--cream);
+  line-height: 0.9;
+  transform: rotate(-3deg);
+  display: block;
+}
+
+.card-main-title {
+  font-family: var(--font-headline);
+  font-weight: 900;
+  font-size: 2.2rem;
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  color: var(--white);
+  margin-top: 4px;
+}
+
+.card-body-text {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 10px;
+  line-height: 1.4;
+}
+
+.card-image-box {
+  position: relative;
+  width: 100%;
+  margin-top: auto;
+  overflow: hidden;
+  height: 280px;
+}
+
+.card-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.poster-card:hover .card-image-box img {
+  transform: scale(1.05);
+}
+
+.card-action-bar {
+  padding: 16px 24px;
+  background: rgba(16, 28, 71, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 3;
+}
+
+.btn-card-action {
+  background: var(--golden-amber);
+  color: var(--deep-navy);
+  font-weight: 900;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--white);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.btn-card-action:hover {
+  background: #ffb834;
+  transform: scale(1.05);
+}
+
+/* -------------------------------------------------------------
+   CARD 2: The Spicy Bite (Burger Poster)
+   ------------------------------------------------------------- */
+.card-spicy-bite {
+  background: radial-gradient(circle at 50% 30%, #1e40af 0%, var(--deep-navy) 100%);
+  min-height: 520px;
+}
+
+.spicy-flame-burst {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(232, 35, 122, 0.35) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.spicy-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--hot-pink);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 8px;
+}
+
+/* -------------------------------------------------------------
+   CARD 3: Double Trouble (Receipt Poster with Metal Binder Clip)
+   ------------------------------------------------------------- */
+.card-double-trouble {
+  background: #111e4f;
+  min-height: 520px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Photorealistic Paper Receipt */
+.receipt-paper {
+  position: relative;
+  background: #FFFFFF;
+  color: #1a202c;
+  width: 100%;
+  border-radius: 8px;
+  padding: 38px 20px 24px 20px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+  font-family: var(--font-mono);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Jagged Zigzag Top & Bottom Cut */
+.receipt-zigzag-top,
+.receipt-zigzag-bottom {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background-size: 14px 8px;
+}
+
+.receipt-zigzag-top {
+  top: -8px;
+  background-image: linear-gradient(135deg, #FFFFFF 50%, transparent 50%), linear-gradient(225deg, #FFFFFF 50%, transparent 50%);
+}
+
+.receipt-zigzag-bottom {
+  bottom: -8px;
+  background-image: linear-gradient(315deg, #FFFFFF 50%, transparent 50%), linear-gradient(45deg, #FFFFFF 50%, transparent 50%);
+}
+
+/* Metal Binder Clip */
+.binder-clip-graphic {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;
+  height: 32px;
+  z-index: 10;
+}
+
+.binder-clip-graphic svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+}
+
+.receipt-header {
+  text-align: center;
+  border-bottom: 2px dashed #cbd5e1;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+}
+
+.receipt-logo-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+  color: var(--deep-navy);
+  line-height: 1;
+}
+
+.receipt-tagline {
+  font-size: 0.65rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+}
+
+.receipt-deal-banner {
+  background: var(--deep-navy);
+  color: var(--golden-amber);
+  text-align: center;
+  font-weight: 900;
+  font-size: 0.95rem;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.receipt-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.825rem;
+  border-bottom: 2px dashed #cbd5e1;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.receipt-row.discount-row {
+  color: var(--hot-pink);
+  font-weight: 700;
+}
+
+.receipt-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 4px 0 12px 0;
+}
+
+.receipt-total-label {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--deep-navy);
+}
+
+.receipt-total-amount {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--electric-blue);
+  letter-spacing: -0.03em;
+}
+
+.receipt-barcode-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+}
+
+.barcode-svg {
+  width: 100%;
+  max-width: 220px;
+  height: 40px;
+}
+
+.btn-bundle-order {
+  width: 100%;
+  background: var(--golden-amber);
+  color: var(--deep-navy);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  padding: 14px 20px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--white);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  margin-top: 16px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+  transition: all var(--duration-fast) var(--ease-spring);
+}
+
+.btn-bundle-order:hover {
+  background: #ffb834;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .promo-grid {
+    grid-template-columns: 1fr;
+    max-width: 540px;
+    margin: 0 auto;
+  }
+}

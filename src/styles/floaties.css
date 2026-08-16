@@ -1,0 +1,171 @@
+/* ==========================================================================
+   BAIA CAFE — iOS26 Liquid Glass Floaties System (Rich Full-Page Constellation)
+   ========================================================================== */
+
+/* Background layer for floaties in every section */
+.section-floaties-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Base Liquid Glass Floatie Element */
+.glass-floatie {
+  position: absolute;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  backdrop-filter: blur(12px) saturate(190%);
+  -webkit-backdrop-filter: blur(12px) saturate(190%);
+  will-change: transform;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+/* Glass Specular Reflection Highlight */
+.glass-floatie::before {
+  content: "";
+  position: absolute;
+  top: 10%;
+  left: 14%;
+  width: 40%;
+  height: 28%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 80%);
+  transform: rotate(-30deg);
+  pointer-events: none;
+}
+
+/* -------------------------------------------------------------
+   VARIANT A: FROST-WHITE (For Dark & Electric Blue Backgrounds)
+   ------------------------------------------------------------- */
+.frost-white {
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.15),
+    0 14px 36px rgba(0, 0, 0, 0.22);
+  color: #FFFFFF;
+}
+
+.frost-white svg {
+  fill: #FFFFFF;
+  opacity: 0.9;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.18));
+}
+
+/* -------------------------------------------------------------
+   VARIANT B: FROST-BLUE (For Light Sand & Cream Backgrounds)
+   ------------------------------------------------------------- */
+.frost-blue {
+  background: radial-gradient(circle at 35% 30%, rgba(31, 58, 224, 0.18) 0%, rgba(31, 58, 224, 0.06) 100%);
+  border: 1.5px solid rgba(31, 58, 224, 0.35);
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.95),
+    inset 0 -2px 4px rgba(31, 58, 224, 0.12),
+    0 12px 28px rgba(22, 37, 92, 0.1);
+  color: var(--electric-blue);
+}
+
+.frost-blue svg {
+  fill: var(--electric-blue);
+  opacity: 0.85;
+  filter: drop-shadow(0 2px 6px rgba(31, 58, 224, 0.16));
+}
+
+/* Size Variants */
+.size-sm {
+  width: 42px;
+  height: 42px;
+}
+.size-sm svg { width: 20px; height: 20px; }
+
+.size-md {
+  width: 58px;
+  height: 58px;
+}
+.size-md svg { width: 26px; height: 26px; }
+
+.size-lg {
+  width: 72px;
+  height: 72px;
+}
+.size-lg svg { width: 32px; height: 32px; }
+
+.size-xl {
+  width: 86px;
+  height: 86px;
+}
+.size-xl svg { width: 38px; height: 38px; }
+
+.size-pill {
+  height: 38px;
+  border-radius: var(--radius-pill);
+  padding: 0 16px;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Shape Variants */
+.shape-flower {
+  border-radius: 44% 56% 58% 42% / 46% 46% 54% 54%;
+}
+
+.shape-wave {
+  border-radius: 60% 40% 50% 50% / 40% 60% 40% 60%;
+}
+
+.shape-teardrop {
+  border-radius: 50% 50% 50% 12% / 50% 50% 50% 12%;
+  transform: rotate(-45deg);
+}
+
+/* Multi-Phase Ambient Floating Keyframes */
+@keyframes floatGentle1 {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-18px) rotate(8deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes floatGentle2 {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-24px) rotate(-10deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes floatGentle3 {
+  0% { transform: translateY(0px) scale(1) rotate(0deg); }
+  50% { transform: translateY(-14px) scale(1.06) rotate(6deg); }
+  100% { transform: translateY(0px) scale(1) rotate(0deg); }
+}
+
+@keyframes floatGentle4 {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(-6deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.anim-1 { animation: floatGentle1 6.5s ease-in-out infinite; }
+.anim-2 { animation: floatGentle2 8s ease-in-out infinite -2s; }
+.anim-3 { animation: floatGentle3 7.2s ease-in-out infinite -4s; }
+.anim-4 { animation: floatGentle4 9s ease-in-out infinite -1.5s; }
+
+/* Ensure All Section Main Contents Always Stay Above Floaties */
+.hero-grid,
+.story-container,
+.promo-grid-section .container,
+.menu-section .container,
+.boards-section .container,
+.atmosphere-section .container,
+.site-footer .container {
+  position: relative;
+  z-index: 2;
+}

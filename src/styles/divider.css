@@ -1,0 +1,97 @@
+/* ==========================================================================
+   BAIA CAFE — Checkerboard & Wave Hybrid Divider
+   ========================================================================== */
+
+.divider-strip {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--electric-blue);
+  z-index: 10;
+  user-select: none;
+}
+
+/* Dual Pattern Ribbon */
+.checker-wave-band {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* 1. Checkerboard row */
+.checker-row {
+  height: 28px;
+  width: 200%;
+  background-image: 
+    linear-gradient(45deg, var(--white) 25%, transparent 25%), 
+    linear-gradient(-45deg, var(--white) 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, var(--white) 75%), 
+    linear-gradient(-45deg, transparent 75%, var(--white) 75%);
+  background-size: 28px 28px;
+  background-position: 0 0, 0 14px, 14px -14px, -14px 0px;
+  background-color: var(--electric-blue);
+  animation: checkerScroll 25s linear infinite;
+}
+
+/* 2. Wave pattern SVG row */
+.wave-svg-row {
+  height: 24px;
+  width: 200%;
+  background: var(--deep-navy);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.wave-repeat-track {
+  display: flex;
+  width: 200%;
+  animation: waveScroll 20s linear infinite;
+}
+
+.wave-repeat-unit {
+  flex-shrink: 0;
+  width: 60px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wave-repeat-unit svg {
+  width: 100%;
+  height: 14px;
+  stroke: var(--cream);
+}
+
+@keyframes checkerScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes waveScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Inverted Divider for Transition to Dark or White */
+.divider-strip.inverted {
+  background: var(--cream);
+}
+
+.divider-strip.inverted .checker-row {
+  background-color: var(--cream);
+  background-image: 
+    linear-gradient(45deg, var(--deep-navy) 25%, transparent 25%), 
+    linear-gradient(-45deg, var(--deep-navy) 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, var(--deep-navy) 75%), 
+    linear-gradient(-45deg, transparent 75%, var(--deep-navy) 75%);
+}
+
+.divider-strip.inverted .wave-svg-row {
+  background: var(--electric-blue);
+}
+
+.divider-strip.inverted .wave-repeat-unit svg {
+  stroke: var(--golden-amber);
+}

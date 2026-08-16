@@ -1,0 +1,211 @@
+/* ==========================================================================
+   BAIA CAFE — Location, Sunset & Footer
+   ========================================================================== */
+
+.site-footer {
+  background: var(--deep-navy);
+  color: var(--white);
+  padding: 80px 0 40px 0;
+  border-top: 4px solid var(--golden-amber);
+  position: relative;
+  overflow: hidden;
+}
+
+.footer-top-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr;
+  gap: var(--space-xl);
+  margin-bottom: 64px;
+}
+
+/* Column 1: Brand & Bay Hours */
+.footer-col-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.footer-brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.footer-glyphs {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 3px !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  max-width: 38px !important;
+  max-height: 38px !important;
+  background: var(--cream) !important;
+  padding: 5px !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+}
+
+.footer-glyphs svg,
+.footer-glyphs .glyph-svg {
+  width: 12px !important;
+  height: 12px !important;
+  min-width: 12px !important;
+  min-height: 12px !important;
+  max-width: 12px !important;
+  max-height: 12px !important;
+  fill: var(--deep-navy) !important;
+  display: block !important;
+}
+
+.footer-brand-name {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: var(--white);
+}
+
+.footer-tagline {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--cream);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+}
+
+.footer-hours-box {
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 3px solid var(--golden-amber);
+  padding: 12px 16px;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.footer-hours-box h5 {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--golden-amber);
+  margin-bottom: 4px;
+}
+
+.footer-hours-box p {
+  font-size: 0.9rem;
+  color: var(--white);
+  font-weight: 600;
+}
+
+/* Column 2: Sunset Countdown & Bay Vibe */
+.footer-col-vibe {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sunset-countdown-card {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sunset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sunset-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--golden-amber);
+  font-weight: 700;
+}
+
+.sunset-time-display {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: -0.02em;
+}
+
+.sunset-note {
+  font-size: 0.8rem;
+  color: var(--cream);
+  opacity: 0.85;
+}
+
+/* Column 3: Newsletter & Community */
+.footer-col-newsletter {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-col-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+
+.footer-newsletter-p {
+  font-size: 0.88rem;
+  color: var(--cream);
+  opacity: 0.85;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+/* Footer Bottom Strip */
+.footer-bottom-row {
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-copy-text {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.footer-social-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.social-link {
+  color: var(--cream);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: color var(--duration-fast);
+}
+
+.social-link:hover {
+  color: var(--golden-amber);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .footer-top-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}

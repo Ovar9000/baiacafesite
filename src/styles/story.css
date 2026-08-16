@@ -1,0 +1,255 @@
+/* ==========================================================================
+   BAIA CAFE — Story & Team BAIA Real Polaroid Section
+   ========================================================================== */
+
+.story-section {
+  position: relative;
+  background-color: var(--cream);
+  color: var(--deep-navy);
+  padding: 100px 0 120px 0;
+  overflow: hidden;
+}
+
+.story-container {
+  display: grid;
+  grid-template-columns: 1.05fr 1.05fr;
+  align-items: center;
+  gap: var(--space-2xl);
+  position: relative;
+  z-index: 2;
+}
+
+/* Left: Typography & Brand Philosophy */
+.story-text-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.story-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--deep-navy);
+  color: var(--cream);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--space-md);
+}
+
+.story-headline {
+  font-family: var(--font-headline);
+  font-weight: 900;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: var(--deep-navy);
+  margin-bottom: var(--space-md);
+}
+
+.story-headline .script-accent {
+  font-size: 1.25em;
+  color: var(--electric-blue);
+  transform: rotate(-3deg);
+  margin: 0 4px;
+}
+
+.story-body {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #38466b;
+  margin-bottom: var(--space-lg);
+  font-weight: 500;
+}
+
+.story-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  width: 100%;
+  padding: var(--space-md) 0;
+  border-top: 2px dashed rgba(22, 37, 92, 0.18);
+  border-bottom: 2px dashed rgba(22, 37, 92, 0.18);
+  margin-bottom: var(--space-lg);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-num {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--electric-blue);
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-weight: 700;
+}
+
+.btn-story-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--deep-navy);
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(22, 37, 92, 0.2);
+  transition: all var(--duration-fast) var(--ease-spring);
+}
+
+.btn-story-pill:hover {
+  background: var(--electric-blue);
+  color: var(--white);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 14px 28px rgba(31, 58, 224, 0.3);
+}
+
+/* Right: Scattered Interactive Polaroid Gallery */
+.polaroid-gallery-wrapper {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  perspective: 1000px;
+}
+
+.polaroid-card {
+  position: absolute;
+  background: #FFFFFF;
+  padding: 12px 12px 24px 12px;
+  border-radius: 6px;
+  box-shadow: 0 16px 36px rgba(22, 37, 92, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.4s var(--ease-spring), box-shadow 0.4s ease, z-index 0s;
+  user-select: none;
+}
+
+.polaroid-card:hover {
+  z-index: 20 !important;
+  transform: scale(1.08) rotate(0deg) translateZ(40px) !important;
+  box-shadow: 0 28px 56px rgba(22, 37, 92, 0.28);
+}
+
+.polaroid-img-box {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #f0f0f0;
+}
+
+.polaroid-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.polaroid-caption {
+  font-family: var(--font-script);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--deep-navy);
+  text-align: center;
+  margin-top: 10px;
+  line-height: 1.1;
+}
+
+/* 3 Real Polaroid Positions */
+.polaroid-1 {
+  top: 0px;
+  left: 10px;
+  width: 250px;
+  transform: rotate(-6deg);
+  z-index: 2;
+}
+
+.polaroid-2 {
+  top: 40px;
+  right: 10px;
+  width: 260px;
+  transform: rotate(6deg);
+  z-index: 3;
+}
+
+.polaroid-3 {
+  bottom: 10px;
+  left: 80px;
+  width: 240px;
+  transform: rotate(-3deg);
+  z-index: 4;
+}
+
+.polaroid-stamp {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: var(--golden-amber);
+  color: var(--deep-navy);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  border: 2px dashed var(--deep-navy);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  transform: rotate(14deg);
+  z-index: 5;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .story-container {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  .polaroid-gallery-wrapper {
+    height: 440px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .story-section {
+    padding: 60px 0 80px 0;
+  }
+  .polaroid-gallery-wrapper {
+    height: 380px;
+  }
+  .polaroid-1 {
+    width: 190px;
+    left: 0;
+  }
+  .polaroid-2 {
+    width: 200px;
+    right: 0;
+  }
+  .polaroid-3 {
+    width: 190px;
+    left: 30px;
+  }
+}

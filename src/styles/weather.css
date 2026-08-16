@@ -1,0 +1,47 @@
+/* ==========================================================================
+   BAIA CAFE — Weather Easter Egg & Rain Simulation Canvas
+   ========================================================================== */
+
+#weather-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 98;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+#weather-canvas.active {
+  opacity: 1;
+}
+
+/* Weather Status Pill Interactive Trigger */
+.shore-status-pill {
+  cursor: pointer;
+  user-select: none;
+  transition: transform var(--duration-fast) var(--ease-spring), background var(--duration-fast), border-color var(--duration-fast);
+}
+
+.shore-status-pill:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: rgba(22, 37, 92, 0.7);
+  border-color: var(--golden-amber);
+}
+
+.weather-badge-icon {
+  font-size: 1rem;
+  margin-right: 2px;
+}
+
+.weather-easter-hint {
+  font-size: 0.7rem;
+  opacity: 0.75;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 6px;
+  text-transform: uppercase;
+}
