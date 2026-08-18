@@ -202,6 +202,27 @@
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Subtle radial spotlight gradient behind headline fading toward CTA button */
+.hero-primary-block::before {
+  content: '';
+  position: absolute;
+  top: -25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140%;
+  height: 135%;
+  background: radial-gradient(
+    ellipse 70% 60% at 50% 30%,
+    rgba(68, 122, 255, 0.6) 0%,
+    rgba(30, 74, 255, 0.25) 55%,
+    rgba(30, 74, 255, 0) 80%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
 .hero-supporting-block {
@@ -213,55 +234,59 @@
   margin-top: var(--space-lg);
 }
 
-/* Single Merged Trust Signal Capsule */
+/* Fix 1: Single Merged Trust Signal Capsule — Quiet Utility Line (No pill badge/border) */
 .hero-trust-row {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(22, 37, 92, 0.45);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1.5px solid rgba(245, 166, 35, 0.5);
-  padding: 6px 16px;
-  border-radius: var(--radius-pill);
+  justify-content: flex-start;
+  gap: 6px 8px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: var(--amber-contrast);
-  margin-bottom: var(--space-md);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-  letter-spacing: 0.02em;
+  font-size: 0.72rem; /* ~11.5px: Quiet utility line */
+  font-weight: 700;
+  color: rgba(245, 233, 214, 0.75);
+  margin-bottom: 8px;
+  box-shadow: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   max-width: 100%;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .trust-rating {
   color: var(--golden-amber);
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .trust-divider {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .trust-hours {
-  color: var(--cream);
-  font-weight: 700;
+  color: rgba(245, 233, 214, 0.75);
+  font-weight: 600;
 }
 
-/* Hero Headline */
+/* Fix 1 & 2: Dominant Headline with Tight Proximity to Pitch Paragraph */
 .hero-headline {
   font-family: var(--font-headline);
   font-weight: 900;
-  font-size: clamp(2.4rem, 5.5vw, 4.4rem);
+  font-size: clamp(2.8rem, 5.5vw, 4.4rem);
   line-height: 0.98;
   letter-spacing: -0.04em;
   text-transform: uppercase;
   color: var(--white);
-  margin-bottom: var(--space-md);
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+  margin-bottom: 6px; /* Pulled tight to body paragraph as one pitch unit */
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
   word-wrap: break-word;
   overflow-wrap: break-word;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-headline .headline-row {
@@ -274,25 +299,37 @@
   transform: rotate(-4deg);
 }
 
+/* Fix 2: Body Paragraph pulled tight to headline, loose gap before CTA */
 .hero-subtitle {
-  font-size: 1.1rem;
-  line-height: 1.6;
+  font-size: 1.02rem;
+  line-height: 1.55;
   color: var(--cream);
-  margin-bottom: var(--space-lg);
+  margin-bottom: 24px; /* Loose gap before deliberate next step CTA */
   max-width: 520px;
+  position: relative;
+  z-index: 1;
 }
 
-/* Hero Call to Action Group */
+/* Fix 1 & 2: Hero Call to Action Group — Second-Most Visually Loud Element */
 .hero-cta-group {
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  margin-bottom: var(--space-sm);
+  margin-bottom: 32px; /* Loose gap before photo proof section */
   flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-primary-cta {
   font-size: 1.05rem;
+  padding: 16px 36px;
+  box-shadow: 0 10px 28px rgba(245, 166, 35, 0.5), 0 0 28px rgba(245, 166, 35, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.hero-primary-cta:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 14px 36px rgba(245, 166, 35, 0.65), 0 0 36px rgba(245, 166, 35, 0.5);
 }
 
 /* Illustrated Surfer Mascot */
@@ -427,7 +464,7 @@
   overflow: visible;
 }
 
-/* Hero Right: 3D Card Visual Frame */
+/* Fix 3: Hero Right: 3D Card Visual Frame with 3° Rotation and Deep Drop Shadow */
 .hero-visual-container {
   display: flex;
   justify-content: center;
@@ -437,6 +474,7 @@
   width: 100%;
   min-height: 480px;
   box-sizing: border-box;
+  margin-bottom: 36px; /* Loose gap before info grid */
 }
 
 .hero-3d-card {
@@ -446,7 +484,6 @@
   height: 480px;
   min-height: 480px;
   transform-style: preserve-3d;
-  transition: transform 0.1s ease-out;
   cursor: grab;
 }
 
@@ -456,9 +493,16 @@
   border-radius: var(--radius-xl);
   overflow: hidden;
   position: relative;
-  box-shadow: 0 30px 60px rgba(10, 20, 70, 0.4);
+  transform: rotate(-3deg); /* Directional physical object anchor */
+  box-shadow: 0 24px 50px -8px rgba(10, 20, 60, 0.65), 0 12px 28px -6px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.25);
   border: 4px solid var(--white);
   background: #0f172a;
+  transition: transform 0.3s var(--ease-spring), box-shadow 0.3s ease;
+}
+
+.hero-image-frame:hover {
+  transform: rotate(-1deg) scale(1.02);
+  box-shadow: 0 30px 60px -8px rgba(10, 20, 60, 0.75), 0 16px 32px -6px rgba(0, 0, 0, 0.45);
 }
 
 .hero-image-frame img {
@@ -469,24 +513,27 @@
   display: block;
 }
 
-/* Floating Flavor Tag */
+/* Fix 4: Floating Flavor Tag with Clean Breathing Room and Counter-Tilt */
 .floating-flavor-pill {
   position: absolute;
-  bottom: 24px;
-  left: -20px;
-  background: var(--cream);
-  color: var(--deep-navy);
-  padding: 10px 20px;
+  bottom: 16px;
+  left: 16px;
+  background: rgba(16, 28, 75, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--white);
+  padding: 8px 16px;
   border-radius: var(--radius-pill);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
-  border: 3px solid var(--white);
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(10, 20, 60, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.9);
   z-index: 10;
   font-weight: 800;
-  font-size: 0.9rem;
-  transform: translateZ(40px);
+  font-size: 0.825rem;
+  transform: translateZ(40px) rotate(3deg); /* Counter-rotates so badge sits level and proud */
+  pointer-events: none;
 }
 
 .floating-flavor-pill .flavor-tag {
@@ -494,8 +541,10 @@
   color: var(--white);
   padding: 2px 8px;
   border-radius: var(--radius-pill);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 900;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 /* ==========================================================================
@@ -506,7 +555,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 24px;
+    gap: 0;
     text-align: center;
   }
   .hero-content {
@@ -520,32 +569,38 @@
   }
   .hero-trust-row {
     justify-content: center;
+    margin-bottom: 8px;
+  }
+  .hero-headline {
+    margin-bottom: 6px;
   }
   .hero-subtitle {
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: 20px;
   }
   .hero-cta-group {
     justify-content: center;
-    margin-bottom: 0;
+    margin-bottom: 26px;
   }
   .hero-visual-container {
     order: 2;
     min-height: auto;
     width: 100%;
     max-width: 380px;
-    margin: 12px auto;
+    margin: 4px auto 30px auto;
   }
   .hero-3d-card {
-    height: 340px;
-    min-height: 340px;
+    height: 320px;
+    min-height: 320px;
     max-width: 100%;
   }
   .hero-supporting-block {
     order: 3;
     align-items: center;
     max-width: 520px;
-    margin-top: 8px;
+    margin-top: 0;
+    gap: 14px;
   }
   .hero-shore-strip {
     text-align: left;
@@ -567,39 +622,55 @@
 
 @media (max-width: 640px) {
   .hero-section {
-    padding-top: calc(var(--header-height) + 12px);
-    padding-bottom: 32px;
+    padding-top: calc(var(--header-height) + 10px);
+    padding-bottom: 96px;
+  }
+  .hero-trust-row {
+    font-size: 0.72rem; /* ~11.5px: quiet utility line */
+    gap: 6px;
+    margin-bottom: 6px;
   }
   .hero-headline {
-    font-size: clamp(1.95rem, 7.2vw, 2.45rem);
+    font-size: clamp(2.15rem, 8vw, 2.75rem); /* At least 3x the 11.5px rating strip (~35-44px) */
+    line-height: 1.0;
+    margin-bottom: 6px;
   }
   .hero-subtitle {
-    font-size: 0.95rem;
-    line-height: 1.5;
-    margin-bottom: var(--space-md);
+    font-size: 0.88rem;
+    line-height: 1.45;
+    margin-bottom: 18px;
+    max-width: 440px;
   }
   .hero-cta-group {
     width: 100%;
+    margin-bottom: 22px;
   }
   .hero-cta-group .btn-primary-glow {
     width: 100%;
+    max-width: 360px;
     justify-content: center;
-    padding: 15px 24px;
-    font-size: 1rem;
+    padding: 14px 24px;
+    font-size: 0.98rem;
+    min-height: 50px;
   }
   .hero-visual-container {
-    max-width: 100%;
-    margin: 8px auto;
+    max-width: 320px;
+    margin: 4px auto 26px auto;
   }
   .hero-3d-card {
-    height: 300px;
-    min-height: 300px;
+    height: 250px;
+    min-height: 250px;
   }
   .floating-flavor-pill {
     bottom: 12px;
-    left: 8px;
-    padding: 6px 12px;
-    font-size: 0.75rem;
+    left: 12px;
+    padding: 5px 12px;
+    font-size: 0.72rem;
+    transform: translateZ(40px) rotate(3deg);
+  }
+  .floating-flavor-pill .flavor-tag {
+    font-size: 0.62rem;
+    padding: 2px 6px;
   }
   .hero-mascot-wrapper {
     max-width: 100%;
@@ -617,6 +688,26 @@
   .strip-value {
     font-size: 0.8rem;
     line-height: 1.25;
+  }
+}
+
+@media (min-width: 390px) and (max-width: 640px) {
+  .hero-visual-container {
+    max-width: 340px;
+  }
+  .hero-3d-card {
+    height: 265px;
+    min-height: 265px;
+  }
+}
+
+@media (min-width: 420px) and (max-width: 640px) {
+  .hero-visual-container {
+    max-width: 360px;
+  }
+  .hero-3d-card {
+    height: 285px;
+    min-height: 285px;
   }
 }
 

@@ -234,11 +234,22 @@
   flex-wrap: wrap;
 }
 
-/* Boards Grid */
+/* Boards Grid — 2x2 Symmetrical Grid */
 .boards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+}
+
+.boards-grid .board-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .boards-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
 }
 
 .board-card {
