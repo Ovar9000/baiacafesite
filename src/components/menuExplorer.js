@@ -5,19 +5,11 @@ export function initMenuExplorer() {
   const container = document.getElementById('menu-explorer-root');
   if (!container) return;
 
-  let activeBoard = 'drinks'; // 'drinks' | 'food'
+  let activeBoard = 'food'; // 'food' | 'drinks'
   let searchQuery = '';
-  let openCategories = new Set();
+  let openCategories = new Set(['burgers', 'rice-meals']);
 
   const categoryIcons = {
-    // Drinks
-    'classic': '☕',
-    'house-special': '⭐',
-    'signature-coffee': '🌊',
-    'blended': '🥤',
-    'non-coffee': '🍵',
-    'fruit-soda': '🍹',
-    'iced-tea': '🧋',
     // Food
     'mirindal': '🧇',
     'burgers': '🍔',
@@ -25,7 +17,15 @@ export function initMenuExplorer() {
     'rice-meals': '🍚',
     'pub': '🍗',
     'pasta': '🍝',
-    'sides': '🍚'
+    'sides': '🍚',
+    // Drinks
+    'classic': '☕',
+    'house-special': '⭐',
+    'signature-coffee': '🌊',
+    'blended': '🥤',
+    'non-coffee': '🍵',
+    'fruit-soda': '🍹',
+    'iced-tea': '🧋'
   };
 
   function getTotalBoardItemsCount() {
@@ -70,21 +70,21 @@ export function initMenuExplorer() {
       <div class="board-switcher" id="menu-board-switcher" role="tablist" aria-label="Menu Boards">
         <button 
           role="tab" 
-          aria-selected="${activeBoard === 'drinks'}" 
-          class="board-tab-btn ${activeBoard === 'drinks' ? 'active' : ''}" 
-          data-board="drinks"
-          id="tab-drinks"
-        >
-          ☕ Board 2 — Drinks & Espresso (${menuData.drinks.reduce((s, c) => s + c.items.length, 0)} items)
-        </button>
-        <button 
-          role="tab" 
           aria-selected="${activeBoard === 'food'}" 
           class="board-tab-btn ${activeBoard === 'food' ? 'active' : ''}" 
           data-board="food"
           id="tab-food"
         >
           🍔 Board 1 — Food & Smash Burgers (${menuData.food.reduce((s, c) => s + c.items.length, 0)} items)
+        </button>
+        <button 
+          role="tab" 
+          aria-selected="${activeBoard === 'drinks'}" 
+          class="board-tab-btn ${activeBoard === 'drinks' ? 'active' : ''}" 
+          data-board="drinks"
+          id="tab-drinks"
+        >
+          ☕ Board 2 — Drinks & Espresso (${menuData.drinks.reduce((s, c) => s + c.items.length, 0)} items)
         </button>
       </div>
 

@@ -621,12 +621,6 @@ main,
   border-color: rgba(245, 166, 35, 0.5);
 }
 
-.review-card.featured {
-  background: #182a6d;
-  border-color: var(--golden-amber);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3);
-}
-
 .review-top-row {
   display: flex;
   align-items: center;
@@ -981,10 +975,10 @@ main,
     display: none;
   }
   body {
-    padding-bottom: 64px;
+    padding-bottom: 90px;
   }
   .toast-container {
-    bottom: 80px;
+    bottom: 96px;
     right: 16px;
     left: 16px;
   }
