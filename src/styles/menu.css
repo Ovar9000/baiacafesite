@@ -236,20 +236,23 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .category-icon-emoji {
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .category-title-text {
   font-family: var(--font-headline);
   font-weight: 900;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   letter-spacing: -0.02em;
   text-transform: uppercase;
   color: var(--deep-navy);
+  white-space: nowrap;
 }
 
 .category-count-pill {
@@ -258,12 +261,18 @@
   font-weight: 800;
   background: rgba(22, 37, 92, 0.08);
   color: var(--deep-navy);
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: var(--radius-pill);
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .menu-accordion-card.is-open .category-count-pill {
-  background: var(--electric-blue);
+  background: var(--royal-blue, var(--electric-blue));
   color: var(--white);
 }
 
@@ -274,7 +283,9 @@
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 800;
-  color: var(--electric-blue);
+  color: var(--royal-blue, var(--electric-blue));
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .chevron-icon {
@@ -580,10 +591,24 @@
     padding: 12px 20px;
   }
   .category-accordion-btn {
-    padding: 16px 18px;
+    padding: 14px 16px;
+    gap: 8px;
+  }
+  .category-title-left {
+    gap: 8px;
+  }
+  .category-icon-emoji {
+    font-size: 1.2rem;
   }
   .category-title-text {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
+  }
+  .category-count-pill {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+  .category-toggle-indicator {
+    font-size: 0.75rem;
   }
   .category-accordion-body {
     padding: 16px;

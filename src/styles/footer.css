@@ -85,11 +85,13 @@
 }
 
 .footer-hours-box {
-  background: rgba(255, 255, 255, 0.05);
+  background: #0f1c48;
   border-left: 3.5px solid var(--golden-amber);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   padding: 14px 18px;
   margin-top: 4px;
+  position: relative;
+  z-index: 2;
 }
 
 .hours-title {

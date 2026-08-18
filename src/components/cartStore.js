@@ -61,24 +61,22 @@ class CartStore {
   }
 
   addDoubleTroubleBundle() {
-    const bundleKey = 'bundle-double-trouble';
+    const bundleKey = 'pairing-shore-favorites';
     const existing = this.items.find(i => i.key === bundleKey);
     if (existing) {
       existing.quantity += 1;
     } else {
       this.items.push({
-        id: 'bundle-double-trouble',
+        id: 'pairing-shore-favorites',
         key: bundleKey,
-        name: '⚡ Double Trouble Combo Deal',
+        name: '⚡ Popular Shore Pairing',
         description: 'BAIA Smash Burger + Sea Salt Latte (Iced) + Chili BBQ Fries',
         quantity: 1,
-        unitPrice: 480,
-        originalPrice: 565,
-        discount: 85,
+        unitPrice: 565,
         isBundle: true
       });
     }
-    this.showToast('Combo Deal Added!', 'Double Trouble Bundle (₱480) added to your order list', '🍔');
+    this.showToast('Shore Pairing Added!', 'BAIA Smash + Sea Salt Latte + Fries (₱565) added to your order list', '🍔');
     this.openDrawer();
   }
 
