@@ -7,7 +7,7 @@ export function initMenuExplorer() {
 
   let activeBoard = 'food'; // 'food' | 'drinks'
   let searchQuery = '';
-  let openCategories = new Set(['burgers', 'rice-meals']);
+  let openCategories = new Set();
 
   const categoryIcons = {
     // Food
@@ -212,11 +212,7 @@ export function initMenuExplorer() {
       btn.addEventListener('click', () => {
         activeBoard = btn.dataset.board;
         searchQuery = '';
-        if (activeBoard === 'drinks') {
-          openCategories = new Set(['house-special', 'classic']);
-        } else {
-          openCategories = new Set(['burgers', 'rice-meals']);
-        }
+        openCategories = new Set();
         render();
       });
     });

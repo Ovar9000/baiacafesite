@@ -234,15 +234,20 @@
   flex-wrap: wrap;
 }
 
-/* Boards Grid — 2x2 Symmetrical Grid */
+/* Boards Grid — 3 Columns on Desktop, 2 on Tablet, 1 on Mobile */
 .boards-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 28px;
 }
 
-.boards-grid .board-card:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
+@media (max-width: 1024px) {
+  .boards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .boards-grid .board-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 768px) {
