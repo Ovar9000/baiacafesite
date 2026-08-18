@@ -8,9 +8,13 @@ import { initLiquidFloaties } from './components/liquidFloaties.js';
 import { initWeatherEasterEgg } from './components/weatherEasterEgg.js';
 import { initCartDrawer } from './components/cartDrawer.js';
 import { injectSpeedInsights } from '@vercel/speed-insights';
+import { inject } from '@vercel/analytics';
 
 // Initialize Vercel Speed Insights
 injectSpeedInsights();
+
+// Initialize Vercel Web Analytics
+inject();
 
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize showcase modules
