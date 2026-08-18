@@ -7,6 +7,10 @@ import { initShoreConditions } from './components/shoreConditions.js';
 import { initLiquidFloaties } from './components/liquidFloaties.js';
 import { initWeatherEasterEgg } from './components/weatherEasterEgg.js';
 import { initCartDrawer } from './components/cartDrawer.js';
+import { injectSpeedInsights } from '@vercel/speed-insights';
+
+// Initialize Vercel Speed Insights
+injectSpeedInsights();
 
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize showcase modules
