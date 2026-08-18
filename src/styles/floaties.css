@@ -169,3 +169,21 @@
   position: relative;
   z-index: 2;
 }
+
+@media (max-width: 768px) {
+  .glass-floatie {
+    opacity: 0.15 !important;
+  }
+  .size-lg, .size-xl {
+    width: 44px;
+    height: 44px;
+  }
+  .size-lg svg, .size-xl svg {
+    width: 20px;
+    height: 20px;
+  }
+  .size-pill {
+    display: none;
+  }
+}
+

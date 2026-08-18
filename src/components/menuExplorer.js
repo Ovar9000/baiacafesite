@@ -7,7 +7,7 @@ export function initMenuExplorer() {
 
   let activeBoard = 'drinks'; // 'drinks' | 'food'
   let searchQuery = '';
-  let openCategories = new Set(['house-special', 'burgers']);
+  let openCategories = new Set();
 
   const categoryIcons = {
     // Drinks

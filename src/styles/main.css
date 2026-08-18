@@ -14,10 +14,13 @@
 @import './footer.css';
 
 :root {
-  /* Color Palette — Tailored Coastal Electric Scheme (WCAG AA Compliant) */
-  --electric-blue: #1F3AE0;
-  --electric-blue-dark: #162BB5;
-  --electric-blue-glow: rgba(31, 58, 224, 0.4);
+  /* Color Palette — Official BAIA Cafe Royal Blue (#1E4AFF) from Brand Logo (WCAG AA Compliant) */
+  --royal-blue: #1E4AFF;
+  --royal-blue-dark: #1538D4;
+  --royal-blue-glow: rgba(30, 74, 255, 0.4);
+  --electric-blue: #1E4AFF;
+  --electric-blue-dark: #1538D4;
+  --electric-blue-glow: rgba(30, 74, 255, 0.4);
   --deep-navy: #16255C;
   --deep-navy-dark: #0E1A45;
   --cream: #F5E9D6;
@@ -153,7 +156,7 @@ img {
   border-radius: var(--radius-pill);
 }
 
-/* Global Container */
+/* Global Container & Section Stacking Context */
 .container {
   width: 100%;
   max-width: var(--max-width);
@@ -162,6 +165,21 @@ img {
   padding-left: var(--container-padding);
   padding-right: var(--container-padding);
   box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+}
+
+main,
+.site-footer,
+.hero-section,
+.story-section,
+.promo-grid-section,
+.menu-section,
+.reviews-section,
+.boards-section,
+.atmosphere-section {
+  position: relative;
+  z-index: 2;
 }
 
 /* Performance Optimized Atmosphere Texture */
@@ -585,26 +603,28 @@ img {
 }
 
 .review-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background: #142259;
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--radius-lg);
   padding: 28px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 2;
   transition: transform var(--duration-fast), border-color var(--duration-fast);
 }
 
 .review-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(245, 166, 35, 0.4);
+  border-color: rgba(245, 166, 35, 0.5);
 }
 
 .review-card.featured {
-  background: rgba(255, 255, 255, 0.08);
+  background: #182a6d;
   border-color: var(--golden-amber);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3);
 }
 
 .review-top-row {
@@ -956,6 +976,9 @@ img {
 @media (max-width: 768px) {
   .mobile-sticky-bar {
     display: block;
+  }
+  .site-header .nav-cart-btn {
+    display: none;
   }
   body {
     padding-bottom: 64px;

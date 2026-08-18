@@ -24,11 +24,23 @@ export function initHero3D() {
     });
   }
 
-  // Surfer Mascot Click Interaction
+  // Surfer Mascot Click Interaction -> Smooth scroll to About & Story section
   const mascot = document.querySelector('.hero-mascot-wrapper');
   if (mascot) {
-    mascot.addEventListener('click', () => {
-      showShowcaseToast('🏄‍♂️ Welcome to BAIA Cafe!', 'Catch the morning breeze, grab an Asin Tibuok latte, and chill on the shore.', '🌴');
+    const handleMascotAction = (e) => {
+      e.preventDefault();
+      const storySec = document.getElementById('story') || document.getElementById('about');
+      if (storySec) {
+        storySec.scrollIntoView({ behavior: 'smooth' });
+      }
+      showShowcaseToast('🏄‍♂️ Coffee by the Bay', 'Fresh brews & free guest skimboards right on the sand!', '🌊');
+    };
+
+    mascot.addEventListener('click', handleMascotAction);
+    mascot.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        handleMascotAction(e);
+      }
     });
   }
 }

@@ -197,6 +197,58 @@
   box-sizing: border-box;
 }
 
+.hero-primary-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.hero-supporting-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 16px;
+  margin-top: var(--space-lg);
+}
+
+/* Single Merged Trust Signal Capsule */
+.hero-trust-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(22, 37, 92, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(245, 166, 35, 0.5);
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--amber-contrast);
+  margin-bottom: var(--space-md);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.02em;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.trust-rating {
+  color: var(--golden-amber);
+  font-weight: 900;
+}
+
+.trust-divider {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.trust-hours {
+  color: var(--cream);
+  font-weight: 700;
+}
+
 /* Hero Headline */
 .hero-headline {
   font-family: var(--font-headline);
@@ -235,8 +287,12 @@
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-sm);
   flex-wrap: wrap;
+}
+
+.hero-primary-cta {
+  font-size: 1.05rem;
 }
 
 /* Illustrated Surfer Mascot */
@@ -250,9 +306,16 @@
   border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  max-width: 400px;
+  max-width: 520px;
   width: 100%;
   box-sizing: border-box;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-spring), background-color var(--duration-fast);
+}
+
+.hero-mascot-wrapper:hover {
+  background: rgba(22, 37, 92, 0.6);
+  transform: translateY(-2px);
 }
 
 .mascot-illustration {
@@ -268,7 +331,8 @@
   border: 2px solid var(--deep-navy);
 }
 
-.mascot-text h4 {
+.mascot-text h4,
+.mascot-text .mascot-title {
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 0.95rem;
@@ -281,18 +345,48 @@
   color: var(--cream);
 }
 
+/* Recreation & Skimboard Sub-Action Link */
+.hero-recreation-sublink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--cream);
+  width: 100%;
+  max-width: 520px;
+}
+
+.recreation-anchor {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 12px;
+  background: rgba(245, 166, 35, 0.15);
+  color: var(--amber-contrast);
+  font-weight: 800;
+  text-decoration: none;
+  border: 1px solid var(--golden-amber);
+  border-radius: var(--radius-pill);
+  transition: all var(--duration-fast);
+}
+
+.recreation-anchor:hover {
+  background: var(--golden-amber);
+  color: var(--deep-navy);
+}
+
 /* Integrated Live Shore Telemetry Grid */
 .hero-shore-strip {
-  margin-top: var(--space-lg);
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px 24px;
+  gap: 12px 20px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   border-radius: var(--radius-lg);
-  padding: 14px 22px;
+  padding: 14px 20px;
   box-shadow: 0 8px 32px rgba(10, 20, 70, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.4);
   width: 100%;
   max-width: 520px;
@@ -301,8 +395,9 @@
 
 .shore-strip-item {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
   justify-content: flex-start;
   text-align: left;
   min-width: 0;
@@ -326,13 +421,10 @@
   font-weight: 800;
   font-size: 0.85rem;
   color: var(--white);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.shore-strip-divider {
-  display: none;
+  line-height: 1.35;
+  white-space: normal;
+  word-break: normal;
+  overflow: visible;
 }
 
 /* Hero Right: 3D Card Visual Frame */
@@ -377,53 +469,6 @@
   display: block;
 }
 
-/* Floating Circular Badge */
-.floating-order-badge {
-  position: absolute;
-  top: -24px;
-  right: -24px;
-  width: 120px;
-  height: 120px;
-  background: var(--golden-amber);
-  color: var(--deep-navy);
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
-  border: 3px solid var(--white);
-  z-index: 10;
-  transform: translateZ(50px);
-  transition: transform var(--duration-fast) var(--ease-spring);
-}
-
-.floating-order-badge:hover {
-  transform: translateZ(60px) scale(1.08) rotate(6deg);
-}
-
-.badge-text-top {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.badge-text-main {
-  font-family: var(--font-headline);
-  font-weight: 900;
-  font-size: 1rem;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.badge-icon {
-  font-size: 1rem;
-  margin-top: 2px;
-}
-
 /* Floating Flavor Tag */
 .floating-flavor-pill {
   position: absolute;
@@ -458,13 +503,23 @@
    ========================================================================== */
 @media (max-width: 1024px) {
   .hero-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
     text-align: center;
-    gap: 40px;
   }
   .hero-content {
+    display: contents;
+  }
+  .hero-primary-block {
+    order: 1;
     align-items: center;
-    max-width: 100%;
+    text-align: center;
+    max-width: 580px;
+  }
+  .hero-trust-row {
+    justify-content: center;
   }
   .hero-subtitle {
     margin-left: auto;
@@ -472,9 +527,32 @@
   }
   .hero-cta-group {
     justify-content: center;
+    margin-bottom: 0;
+  }
+  .hero-visual-container {
+    order: 2;
+    min-height: auto;
+    width: 100%;
+    max-width: 380px;
+    margin: 12px auto;
+  }
+  .hero-3d-card {
+    height: 340px;
+    min-height: 340px;
+    max-width: 100%;
+  }
+  .hero-supporting-block {
+    order: 3;
+    align-items: center;
+    max-width: 520px;
+    margin-top: 8px;
   }
   .hero-shore-strip {
+    text-align: left;
+  }
+  .hero-recreation-sublink {
     justify-content: center;
+    text-align: center;
   }
 }
 
@@ -483,47 +561,62 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 10px 16px;
     width: 100%;
-    padding: 12px 16px;
+    padding: 14px 16px;
   }
 }
 
 @media (max-width: 640px) {
   .hero-section {
-    padding-top: calc(var(--header-height) + 16px);
-    padding-bottom: 40px;
+    padding-top: calc(var(--header-height) + 12px);
+    padding-bottom: 32px;
   }
   .hero-headline {
-    font-size: clamp(2rem, 7.5vw, 2.45rem);
+    font-size: clamp(1.95rem, 7.2vw, 2.45rem);
+  }
+  .hero-subtitle {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: var(--space-md);
   }
   .hero-cta-group {
     width: 100%;
-    flex-direction: column;
-    gap: 12px;
   }
-  .hero-cta-group .btn-primary-glow,
-  .hero-cta-group .btn-secondary-pill {
+  .hero-cta-group .btn-primary-glow {
     width: 100%;
     justify-content: center;
-    padding: 14px 20px;
-    font-size: 0.95rem;
+    padding: 15px 24px;
+    font-size: 1rem;
+  }
+  .hero-visual-container {
+    max-width: 100%;
+    margin: 8px auto;
   }
   .hero-3d-card {
-    height: 380px;
-    max-width: 100%;
-  }
-  .floating-order-badge {
-    width: 90px;
-    height: 90px;
-    top: -12px;
-    right: -10px;
-  }
-  .badge-text-main {
-    font-size: 0.8rem;
+    height: 300px;
+    min-height: 300px;
   }
   .floating-flavor-pill {
-    display: none;
+    bottom: 12px;
+    left: 8px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
   }
   .hero-mascot-wrapper {
     max-width: 100%;
+    padding: 10px 16px;
+  }
+  .hero-shore-strip {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 12px;
+    padding: 12px 14px;
+    max-width: 100%;
+  }
+  .strip-label {
+    font-size: 0.68rem;
+  }
+  .strip-value {
+    font-size: 0.8rem;
+    line-height: 1.25;
   }
 }
+
