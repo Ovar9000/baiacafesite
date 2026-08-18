@@ -172,6 +172,10 @@
   color: var(--white);
   letter-spacing: -0.02em;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  min-width: 140px;
+  display: inline-block;
 }
 
 .sunset-time-label {

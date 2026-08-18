@@ -160,10 +160,12 @@
 
 /* Ensure All Section Main Contents Always Stay Above Floaties */
 .hero-grid,
+.snapshot-container,
 .story-container,
 .promo-grid-section .container,
 .menu-section .container,
 .boards-section .container,
+.reviews-section .container,
 .atmosphere-section .container,
 .site-footer .container {
   position: relative;
@@ -171,19 +173,7 @@
 }
 
 @media (max-width: 768px) {
-  .glass-floatie {
-    opacity: 0.15 !important;
-  }
-  .size-lg, .size-xl {
-    width: 44px;
-    height: 44px;
-  }
-  .size-lg svg, .size-xl svg {
-    width: 20px;
-    height: 20px;
-  }
-  .size-pill {
+  .section-floaties-layer {
     display: none;
   }
 }
-

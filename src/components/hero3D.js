@@ -8,8 +8,7 @@ export function initHero3D() {
     VanillaTilt.init(heroCard, {
       max: 10,
       speed: 400,
-      glare: true,
-      'max-glare': 0.2,
+      glare: false,
       perspective: 1200,
       scale: 1.02
     });

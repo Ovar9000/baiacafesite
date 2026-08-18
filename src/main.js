@@ -16,6 +16,28 @@ injectSpeedInsights();
 // Initialize Vercel Web Analytics
 inject();
 
+/**
+ * ============================================================================
+ * PROMOS & SEASONAL EVENTS TOGGLE
+ * ============================================================================
+ * Set SHOW_PROMOS_SECTION = true to activate and display the seasonal events
+ * & holiday promotions section on the landing page.
+ * When false (default), the section remains completely hidden with zero layout impact.
+ */
+export const SHOW_PROMOS_SECTION = false;
+
+function initSeasonalPromosToggle() {
+  const section = document.getElementById('seasonal-events');
+  if (!section) return;
+  if (SHOW_PROMOS_SECTION) {
+    section.hidden = false;
+    section.classList.remove('is-hidden');
+  } else {
+    section.hidden = true;
+    section.classList.add('is-hidden');
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize showcase modules
   initHero3D();
@@ -26,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initLiquidFloaties();
   initWeatherEasterEgg();
   initCartDrawer();
+  initSeasonalPromosToggle();
 
   // Scroll Header Glassmorphism Effect
   const header = document.getElementById('site-header');
@@ -37,29 +60,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, { passive: true });
 
-  // Update Sunset Countdown to 5:58 PM Daily
-  function updateSunsetCountdown() {
-    const display = document.getElementById('sunset-countdown-display');
-    if (!display) return;
+  // Scroll-Aware Mobile Sticky Order Bar (IntersectionObserver on Hero Section)
+  function initScrollAwareStickyBar() {
+    const stickyBar = document.getElementById('mobile-sticky-bar');
+    const heroSection = document.getElementById('hero') || document.querySelector('.hero-section');
+    if (!stickyBar || !heroSection) return;
 
-    const now = new Date();
-    const sunset = new Date();
-    sunset.setHours(17, 58, 0, 0);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        // Hide sticky bar when hero is visible in viewport
+        if (entry.isIntersecting) {
+          const rect = heroSection.getBoundingClientRect();
+          // If top of hero is near top of viewport, hide bar
+          if (rect.top >= -80) {
+            stickyBar.classList.remove('is-visible');
+          }
+        } else {
+          // Show once user has scrolled past the hero section
+          const rect = heroSection.getBoundingClientRect();
+          if (rect.bottom < 150) {
+            stickyBar.classList.add('is-visible');
+          } else {
+            stickyBar.classList.remove('is-visible');
+          }
+        }
+      });
+    }, {
+      root: null,
+      threshold: [0, 0.1, 0.5, 1.0]
+    });
 
-    let diff = sunset.getTime() - now.getTime();
-    if (diff < 0) {
-      // Sunset passed for today, set to tomorrow's sunset
-      sunset.setDate(sunset.getDate() + 1);
-      diff = sunset.getTime() - now.getTime();
-    }
+    observer.observe(heroSection);
 
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const secs = Math.floor((diff % (1000 * 60)) / 1000);
-
-    display.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    // Fast scroll fallback listener
+    window.addEventListener('scroll', () => {
+      const rect = heroSection.getBoundingClientRect();
+      if (rect.bottom < 100) {
+        stickyBar.classList.add('is-visible');
+      } else {
+        stickyBar.classList.remove('is-visible');
+      }
+    }, { passive: true });
   }
 
-  updateSunsetCountdown();
-  setInterval(updateSunsetCountdown, 1000);
+  initScrollAwareStickyBar();
 });
