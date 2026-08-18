@@ -1,45 +1,185 @@
 /* ==========================================================================
-   BAIA CAFE — 3 Poster-Style Promo Showcase Cards Grid
+   BAIA CAFE — Illustrated Highlight & Promo Showcase Section (Fat Seed Inspired)
    ========================================================================== */
 
 .promo-grid-section {
   background: var(--electric-blue);
-  padding: 80px 0 100px 0;
+  padding: 110px 0 130px 0;
   position: relative;
   overflow: hidden;
 }
 
+/* Illustrated Header Block with Scattered Brand Doodles */
 .promo-header-block {
   text-align: center;
-  max-width: 680px;
-  margin: 0 auto 56px auto;
+  max-width: 820px;
+  margin: 0 auto 72px auto;
+  position: relative;
 }
 
-.promo-section-tag {
+.promo-doodle-container {
+  position: relative;
   display: inline-block;
+  padding: 24px 36px;
+}
+
+/* Scattered Hand-Drawn Brand Doodles */
+.doodle-accent {
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 4px 10px rgba(10, 20, 60, 0.25));
+}
+
+.doodle-flower {
+  top: -16px;
+  left: -28px;
+  width: 52px;
+  height: 52px;
+  transform: rotate(-12deg);
+  animation: doodleBob 4.5s ease-in-out infinite alternate;
+}
+
+.doodle-cup {
+  top: -24px;
+  right: -24px;
+  width: 56px;
+  height: 50px;
+  transform: rotate(10deg);
+  animation: doodleBob 5s ease-in-out infinite alternate -1.5s;
+}
+
+.doodle-palm {
+  bottom: 0px;
+  left: -36px;
+  width: 48px;
+  height: 48px;
+  transform: rotate(18deg);
+  animation: doodleBob 6s ease-in-out infinite alternate -2s;
+}
+
+.doodle-wave {
+  bottom: -16px;
+  right: -20px;
+  width: 68px;
+  height: 28px;
+  transform: rotate(-6deg);
+  animation: doodleBob 4s ease-in-out infinite alternate -0.8s;
+}
+
+.doodle-sparkle {
+  position: absolute;
+  pointer-events: none;
+  animation: sparkleTwinkle 3s ease-in-out infinite alternate;
+}
+
+.doodle-sparkle-1 {
+  top: 10px;
+  right: 28%;
+  width: 22px;
+  height: 22px;
+  animation-delay: -0.5s;
+}
+
+.doodle-sparkle-2 {
+  bottom: 22px;
+  left: 24%;
+  width: 18px;
+  height: 18px;
+  animation-delay: -1.8s;
+}
+
+.doodle-sparkle-3 {
+  top: 36px;
+  left: -6px;
+  width: 16px;
+  height: 16px;
+  animation-delay: -2.4s;
+}
+
+@keyframes doodleBob {
+  0% { transform: translateY(0px) rotate(var(--rot, 0deg)); }
+  100% { transform: translateY(-8px) rotate(calc(var(--rot, 0deg) + 6deg)); }
+}
+
+@keyframes sparkleTwinkle {
+  0% { transform: scale(0.85) rotate(0deg); opacity: 0.7; }
+  100% { transform: scale(1.15) rotate(15deg); opacity: 1; }
+}
+
+/* Illustrated Section Tag Pill */
+.promo-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(22, 37, 92, 0.45);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255, 230, 153, 0.4);
+  color: var(--amber-contrast);
   font-family: var(--font-mono);
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--amber-contrast);
-  margin-bottom: 12px;
+  letter-spacing: 0.12em;
+  padding: 6px 18px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 16px;
 }
 
-.promo-section-title {
+.doodle-sparkle-icon {
+  color: var(--golden-amber);
+  font-size: 0.85rem;
+}
+
+/* Hand-Lettered Bubbly Title Display */
+.promo-illustrated-title {
   font-family: var(--font-headline);
   font-weight: 900;
-  font-size: clamp(2.2rem, 4vw, 3.2rem);
-  line-height: 1;
+  font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+  line-height: 1.05;
   text-transform: uppercase;
   letter-spacing: -0.03em;
   color: var(--white);
+  text-shadow: 0 6px 28px rgba(10, 20, 60, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
 }
 
+.title-word-script {
+  font-family: var(--font-script);
+  font-size: 1.2em;
+  color: #ff6b9d;
+  font-weight: 700;
+  text-transform: capitalize;
+  transform: rotate(-5deg);
+  text-shadow: 0 4px 16px rgba(232, 35, 122, 0.4);
+  display: inline-block;
+}
+
+.title-word-bold {
+  color: var(--white);
+  letter-spacing: -0.04em;
+  text-shadow: 0 4px 20px rgba(10, 20, 60, 0.4);
+}
+
+.promo-subtitle {
+  font-size: 1.1rem;
+  color: var(--cream);
+  margin-top: 16px;
+  max-width: 580px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+/* 3-Column Promo Grid with Generous Spacing */
 .promo-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-lg);
+  gap: 32px;
   align-items: stretch;
 }
 
@@ -47,19 +187,19 @@
 .poster-card {
   position: relative;
   background: var(--deep-navy);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: 0 20px 48px rgba(10, 20, 60, 0.35);
   display: flex;
   flex-direction: column;
-  border: 3px solid rgba(255, 255, 255, 0.15);
-  transition: transform 0.35s var(--ease-spring), box-shadow 0.35s ease;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  transition: transform 0.35s var(--ease-spring), box-shadow 0.35s ease, border-color 0.35s ease;
 }
 
 .poster-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 30px 64px rgba(10, 20, 60, 0.45);
-  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 32px 68px rgba(10, 20, 60, 0.48);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 /* -------------------------------------------------------------
@@ -67,25 +207,26 @@
    ------------------------------------------------------------- */
 .card-ready-sip {
   background: linear-gradient(180deg, #1e3a8a 0%, var(--deep-navy) 100%);
-  min-height: 520px;
+  min-height: 540px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 .card-top-content {
-  padding: 32px 28px 16px 28px;
+  padding: 36px 30px 18px 30px;
   position: relative;
   z-index: 3;
 }
 
 .card-script-title {
   font-family: var(--font-script);
-  font-size: 2rem;
-  color: var(--cream);
+  font-size: 2.2rem;
+  color: #ff6b9d;
   line-height: 0.9;
   transform: rotate(-3deg);
-  display: block;
+  display: inline-block;
+  text-shadow: 0 2px 10px rgba(232, 35, 122, 0.3);
 }
 
 .card-main-title {
@@ -96,14 +237,14 @@
   text-transform: uppercase;
   letter-spacing: -0.03em;
   color: var(--white);
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .card-body-text {
-  font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.85);
-  margin-top: 10px;
-  line-height: 1.4;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.88);
+  margin-top: 12px;
+  line-height: 1.45;
 }
 
 .card-image-box {
@@ -122,23 +263,23 @@
 }
 
 .poster-card:hover .card-image-box img {
-  transform: scale(1.05);
+  transform: scale(1.06);
 }
 
 .card-action-bar {
-  padding: 16px 24px;
+  padding: 18px 26px;
   background: rgba(16, 28, 71, 0.95);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   z-index: 3;
 }
 
 .card-price-highlight {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: var(--golden-amber);
 }
 
@@ -147,15 +288,15 @@
   color: var(--deep-navy);
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   text-transform: uppercase;
-  padding: 10px 18px;
+  padding: 12px 20px;
   border-radius: var(--radius-pill);
   border: 2px solid var(--white);
   text-decoration: none;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.35);
-  transition: all var(--duration-fast);
+  box-shadow: 0 4px 14px rgba(245, 166, 35, 0.4);
+  transition: all var(--duration-fast) var(--ease-spring);
 }
 
 .btn-card-action:hover {
@@ -168,7 +309,7 @@
    ------------------------------------------------------------- */
 .card-spicy-bite {
   background: radial-gradient(circle at 50% 30%, #1e40af 0%, var(--deep-navy) 100%);
-  min-height: 520px;
+  min-height: 540px;
 }
 
 .spicy-flame-burst {
@@ -193,9 +334,10 @@
   font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: var(--radius-pill);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* -------------------------------------------------------------
@@ -203,8 +345,8 @@
    ------------------------------------------------------------- */
 .card-double-trouble {
   background: #111e4f;
-  min-height: 520px;
-  padding: 24px 20px;
+  min-height: 540px;
+  padding: 28px 24px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -217,9 +359,9 @@
   background: #FFFFFF;
   color: #1a202c;
   width: 100%;
-  border-radius: 8px;
-  padding: 38px 20px 24px 20px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  padding: 40px 22px 26px 22px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
   font-family: var(--font-mono);
   display: flex;
   flex-direction: column;
@@ -248,7 +390,7 @@
 /* Metal Binder Clip */
 .binder-clip-graphic {
   position: absolute;
-  top: -16px;
+  top: -18px;
   left: 50%;
   transform: translateX(-50%);
   width: 44px;
@@ -259,53 +401,54 @@
 .binder-clip-graphic svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.35));
 }
 
 .receipt-header {
   text-align: center;
   border-bottom: 2px dashed #cbd5e1;
-  padding-bottom: 12px;
-  margin-bottom: 14px;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .receipt-logo-title {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.4rem;
+  font-size: 1.45rem;
   letter-spacing: -0.02em;
   color: var(--deep-navy);
   line-height: 1;
 }
 
 .receipt-tagline {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-top: 4px;
 }
 
-.receipt-deal-banner {
+.receipt-deal-banner,
+.receipt-pairing-banner {
   background: var(--deep-navy);
   color: var(--golden-amber);
   text-align: center;
   font-weight: 900;
   font-size: 0.95rem;
-  padding: 6px 10px;
-  border-radius: 4px;
-  margin-bottom: 14px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
   text-transform: uppercase;
 }
 
 .receipt-item-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  font-size: 0.825rem;
+  gap: 10px;
+  font-size: 0.85rem;
   border-bottom: 2px dashed #cbd5e1;
-  padding-bottom: 14px;
-  margin-bottom: 14px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
 }
 
 .receipt-row {
@@ -323,18 +466,18 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 4px 0 12px 0;
+  padding: 4px 0 14px 0;
 }
 
 .receipt-total-label {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 900;
   color: var(--deep-navy);
 }
 
 .receipt-total-amount {
   font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   font-weight: 900;
   color: var(--electric-blue);
   letter-spacing: -0.03em;
@@ -346,7 +489,7 @@
   color: var(--deep-navy);
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   text-transform: uppercase;
   letter-spacing: -0.01em;
   padding: 14px 20px;
@@ -369,9 +512,107 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
+  .promo-grid-section {
+    padding: 80px 0 100px 0;
+  }
+  .promo-header-block {
+    margin-bottom: 48px;
+  }
   .promo-grid {
     grid-template-columns: 1fr;
-    max-width: 540px;
+    max-width: 520px;
     margin: 0 auto;
+    gap: 28px;
+  }
+  .doodle-flower {
+    left: -16px;
+    width: 44px;
+    height: 44px;
+  }
+  .doodle-cup {
+    right: -16px;
+    width: 46px;
+    height: 42px;
+  }
+  .doodle-palm {
+    left: -20px;
+    width: 40px;
+    height: 40px;
+  }
+  .doodle-wave {
+    right: -12px;
+    width: 54px;
+    height: 22px;
   }
 }
+
+@media (max-width: 640px) {
+  .promo-grid-section {
+    padding: 72px 0 90px 0;
+  }
+  .promo-doodle-container {
+    padding: 16px 8px;
+    width: 100%;
+  }
+  .promo-illustrated-title {
+    font-size: clamp(2.1rem, 8vw, 2.6rem);
+    gap: 4px 8px;
+  }
+  .title-word-script {
+    font-size: 1.1em;
+  }
+  .promo-subtitle {
+    font-size: 0.95rem;
+    margin-top: 14px;
+    padding: 0 8px;
+  }
+  .doodle-flower {
+    top: -14px;
+    left: -2px;
+    width: 36px;
+    height: 36px;
+  }
+  .doodle-cup {
+    top: -20px;
+    right: -2px;
+    width: 38px;
+    height: 34px;
+  }
+  .doodle-palm {
+    bottom: -10px;
+    left: 2px;
+    width: 32px;
+    height: 32px;
+  }
+  .doodle-wave {
+    bottom: -10px;
+    right: 2px;
+    width: 46px;
+    height: 18px;
+  }
+  .doodle-sparkle-1 {
+    top: 4px;
+    right: 12%;
+    width: 16px;
+    height: 16px;
+  }
+  .doodle-sparkle-2 {
+    display: none;
+  }
+  .doodle-sparkle-3 {
+    top: 24px;
+    left: 4px;
+    width: 14px;
+    height: 14px;
+  }
+  .card-top-content {
+    padding: 24px 20px 14px 20px;
+  }
+  .card-main-title {
+    font-size: 1.8rem;
+  }
+  .card-script-title {
+    font-size: 1.8rem;
+  }
+}
+

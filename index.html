@@ -115,37 +115,52 @@ svg { display: block; max-width: 100%; }
 .nav-phone-link { display: inline-flex; align-items: center; gap: 6px; color: var(--cream); text-decoration: none; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; padding: 0 12px; height: 38px; border-radius: var(--radius-pill); border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.15); }
 .nav-cart-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--golden-amber); color: var(--deep-navy); border: none; font-family: var(--font-display); font-weight: 900; font-size: 0.85rem; text-transform: uppercase; padding: 0 16px; height: 38px; border-radius: var(--radius-pill); cursor: pointer; }
 .cart-count-badge { background: var(--hot-pink); color: var(--white); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 900; width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
-.hero-section { min-height: 100vh; padding-top: calc(var(--header-height) + 24px); padding-bottom: 60px; display: flex; align-items: center; position: relative; background: radial-gradient(120% 80% at 75% 40%, #2949ff 0%, var(--electric-blue) 60%, #152bb5 100%); }
-.hero-grid { display: grid; grid-template-columns: 1.15fr 0.95fr; align-items: center; gap: var(--space-xl); position: relative; z-index: 2; width: 100%; }
+.hero-section { position: relative; min-height: 90vh; padding-top: calc(var(--header-height) + 32px); padding-bottom: 72px; background: radial-gradient(120% 90% at 50% 25%, #2a52ff 0%, #1a3fe8 55%, #142eb8 100%); overflow: hidden; display: flex; flex-direction: column; justify-content: center; width: 100%; box-sizing: border-box; }
+.hero-grid { display: grid; grid-template-columns: 1.15fr 0.95fr; align-items: center; gap: var(--space-2xl); position: relative; z-index: 2; width: 100%; }
 .hero-content { display: flex; flex-direction: column; align-items: flex-start; max-width: 640px; width: 100%; }
-.hero-primary-block { display: flex; flex-direction: column; align-items: flex-start; width: 100%; position: relative; isolation: isolate; }
-.hero-primary-block::before { content: ''; position: absolute; top: -25%; left: 50%; transform: translateX(-50%); width: 140%; height: 135%; background: radial-gradient(ellipse 70% 60% at 50% 30%, rgba(68, 122, 255, 0.6) 0%, rgba(30, 74, 255, 0.25) 55%, rgba(30, 74, 255, 0) 80%); pointer-events: none; z-index: 0; }
-.hero-supporting-block { display: flex; flex-direction: column; align-items: flex-start; width: 100%; gap: 16px; margin-top: var(--space-lg); }
-.hero-trust-row { display: inline-flex; align-items: center; justify-content: flex-start; gap: 6px 8px; background: transparent; border: none; padding: 0; border-radius: 0; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: rgba(245, 233, 214, 0.75); margin-bottom: 8px; letter-spacing: 0.04em; text-transform: uppercase; position: relative; z-index: 1; }
-.trust-rating { color: var(--golden-amber); font-weight: 800; }
-.trust-divider { color: rgba(255, 255, 255, 0.3); }
-.trust-hours { color: rgba(245, 233, 214, 0.75); font-weight: 600; }
-.hero-headline { font-family: var(--font-headline); font-weight: 900; font-size: clamp(2.8rem, 5.5vw, 4.4rem); line-height: 0.98; letter-spacing: -0.04em; text-transform: uppercase; color: var(--white); margin-bottom: 6px; text-shadow: 0 4px 24px rgba(0, 0, 0, 0.25); position: relative; z-index: 1; }
-.hero-headline .headline-row { display: block; }
-.hero-subtitle { font-size: 1.02rem; line-height: 1.55; color: var(--cream); margin-bottom: 24px; max-width: 520px; position: relative; z-index: 1; }
-.hero-cta-group { display: flex; align-items: center; gap: var(--space-md); margin-bottom: 32px; flex-wrap: wrap; position: relative; z-index: 1; }
-.btn-primary-glow { display: inline-flex; align-items: center; gap: 10px; background: var(--golden-amber); color: var(--deep-navy); font-family: var(--font-display); font-weight: 900; font-size: 1.05rem; text-transform: uppercase; text-decoration: none; padding: 16px 36px; border-radius: var(--radius-pill); box-shadow: 0 10px 28px rgba(245, 166, 35, 0.5), 0 0 28px rgba(245, 166, 35, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.6); border: none; cursor: pointer; transition: transform var(--duration-fast) var(--ease-spring), box-shadow var(--duration-fast); }
-.btn-secondary-pill { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: var(--white); font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; text-transform: uppercase; text-decoration: none; padding: 16px 28px; border-radius: var(--radius-pill); border: 2px solid rgba(255, 255, 255, 0.35); cursor: pointer; }
-.hero-recreation-sublink { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.85rem; color: var(--cream); width: 100%; max-width: 520px; }
-.recreation-anchor { display: inline-flex; align-items: center; min-height: 32px; padding: 4px 12px; background: rgba(245, 166, 35, 0.15); color: var(--amber-contrast); font-weight: 800; text-decoration: none; border: 1px solid var(--golden-amber); border-radius: var(--radius-pill); }
-.hero-mascot-wrapper { display: flex; align-items: center; gap: 16px; background: rgba(22, 37, 92, 0.4); backdrop-filter: blur(8px); padding: 12px 20px; border-radius: var(--radius-lg); border: 1px solid rgba(255, 255, 255, 0.15); max-width: 520px; width: 100%; cursor: pointer; }
-.mascot-illustration { width: 48px; height: 48px; background: var(--cream); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 2px solid var(--deep-navy); }
-.hero-shore-strip { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 20px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(14px); border: 1.5px solid rgba(255, 255, 255, 0.25); border-radius: var(--radius-lg); padding: 14px 20px; width: 100%; max-width: 520px; }
-.shore-strip-item { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
-.strip-label { font-family: var(--font-mono); font-size: 0.725rem; font-weight: 800; text-transform: uppercase; color: var(--golden-amber); }
-.strip-value { font-family: var(--font-body); font-weight: 800; font-size: 0.85rem; color: var(--white); line-height: 1.35; }
-.hero-visual-container { display: flex; justify-content: center; align-items: center; perspective: 1200px; position: relative; width: 100%; min-height: 480px; margin-bottom: 36px; }
+.hero-trust-pill { display: inline-flex; align-items: center; gap: 8px 10px; background: rgba(22, 37, 92, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.2px solid rgba(255, 255, 255, 0.22); padding: 6px 16px; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--white); margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12); align-self: flex-start; }
+.hero-headline.hero-vertical-focus { margin-bottom: 16px; position: relative; z-index: 1; width: 100%; }
+.tagline-stack { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+.tagline-row { display: flex; align-items: center; gap: 12px; line-height: 0.9; letter-spacing: -0.035em; }
+.tagline-row .letter-chunky { font-family: var(--font-headline); font-weight: 900; font-size: clamp(3.4rem, 8vw, 5.2rem); text-transform: uppercase; color: var(--white); text-shadow: 0 4px 24px rgba(10, 20, 60, 0.45); }
+.ampersand-chunky { font-family: var(--font-headline); font-weight: 900; font-size: clamp(3.2rem, 7.5vw, 4.8rem); color: var(--golden-amber); margin-left: 2px; }
+.row-vibes .letter-chunky { color: var(--amber-contrast); }
+.row-crafted-bay { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+.script-crafted-fatseed { font-family: var(--font-script); font-weight: 700; font-size: clamp(3.4rem, 8.5vw, 5.4rem); color: #ff6b9d; transform: rotate(-4deg); display: inline-block; line-height: 0.82; }
+.bay-chunky { font-family: var(--font-headline); font-weight: 900; font-size: clamp(2.6rem, 6.2vw, 4.2rem); text-transform: uppercase; color: var(--white); }
+.hero-subtitle { font-size: clamp(1.02rem, 2vw, 1.15rem); line-height: 1.6; color: var(--cream); margin-bottom: 0; max-width: 540px; position: relative; z-index: 1; }
+.hero-visual-container { display: flex; justify-content: center; align-items: center; perspective: 1200px; position: relative; width: 100%; min-height: 460px; }
 .hero-3d-card { position: relative; width: 100%; max-width: 440px; height: 480px; min-height: 480px; transform-style: preserve-3d; }
 .hero-image-frame { width: 100%; height: 100%; border-radius: var(--radius-xl); overflow: hidden; position: relative; transform: rotate(-3deg); box-shadow: 0 24px 50px -8px rgba(10, 20, 60, 0.65), 0 12px 28px -6px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.25); border: 4px solid var(--white); background: #0f172a; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease; }
 .hero-image-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center 65%; display: block; }
-.floating-flavor-pill { position: absolute; bottom: 16px; left: 16px; background: rgba(16, 28, 75, 0.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: var(--white); padding: 8px 16px; border-radius: var(--radius-pill); border: 2px solid rgba(255, 255, 255, 0.9); display: inline-flex; align-items: center; gap: 8px; font-size: 0.825rem; font-weight: 800; box-shadow: 0 8px 24px rgba(10, 20, 60, 0.5); z-index: 10; transform: translateZ(40px) rotate(3deg); pointer-events: none; }
+.floating-flavor-pill { position: absolute; bottom: 16px; left: 16px; background: rgba(16, 28, 75, 0.94); backdrop-filter: blur(12px); color: var(--white); padding: 8px 16px; border-radius: var(--radius-pill); border: 2px solid rgba(255, 255, 255, 0.9); display: inline-flex; align-items: center; gap: 8px; font-size: 0.825rem; font-weight: 800; box-shadow: 0 8px 24px rgba(10, 20, 60, 0.5); z-index: 10; transform: translateZ(40px) rotate(3deg); pointer-events: none; }
 .flavor-tag { background: var(--hot-pink); color: var(--white); font-family: var(--font-mono); font-size: 0.68rem; font-weight: 900; padding: 2px 8px; border-radius: var(--radius-pill); text-transform: uppercase; letter-spacing: 0.04em; }
-
+.mobile-sticky-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 990; background: rgba(22, 37, 92, 0.96); backdrop-filter: blur(16px); border-top: 2px solid var(--golden-amber); padding: 10px 16px; box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.3); transform: translateY(115%); opacity: 0; pointer-events: none; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease; }
+.mobile-sticky-bar.is-visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
+@media (max-width: 1024px) {
+  .hero-section { min-height: auto; padding-top: calc(var(--header-height) + 16px); padding-bottom: 64px; display: block; }
+  .hero-grid { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0; }
+  .hero-content { display: contents; }
+  .hero-headline.hero-vertical-focus { order: 1; margin-top: 8px; margin-bottom: 24px; width: 100%; }
+  .tagline-row { justify-content: center; }
+  .row-crafted-bay { justify-content: center; }
+  .hero-visual-container { order: 2; min-height: auto; width: 100%; max-width: 360px; margin: 0 auto 40px auto; }
+  .hero-3d-card { height: 300px; min-height: 300px; max-width: 100%; }
+  .hero-trust-pill { order: 3; align-self: center; margin: 0 auto 20px auto; }
+  .hero-subtitle { order: 4; margin: 0 auto 24px auto; max-width: 480px; }
+}
+@media (max-width: 640px) {
+  .hero-section { padding-top: calc(var(--header-height) + 12px); padding-bottom: 56px; }
+  .hero-headline.hero-vertical-focus { margin-top: 4px; margin-bottom: 18px; }
+  .tagline-row .letter-chunky { font-size: clamp(2.4rem, 9.5vw, 3.4rem); }
+  .ampersand-chunky { font-size: clamp(2.2rem, 9vw, 3.3rem); }
+  .script-crafted-fatseed { font-size: clamp(2.3rem, 9.8vw, 3.4rem); }
+  .bay-chunky { font-size: clamp(1.8rem, 7.8vw, 2.7rem); }
+  .hero-visual-container { max-width: 310px; margin: 0 auto 36px auto; min-height: 250px; }
+  .hero-3d-card { height: 250px; min-height: 250px; }
+  .hero-trust-pill { padding: 6px 14px; font-size: 0.72rem; margin: 0 auto 16px auto; }
+  .hero-subtitle { font-size: 0.92rem; line-height: 1.55; margin-bottom: 20px; max-width: 360px; }
+}
   </style>
 
   <!-- Master Stylesheet and Main Entry Module -->
@@ -275,7 +290,7 @@ svg { display: block; max-width: 100%; }
   </script>
 </head>
 
-<body>
+<body spellcheck="false">
   <!-- Skip to Main Content Link for Keyboard / Screen Readers -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
@@ -336,165 +351,144 @@ svg { display: block; max-width: 100%; }
   </header>
 
   <!-- MAIN CONTENT CONTAINER -->
-  <main id="main-content">
-
-    <!-- 1. HERO SECTION (Above the fold conversion engine) -->
-    <section class="hero-section" id="hero" aria-label="Welcome to BAIA Cafe">
-      <div class="section-floaties-layer" aria-hidden="true">
-        <div class="glass-floatie frost-white anim-1 size-lg" style="top: 8%; left: 3%;">
-          <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" /></svg>
-        </div>
-        <div class="glass-floatie frost-white anim-3 size-md" style="top: 80%; left: 4%;">
-          <svg viewBox="0 0 24 24"><path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" /></svg>
-        </div>
-        <div class="glass-floatie frost-white anim-4 size-lg shape-flower" style="top: 8%; right: 4%;">
-          <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" /></svg>
-        </div>
-        <div class="glass-floatie frost-white anim-1 size-md" style="top: 50%; right: 3%;">
-          <svg viewBox="0 0 24 24"><path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" /></svg>
-        </div>
-        <div class="glass-floatie frost-white anim-2 size-md shape-wave" style="top: 84%; right: 4%;">
-          <svg viewBox="0 0 24 24"><path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" /></svg>
-        </div>
+  <!-- 1. HERO SECTION (Commanding Vertical Focus — Fat Seed Energy with Coastal Restraint) -->
+  <section class="hero-section" id="hero" aria-label="Welcome to BAIA Cafe">
+    <!-- Ambient Floating Glyphs (BAIA Brand Only: 6-Petal Flower & Palm Tree) -->
+    <div class="floating-glyphs-layer" aria-hidden="true">
+      <div class="floating-glyph glyph-1">
+        <svg viewBox="0 0 24 24" fill="#ffffff">
+          <circle cx="12" cy="12" r="3" />
+          <circle cx="12" cy="5" r="2.5" />
+          <circle cx="12" cy="19" r="2.5" />
+          <circle cx="5.94" cy="8.5" r="2.5" />
+          <circle cx="18.06" cy="15.5" r="2.5" />
+          <circle cx="5.94" cy="15.5" r="2.5" />
+          <circle cx="18.06" cy="8.5" r="2.5" />
+        </svg>
       </div>
-
-      <div class="container hero-grid">
-        <!-- Hero Content Column -->
-        <div class="hero-content">
-          <!-- Above-The-Fold Primary Brand Block -->
-          <div class="hero-primary-block">
-            <!-- Single Trust Signal Row -->
-            <div class="hero-trust-row" aria-label="Rating and Operating Hours">
-              <span class="trust-rating">⭐ 4.9/5 (128+ Reviews)</span>
-              <span class="trust-divider" aria-hidden="true">•</span>
-              <span class="trust-hours">Open Daily 11:00 AM – 10:00 PM</span>
-            </div>
-
-            <!-- Single H1 Title for Entire Page -->
-            <h1 class="hero-headline">
-              <span class="headline-row">COFFEE, FOOD & GOOD VIBES</span>
-              <span class="headline-row">
-                <span class="script-accent pink">CRAFTED</span> BY THE BAY
-              </span>
-            </h1>
-
-            <p class="hero-subtitle">
-              Artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers, and shore recreation right on the
-              beach sand in Barangay Laurente. Dine-in, beach takeout, or message ahead via Facebook Messenger & Instagram DM.
-            </p>
-
-            <!-- Unambiguous Primary Above-The-Fold Action -->
-            <div class="hero-cta-group">
-              <button class="btn-primary-glow hero-primary-cta" data-open-cart>
-                <span>💬 Message to Order Ahead</span>
-                <span aria-hidden="true">→</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Supporting Information (Rendered below photo on mobile, left column below CTA on desktop) -->
-          <div class="hero-supporting-block">
-            <!-- Trust Signals Strip: Real Hours, Location & Messaging Orders -->
-            <div class="hero-shore-strip" id="hero-shore-strip" aria-label="Cafe Key Details and Shore Telemetry">
-              <div class="shore-strip-item">
-                <span class="strip-label">📍 Spot</span>
-                <span class="strip-value">Barangay Laurente, Masbate</span>
-              </div>
-              <div class="shore-strip-item">
-                <span class="strip-label">⏰ Hours</span>
-                <span class="strip-value">11:00 AM – 10:00 PM (Kitchen 9 PM)</span>
-              </div>
-              <div class="shore-strip-item">
-                <span class="strip-label">💬 Orders</span>
-                <span class="strip-value">FB & IG Message</span>
-              </div>
-              <div class="shore-strip-item">
-                <span class="strip-label">🌊 Bay</span>
-                <span class="strip-value" id="shore-live-weather">☀️ Sunny Bay 29°C</span>
-              </div>
-            </div>
-
-            <!-- Illustrated Surfer Mascot Quick Interaction -->
-            <div class="hero-mascot-wrapper" id="hero-mascot" role="button" tabindex="0">
-              <div class="mascot-illustration">
-                <svg viewBox="0 0 64 64" width="46" height="46" aria-hidden="true">
-                  <path d="M6 46 Q32 54 58 46 Q32 38 6 46 Z" fill="#F5A623" stroke="#16255C" stroke-width="2" />
-                  <circle cx="34" cy="18" r="7" fill="#F5E9D6" stroke="#16255C" stroke-width="2" />
-                  <path d="M28 15 Q34 11 40 15 L43 14" stroke="#16255C" stroke-width="2" fill="none" />
-                  <path d="M34 25 L32 38 L24 45 M32 38 L40 45" stroke="#16255C" stroke-width="2.5" stroke-linecap="round" fill="none" />
-                  <path d="M33 28 L44 26 L48 20" stroke="#16255C" stroke-width="2" stroke-linecap="round" fill="none" />
-                  <rect x="42" y="18" width="16" height="3" rx="1.5" fill="#FFFFFF" stroke="#16255C" stroke-width="1.5" />
-                  <rect x="45" y="11" width="4" height="7" rx="1" fill="#E8237A" />
-                  <rect x="51" y="9" width="4" height="9" rx="1" fill="#1F3AE0" />
-                </svg>
-              </div>
-              <div class="mascot-text">
-                <p class="mascot-title"><strong>🏄‍♂️ Coffee by the Bay</strong></p>
-                <p>Fresh brews & free guest skimboards daily</p>
-              </div>
-            </div>
-
-            <!-- Recreation & Skimboard Sub-Action Link -->
-            <div class="hero-recreation-sublink">
-              <span>🏄 Complimentary Skimboards for Cafe Guests:</span>
-              <a href="#boards" class="recreation-anchor">View Shore Recreation →</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Hero Right Column: 3D Visual Centerpiece (Surfaced earlier on mobile) -->
-        <div class="hero-visual-container">
-          <div class="hero-3d-card" id="hero-3d-card">
-            <div class="hero-image-frame">
-              <img 
-                src="./images/Baia%20skimboard%20and%20coffee.webp"
-                alt="BAIA Hazelnut Iced Coffee and custom branded skimboard on the beach sand at Laurente shore"
-                width="440"
-                height="480"
-                fetchpriority="high"
-              />
-            </div>
-
-            <!-- Floating Flavor Tag -->
-            <div class="floating-flavor-pill">
-              <span class="flavor-tag">House Special</span>
-              <span>Sea Salt Latte & Skimboard</span>
-            </div>
-          </div>
-        </div>
+      <div class="floating-glyph glyph-6">
+        <svg viewBox="0 0 24 24" fill="#FFE699"><path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" /></svg>
       </div>
-    </section>
-
-    <!-- 2. CHECKER & WAVE HYBRID DIVIDER STRIP -->
-    <div class="divider-strip" aria-hidden="true">
-      <div class="checker-wave-band">
-        <div class="checker-row"></div>
-        <div class="wave-svg-row"></div>
+      <div class="floating-glyph glyph-8">
+        <svg viewBox="0 0 24 24" fill="#ff6b9d">
+          <circle cx="12" cy="12" r="3" />
+          <circle cx="12" cy="5" r="2.5" />
+          <circle cx="12" cy="19" r="2.5" />
+          <circle cx="5.94" cy="8.5" r="2.5" />
+          <circle cx="18.06" cy="15.5" r="2.5" />
+          <circle cx="5.94" cy="15.5" r="2.5" />
+          <circle cx="18.06" cy="8.5" r="2.5" />
+        </svg>
       </div>
     </div>
 
-    <!-- 3. STORY & "TEAM BAIA" POLAROID SECTION -->
-    <section class="story-section" id="about" aria-label="About BAIA Cafe">
-      <div class="section-floaties-layer" aria-hidden="true">
-        <div class="glass-floatie frost-blue anim-1 size-lg" style="top: 8%; left: 6%;">
-          <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 2-2 4-2 4s-2-2-2-4a2 2 0 0 1 2-2zm0 20a2 2 0 0 1-2-2c0-2 2-4 2-4s2 2 2 4a2 2 0 0 1-2 2zm10-10a2 2 0 0 1-2 2c-2 0-4-2-4-2s2-2 4-2a2 2 0 0 1 2 2zM2 12a2 2 0 0 1 2-2c2 0 4 2 4 2s-2 2-4 2a2 2 0 0 1-2-2z" /></svg>
+    <div class="container hero-grid">
+      <!-- Hero Left Column: Vertical Focus Typography Stack -->
+      <div class="hero-content">
+        <!-- Top Trust Pill (Desktop: top of col; Mobile: reveals on scroll below photo) -->
+        <div class="hero-trust-pill" aria-label="Rating and Operating Hours">
+          <span class="trust-star">⭐ 4.9/5 (128+ Reviews)</span>
+          <span class="trust-sep">•</span>
+          <span class="trust-info">Open Daily 11:00 AM – 10:00 PM (Kitchen 9:00 PM)</span>
         </div>
-        <div class="glass-floatie frost-blue anim-2 size-md shape-wave" style="top: 28%; left: 32%;">
-          <svg viewBox="0 0 24 24"><path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" /></svg>
-        </div>
-        <div class="glass-floatie frost-blue anim-3 size-xl" style="top: 12%; right: 10%;">
-          <svg viewBox="0 0 24 24"><path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" /></svg>
-        </div>
+
+        <!-- Dominant Vertical-Focus Tagline (Fat Seed Inspiration) -->
+        <h1 class="hero-headline hero-vertical-focus">
+          <span class="tagline-stack">
+            <span class="tagline-row row-coffee">
+              <span class="letter-chunky">COFFEE,</span>
+              <svg class="hero-doodle doodle-mug" viewBox="0 0 40 40" width="38" height="38" aria-hidden="true">
+                <path d="M6 14 h22 v14 a6 6 0 0 1 -6 6 h-10 a6 6 0 0 1 -6 -6 Z" fill="#F5E9D6" stroke="#16255C" stroke-width="2.5" />
+                <path d="M28 17 h4 a4 4 0 0 1 4 4 v2 a4 4 0 0 1 -4 4 h-4" fill="none" stroke="#16255C" stroke-width="2.5" stroke-linecap="round" />
+                <path d="M12 9 Q14 5 12 2 M18 9 Q20 5 18 2 M24 9 Q26 5 24 2" fill="none" stroke="#FFE699" stroke-width="2" stroke-linecap="round" />
+              </svg>
+            </span>
+            <span class="tagline-row row-food">
+              <span class="letter-chunky">FOOD</span>
+              <span class="ampersand-chunky">&amp;</span>
+            </span>
+            <span class="tagline-row row-vibes">
+              <span class="letter-chunky">GOOD VIBES</span>
+              <svg class="hero-doodle doodle-sparkle" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+                <path d="M12 2 L14 9 L21 12 L14 15 L12 22 L10 15 L3 12 L10 9 Z" fill="#F5A623" stroke="#16255C" stroke-width="1.5" />
+              </svg>
+            </span>
+            <span class="tagline-row row-crafted-bay">
+              <span class="script-crafted-fatseed">Crafted</span>
+              <span class="bay-chunky">BY THE BAY</span>
+            </span>
+          </span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers, and shore recreation right on the beach sand in Barangay Laurente.
+        </p>
       </div>
 
-      <div class="container story-container">
-        <!-- Story Text -->
-        <div class="story-text-block">
-          <span class="story-badge">Coffee by the Bay</span>
-          <h2 class="story-headline">
-            Crafted for Sunset Chill Sessions — <span class="script-accent">Your Daily Dose of Vitamin Sea</span>
-          </h2>
-          <p class="story-body">
+      <!-- Hero Right Column: 3D Visual Centerpiece -->
+      <div class="hero-visual-container">
+        <div class="hero-3d-card" id="hero-3d-card">
+          <div class="hero-image-frame">
+            <img 
+              src="./images/Baia%20skimboard%20and%20coffee.webp" 
+              alt="BAIA Hazelnut Iced Coffee and custom branded skimboard on the beach sand at Laurente shore" 
+              width="440" 
+              height="480" 
+              fetchpriority="high" 
+            />
+          </div>
+
+          <!-- Floating Flavor Tag -->
+          <div class="floating-flavor-pill">
+            <span class="flavor-tag">House Special</span>
+            <span>Sea Salt Latte & Skimboard</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. CHECKER & WAVE HYBRID DIVIDER STRIP -->
+  <div class="divider-strip" aria-hidden="true">
+    <div class="checker-wave-band">
+      <div class="checker-row"></div>
+      <div class="wave-svg-row"></div>
+    </div>
+  </div>
+
+  <!-- 4. STORY & "TEAM BAIA" POLAROID SECTION -->
+  <section class="story-section" id="about" aria-label="About BAIA Cafe">
+    <div class="section-floaties-layer" aria-hidden="true">
+      <div class="glass-floatie frost-blue anim-1 size-lg" style="top: 6%; left: 3%;">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3" />
+          <circle cx="12" cy="5" r="2.5" />
+          <circle cx="12" cy="19" r="2.5" />
+          <circle cx="5.94" cy="8.5" r="2.5" />
+          <circle cx="18.06" cy="15.5" r="2.5" />
+          <circle cx="5.94" cy="15.5" r="2.5" />
+          <circle cx="18.06" cy="8.5" r="2.5" />
+        </svg>
+      </div>
+      <div class="glass-floatie frost-blue anim-2 size-md shape-wave" style="top: 86%; left: 3%;">
+        <svg viewBox="0 0 24 24"><path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" /></svg>
+      </div>
+      <div class="glass-floatie frost-blue anim-3 size-xl" style="top: 8%; right: 4%;">
+        <svg viewBox="0 0 24 24"><path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" /></svg>
+      </div>
+    </div>
+
+    <div class="container story-container">
+      <!-- Story Text -->
+      <div class="story-text-block">
+        <span class="story-badge">Coffee by the Bay</span>
+        <h2 class="story-headline">
+          <span class="headline-primary">CRAFTED FOR SUNSET CHILL SESSIONS</span>
+          <span class="headline-script-line">
+            <span class="script-accent">Your Daily Dose of Vitamin Sea</span>
+          </span>
+        </h2>
+        <p class="story-body">
             BAIA was born from a simple shore philosophy: great coffee, satisfying fresh meals, and the relaxation of the open
             ocean belong together. Located right on the beach in Barangay Laurente, we serve everything from artisanal Bohol Asin Tibuok
             lattes to juicy double smash burgers and refreshing fruit sodas.
@@ -549,15 +543,177 @@ svg { display: block; max-width: 100%; }
           </div>
         </div>
       </div>
+
+      <!-- SHORE INFO SNAPSHOT (Spot/Hours/Orders/Bay Grid + Recreation & Coffee Cards) -->
+      <div class="container snapshot-container" id="snapshot" aria-label="Cafe Information and Shore Amenities">
+        <!-- Section Header -->
+        <div class="snapshot-header-block">
+          <span class="snapshot-tag-pill">✦ Beachfront Essentials ✦</span>
+          <h2 class="snapshot-title">
+            <span class="script-accent">Shore</span>
+            <span class="wordmark">Snapshot &amp; Guest Info</span>
+          </h2>
+          <p class="snapshot-subtitle">
+            Everything you need for your beachfront visit in Barangay Laurente, Masbate.
+          </p>
+        </div>
+
+        <!-- Feature Highlight Cards (Coffee by the Bay & Guest Recreation) -->
+        <div class="snapshot-grid-cards">
+          <!-- Card 1: Coffee by the Bay Mascot Feature -->
+          <div class="snapshot-feature-card card-mascot-feature">
+            <div class="feature-card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 8h12v7a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8zm12 2h2a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-2v-5zM6 4h1a1 1 0 0 1 1 1v1H5V5a1 1 0 0 1 1-1zm4 0h1a1 1 0 0 1 1 1v1H9V5a1 1 0 0 1 1-1zm4 0h1a1 1 0 0 1 1 1v1h-3V5a1 1 0 0 1 1-1z" />
+              </svg>
+            </div>
+            <div class="feature-card-body">
+              <h3>Coffee by the Bay</h3>
+              <p>Artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers, and fresh fruit sodas served steps from the water.</p>
+            </div>
+          </div>
+
+          <!-- Card 2: Guest Recreation Feature -->
+          <div class="snapshot-feature-card card-recreation-feature">
+            <div class="feature-card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
+              </svg>
+            </div>
+            <div class="feature-card-body">
+              <h3>Guest Recreation</h3>
+              <p>Complimentary skimboard gear for all cafe guests, beach lounge seating, umbrellas, and evening lantern chill sessions.</p>
+              <a href="#boards" class="feature-card-link">Explore Shore Gear →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spot / Hours / Orders / Bay Telemetry Bar -->
+        <div class="snapshot-telemetry-bar" aria-label="Cafe Location, Operating Hours, Orders, and Live Bay Status">
+          <div class="telemetry-col">
+            <span class="telemetry-label">📍 Spot</span>
+            <span class="telemetry-val">Barangay Laurente, Masbate</span>
+          </div>
+          <div class="telemetry-col">
+            <span class="telemetry-label">⏰ Hours</span>
+            <span class="telemetry-val">11:00 AM – 10:00 PM <span class="kitchen-sub">(Kitchen 9:00 PM)</span></span>
+          </div>
+          <div class="telemetry-col">
+            <span class="telemetry-label">🛍️ Orders</span>
+            <span class="telemetry-val">Dine-in, Beach Takeout &amp; Messenger</span>
+          </div>
+          <div class="telemetry-col">
+            <span class="telemetry-label">🌊 Bay</span>
+            <span class="telemetry-val" id="shore-live-weather">☀️ Sunny Bay 29°C</span>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- 4. PROMO / SIGNATURE SHOWCASE TILES -->
-    <section class="promo-grid-section" id="promos" aria-label="House Signatures and Specials">
-      <div class="container">
-        <div class="promo-header-block">
-          <span class="promo-section-tag">✦ Daily Specials & Shore Favorites ✦</span>
-          <h2 class="promo-section-title">House Signatures & Deals</h2>
+  <!-- ==========================================================================
+       SEASONAL PROMOS & HOLIDAY EVENTS SECTION (SCAFFOLDED PLACEHOLDER)
+       Toggle: Controlled via SHOW_PROMOS_SECTION flag in src/main.js (defaults to false).
+       To enable: Set SHOW_PROMOS_SECTION = true in src/main.js or remove hidden attribute.
+       ========================================================================== -->
+  <section class="seasonal-events-section is-hidden" id="seasonal-events" aria-label="Seasonal Events and Holiday Specials" hidden>
+    <div class="container">
+      <div class="events-header-block">
+        <span class="events-tag-pill">✦ Seasonal Happenings ✦</span>
+        <h2 class="events-title">
+          <span class="script-accent">Beachside</span>
+          <span class="wordmark">Events &amp; Holiday Specials</span>
+        </h2>
+        <p class="events-subtitle">
+          Upcoming sunset acoustic sessions, holiday beach celebrations, and seasonal guest specials.
+        </p>
+      </div>
+
+      <div class="events-cards-grid">
+        <!-- Event Card 1: Sunset Acoustic Weekend -->
+        <article class="event-card">
+          <div class="event-card-badge">Upcoming Event</div>
+          <h3 class="event-card-title">Sunset Acoustic by the Shore</h3>
+          <p class="event-card-date">🗓️ Saturday Evenings • 5:00 PM – 8:00 PM</p>
+          <p class="event-card-desc">Live beach acoustic music, coastal fairy lights, and signature Asin Tibuok iced lattes right on the sand.</p>
+          <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-event-rsvp">Reserve a Beach Spot →</a>
+        </article>
+
+        <!-- Event Card 2: Seasonal Holiday Feature -->
+        <article class="event-card">
+          <div class="event-card-badge">Seasonal Special</div>
+          <h3 class="event-card-title">Holiday Bay Roast &amp; Coconut Cold Brew</h3>
+          <p class="event-card-date">🎄 Limited Seasonal Feature</p>
+          <p class="event-card-desc">Freshly harvested Masbate coconut water infused with artisan slow-drip cold brew and toasted cinnamon spice.</p>
+          <button class="btn-event-rsvp" data-open-cart>Explore Holiday Menu →</button>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. HOUSE SIGNATURES SHOWCASE TILES (Fat Seed Illustrated Creative Direction) -->
+  <section class="promo-grid-section" id="promos" aria-label="House Signatures and Specialties">
+    <div class="container">
+      <!-- Illustrated Header with Scattered Brand Doodles -->
+      <div class="promo-header-block">
+        <div class="promo-doodle-container">
+          <!-- Brand Doodle: Bubbly Beach Flower (Amber & Hot Pink) -->
+          <svg class="doodle-accent doodle-flower" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M24 16C24 10 18 10 18 16C12 16 12 22 18 22C12 24 12 30 18 30C18 36 24 36 24 30C24 36 30 36 30 30C36 30 36 24 30 22C36 22 36 16 30 16C30 10 24 10 24 16Z" fill="#F5A623" stroke="#FAF4EB" stroke-width="2.5" stroke-linejoin="round" />
+            <circle cx="24" cy="22" r="4.5" fill="#E8237A" stroke="#FAF4EB" stroke-width="1.5" />
+          </svg>
+
+          <!-- Brand Doodle: Coffee Cup with Steam Swirl (Cream & Navy) -->
+          <svg class="doodle-accent doodle-cup" viewBox="0 0 54 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M8 20C8 20 9 38 24 38C39 38 40 20 40 20H8Z" fill="#FAF4EB" stroke="#16255C" stroke-width="2.5" stroke-linejoin="round" />
+            <path d="M40 24C45 24 48 26 48 29C48 32 45 34 40 34" stroke="#FAF4EB" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M16 14C16 11 18 8 20 6C22 4 20 2 20 2" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M26 15C26 11 28 8 30 6C32 4 30 2 30 2" stroke="#E8237A" stroke-width="2.5" stroke-linecap="round" />
+          </svg>
+
+          <!-- Brand Doodle: Tropical Palm Frond (Golden Amber) -->
+          <svg class="doodle-accent doodle-palm" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M10 40C16 32 26 22 40 10" stroke="#F5A623" stroke-width="3" stroke-linecap="round" />
+            <path d="M24 24C28 18 34 16 40 16" stroke="#FAF4EB" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M20 28C22 34 26 38 32 40" stroke="#FAF4EB" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M30 18C36 14 42 12 44 14" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M26 22C28 28 32 32 36 34" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" />
+          </svg>
+
+          <!-- Brand Doodle: Ocean Wave Squiggle -->
+          <svg class="doodle-accent doodle-wave" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 12C9 6 15 6 20 12C25 18 31 18 36 12C41 6 47 6 52 12" stroke="#F5A623" stroke-width="3" stroke-linecap="round" />
+            <path d="M8 18C12 14 16 14 20 18C24 22 28 22 32 18C36 14 40 14 44 18" stroke="#FAF4EB" stroke-width="2" stroke-linecap="round" opacity="0.8" />
+          </svg>
+
+          <!-- Brand Doodle: Star Sparkles -->
+          <svg class="doodle-accent doodle-sparkle doodle-sparkle-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 0C12 7 17 12 24 12C17 12 12 17 12 24C12 17 7 12 0 12C7 12 12 7 12 0Z" fill="#F5A623" />
+          </svg>
+          <svg class="doodle-accent doodle-sparkle doodle-sparkle-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 0C12 7 17 12 24 12C17 12 12 17 12 24C12 17 7 12 0 12C7 12 12 7 12 0Z" fill="#E8237A" />
+          </svg>
+          <svg class="doodle-accent doodle-sparkle doodle-sparkle-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 0C12 7 17 12 24 12C17 12 12 17 12 24C12 17 7 12 0 12C7 12 12 7 12 0Z" fill="#FAF4EB" />
+          </svg>
+
+          <!-- Illustrated Tag Pill -->
+          <div class="promo-tag-pill">
+            <span class="doodle-sparkle-icon" aria-hidden="true">✦</span>
+            <span>Handcrafted Shore Signatures</span>
+            <span class="doodle-sparkle-icon" aria-hidden="true">✦</span>
+          </div>
+
+          <!-- Hand-Lettered Bubbly Headline Treatment (Fat Seed technique in BAIA palette) -->
+          <h2 class="promo-illustrated-title">
+            <span class="title-word-script">House</span>
+            <span class="title-word-bold">SIGNATURES</span>
+          </h2>
+
+          <p class="promo-subtitle">
+            Handcrafted beachside bites & signature brews made to order right by the Masbate waves.
+          </p>
         </div>
+      </div>
 
         <div class="promo-grid">
           <!-- CARD 1: Ready-to-Sip (Fruit Sodas & Frappes) -->
@@ -636,7 +792,7 @@ svg { display: block; max-width: 100%; }
                 <p class="receipt-tagline">Popular Beachside Pairing</p>
               </div>
 
-              <div class="receipt-deal-banner">
+              <div class="receipt-pairing-banner">
                 ⚡ POPULAR SHORE PAIRING
               </div>
 
@@ -952,7 +1108,7 @@ svg { display: block; max-width: 100%; }
     <!-- Drawer Header -->
     <div class="drawer-header">
       <div class="drawer-title-group">
-        <h3 id="drawer-heading">Order List</h3>
+        <h3 id="drawer-heading">Message to Order Ahead</h3>
         <span class="drawer-count-tag">0</span>
       </div>
       <button class="btn-close-drawer" id="drawer-close-btn" aria-label="Close order drawer">✕</button>

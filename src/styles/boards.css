@@ -5,9 +5,17 @@
 .boards-section {
   background: var(--deep-navy);
   color: var(--white);
-  padding: 100px 0 120px 0;
+  padding-top: 48px;
+  padding-bottom: 110px;
   position: relative;
   overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .boards-section {
+    padding-top: 36px;
+    padding-bottom: 80px;
+  }
 }
 
 .boards-header {

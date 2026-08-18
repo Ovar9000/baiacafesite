@@ -163,7 +163,7 @@ export function initCartDrawer() {
       const metaParts = [];
       if (item.temp) metaParts.push(item.temp);
       if (item.size) metaParts.push(`Size ${item.size}`);
-      if (item.isBundle) metaParts.push('Combo Deal (Saved ₱85)');
+      if (item.isBundle) metaParts.push('Popular Shore Pairing');
 
       return `
         <div class="cart-item-card" data-key="${item.key}">
