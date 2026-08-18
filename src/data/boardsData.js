@@ -37,24 +37,6 @@ export const boardsData = [
     tag: "Reef Adventure"
   },
   {
-    id: "gear-beach-lounge",
-    name: "Shorefront Lounge Chair & Parasol Set",
-    type: "Beach Leisure",
-    image: "./images/beachandchill.webp",
-    length: "Full Set (Chair + Umbrella)",
-    level: "All Cafe Guests / Sunset Relaxation",
-    isFree: true,
-    priceDisplay: "FREE",
-    priceSubtext: "Complimentary for Dine-in Guests",
-    status: "available",
-    features: [
-      "Comfortable reclining beachside lounge chairs",
-      "Wide UV-protective tropical parasol shade",
-      "Reserved waterfront spots right on the sand"
-    ],
-    tag: "🏖️ Free for Guests"
-  },
-  {
     id: "board-surfboard-9",
     name: "Classic Shore Cruiser 9'0\"",
     type: "Surfboard",
