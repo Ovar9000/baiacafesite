@@ -30,9 +30,12 @@ export function initBoardsRental() {
           </ul>
 
           <div class="cottage-actions">
-            <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow">
-              <span>Book Cottage via Instagram</span>
+            <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow" style="background: #0084FF;">
+              <span>Book via Facebook Messenger</span>
               <span aria-hidden="true">↗</span>
+            </a>
+            <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill">
+              <span>📸 View Photos @thebaiacafe</span>
             </a>
             <a href="tel:+639171234567" class="btn-secondary-pill">
               <span>Call BAIA Desk</span>
@@ -79,8 +82,8 @@ export function initBoardsRental() {
         </div>
       `;
       actionBtnHtml = `
-        <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill" style="width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.9rem;">
-          Inquire @thebaiacafe
+        <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill" style="width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.9rem;">
+          Inquire via Facebook Messenger
         </a>
       `;
     } else {

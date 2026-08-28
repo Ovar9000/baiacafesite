@@ -149,7 +149,7 @@ export function initCartDrawer() {
         <div class="empty-cart-state">
           <div class="empty-cart-icon" aria-hidden="true">☕</div>
           <h4>Your Order List is Empty</h4>
-          <p>Explore our menu and build your order list to send via Facebook Messenger or Instagram!</p>
+          <p>Explore our menu and build your order list to message directly via Facebook Messenger!</p>
           <button class="btn-story-pill" style="margin-top: 14px;" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'}); cartStore.closeDrawer();">
             <span>Explore BAIA Menu</span>
             <span aria-hidden="true">→</span>
@@ -221,7 +221,7 @@ export function initCartDrawer() {
     modal.innerHTML = `
       <div class="modal-dialog-card">
         <div class="modal-header">
-          <div class="modal-badge">💬 Message Order Ahead</div>
+          <div class="modal-badge">💬 Fast Dispatch via Messenger</div>
           <h3 id="checkout-modal-title" style="font-family: var(--font-display); font-size: 1.35rem; color: var(--deep-navy); margin-top: 6px;">
             Send Order to BAIA Cafe
           </h3>
@@ -254,17 +254,16 @@ export function initCartDrawer() {
           </div>
 
           <p style="font-size: 0.85rem; color: #475569; line-height: 1.45; margin: 12px 0;">
-            All orders & pickups are handled directly via <strong>Facebook Messenger</strong> and <strong>Instagram DM</strong>.
-            Click below to copy your order and chat with us!
+            All orders &amp; pickups are prioritized via <strong>Facebook Messenger</strong>. Click below to copy your order and chat directly with our counter team!
           </p>
 
           <div class="modal-action-buttons">
-            <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow modal-btn send-fb-btn" style="justify-content: center; width: 100%; background: #0084FF; color: #FFFFFF;">
-              <span>💬 Send via Facebook Messenger</span>
+            <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow modal-btn send-fb-btn" style="justify-content: center; width: 100%; background: #0084FF; color: #FFFFFF; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 132, 255, 0.4);">
+              <span>💬 Send via Facebook Messenger (Recommended)</span>
               <span aria-hidden="true">↗</span>
             </a>
-            <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow modal-btn send-ig-btn" style="justify-content: center; width: 100%; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: #FFFFFF;">
-              <span>📸 Send via Instagram DM</span>
+            <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill modal-btn send-ig-btn" style="justify-content: center; width: 100%; border-color: #cbd5e1; color: #475569; font-size: 0.88rem;">
+              <span>📸 Or Message via Instagram DM</span>
               <span aria-hidden="true">↗</span>
             </a>
             <button class="btn-secondary-pill modal-btn copy-order-btn" style="justify-content: center; width: 100%; border-color: var(--deep-navy); color: var(--deep-navy);">
@@ -285,7 +284,7 @@ export function initCartDrawer() {
     const copyToClipboard = () => {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(orderMsg);
-        cartStore.showToast('Order Copied! 📋', 'Paste directly into Facebook or Instagram chat', '✨');
+        cartStore.showToast('Order Copied! 📋', 'Paste directly into Facebook Messenger or Instagram chat', '💬');
       }
     };
 

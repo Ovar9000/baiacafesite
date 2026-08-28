@@ -58,7 +58,7 @@ export const boardsData = [
 
 export const cottageData = {
   title: "Barangay Laurente Floating Cottage",
-  subtitle: "Official Booking Partner: BAIA Café (@thebaiacafe)",
+  subtitle: "Official Booking Partner: BAIA Café (Message via Messenger)",
   hours: "11:00 AM – 6:00 PM (Cafe open until 10:00 PM)",
   image: "./images/Cottage%20rental.webp",
   cottagePhoto: "./images/Cottage.webp",
