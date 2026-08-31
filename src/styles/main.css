@@ -8,6 +8,7 @@
 @import './divider.css';
 @import './story.css';
 @import './promo-grid.css';
+@import './new-drops.css';
 @import './menu.css';
 @import './boards.css';
 @import './drawer.css';
@@ -34,12 +35,13 @@
   --text-muted: #5A6987;
 
   /* Typography */
-  --font-headline: 'Outfit', sans-serif;
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Outfit', sans-serif;
+  --font-headline: 'Outfit', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --font-display: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --font-body: 'Outfit', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
   --font-script: 'Caveat', cursive;
   --font-fun: 'Playpen Sans', cursive;
-  --font-mono: 'Space Grotesk', monospace;
+  --font-mono: 'Space Grotesk', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --font-price: 'Space Grotesk', 'Outfit', 'Segoe UI', system-ui, -apple-system, sans-serif;
 
   /* Spacing Scale */
   --space-xs: 4px;
@@ -73,8 +75,73 @@
   /* Transitions */
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
-  --duration-fast: 0.2s;
-  --duration-normal: 0.35s;
+  /* Automated Coastal Depth Scale (Sunlit Shore to Ocean Abyss) */
+  --depth-surface-blue: #1E4AFF;
+  --depth-sand-cream: #F5E9D6;
+  --depth-vibrant-bay: #173CE8;
+  --depth-sand-deck: #FAF4EB;
+  --depth-ocean-mid: #132CA6;
+  --depth-navy-dusk: #0E1A45;
+  --depth-navy-deep: #0E1A45;
+  --depth-navy-twilight: #0E1A45;
+  --depth-midnight-abyss: #0E1A45;
+}
+
+/* ==========================================================================
+   AUTOMATED SECTION DEPTH & THEME SYSTEM (SEAMLESS TRANSITIONS)
+   ========================================================================== */
+main > section,
+.site-footer {
+  margin: 0;
+  outline: none;
+}
+
+/* Fix mobile sub-pixel gaps between adjacent stacked sections */
+main > section + section,
+main + .site-footer {
+  margin-top: -1px;
+}
+
+[data-theme="sand"],
+.theme-sand {
+  background-color: var(--depth-sand-cream) !important;
+  color: var(--deep-navy) !important;
+}
+[data-theme="sand"] h2:not(.poster-card h2),
+.theme-sand h2:not(.poster-card h2) {
+  color: var(--deep-navy) !important;
+}
+
+[data-theme="sand-deck"],
+.theme-sand-deck {
+  background-color: var(--depth-sand-deck) !important;
+  color: var(--deep-navy) !important;
+}
+
+[data-theme="bay-blue"],
+.theme-bay-blue {
+  background: radial-gradient(120% 80% at 50% 10%, #173ce8 0%, #1532be 60%, #10258d 100%) !important;
+  color: var(--white) !important;
+}
+
+[data-theme="ocean-depth"],
+.theme-ocean-depth,
+[data-theme="navy-dusk"],
+.theme-navy-dusk,
+[data-theme="navy-deep"],
+.theme-navy-deep,
+[data-theme="navy-twilight"],
+.theme-navy-twilight,
+[data-theme="midnight"],
+.theme-midnight,
+.menu-section,
+.reviews-section,
+.boards-section,
+.atmosphere-section,
+.site-footer {
+  background-color: #0E1A45 !important;
+  color: var(--white) !important;
+  box-shadow: 0 1px 0 0 #0E1A45, 0 -1px 0 0 #0E1A45;
 }
 
 /* Reset & Box Sizing */
@@ -559,9 +626,7 @@ main,
 .reviews-section {
   padding-top: 110px;
   padding-bottom: 48px;
-  background: var(--deep-navy);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  border-bottom: none;
+  background: #0E1A45;
   position: relative;
 }
 
@@ -683,7 +748,10 @@ main,
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--golden-amber);
 }
 
 .reviewer-name {
@@ -696,6 +764,42 @@ main,
 .reviewer-origin {
   font-size: 0.775rem;
   color: rgba(255, 255, 255, 0.6);
+}
+
+.reviews-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 36px;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-pill);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.reviews-aggregate-text {
+  font-family: var(--font-headline);
+  font-size: 0.95rem;
+  color: var(--white);
+}
+
+.reviews-fb-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--amber-contrast);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.88rem;
+  text-decoration: none;
+  border-bottom: 1.5px solid var(--golden-amber);
+  transition: color 0.2s ease;
+}
+
+.reviews-fb-link:hover {
+  color: var(--white);
 }
 
 /* ==========================================================================

@@ -3,9 +3,9 @@
    ========================================================================== */
 
 .site-footer {
-  background: var(--deep-navy);
+  background: var(--depth-midnight-abyss, #0E1A45);
   color: var(--white);
-  padding: 72px 0 36px 0;
+  padding: 72px 0 0 0;
   border-top: 4px solid var(--golden-amber);
   position: relative;
   overflow: hidden;
@@ -243,10 +243,16 @@
   text-decoration: none;
 }
 
-/* Footer Bottom Strip */
+/* Edge-to-Edge Full Width Footer Bottom Strip */
+.footer-bottom-strip {
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 24px 0 28px 0;
+  background: rgba(0, 0, 0, 0.25);
+  margin-top: 24px;
+}
+
 .footer-bottom-row {
-  padding-top: 28px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;

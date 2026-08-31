@@ -56,7 +56,7 @@ class CartStore {
       });
     }
 
-    this.showToast('Added to Order List', `${item.name} (${this.formatCurrency(price)})`, '☕');
+    this.showToast('Added to Order List', `${item.name} (${this.formatCurrency(price)})`, '✓');
     this.openDrawer();
   }
 
@@ -69,14 +69,14 @@ class CartStore {
       this.items.push({
         id: 'pairing-shore-favorites',
         key: bundleKey,
-        name: '⚡ Popular Shore Pairing',
+        name: 'Popular Shore Pairing',
         description: 'BAIA Smash Burger + Sea Salt Latte (Iced) + Chili BBQ Fries',
         quantity: 1,
         unitPrice: 565,
         isBundle: true
       });
     }
-    this.showToast('Shore Pairing Added!', 'BAIA Smash + Sea Salt Latte + Fries (₱565) added to your order list', '🍔');
+    this.showToast('Shore Pairing Added', 'BAIA Smash + Sea Salt Latte + Fries (₱565) added to your order list', '✓');
     this.openDrawer();
   }
 
@@ -154,7 +154,7 @@ class CartStore {
     return `₱${val.toLocaleString()}`;
   }
 
-  showToast(title, message, icon = '✦') {
+  showToast(title, message, icon = '✓') {
     const toast = {
       id: Date.now() + Math.random(),
       title,

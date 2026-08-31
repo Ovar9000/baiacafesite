@@ -259,19 +259,16 @@ export function initCartDrawer() {
 
           <div class="modal-action-buttons">
             <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow modal-btn send-fb-btn" style="justify-content: center; width: 100%; background: #0084FF; color: #FFFFFF; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 132, 255, 0.4);">
-              <span>💬 Send via Facebook Messenger (Recommended)</span>
+              <span>Send via Facebook Messenger (Recommended)</span>
               <span aria-hidden="true">↗</span>
             </a>
             <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill modal-btn send-ig-btn" style="justify-content: center; width: 100%; border-color: #cbd5e1; color: #475569; font-size: 0.88rem;">
-              <span>📸 Or Message via Instagram DM</span>
+              <span>Message via Instagram DM</span>
               <span aria-hidden="true">↗</span>
             </a>
             <button class="btn-secondary-pill modal-btn copy-order-btn" style="justify-content: center; width: 100%; border-color: var(--deep-navy); color: var(--deep-navy);">
-              <span>📋 Copy Order Text</span>
+              <span>Copy Order Text</span>
             </button>
-            <a href="tel:+639171234567" class="btn-secondary-pill modal-btn" style="justify-content: center; width: 100%; border-color: #94a3b8; color: #475569; font-size: 0.85rem;">
-              <span>📞 Call Counter (+63 917 123 4567)</span>
-            </a>
             <button class="btn-close-modal" id="close-checkout-modal-btn">Back to Edit</button>
           </div>
         </div>
@@ -284,7 +281,7 @@ export function initCartDrawer() {
     const copyToClipboard = () => {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(orderMsg);
-        cartStore.showToast('Order Copied! 📋', 'Paste directly into Facebook Messenger or Instagram chat', '💬');
+        cartStore.showToast('Order Copied', 'Paste directly into Facebook Messenger or Instagram chat', '✓');
       }
     };
 

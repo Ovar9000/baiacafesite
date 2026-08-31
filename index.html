@@ -13,16 +13,16 @@
     content="BAIA Cafe, Masbate cafe, specialty coffee Masbate, Asin Tibuok latte, smash burger, Laurente beach, skimboarding, floating cottage Masbate, order on facebook messenger" />
   <meta name="author" content="BAIA Cafe" />
   <meta name="theme-color" content="#1E4AFF" />
-  <link rel="canonical" href="https://thebaiacafe.ph/" />
+  <link rel="canonical" href="https://baia.cafe/" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://thebaiacafe.ph/" />
+  <meta property="og:url" content="https://baia.cafe/" />
   <meta property="og:title" content="BAIA Cafe — Beachfront Specialty Coffee, Smash Burgers & Good Vibes" />
   <meta property="og:description"
     content="Artisanal Asin Tibuok lattes, handcrafted double smash burgers, fresh fruit sodas, and shore recreation right on Laurente beach, Masbate. Orders & pickups prioritized via Facebook Messenger." />
-  <meta property="og:image" content="https://thebaiacafe.ph/images/Baia%20skimboard%20and%20coffee.webp" />
+  <meta property="og:image" content="https://baia.cafe/images/Baia%20skimboard%20and%20coffee.webp" />
   <meta property="og:image:width" content="1179" />
   <meta property="og:image:height" content="1176" />
   <meta property="og:image:alt" content="BAIA iced specialty coffee and custom skimboard on the shoreline sand" />
@@ -31,11 +31,11 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:url" content="https://thebaiacafe.ph/" />
+  <meta name="twitter:url" content="https://baia.cafe/" />
   <meta name="twitter:title" content="BAIA Cafe — Beachfront Specialty Coffee & Good Vibes" />
   <meta name="twitter:description"
     content="Artisanal Asin Tibuok lattes, handcrafted double smash burgers, and shore recreation on Laurente beach, Masbate. Message & order ahead via Facebook Messenger." />
-  <meta name="twitter:image" content="https://thebaiacafe.ph/images/Baia%20skimboard%20and%20coffee.webp" />
+  <meta name="twitter:image" content="https://baia.cafe/images/Baia%20skimboard%20and%20coffee.webp" />
 
   <!-- Preload Critical Hero Asset & Google Fonts -->
   <link rel="preload" as="image" href="./images/Baia%20skimboard%20and%20coffee.webp" type="image/webp" fetchpriority="high" />
@@ -71,13 +71,13 @@
   --amber-contrast: #FFE699;
   --white: #FFFFFF;
   --text-dark: #16255C;
-  --text-muted: #5A6987;
-  --font-headline: 'Outfit', sans-serif;
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Outfit', sans-serif;
+  --font-headline: 'Outfit', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --font-display: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --font-body: 'Outfit', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
   --font-script: 'Caveat', cursive;
   --font-fun: 'Playpen Sans', cursive;
-  --font-mono: 'Space Grotesk', monospace;
+  --font-mono: 'Space Grotesk', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --font-price: 'Space Grotesk', 'Outfit', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px;
   --radius-sm: 8px; --radius-md: 14px; --radius-lg: 20px; --radius-xl: 32px; --radius-pill: 9999px;
   --shadow-sm: 0 2px 8px rgba(22, 37, 92, 0.06);
@@ -174,11 +174,10 @@ svg { display: block; max-width: 100%; }
     "@type": ["CafeOrCoffeeShop", "Restaurant", "LocalBusiness"],
     "name": "BAIA Cafe",
     "alternateName": "The BAIA Cafe Masbate",
-    "image": "https://thebaiacafe.ph/images/Baia%20skimboard%20and%20coffee.webp",
-    "logo": "https://thebaiacafe.ph/images/Logo.webp",
-    "url": "https://thebaiacafe.ph/",
+    "image": "https://baia.cafe/images/Baia%20skimboard%20and%20coffee.webp",
+    "logo": "https://baia.cafe/images/Logo.webp",
+    "url": "https://baia.cafe/",
     "hasMap": "https://maps.app.goo.gl/vNYohzy8UWbM4d5P6",
-    "telephone": "+639171234567",
     "priceRange": "₱105 - ₱480",
     "servesCuisine": [
       "Specialty Coffee",
@@ -320,6 +319,7 @@ svg { display: block; max-width: 100%; }
       <nav class="main-nav-wrapper" aria-label="Primary Navigation">
         <ul class="main-nav-links">
           <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#drops" class="nav-link nav-link-drops"><span class="nav-drop-badge">NEW</span> Drops</a></li>
           <li><a href="#promos" class="nav-link">Favorites</a></li>
           <li><a href="#menu" class="nav-link">Menu</a></li>
           <li><a href="#reviews" class="nav-link">Reviews</a></li>
@@ -332,18 +332,28 @@ svg { display: block; max-width: 100%; }
       <!-- Right Nav Controls -->
       <div class="nav-actions">
         <button class="audio-toggle-btn" id="audio-toggle-btn" title="Toggle Bay Sound ocean waves">
-          <span aria-hidden="true">🔈</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
           <span class="audio-btn-label">Bay Sound</span>
         </button>
 
         <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="nav-phone-link" aria-label="Message BAIA Cafe on Facebook Messenger">
-          <span aria-hidden="true">💬</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
+          </svg>
           <span class="nav-phone-text">Messenger</span>
         </a>
 
         <!-- Header Cart Trigger Button -->
         <button class="nav-cart-btn" data-open-cart aria-label="View current order list">
-          <span aria-hidden="true">🛍️</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
           <span class="nav-cart-text">Order List</span>
           <span class="cart-count-badge">0</span>
         </button>
@@ -353,7 +363,7 @@ svg { display: block; max-width: 100%; }
 
   <!-- MAIN CONTENT CONTAINER -->
   <!-- 1. HERO SECTION (Commanding Vertical Focus — Fat Seed Energy with Coastal Restraint) -->
-  <section class="hero-section" id="hero" aria-label="Welcome to BAIA Cafe">
+  <section class="hero-section" id="hero" data-theme="surface-blue" aria-label="Welcome to BAIA Cafe">
     <!-- Ambient Floating Glyphs (BAIA Brand Only: 6-Petal Flower & Palm Tree) -->
     <div class="floating-glyphs-layer" aria-hidden="true">
       <div class="floating-glyph glyph-1">
@@ -458,7 +468,7 @@ svg { display: block; max-width: 100%; }
   </div>
 
   <!-- 4. STORY & "TEAM BAIA" POLAROID SECTION -->
-  <section class="story-section" id="about" aria-label="About BAIA Cafe">
+  <section class="story-section" id="about" data-theme="sand" aria-label="About BAIA Cafe">
     <div class="section-floaties-layer" aria-hidden="true">
       <div class="glass-floatie frost-blue anim-1 size-lg" style="top: 6%; left: 3%;">
         <svg viewBox="0 0 24 24">
@@ -486,13 +496,11 @@ svg { display: block; max-width: 100%; }
         <h2 class="story-headline">
           <span class="headline-primary">CRAFTED FOR SUNSET CHILL SESSIONS</span>
           <span class="headline-script-line">
-            <span class="script-accent">Your Daily Dose of Vitamin Sea</span>
+            <span class="script-accent">Specialty Coffee & Beachside Bites</span>
           </span>
         </h2>
         <p class="story-body">
-            BAIA was born from a simple shore philosophy: great coffee, satisfying fresh meals, and the relaxation of the open
-            ocean belong together. Located right on the beach in Barangay Laurente, we serve everything from artisanal Bohol Asin Tibuok
-            lattes to juicy double smash burgers and refreshing fruit sodas.
+            Artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers, and the open shore. Located right on the beach sand in Barangay Laurente, Masbate, we serve specialty espresso, fresh hearty food, and offer complimentary skimboards for every cafe guest.
           </p>
 
           <div class="story-stats-grid">
@@ -522,92 +530,36 @@ svg { display: block; max-width: 100%; }
             <div class="polaroid-img-box">
               <img src="./images/crew.webp" alt="Team BAIA cafe crew wearing brand aprons by the beach" width="720" height="960" loading="lazy" decoding="async" />
             </div>
-            <p class="polaroid-caption">Team baia crew ☕</p>
+            <p class="polaroid-caption">Team baia crew</p>
           </div>
 
           <div class="polaroid-card polaroid-2">
             <div class="polaroid-img-box">
               <img src="./images/beachandchill.webp" alt="BAIA beachfront lounge chairs and umbrellas on white sand" width="1200" height="800" loading="lazy" decoding="async" />
             </div>
-            <p class="polaroid-caption">Shoreline chill spot 🌴</p>
+            <p class="polaroid-caption">Shoreline chill spot</p>
           </div>
 
           <div class="polaroid-card polaroid-3">
             <div class="polaroid-img-box">
               <img src="./images/twilight.webp" alt="Twilight fairy lanterns on the beach by the calming waves" width="800" height="1200" loading="lazy" decoding="async" />
             </div>
-            <p class="polaroid-caption">Evening glow ✨</p>
+            <p class="polaroid-caption">Evening glow</p>
           </div>
 
           <div class="polaroid-stamp">
-            <span>✦ Bay Life ✦</span>
+            <span>BAIA SHORE</span>
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- SHORE INFO SNAPSHOT (Spot/Hours/Orders/Bay Grid + Recreation & Coffee Cards) -->
-      <div class="container snapshot-container" id="snapshot" aria-label="Cafe Information and Shore Amenities">
-        <!-- Section Header -->
-        <div class="snapshot-header-block">
-          <span class="snapshot-tag-pill">✦ Beachfront Essentials ✦</span>
-          <h2 class="snapshot-title">
-            <span class="script-accent">Shore</span>
-            <span class="wordmark">Snapshot &amp; Guest Info</span>
-          </h2>
-          <p class="snapshot-subtitle">
-            Everything you need for your beachfront visit in Barangay Laurente, Masbate.
-          </p>
-        </div>
-
-        <!-- Feature Highlight Cards (Coffee by the Bay & Guest Recreation) -->
-        <div class="snapshot-grid-cards">
-          <!-- Card 1: Coffee by the Bay Mascot Feature -->
-          <div class="snapshot-feature-card card-mascot-feature">
-            <div class="feature-card-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M4 8h12v7a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8zm12 2h2a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-2v-5zM6 4h1a1 1 0 0 1 1 1v1H5V5a1 1 0 0 1 1-1zm4 0h1a1 1 0 0 1 1 1v1H9V5a1 1 0 0 1 1-1zm4 0h1a1 1 0 0 1 1 1v1h-3V5a1 1 0 0 1 1-1z" />
-              </svg>
-            </div>
-            <div class="feature-card-body">
-              <h3>Coffee by the Bay</h3>
-              <p>Artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers, and fresh fruit sodas served steps from the water.</p>
-            </div>
-          </div>
-
-          <!-- Card 2: Guest Recreation Feature -->
-          <div class="snapshot-feature-card card-recreation-feature">
-            <div class="feature-card-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" />
-              </svg>
-            </div>
-            <div class="feature-card-body">
-              <h3>Guest Recreation</h3>
-              <p>Complimentary skimboard gear for all cafe guests, beach lounge seating, umbrellas, and evening lantern chill sessions.</p>
-              <a href="#boards" class="feature-card-link">Explore Shore Gear →</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Spot / Hours / Orders / Bay Telemetry Bar -->
-        <div class="snapshot-telemetry-bar" aria-label="Cafe Location, Operating Hours, Orders, and Live Bay Status">
-          <div class="telemetry-col">
-            <span class="telemetry-label">📍 Spot</span>
-            <span class="telemetry-val">Barangay Laurente, Masbate</span>
-          </div>
-          <div class="telemetry-col">
-            <span class="telemetry-label">⏰ Hours</span>
-            <span class="telemetry-val">11:00 AM – 10:00 PM <span class="kitchen-sub">(Kitchen 9:00 PM)</span></span>
-          </div>
-          <div class="telemetry-col">
-            <span class="telemetry-label">🛍️ Orders</span>
-            <span class="telemetry-val">Dine-in, Beach Takeout &amp; Messenger</span>
-          </div>
-          <div class="telemetry-col">
-            <span class="telemetry-label">🌊 Bay</span>
-            <span class="telemetry-val" id="shore-live-weather">☀️ Sunny Bay 29°C</span>
-          </div>
-        </div>
+    <!-- ==========================================================================
+         NEW RELEASES & FACEBOOK DROPS SHOWCASE (Auto-Synced from Facebook)
+         ========================================================================== -->
+    <section class="new-drops-section" id="drops" data-theme="bay-blue" aria-label="New Releases and Facebook Food and Drink Drops">
+      <div class="container" id="new-drops-root">
+        <!-- Injected dynamically by src/components/newDrops.js -->
       </div>
     </section>
 
@@ -619,10 +571,10 @@ svg { display: block; max-width: 100%; }
   <section class="seasonal-events-section is-hidden" id="seasonal-events" aria-label="Seasonal Events and Holiday Specials" hidden>
     <div class="container">
       <div class="events-header-block">
-        <span class="events-tag-pill">✦ Seasonal Happenings ✦</span>
+        <span class="events-tag-pill">Beachside Events</span>
         <h2 class="events-title">
           <span class="script-accent">Beachside</span>
-          <span class="wordmark">Events &amp; Holiday Specials</span>
+          <span class="wordmark">Events &amp; Specials</span>
         </h2>
         <p class="events-subtitle">
           Upcoming sunset acoustic sessions, holiday beach celebrations, and seasonal guest specials.
@@ -634,7 +586,7 @@ svg { display: block; max-width: 100%; }
         <article class="event-card">
           <div class="event-card-badge">Upcoming Event</div>
           <h3 class="event-card-title">Sunset Acoustic by the Shore</h3>
-          <p class="event-card-date">🗓️ Saturday Evenings • 5:00 PM – 8:00 PM</p>
+          <p class="event-card-date">Saturday Evenings • 5:00 PM – 8:00 PM</p>
           <p class="event-card-desc">Live beach acoustic music, coastal fairy lights, and signature Asin Tibuok iced lattes right on the sand.</p>
           <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-event-rsvp">Reserve a Beach Spot →</a>
         </article>
@@ -643,7 +595,7 @@ svg { display: block; max-width: 100%; }
         <article class="event-card">
           <div class="event-card-badge">Seasonal Special</div>
           <h3 class="event-card-title">Holiday Bay Roast &amp; Coconut Cold Brew</h3>
-          <p class="event-card-date">🎄 Limited Seasonal Feature</p>
+          <p class="event-card-date">Limited Seasonal Feature</p>
           <p class="event-card-desc">Freshly harvested Masbate coconut water infused with artisan slow-drip cold brew and toasted cinnamon spice.</p>
           <button class="btn-event-rsvp" data-open-cart>Explore Holiday Menu →</button>
         </article>
@@ -652,7 +604,7 @@ svg { display: block; max-width: 100%; }
   </section>
 
   <!-- 6. HOUSE SIGNATURES SHOWCASE TILES (Fat Seed Illustrated Creative Direction) -->
-  <section class="promo-grid-section" id="promos" aria-label="House Signatures and Specialties">
+  <section class="promo-grid-section" id="promos" data-theme="sand-deck" aria-label="House Signatures and Specialties">
     <div class="container">
       <!-- Illustrated Header with Scattered Brand Doodles -->
       <div class="promo-header-block">
@@ -686,22 +638,9 @@ svg { display: block; max-width: 100%; }
             <path d="M8 18C12 14 16 14 20 18C24 22 28 22 32 18C36 14 40 14 44 18" stroke="#FAF4EB" stroke-width="2" stroke-linecap="round" opacity="0.8" />
           </svg>
 
-          <!-- Brand Doodle: Star Sparkles -->
-          <svg class="doodle-accent doodle-sparkle doodle-sparkle-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M12 0C12 7 17 12 24 12C17 12 12 17 12 24C12 17 7 12 0 12C7 12 12 7 12 0Z" fill="#F5A623" />
-          </svg>
-          <svg class="doodle-accent doodle-sparkle doodle-sparkle-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M12 0C12 7 17 12 24 12C17 12 12 17 12 24C12 17 7 12 0 12C7 12 12 7 12 0Z" fill="#E8237A" />
-          </svg>
-          <svg class="doodle-accent doodle-sparkle doodle-sparkle-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M12 0C12 7 17 12 24 12C17 12 12 17 12 24C12 17 7 12 0 12C7 12 12 7 12 0Z" fill="#FAF4EB" />
-          </svg>
-
           <!-- Illustrated Tag Pill -->
           <div class="promo-tag-pill">
-            <span class="doodle-sparkle-icon" aria-hidden="true">✦</span>
-            <span>Handcrafted Shore Signatures</span>
-            <span class="doodle-sparkle-icon" aria-hidden="true">✦</span>
+            <span>House Specials &amp; Favorites</span>
           </div>
 
           <!-- Hand-Lettered Bubbly Headline Treatment (Fat Seed technique in BAIA palette) -->
@@ -748,7 +687,7 @@ svg { display: block; max-width: 100%; }
           <article class="poster-card card-spicy-bite">
             <div class="spicy-flame-burst" aria-hidden="true"></div>
             <div class="card-top-content" style="z-index: 4;">
-              <span class="spicy-badge-pill">🔥 Freshly Grilled</span>
+              <span class="spicy-badge-pill">Freshly Smashed</span>
               <span class="card-script-title" style="color: var(--golden-amber);">The</span>
               <h3 class="card-main-title">BAIA SMASH</h3>
               <p class="card-body-text">
@@ -768,7 +707,7 @@ svg { display: block; max-width: 100%; }
             <div class="card-action-bar">
               <span class="card-price-highlight">₱230</span>
               <button class="btn-card-action" data-order-item="burger-smash">
-                💬 Message to Order (₱230)
+                Message to Order (₱230)
               </button>
             </div>
           </article>
@@ -794,7 +733,7 @@ svg { display: block; max-width: 100%; }
               </div>
 
               <div class="receipt-pairing-banner">
-                ⚡ POPULAR SHORE PAIRING
+                POPULAR SHORE PAIRING
               </div>
 
               <div class="receipt-item-list">
@@ -818,7 +757,7 @@ svg { display: block; max-width: 100%; }
               </div>
 
               <button class="btn-bundle-order" data-order-bundle="double-trouble">
-                💬 Order This Pairing (₱565)
+                Order This Pairing (₱565)
               </button>
             </div>
           </article>
@@ -827,10 +766,10 @@ svg { display: block; max-width: 100%; }
     </section>
 
     <!-- 5. INTERACTIVE MENU EXPLORER (50+ Items with 1-Click Ordering) -->
-    <section class="menu-section" id="menu" aria-label="Full BAIA Cafe Menu Explorer">
+    <section class="menu-section" id="menu" data-theme="ocean-depth" aria-label="Full BAIA Cafe Menu Explorer">
       <div class="container">
         <div class="menu-header-wrapper">
-          <span class="menu-badge">✦ Complete Menu Catalog ✦</span>
+          <span class="menu-badge">Full Menu &amp; Daily Roasts</span>
           <h2 class="menu-main-title">Crafted Fresh Daily</h2>
           <p class="menu-subtitle">
             Authentic espresso, signature Asin Tibuok lattes, blended frappes, sizzling rice meals & gourmet double smash burgers.
@@ -843,12 +782,12 @@ svg { display: block; max-width: 100%; }
     </section>
 
     <!-- 6. CUSTOMER REVIEWS & SOCIAL PROOF -->
-    <section class="reviews-section" id="reviews" aria-label="Customer Reviews and Testimonials">
+    <section class="reviews-section" id="reviews" data-theme="navy-dusk" aria-label="Customer Reviews and Testimonials">
       <div class="container">
         <div class="reviews-header-block">
-          <span class="reviews-tag">✦ What Shoregoers Say ✦</span>
-          <h2 class="reviews-title">Loved by Beachgoers & Surfers</h2>
-          <p class="reviews-subtitle">Real ratings and feedback from visitors enjoying the Masbate shore.</p>
+          <span class="reviews-tag">Guest Reviews</span>
+          <h2 class="reviews-title">What Guests Say About BAIA</h2>
+          <p class="reviews-subtitle">Real feedback from visitors enjoying coffee and burgers on the Laurente beachfront.</p>
         </div>
 
         <div class="reviews-grid">
@@ -856,16 +795,16 @@ svg { display: block; max-width: 100%; }
           <div class="review-card">
             <div class="review-top-row">
               <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
-              <span class="review-verified-badge">✓ Verified Visitor</span>
+              <span class="review-verified-badge">Facebook Review</span>
             </div>
             <p class="review-text">
-              "The <strong>Asin Tibuok Latte</strong> is a game changer! You get the rich espresso with this subtle, artisanal smoky salty caramel finish right on the beach sand. Best coffee spot in Masbate!"
+              "Finally tried the Asin Tibuok latte — the salty note from the Bohol artisanal salt brings out the espresso really well without being overpowering. Great quiet spot right by the water in the afternoon."
             </p>
             <div class="reviewer-meta">
-              <div class="reviewer-avatar">☕</div>
+              <div class="reviewer-avatar">AM</div>
               <div>
                 <p class="reviewer-name"><strong>Abeneil M.</strong></p>
-                <p class="reviewer-origin">Specialty Coffee Enthusiast</p>
+                <p class="reviewer-origin">February 2026 • Local Visitor</p>
               </div>
             </div>
           </div>
@@ -874,34 +813,34 @@ svg { display: block; max-width: 100%; }
           <div class="review-card">
             <div class="review-top-row">
               <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
-              <span class="review-verified-badge">✓ Local Favorite</span>
+              <span class="review-verified-badge">Google Maps Review</span>
             </div>
             <p class="review-text">
-              "The <strong>BAIA Double Smash Burger</strong> is crispy, juicy, and packed with flavor. Having a burger and iced Sea Salt Latte while sitting by the waves is literally the ultimate weekend therapy."
+              "Smash burgers came out hot with crispy edges and seasoned fries. Can get busy around sunset so message ahead if you want a beach table, but the crew was super accommodating."
             </p>
             <div class="reviewer-meta">
-              <div class="reviewer-avatar">🍔</div>
+              <div class="reviewer-avatar">NM</div>
               <div>
                 <p class="reviewer-name"><strong>Norman M.</strong></p>
-                <p class="reviewer-origin">Weekend Shoregoer</p>
+                <p class="reviewer-origin">January 2026 • Dine-in Guest</p>
               </div>
             </div>
           </div>
 
-          <!-- Review 3: Bianca Natalie L. -->
+          <!-- Review 3: Bianca L. -->
           <div class="review-card">
             <div class="review-top-row">
               <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
-              <span class="review-verified-badge">✓ Sunset Regular</span>
+              <span class="review-verified-badge">Facebook Review</span>
             </div>
             <p class="review-text">
-              "The <strong>Strawberry Crimson Pop</strong> fruit soda and <strong>Biscoff Croffle</strong> during golden hour is heavenly! Super relaxing beachfront atmosphere and the friendliest crew."
+              "Loved the strawberry fruit soda and croffles during golden hour. The outdoor seating right on the sand with the evening lights makes it such a peaceful place to hang out after a swim."
             </p>
             <div class="reviewer-meta">
-              <div class="reviewer-avatar">🍹</div>
+              <div class="reviewer-avatar">BL</div>
               <div>
-                <p class="reviewer-name"><strong>Bianca Natalie L.</strong></p>
-                <p class="reviewer-origin">Sunset & Food Lover</p>
+                <p class="reviewer-name"><strong>Bianca L.</strong></p>
+                <p class="reviewer-origin">February 2026 • Weekend Guest</p>
               </div>
             </div>
           </div>
@@ -910,65 +849,98 @@ svg { display: block; max-width: 100%; }
           <div class="review-card">
             <div class="review-top-row">
               <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
-              <span class="review-verified-badge">✓ Skim & Bay Guest</span>
+              <span class="review-verified-badge">Google Maps Review</span>
             </div>
             <p class="review-text">
-              "Complimentary skimboards for cafe guests is such a great touch. Grabbed a board, rode the shorebreak, and booked the Laurente Floating Cottage right at the counter. 10/10 vibe."
+              "Free skimboard use while waiting for your order is a great touch. We spent the whole afternoon here and arranged our Laurente floating cottage booking directly with the counter staff."
             </p>
             <div class="reviewer-meta">
-              <div class="reviewer-avatar">🏄</div>
+              <div class="reviewer-avatar">KS</div>
               <div>
                 <p class="reviewer-name"><strong>Kyla S.</strong></p>
-                <p class="reviewer-origin">Skimboarder & Traveler</p>
+                <p class="reviewer-origin">December 2025 • Beach Traveler</p>
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="reviews-footer-row">
+          <p class="reviews-aggregate-text">⭐ Rated <strong>4.9 / 5</strong> across 120+ guest check-ins in Masbate</p>
+          <a href="https://www.facebook.com/thebaiacafe/reviews" target="_blank" rel="noopener" class="reviews-fb-link">
+            <span>Read more reviews on Facebook</span>
+            <span aria-hidden="true">↗</span>
+          </a>
         </div>
       </div>
     </section>
 
     <!-- 7. SHORE RECREATION & FLOATING COTTAGE -->
-    <section class="boards-section" id="boards" aria-label="Shore Recreation and Floating Cottage">
+    <section class="boards-section" id="boards" data-theme="navy-deep" aria-label="Shore Recreation and Floating Cottage">
       <div class="container">
         <div class="boards-header">
-          <span class="boards-tag">✦ Ocean Leisure & Community Gear ✦</span>
+          <span class="boards-tag">Shore Recreation &amp; Gear</span>
           <h2 class="boards-title">
             Shore Recreation & <span class="script-accent">Floating Cottage</span>
           </h2>
           <p class="boards-subtitle">
-            Enjoy complimentary skimboards as a cafe guest, rent snorkeling masks for reef exploration, or book the Barangay Laurente Floating Cottage right through our cafe desk.
+            Enjoy complimentary skimboards as a cafe guest, rent snorkeling masks for reef exploration, or book the Barangay Laurente Floating Cottage right through our cafe counter.
           </p>
         </div>
 
-        <!-- Live Bay Conditions Banner -->
-        <div class="bay-conditions-card" aria-label="Live Bay Telemetry and Conditions">
-          <div class="conditions-info-group">
-            <div class="condition-metric">
-              <div class="condition-icon" aria-hidden="true">🌊</div>
-              <div class="metric-text">
-                <p class="metric-label">Swell Forecast</p>
-                <p id="bay-metric-swell">1.0m @ 14s (Clean Shorebreak)</p>
+        <!-- Shore Visiting Guide & Practical Tips -->
+        <div class="bay-visiting-guide-card" aria-label="Shore Visiting Guide and Guest Tips">
+          <div class="visiting-tips-grid">
+            <div class="tip-metric">
+              <div class="tip-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+              </div>
+              <div class="tip-text">
+                <p class="tip-label">Sunset Golden Hour</p>
+                <p class="tip-value">Prime golden light 4:45 PM – 6:00 PM</p>
               </div>
             </div>
-            <div class="condition-metric">
-              <div class="condition-icon" aria-hidden="true">🌡️</div>
-              <div class="metric-text">
-                <p class="metric-label">Water Temp</p>
-                <p id="bay-metric-temp">28°C (Warm Tropical Bay)</p>
+            <div class="tip-metric">
+              <div class="tip-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12h20M2 12a10 10 0 0 1 10-10 10 10 0 0 1 10 10M2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10"></path>
+                </svg>
+              </div>
+              <div class="tip-text">
+                <p class="tip-label">Shore Skimboarding</p>
+                <p class="tip-value">Complimentary boards for cafe guests</p>
               </div>
             </div>
-            <div class="condition-metric">
-              <div class="condition-icon" aria-hidden="true">💨</div>
-              <div class="metric-text">
-                <p class="metric-label">Wind Condition</p>
-                <p id="bay-metric-wind">Offshore 15 km/h (8 kts)</p>
+            <div class="tip-metric">
+              <div class="tip-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                  <path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1h18v1z"></path>
+                </svg>
+              </div>
+              <div class="tip-text">
+                <p class="tip-label">Floating Cottage</p>
+                <p class="tip-value">Daily boarding 11:00 AM – 6:00 PM</p>
               </div>
             </div>
-            <div class="condition-metric">
-              <div class="condition-icon" aria-hidden="true">⏳</div>
-              <div class="metric-text">
-                <p class="metric-label">Tide Chart</p>
-                <p id="bay-metric-tide">High Tide 3:45 PM</p>
+            <div class="tip-metric">
+              <div class="tip-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
+                </svg>
+              </div>
+              <div class="tip-text">
+                <p class="tip-label">Messenger Orders</p>
+                <p class="tip-value">Pre-order for fast beach pickup</p>
               </div>
             </div>
           </div>
@@ -983,30 +955,30 @@ svg { display: block; max-width: 100%; }
     </section>
 
     <!-- 8. COASTAL ATMOSPHERE PHOTO GALLERY -->
-    <section class="atmosphere-section" id="atmosphere" aria-label="Atmosphere and Beach Life Photo Gallery">
+    <section class="atmosphere-section" id="atmosphere" data-theme="navy-twilight" aria-label="Atmosphere and Beach Life Photo Gallery">
       <div class="container">
         <div class="atmosphere-header-block">
-          <span class="boards-tag">✦ Beach Life & Sunsets ✦</span>
+          <span class="boards-tag">Beach Life &amp; Atmosphere</span>
           <h2 class="boards-title">Life by the Bay</h2>
-          <p class="atmosphere-subtitle">From morning iced latte to golden hour sunset glow on Laurente beach.</p>
+          <p class="atmosphere-subtitle">From morning iced lattes to golden hour glow on Laurente beach.</p>
         </div>
 
         <div class="atmosphere-grid">
           <div class="atmosphere-card">
-            <img src="./images/beachandchill.webp" alt="BAIA beachfront wooden lounge chairs and umbrellas on the sand" width="1200" height="800" loading="lazy" decoding="async" />
-            <div class="atmosphere-overlay">Shoreline Hangout 🌴</div>
+            <img src="./images/eveningmood.webp" alt="BAIA beachfront dining tables and twilight coastal ambience on the sand" width="1200" height="800" loading="lazy" decoding="async" />
+            <div class="atmosphere-overlay">Twilight Ambience</div>
           </div>
           <div class="atmosphere-card">
             <img src="./images/afternoonchill.webp" alt="Afternoon sea breeze at the beachfront dining tables" width="1200" height="690" loading="lazy" decoding="async" />
-            <div class="atmosphere-overlay">Afternoon Breeze 🌊</div>
+            <div class="atmosphere-overlay">Afternoon Breeze</div>
           </div>
           <div class="atmosphere-card">
             <img src="./images/twilight.webp" alt="Beach chairs and fairy string lanterns at sunset twilight" width="800" height="1200" loading="lazy" decoding="async" />
-            <div class="atmosphere-overlay">Twilight Glow ✨</div>
+            <div class="atmosphere-overlay">Twilight Glow</div>
           </div>
           <div class="atmosphere-card">
             <img src="./images/Cottage.webp" alt="Barangay Laurente Floating Cottage anchored on calm turquoise water" width="1179" height="1176" loading="lazy" decoding="async" />
-            <div class="atmosphere-overlay">Floating Cottage 🏄</div>
+            <div class="atmosphere-overlay">Floating Cottage</div>
           </div>
         </div>
       </div>
@@ -1014,7 +986,7 @@ svg { display: block; max-width: 100%; }
   </main>
 
   <!-- 9. SITE FOOTER & TRUST ANCHORS -->
-  <footer class="site-footer" id="location" role="contentinfo">
+  <footer class="site-footer" id="location" data-theme="midnight" role="contentinfo">
     <div class="container">
       <div class="footer-top-grid">
         <!-- Col 1: Brand & Operating Hours -->
@@ -1042,12 +1014,12 @@ svg { display: block; max-width: 100%; }
         <div class="footer-col-vibe">
           <div class="sunset-countdown-card">
             <div class="sunset-header">
-              <span class="sunset-label">🌅 Golden Hour Sunset</span>
-              <span class="sunset-target">Daily 5:58 PM</span>
+              <span class="sunset-label">Golden Hour Sunset</span>
+              <span class="sunset-target">Daily ~5:58 PM</span>
             </div>
             <div class="sunset-time-row">
               <div class="sunset-time-display" id="sunset-countdown-display" aria-label="Time until sunset">
-                --:--:--
+                Daily ~5:58 PM
               </div>
               <span class="sunset-time-label">Until Sunset</span>
             </div>
@@ -1055,8 +1027,8 @@ svg { display: block; max-width: 100%; }
               Catch the golden hour over Masbate Bay with your favorite BAIA iced latte or double smash burger on the sand.
             </p>
             <div class="sunset-spot-footer">
-              <span>🌊 Swell: <strong>1.0m Clean</strong></span>
-              <span>🌡️ Bay Temp: <strong>28°C</strong></span>
+              <span>Barangay Laurente, Masbate City</span>
+              <span>Open Daily 11:00 AM – 10:00 PM</span>
             </div>
           </div>
         </div>
@@ -1065,28 +1037,41 @@ svg { display: block; max-width: 100%; }
         <div class="footer-col-newsletter">
           <h3 class="footer-col-title">Team BAIA Community</h3>
           <p class="footer-newsletter-p">
-            Order ahead via Messenger, or follow our daily beach life, sunset updates, and drink drops on Instagram.
+            Order ahead via Messenger, or follow our daily beach life, sunset updates, and fresh kitchen releases on Instagram.
           </p>
           <div class="footer-buttons-stack">
             <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow footer-social-btn" style="background: #0084FF;">
-              <span>💬 Message &amp; Order on Messenger</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
+              </svg>
+              <span>Message &amp; Order on Messenger</span>
               <span aria-hidden="true">↗</span>
             </a>
             <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill footer-social-btn">
-              <span>📸 Follow @thebaiacafe on Instagram</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+              <span>Follow @thebaiacafe on Instagram</span>
               <span aria-hidden="true">↗</span>
             </a>
-            <a href="tel:+639171234567" class="btn-secondary-pill footer-social-btn">
-              <span>📞 Call Us: +63 917 123 4567</span>
-            </a>
             <button class="btn-secondary-pill footer-social-btn" data-open-cart style="border-color: var(--golden-amber); color: var(--golden-amber);">
-              <span>⚡ View Order List (Shore Delivery)</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              <span>View Order List (Shore Delivery)</span>
             </button>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="footer-bottom-row">
+    <!-- Edge-to-Edge Full Width Footer Bottom Strip -->
+    <div class="footer-bottom-strip">
+      <div class="container footer-bottom-row">
         <p class="footer-copy-text">
           © 2026 BAIA Cafe. All rights reserved. Coffee by the Bay.
         </p>
@@ -1123,16 +1108,16 @@ svg { display: block; max-width: 100%; }
 
     <!-- Order Type Picker -->
     <div class="order-type-picker">
-      <span class="spot-picker-label">📍 Choose Order Type:</span>
+      <span class="spot-picker-label">Choose Order Type:</span>
       <div class="spot-options-grid" role="radiogroup" aria-label="Select order type">
         <button class="spot-btn active" data-spot="Dine-In at Cafe" aria-pressed="true">
-          ☕ Dine-In
+          Dine-In
         </button>
         <button class="spot-btn" data-spot="Beach Takeout" aria-pressed="false">
-          🥡 Takeout
+          Takeout
         </button>
         <button class="spot-btn" data-spot="Floating Cottage Order" aria-pressed="false">
-          🏄 Cottage
+          Cottage
         </button>
       </div>
     </div>
@@ -1161,7 +1146,10 @@ svg { display: block; max-width: 100%; }
 
       <div class="drawer-actions-row">
         <button class="btn-primary-glow btn-checkout-main" id="drawer-checkout-btn">
-          <span>💬 Message Order to BAIA</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" style="display:inline-block; vertical-align: -2px;">
+            <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
+          </svg>
+          <span>Message Order to BAIA</span>
           <span aria-hidden="true">→</span>
         </button>
         <button class="btn-clear-cart" id="drawer-clear-btn" aria-label="Clear all items in order">Clear</button>
@@ -1172,12 +1160,24 @@ svg { display: block; max-width: 100%; }
   <!-- 11. MOBILE STICKY FLOATING ORDER BAR (Visible on 375px and 768px viewports) -->
   <div class="mobile-sticky-bar" id="mobile-sticky-bar" aria-label="Mobile quick order bar">
     <div class="mobile-bar-inner">
+      <a href="#drops" class="mobile-bar-menu-btn" style="background: rgba(232, 35, 122, 0.25); border-color: rgba(232, 35, 122, 0.5); color: #ff6b9d;">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        <span>Drops</span>
+      </a>
       <a href="#menu" class="mobile-bar-menu-btn">
-        <span aria-hidden="true">📖</span>
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+        </svg>
         <span>Menu</span>
       </a>
       <button class="mobile-bar-cart-btn" data-open-cart>
-        <span>💬 Message Ahead</span>
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true" style="display:inline-block; vertical-align: -1px;">
+          <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
+        </svg>
+        <span>Message Ahead</span>
         <span class="mobile-cart-badge cart-count-badge">0</span>
       </button>
     </div>

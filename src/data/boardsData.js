@@ -15,7 +15,7 @@ export const boardsData = [
       "High-traction deck grip pad",
       "Complimentary for all cafe guests to enjoy on the shore"
     ],
-    tag: "✨ Free for Guests"
+    tag: "Free for Guests"
   },
   {
     id: "gear-sea-mask",
@@ -52,7 +52,7 @@ export const boardsData = [
       "Single fin + stabilizers with leash",
       "Designed for Laurente bay swells"
     ],
-    tag: "✦ Coming Soon ✦"
+    tag: "Coming Soon"
   }
 ];
 

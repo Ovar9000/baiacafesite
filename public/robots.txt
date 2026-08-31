@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://thebaiacafe.ph/sitemap.xml
+Sitemap: https://baia.cafe/sitemap.xml

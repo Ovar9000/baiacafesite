@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sync:fb": "node scripts/sync-facebook-posts.js",
+    "sync:fb:mock": "node scripts/sync-facebook-posts.js --test-mock"
   },
   "devDependencies": {
     "lighthouse": "^12.8.2",

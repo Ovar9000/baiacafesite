@@ -3,7 +3,8 @@
    ========================================================================== */
 
 .promo-grid-section {
-  background: var(--electric-blue);
+  background: var(--depth-sand-deck, #FAF4EB);
+  color: var(--deep-navy);
   padding: 110px 0 130px 0;
   position: relative;
   overflow: hidden;
@@ -28,7 +29,7 @@
   position: absolute;
   pointer-events: none;
   z-index: 3;
-  filter: drop-shadow(0 4px 10px rgba(10, 20, 60, 0.25));
+  filter: drop-shadow(0 4px 10px rgba(10, 20, 60, 0.15));
 }
 
 .doodle-flower {
@@ -112,10 +113,10 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(22, 37, 92, 0.45);
+  background: rgba(30, 74, 255, 0.08);
   backdrop-filter: blur(8px);
-  border: 1.5px solid rgba(255, 230, 153, 0.4);
-  color: var(--amber-contrast);
+  border: 1.5px solid rgba(30, 74, 255, 0.2);
+  color: var(--royal-blue);
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 800;
@@ -139,8 +140,7 @@
   line-height: 1.05;
   text-transform: uppercase;
   letter-spacing: -0.03em;
-  color: var(--white);
-  text-shadow: 0 6px 28px rgba(10, 20, 60, 0.35);
+  color: var(--deep-navy);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -151,23 +151,22 @@
 .title-word-script {
   font-family: var(--font-script);
   font-size: 1.2em;
-  color: #ff6b9d;
+  color: #E8237A;
   font-weight: 700;
   text-transform: capitalize;
   transform: rotate(-5deg);
-  text-shadow: 0 4px 16px rgba(232, 35, 122, 0.4);
+  text-shadow: 0 4px 16px rgba(232, 35, 122, 0.25);
   display: inline-block;
 }
 
 .title-word-bold {
-  color: var(--white);
+  color: var(--deep-navy);
   letter-spacing: -0.04em;
-  text-shadow: 0 4px 20px rgba(10, 20, 60, 0.4);
 }
 
 .promo-subtitle {
   font-size: 1.1rem;
-  color: var(--cream);
+  color: #4b5876;
   margin-top: 16px;
   max-width: 580px;
   margin-left: auto;
@@ -277,7 +276,7 @@
 }
 
 .card-price-highlight {
-  font-family: var(--font-display);
+  font-family: var(--font-price, var(--font-display));
   font-weight: 900;
   font-size: 1.15rem;
   color: var(--golden-amber);
@@ -476,7 +475,7 @@
 }
 
 .receipt-total-amount {
-  font-family: var(--font-display);
+  font-family: var(--font-price, var(--font-display));
   font-size: 1.9rem;
   font-weight: 900;
   color: var(--electric-blue);
