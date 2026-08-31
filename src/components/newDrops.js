@@ -68,15 +68,6 @@ export function initNewDrops() {
 
     container.innerHTML = `
       <div class="drops-header-block">
-        <!-- Live Sync Status Pill -->
-        <div class="drops-sync-badge" aria-label="Synced with Facebook">
-          <span class="sync-live-dot" aria-hidden="true"></span>
-          <span class="sync-label">LIVE SYNCED •</span>
-          <a href="https://www.facebook.com/thebaiacafe" target="_blank" rel="noopener" class="sync-link">
-            fb.com/thebaiacafe ↗
-          </a>
-        </div>
-
         <div class="drops-title-wrap">
           <span class="drops-script-accent">Fresh Out The Kitchen</span>
           <h2 class="drops-headline">
@@ -85,7 +76,7 @@ export function initNewDrops() {
             <span class="wordmark">EVENTS</span>
           </h2>
           <p class="drops-subtitle">
-            Artisanal flavor drops, limited kitchen specials, giveaways, and beachside happenings synced straight from our Facebook feed.
+            Artisanal flavor drops, limited kitchen specials, giveaways, and beachside happenings at BAIA Cafe.
           </p>
         </div>
 
