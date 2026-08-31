@@ -279,5 +279,9 @@ export function initMenuExplorer() {
   }
 
   // Initial render
-  render();
+  if (container.children.length === 0) {
+    render();
+  } else {
+    attachEventListeners();
+  }
 }

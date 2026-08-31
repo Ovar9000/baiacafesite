@@ -5,8 +5,8 @@ export function initBoardsRental() {
   const cottageContainer = document.getElementById('cottage-showcase-root');
   if (!container) return;
 
-  // Render Floating Cottage Showcase Card
-  if (cottageContainer) {
+  // Render Floating Cottage Showcase Card if empty
+  if (cottageContainer && cottageContainer.children.length === 0) {
     cottageContainer.innerHTML = `
       <div class="cottage-showcase-box">
         <div>
@@ -54,8 +54,9 @@ export function initBoardsRental() {
     `;
   }
 
-  // Render Gear & Boards Cards (Free Skimboard, ₱50 Mask, Soon Surfboard)
-  container.innerHTML = boardsData.map(item => {
+  // Render Gear & Boards Cards (Free Skimboard, ₱50 Mask, Soon Surfboard) if empty
+  if (container && container.children.length === 0) {
+    container.innerHTML = boardsData.map(item => {
     let actionBtnHtml = '';
     let pricingBoxHtml = '';
 
@@ -123,4 +124,5 @@ export function initBoardsRental() {
       </div>
     `;
   }).join('');
+  }
 }

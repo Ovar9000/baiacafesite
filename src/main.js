@@ -40,17 +40,27 @@ function initSeasonalPromosToggle() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize showcase modules
+  // Initialize primary interactive modules
   initHero3D();
   initNewDrops();
   initMenuExplorer();
   initBoardsRental();
-  initBayVibesAudio();
-  initShoreConditions();
-  initLiquidFloaties();
-  initWeatherEasterEgg();
   initCartDrawer();
   initSeasonalPromosToggle();
+
+  // Defer non-critical ambient features to idle time
+  const initAmbientFeatures = () => {
+    initBayVibesAudio();
+    initShoreConditions();
+    initLiquidFloaties();
+    initWeatherEasterEgg();
+  };
+
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(initAmbientFeatures, { timeout: 2000 });
+  } else {
+    setTimeout(initAmbientFeatures, 1000);
+  }
 
   // Scroll Header Glassmorphism Effect
   const header = document.getElementById('site-header');
