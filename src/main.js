@@ -7,6 +7,7 @@ import { initShoreConditions } from './components/shoreConditions.js';
 import { initLiquidFloaties } from './components/liquidFloaties.js';
 import { initWeatherEasterEgg } from './components/weatherEasterEgg.js';
 import { initCartDrawer } from './components/cartDrawer.js';
+import { initNewDrops } from './components/newDrops.js';
 import { injectSpeedInsights } from '@vercel/speed-insights';
 import { inject } from '@vercel/analytics';
 
@@ -41,6 +42,7 @@ function initSeasonalPromosToggle() {
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize showcase modules
   initHero3D();
+  initNewDrops();
   initMenuExplorer();
   initBoardsRental();
   initBayVibesAudio();

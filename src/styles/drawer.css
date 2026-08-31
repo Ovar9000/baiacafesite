@@ -213,7 +213,7 @@
 }
 
 .cart-item-price {
-  font-family: var(--font-display);
+  font-family: var(--font-price, var(--font-display));
   font-weight: 900;
   font-size: 1.05rem;
   color: var(--electric-blue);

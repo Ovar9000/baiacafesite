@@ -44,7 +44,7 @@ export function initHero3D() {
   }
 }
 
-export function showShowcaseToast(title, message, icon = '✦') {
+export function showShowcaseToast(title, message, icon = '✓') {
   const container = document.getElementById('toast-container');
   if (!container) return;
 

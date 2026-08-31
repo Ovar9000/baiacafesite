@@ -50,7 +50,7 @@ export function initMenuExplorer() {
       return {
         id: cat.id,
         name: cat.category,
-        icon: categoryIcons[cat.id] || '✦',
+        icon: categoryIcons[cat.id] || '•',
         hasHotCold: cat.hasHotCold,
         hasSizes: cat.hasSizes,
         items: filteredItems,

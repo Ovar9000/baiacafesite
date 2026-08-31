@@ -35,10 +35,7 @@ export function initBoardsRental() {
               <span aria-hidden="true">↗</span>
             </a>
             <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill">
-              <span>📸 View Photos @thebaiacafe</span>
-            </a>
-            <a href="tel:+639171234567" class="btn-secondary-pill">
-              <span>Call BAIA Desk</span>
+              <span>View Photos @thebaiacafe</span>
             </a>
           </div>
         </div>
@@ -70,14 +67,14 @@ export function initBoardsRental() {
         </div>
       `;
       actionBtnHtml = `
-        <button class="btn-primary-glow" style="width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.9rem;" onclick="alert('Skimboards are complimentary and free to use for all BAIA cafe guests! Grab one at the cafe counter 🏄‍♂️');">
+        <button class="btn-primary-glow" style="width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.9rem;" onclick="alert('Skimboards are complimentary and free to use for all BAIA cafe guests! Grab one at the cafe counter.');">
           Grab at Cafe Counter
         </button>
       `;
     } else if (item.status === 'soon') {
       pricingBoxHtml = `
         <div class="board-soon-box">
-          <span class="soon-badge">✦ Arriving Soon ✦</span>
+          <span class="soon-badge">Arriving Soon</span>
           <p class="soon-subtext">${item.priceSubtext}</p>
         </div>
       `;
@@ -94,7 +91,7 @@ export function initBoardsRental() {
         </div>
       `;
       actionBtnHtml = `
-        <button class="btn-primary-glow" style="width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.9rem;" onclick="alert('Snorkeling masks are available for rent at ₱50 at the BAIA Cafe counter 🤿');">
+        <button class="btn-primary-glow" style="width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.9rem;" onclick="alert('Snorkeling masks are available for rent at ₱50 at the BAIA Cafe counter.');">
           Rent at Counter (₱50)
         </button>
       `;
