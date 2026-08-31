@@ -114,7 +114,7 @@ svg { display: block; max-width: 100%; }
 .audio-toggle-btn { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); color: var(--white); padding: 0 14px; height: 38px; border-radius: var(--radius-pill); font-family: var(--font-display); font-weight: 800; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
 .nav-phone-link { display: inline-flex; align-items: center; gap: 6px; color: var(--cream); text-decoration: none; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; padding: 0 12px; height: 38px; border-radius: var(--radius-pill); border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.15); }
 .nav-cart-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--golden-amber); color: var(--deep-navy); border: none; font-family: var(--font-display); font-weight: 900; font-size: 0.85rem; text-transform: uppercase; padding: 0 16px; height: 38px; border-radius: var(--radius-pill); cursor: pointer; }
-.cart-count-badge { background: var(--hot-pink); color: var(--white); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 900; width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+.cart-count-badge { background: var(--hot-pink); color: var(--white); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 900; width: 20px; height: 20px; min-width: 20px; min-height: 20px; max-width: 20px; max-height: 20px; aspect-ratio: 1 / 1; flex-shrink: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; line-height: 1; padding: 0; box-sizing: border-box; }
 .hero-section { position: relative; min-height: 90vh; padding-top: calc(var(--header-height) + 32px); padding-bottom: 72px; background: radial-gradient(120% 90% at 50% 25%, #2a52ff 0%, #1a3fe8 55%, #142eb8 100%); overflow: hidden; display: flex; flex-direction: column; justify-content: center; width: 100%; box-sizing: border-box; }
 .hero-grid { display: grid; grid-template-columns: 1.15fr 0.95fr; align-items: center; gap: var(--space-2xl); position: relative; z-index: 2; width: 100%; }
 .hero-content { display: flex; flex-direction: column; align-items: flex-start; max-width: 640px; width: 100%; }
@@ -338,13 +338,6 @@ svg { display: block; max-width: 100%; }
     <div class="container hero-grid">
       <!-- Hero Left Column: Vertical Focus Typography Stack -->
       <div class="hero-content">
-        <!-- Top Trust Pill (Desktop: top of col; Mobile: reveals on scroll below photo) -->
-        <div class="hero-trust-pill" aria-label="Rating and Operating Hours">
-          <span class="trust-star">⭐ 4.9/5 (128+ Reviews)</span>
-          <span class="trust-sep">•</span>
-          <span class="trust-info">Open Daily 11:00 AM – 10:00 PM (Kitchen 9:00 PM)</span>
-        </div>
-
         <!-- Dominant Vertical-Focus Tagline (Fat Seed Inspiration) -->
         <h1 class="hero-headline hero-vertical-focus">
           <span class="tagline-stack">
@@ -711,7 +704,6 @@ svg { display: block; max-width: 100%; }
     <section class="menu-section" id="menu" data-theme="ocean-depth" aria-label="Full BAIA Cafe Menu Explorer">
       <div class="container">
         <div class="menu-header-wrapper">
-          <span class="menu-badge">Full Menu &amp; Daily Roasts</span>
           <h2 class="menu-main-title">Crafted Fresh Daily</h2>
           <p class="menu-subtitle">
             Authentic espresso, signature Asin Tibuok lattes, blended frappes, sizzling rice meals & gourmet double smash burgers.
