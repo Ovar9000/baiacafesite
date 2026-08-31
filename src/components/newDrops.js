@@ -118,32 +118,50 @@ export function initNewDrops() {
             <p>Check back soon or follow our Facebook page for the next flavor drop.</p>
           </div>
         ` : filteredItems.map((item, index) => {
+          const isFood = item.category === 'food';
+          const isDrink = item.category === 'drink';
           const isEvent = item.category === 'event';
+
           const priceNum = item.price ? parseInt(item.price.replace(/[^\d]/g, ''), 10) : 0;
           const timeAgo = formatTimeAgo(item.published_at);
 
-          const itemText = `${item.title} ${item.description} ${item.badge || ''}`.toLowerCase();
-          const isGiveaway = item.badge === 'Giveaway' || item.badge === 'Winner Awarded' || itemText.includes('giveaway') || itemText.includes('guess') || itemText.includes('win');
-          const isAdvisory = item.badge === '1-Day Advisory' || itemText.includes('weather') || itemText.includes('closed') || itemText.includes('break');
+          // Event sub-types (strictly scoped to events)
+          const isGiveaway = isEvent && (item.badge === 'Giveaway' || item.badge === 'Winner Awarded' || Boolean(item.winner) || /\b(giveaway|contest|guess)\b/i.test(item.title));
           const isGiveawayConcluded = isGiveaway && (item.status === 'concluded' || Boolean(item.winner) || item.badge === 'Winner Awarded');
+          const isAdvisory = isEvent && !isGiveaway && (item.badge === '1-Day Advisory' || /\b(advisory|closure|weather)\b/i.test(item.title));
 
           let badgeClass = 'badge-drop';
-          let badgeLabel = item.badge || 'New Drop';
+          let badgeLabel = item.badge || (isFood ? 'Fresh Drop' : (isDrink ? 'Drink Drop' : 'New Drop'));
+          let categoryLabel = item.category.toUpperCase();
 
-          if (isGiveaway) {
-            if (isGiveawayConcluded) {
-              badgeClass = 'badge-winner';
-              badgeLabel = 'Winner Awarded';
-            } else {
-              badgeClass = 'badge-giveaway';
-              badgeLabel = 'Active Giveaway';
-            }
-          } else if (isAdvisory) {
-            badgeClass = 'badge-advisory';
-            badgeLabel = '1-Day Advisory';
+          if (isFood) {
+            badgeClass = 'badge-drop';
+            badgeLabel = item.badge || 'Fresh Drop';
+            categoryLabel = 'FOOD';
+          } else if (isDrink) {
+            badgeClass = 'badge-drop';
+            badgeLabel = item.badge || 'Drink Drop';
+            categoryLabel = 'DRINK';
           } else if (isEvent) {
-            badgeClass = 'badge-event';
-            badgeLabel = item.badge || 'Live Event';
+            if (isGiveaway) {
+              if (isGiveawayConcluded) {
+                badgeClass = 'badge-winner';
+                badgeLabel = 'Winner Awarded';
+                categoryLabel = 'GIVEAWAY • CONCLUDED';
+              } else {
+                badgeClass = 'badge-giveaway';
+                badgeLabel = 'Active Giveaway';
+                categoryLabel = 'GIVEAWAY';
+              }
+            } else if (isAdvisory) {
+              badgeClass = 'badge-advisory';
+              badgeLabel = '1-Day Advisory';
+              categoryLabel = 'ADVISORY';
+            } else {
+              badgeClass = 'badge-event';
+              badgeLabel = item.badge || 'Live Event';
+              categoryLabel = 'EVENT';
+            }
           }
 
           return `
@@ -191,7 +209,7 @@ export function initNewDrops() {
               <!-- Content Area -->
               <div class="drop-content-body">
                 <div class="drop-meta-line">
-                  <span class="drop-category-label">${isGiveaway ? (isGiveawayConcluded ? 'GIVEAWAY • CONCLUDED' : 'GIVEAWAY') : (isAdvisory ? 'ADVISORY' : item.category.toUpperCase())}</span>
+                  <span class="drop-category-label">${categoryLabel}</span>
                   ${item.winner ? `<span class="drop-date-label status-winner">Winner: ${item.winner}</span>` : (item.event_date ? `<span class="drop-date-label">${formatEventDate(item.event_date)}</span>` : (isAdvisory ? `<span class="drop-date-label status-open">Open Regular Hours</span>` : ''))}
                 </div>
 
