@@ -492,15 +492,23 @@ main,
   background: var(--hot-pink);
   color: var(--white);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 900;
   width: 20px;
   height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  max-width: 20px;
+  max-height: 20px;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 /* Base Button Styles */
@@ -624,7 +632,7 @@ main,
    REVIEWS & TESTIMONIALS SECTION
    ========================================================================== */
 .reviews-section {
-  padding-top: 110px;
+  padding-top: 30px;
   padding-bottom: 48px;
   background: #0E1A45;
   position: relative;
@@ -632,7 +640,7 @@ main,
 
 @media (max-width: 768px) {
   .reviews-section {
-    padding-top: 80px;
+    padding-top: 24px;
     padding-bottom: 36px;
   }
 }

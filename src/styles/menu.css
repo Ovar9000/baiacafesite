@@ -1,7 +1,7 @@
 .menu-section {
   background: #0E1A45;
   color: var(--white);
-  padding: 110px 0 130px 0;
+  padding: 60px 0 30px 0;
   position: relative;
   overflow: hidden;
 }
@@ -578,7 +578,7 @@
 
 @media (max-width: 640px) {
   .menu-section {
-    padding: 60px 0 80px 0;
+    padding: 40px 0 20px 0;
   }
   .board-switcher {
     flex-direction: column;
