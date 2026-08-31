@@ -220,17 +220,17 @@ export function initNewDrops() {
                 <div class="drop-card-actions">
                   ${!isEvent && priceNum > 0 ? `
                     <button class="btn-drop-order" data-order-drop="${item.id}" data-title="${encodeURIComponent(item.title)}" data-price="${priceNum}">
-                      <span>Message to Order (${item.price})</span>
+                      <span>Order (${item.price})</span>
                     </button>
                   ` : (isGiveaway ? `
                     ${isGiveawayConcluded ? `
                       <a href="${item.permalink || 'https://facebook.com/thebaiacafe'}" target="_blank" rel="noopener" class="btn-drop-order btn-drop-winner">
-                        <span>View Winner on FB</span>
+                        <span>View Winner</span>
                         <span aria-hidden="true">↗</span>
                       </a>
                     ` : `
                       <a href="${item.permalink || 'https://facebook.com/thebaiacafe'}" target="_blank" rel="noopener" class="btn-drop-order btn-drop-giveaway">
-                        <span>Enter Giveaway on FB</span>
+                        <span>Enter Giveaway</span>
                         <span aria-hidden="true">→</span>
                       </a>
                     `}
@@ -240,7 +240,7 @@ export function initNewDrops() {
                     </a>
                   ` : (isEvent ? `
                     <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-drop-order btn-drop-rsvp">
-                      <span>RSVP via Messenger</span>
+                      <span>RSVP Event</span>
                       <span aria-hidden="true">→</span>
                     </a>
                   ` : `

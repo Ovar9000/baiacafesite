@@ -451,20 +451,23 @@
 
 .btn-drop-order {
   flex: 1;
+  height: 42px;
+  min-height: 42px;
   background: var(--golden-amber);
   color: var(--deep-navy);
   border: none;
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  padding: 10px 16px;
+  letter-spacing: 0.04em;
+  padding: 0 14px;
   border-radius: var(--radius-pill);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
   gap: 6px;
   text-decoration: none;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -491,6 +494,7 @@
 .btn-drop-fb {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   background: rgba(255, 255, 255, 0.12);
   color: var(--white);
@@ -498,10 +502,13 @@
   font-family: var(--font-mono);
   font-size: 0.78rem;
   font-weight: 700;
-  padding: 0 12px;
-  height: 38px;
+  padding: 0 14px;
+  height: 42px;
+  min-height: 42px;
   border-radius: var(--radius-pill);
   text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.2s ease;
 }
 
