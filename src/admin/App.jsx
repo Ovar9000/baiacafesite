@@ -191,41 +191,68 @@ export default function AdminApp() {
             {/* Action Bar (No Print) */}
             <div className="admin-controls-card no-print" style={{
               display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              flexDirection: 'column',
+              gap: '12px',
               background: '#FFFFFF',
               padding: '16px 20px',
               borderRadius: '16px',
               border: '1px solid var(--loyalty-border)'
             }}>
-              <div>
-                <h3 style={{ fontSize: '1rem', color: 'var(--loyalty-navy)', fontWeight: 700 }}>
-                  Daily Standee QR Code
-                </h3>
-                <p style={{ fontSize: '0.78rem', color: '#64748B' }}>
-                  {tokenData?.formattedDate || 'Today’s QR Token Active'}
-                </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h3 style={{ fontSize: '1rem', color: 'var(--loyalty-navy)', fontWeight: 700 }}>
+                    Daily Standee QR Code
+                  </h3>
+                  <p style={{ fontSize: '0.78rem', color: '#64748B' }}>
+                    {tokenData?.formattedDate || 'Today’s QR Token Active'}
+                  </p>
+                </div>
+
+                <button
+                  onClick={handlePrint}
+                  style={{
+                    background: 'var(--loyalty-navy)',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    padding: '10px 18px',
+                    borderRadius: '9999px',
+                    fontWeight: 700,
+                    fontSize: '0.88rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Printer size={16} />
+                  <span>Print Standee</span>
+                </button>
               </div>
 
-              <button
-                onClick={handlePrint}
-                style={{
-                  background: 'var(--loyalty-navy)',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  padding: '10px 18px',
-                  borderRadius: '9999px',
-                  fontWeight: 700,
-                  fontSize: '0.88rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  cursor: 'pointer'
-                }}
-              >
-                <Printer size={16} />
-                <span>Print Standee</span>
-              </button>
+              {tokenData?.claimUrl && (
+                <div style={{ background: '#FAF4EB', padding: '10px 14px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                  <code style={{ fontSize: '0.75rem', color: '#16255C', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {tokenData.claimUrl}
+                  </code>
+                  <a
+                    href={tokenData.claimUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      background: '#16255C',
+                      color: '#FFF',
+                      textDecoration: 'none',
+                      padding: '6px 12px',
+                      borderRadius: '9999px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    Test Claim Link &rarr;
+                  </a>
+                </div>
+              )}
             </div>
 
             {/* Printable Acrylic Standee Card */}
