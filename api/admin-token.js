@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-const DAILY_QR_SECRET = process.env.DAILY_QR_SECRET || 'baia-cafe-secret-key-2026';
+const DAILY_QR_SECRET = process.env.DAILY_QR_SECRET || 'baia_daily_secret_key_2026_x89a';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'baia-admin-2026';
 const CAFE_TIMEZONE = process.env.CAFE_TIMEZONE || 'Asia/Manila';
 
@@ -48,12 +48,20 @@ export default async function handler(req, res) {
       day: 'numeric'
     }).format(new Date());
 
+    let baseUrl = 'https://baia.cafe';
+    const reqHost = req.headers['x-forwarded-host'] || req.headers.host;
+    const reqProto = req.headers['x-forwarded-proto'] || (reqHost?.includes('localhost') ? 'http' : 'https');
+    if (reqHost) {
+      baseUrl = `${reqProto}://${reqHost}`;
+    }
+
     return res.status(200).json({
       success: true,
       token,
       dateString: todayDateStr,
       formattedDate,
-      claimUrl: `https://baia.cafe/claim?t=${token}`
+      claimUrl: `${baseUrl}/claim?t=${token}`,
+      productionUrl: `https://baia.cafe/claim?t=${token}`
     });
   } catch (err) {
     console.error('Error generating admin token:', err);
