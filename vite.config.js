@@ -2,7 +2,6 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import basicSsl from '@vitejs/plugin-basic-ssl';
 import url from 'url';
 
 // Vite dev server API simulation plugin to test /api endpoints locally
@@ -96,7 +95,6 @@ export default defineConfig({
   base: '/',
   plugins: [
     react(),
-    basicSsl(),
     devApiPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
