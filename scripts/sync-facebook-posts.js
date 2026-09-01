@@ -101,6 +101,13 @@ When a post is a community giveaway or contest:
 - If the post/comments indicate a winner was awarded (or if the launch date has passed), set "status": "concluded", "winner": "<Winner Name if known, else null>", and highlight the winner in the description.
 - If the giveaway is still active and open for entries, set "status": "active", "winner": null.
 
+RULE 5 — Official Website Launch & Brand Debut
+When a post announces a major digital rollout or brand debut (e.g., "BAIA, now online", official website launch at www.baia.cafe, new apparel/stickers collection debut):
+- Classify as category: "event".
+- Set "badge": "Website Launch" (or "New Debut").
+- Set "event_date": "Live Now • baia.cafe" (or status date).
+- Write a clean description highlighting the website features, online menu access, and cottage stays.
+
 OUTPUT FORMAT
 Respond with ONE JSON object. Nothing else — no preamble, no markdown fences.
 
@@ -367,7 +374,7 @@ Classify and return ONE strict JSON object according to the system instructions.
 
   // 1. Try Gemini API if GEMINI_API_KEY is provided
   if (GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 5) {
-    const candidateModels = ['gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
+    const candidateModels = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
     for (const model of candidateModels) {
       try {
         console.log(`✨ [LLM] Calling Google Gemini API (${model})...`);
