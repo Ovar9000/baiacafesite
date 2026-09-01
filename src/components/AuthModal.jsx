@@ -37,14 +37,21 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
         ? `${window.location.origin}/claim/${window.location.search}`
         : `${window.location.origin}/card/`;
 
+      const authOptions = {
+        redirectTo: targetRedirect
+      };
+
+      if (provider === 'google') {
+        authOptions.queryParams = { prompt: 'select_account' };
+      }
+
+      if (provider === 'facebook') {
+        authOptions.scopes = 'email,public_profile';
+      }
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: {
-          redirectTo: targetRedirect,
-          queryParams: {
-            prompt: 'select_account'
-          }
-        }
+        options: authOptions
       });
       if (error) throw error;
     } catch (err) {
