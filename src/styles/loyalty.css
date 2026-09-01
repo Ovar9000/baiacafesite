@@ -94,6 +94,28 @@ body {
   text-transform: uppercase;
 }
 
+.btn-loyalty-signout {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  color: #475569;
+  border-radius: var(--loyalty-radius-full);
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-loyalty-signout:hover {
+  background: #EFF6FF;
+  color: var(--loyalty-navy);
+  border-color: #CBD5E1;
+}
+
 /* Main Container */
 .loyalty-content {
   flex: 1;
@@ -103,16 +125,23 @@ body {
   gap: 20px;
 }
 
-/* Hero Digital Card */
+/* Hero Digital Card (Signature BAIA Ocean Royal Blue) */
 .digital-card {
-  background: linear-gradient(135deg, #16255C 0%, #1E293B 100%);
+  background: linear-gradient(145deg, #16255C 0%, #1b3582 55%, #0d1a45 100%);
   border-radius: var(--loyalty-radius-lg);
   padding: 24px 20px;
   color: #FFFFFF;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--loyalty-shadow-lg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 36px -8px rgba(22, 37, 92, 0.4);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.4s ease;
+}
+
+.digital-card.completed-cycle {
+  border: 2px solid #F5A623;
+  box-shadow: 0 0 25px rgba(245, 166, 35, 0.45), 0 16px 36px -8px rgba(22, 37, 92, 0.4);
+  background: linear-gradient(145deg, #16255C 0%, #1e3d99 50%, #0e1c4e 100%);
 }
 
 .digital-card::before {
@@ -120,8 +149,8 @@ body {
   position: absolute;
   top: -50px;
   right: -50px;
-  width: 150px;
-  height: 150px;
+  width: 160px;
+  height: 160px;
   background: radial-gradient(circle, rgba(251, 146, 60, 0.25) 0%, rgba(251, 146, 60, 0) 70%);
   border-radius: 50%;
   pointer-events: none;
@@ -132,6 +161,7 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 20px;
+  gap: 12px;
 }
 
 .card-holder-name {
@@ -140,6 +170,7 @@ body {
   font-weight: 700;
   color: #FFFFFF;
   margin-bottom: 2px;
+  line-height: 1.2;
 }
 
 .card-member-since {
@@ -150,19 +181,22 @@ body {
 .card-tier-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(251, 146, 60, 0.2);
-  border: 1px solid rgba(251, 146, 60, 0.5);
-  color: #FB923C;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #FFE699;
   font-size: 0.75rem;
-  font-weight: 600;
-  padding: 4px 10px;
+  font-weight: 700;
+  padding: 4px 12px;
   border-radius: var(--loyalty-radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
 }
 
 /* 10-Stamp Visual Grid */
 .stamp-grid-container {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--loyalty-radius-md);
   padding: 16px 12px;
@@ -173,9 +207,9 @@ body {
   display: flex;
   justify-content: space-between;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
   margin-bottom: 12px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .stamp-grid-slots {
@@ -206,9 +240,15 @@ body {
 .stamp-slot.filled {
   background: linear-gradient(135deg, #FB923C 0%, #EA580C 100%);
   color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4);
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.45);
   border: 2px solid #FFE699;
   transform: scale(1.04);
+}
+
+.stamp-slot.filled.full-gold {
+  background: linear-gradient(135deg, #F5A623 0%, #D97706 100%);
+  box-shadow: 0 4px 14px rgba(245, 166, 35, 0.5);
+  border: 2px solid #FFFBEB;
 }
 
 .stamp-slot.filled svg {
