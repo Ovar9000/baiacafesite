@@ -1,12 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { Camera, X, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
+import { Camera, X, AlertCircle, RefreshCw, Loader2, ImagePlus, Zap } from 'lucide-react';
 
 export default function QrScanner({ onScan, onClose }) {
   const [cameraError, setCameraError] = useState('');
   const [isStarting, setIsStarting] = useState(true);
+  const [isScanningFile, setIsScanningFile] = useState(false);
   const scannerRef = useRef(null);
   const isScannedRef = useRef(false);
+  const fileInputRef = useRef(null);
+
+  const processDecodedText = (decodedText) => {
+    if (isScannedRef.current) return;
+    isScannedRef.current = true;
+
+    let token = decodedText.trim();
+    try {
+      if (token.includes('?')) {
+        const parsedUrl = new URL(token, window.location.origin);
+        const t = parsedUrl.searchParams.get('t') || parsedUrl.searchParams.get('token');
+        if (t) token = t;
+      }
+    } catch (e) {}
+
+    onScan(token);
+  };
 
   useEffect(() => {
     const scannerId = 'baia-qr-scanner-viewport';
@@ -18,8 +36,17 @@ export default function QrScanner({ onScan, onClose }) {
         setCameraError('');
         isScannedRef.current = false;
 
+        // Check if browser is in a Secure Context (HTTPS or localhost)
+        const isSecure = window.isSecureContext || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
         html5QrCode = new Html5Qrcode(scannerId);
         scannerRef.current = html5QrCode;
+
+        if (!isSecure && !navigator.mediaDevices?.getUserMedia) {
+          setCameraError('Live video stream requires HTTPS on mobile. Use the button below to snap a photo with your phone camera!');
+          setIsStarting(false);
+          return;
+        }
 
         const config = {
           fps: 15,
@@ -31,42 +58,26 @@ export default function QrScanner({ onScan, onClose }) {
           { facingMode: 'environment' },
           config,
           (decodedText) => {
-            if (isScannedRef.current) return;
-            isScannedRef.current = true;
-
-            // Extract token if decoded text is a URL or raw string
-            let token = decodedText.trim();
-            try {
-              if (token.includes('?')) {
-                const parsedUrl = new URL(token, window.location.origin);
-                const t = parsedUrl.searchParams.get('t') || parsedUrl.searchParams.get('token');
-                if (t) token = t;
-              }
-            } catch (e) {}
-
-            // Stop scanner and call handler
-            html5QrCode.stop().then(() => {
-              onScan(token);
-            }).catch(() => {
-              onScan(token);
-            });
+            if (scannerRef.current?.isScanning) {
+              scannerRef.current.stop().then(() => {
+                processDecodedText(decodedText);
+              }).catch(() => {
+                processDecodedText(decodedText);
+              });
+            } else {
+              processDecodedText(decodedText);
+            }
           },
           (errorMessage) => {
-            // Frame parsing errors are normal while scanning
+            // Frame parsing error - normal while scanning
           }
         );
 
         setIsStarting(false);
       } catch (err) {
-        console.error('Error starting camera QR scanner:', err);
+        console.error('Error starting live camera QR scanner:', err);
         setIsStarting(false);
-        if (err?.name === 'NotAllowedError' || err?.toString().includes('Permission denied')) {
-          setCameraError('Camera access was denied. Please allow camera permissions in your browser settings to scan.');
-        } else if (err?.name === 'NotFoundError') {
-          setCameraError('No camera found on this device.');
-        } else {
-          setCameraError('Could not start camera. Please ensure camera permissions are allowed.');
-        }
+        setCameraError('Live camera not available over HTTP. Tap "Snap Photo with Camera" below to scan instantly!');
       }
     };
 
@@ -82,6 +93,29 @@ export default function QrScanner({ onScan, onClose }) {
       }
     };
   }, [onScan]);
+
+  const handleFileCapture = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsScanningFile(true);
+      setCameraError('');
+
+      let html5QrCode = scannerRef.current;
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode('baia-qr-scanner-viewport');
+        scannerRef.current = html5QrCode;
+      }
+
+      const decodedText = await html5QrCode.scanFile(file, true);
+      setIsScanningFile(false);
+      processDecodedText(decodedText);
+    } catch (err) {
+      setIsScanningFile(false);
+      setCameraError('Could not find a QR code in the photo. Please snap a closer, well-lit photo of the standee.');
+    }
+  };
 
   return (
     <div style={{
@@ -135,7 +169,7 @@ export default function QrScanner({ onScan, onClose }) {
       <div style={{
         position: 'relative',
         width: '100%',
-        height: '280px',
+        height: '240px',
         borderRadius: '16px',
         overflow: 'hidden',
         background: '#0F172A',
@@ -162,31 +196,83 @@ export default function QrScanner({ onScan, onClose }) {
           </div>
         )}
 
+        {isScanningFile && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.85)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#FFFFFF',
+            gap: '10px'
+          }}>
+            <Loader2 className="animate-spin" size={32} color="#FB923C" />
+            <span style={{ fontSize: '0.85rem' }}>Decoding QR Code...</span>
+          </div>
+        )}
+
         {cameraError && (
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: '#FEF2F2',
+            background: '#FAF4EB',
             padding: '20px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             textAlign: 'center',
-            color: '#B91C1C',
-            gap: '12px'
+            color: '#16255C',
+            gap: '8px'
           }}>
-            <AlertCircle size={32} />
-            <p style={{ fontSize: '0.82rem', lineHeight: '1.4', margin: 0 }}>
+            <Camera size={32} color="#FB923C" />
+            <p style={{ fontSize: '0.82rem', lineHeight: '1.4', margin: 0, color: '#475569' }}>
               {cameraError}
             </p>
           </div>
         )}
       </div>
 
-      {/* Footer Instructions */}
-      <div style={{ marginTop: '16px', fontSize: '0.78rem', color: '#64748B' }}>
-        Hold your phone steady in front of the acrylic standee.
+      {/* Direct Shutter Camera Button (Works on all mobile browsers & HTTP/HTTPS) */}
+      <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          style={{ display: 'none' }}
+          onChange={handleFileCapture}
+        />
+
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isScanningFile}
+          style={{
+            background: '#16255C',
+            color: '#FFFFFF',
+            border: 'none',
+            padding: '12px 16px',
+            borderRadius: '9999px',
+            fontWeight: 700,
+            fontSize: '0.88rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            boxShadow: '0 4px 12px rgba(22, 37, 92, 0.2)'
+          }}
+        >
+          <Camera size={18} />
+          <span>Snap Photo with Camera 📸</span>
+        </button>
+
+        <div style={{ fontSize: '0.75rem', color: '#94A3B8' }}>
+          Point camera at the acrylic standee at the pickup bar.
+        </div>
       </div>
     </div>
   );
