@@ -190,8 +190,8 @@ export default async function handler(req, res) {
       pendingRewards,
       milestoneNumber,
       message: rewardUnlockedNow
-        ? `🎉 Milestone Reached! You unlocked a ${milestoneNumber % 2 !== 0 ? 'Free Coffee' : 'Free Tote Bag'}!`
-        : `☕ Stamp recorded! You now have ${currentTotal} lifetime ${currentTotal === 1 ? 'stamp' : 'stamps'}.`
+        ? `Milestone Reached! You unlocked a Free Specialty Coffee!`
+        : `Stamp recorded! You now have ${currentTotal} ${currentTotal === 1 ? 'stamp' : 'stamps'}.`
     });
 
   } catch (err) {
