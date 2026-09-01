@@ -6,7 +6,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
   const [email, setEmail] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [step, setStep] = useState('input-email'); // 'input-email' | 'check-email'
-  const [oauthLoading, setOauthLoading] = useState(null); // 'google' | 'facebook' | null
+  const [oauthLoading, setOauthLoading] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
   const [otpVerifying, setOtpVerifying] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -29,34 +29,27 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
     }
   }, []);
 
-  const handleOAuth = async (provider) => {
+  const handleGoogleSignIn = async () => {
     try {
-      setOauthLoading(provider);
+      setOauthLoading(true);
       setErrorMsg('');
       const targetRedirect = window.location.pathname.includes('/claim')
         ? `${window.location.origin}/claim/${window.location.search}`
         : `${window.location.origin}/card/`;
 
-      const authOptions = {
-        redirectTo: targetRedirect
-      };
-
-      if (provider === 'google') {
-        authOptions.queryParams = { prompt: 'select_account' };
-      }
-
-      if (provider === 'facebook') {
-        authOptions.scopes = 'email,public_profile';
-      }
-
       const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: authOptions
+        provider: 'google',
+        options: {
+          redirectTo: targetRedirect,
+          queryParams: {
+            prompt: 'select_account'
+          }
+        }
       });
       if (error) throw error;
     } catch (err) {
-      setErrorMsg(err.message || `Failed to sign in with ${provider}`);
-      setOauthLoading(null);
+      setErrorMsg(err.message || 'Failed to sign in with Google');
+      setOauthLoading(false);
     }
   };
 
@@ -84,7 +77,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
       setStep('check-email');
     } catch (err) {
       if (err.message?.toLowerCase().includes('rate limit')) {
-        setErrorMsg('Email rate limit reached for this hour. Please try Google Sign-In or try again shortly.');
+        setErrorMsg('Email rate limit reached for this hour. Please use Google Sign-In or try again shortly.');
       } else {
         setErrorMsg(err.message || 'Failed to send login email.');
       }
@@ -167,15 +160,15 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
 
       {step === 'input-email' && (
         <>
-          {/* Symmetrical OAuth Pill Buttons */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', marginBottom: '14px' }}>
+          {/* Primary 1-Tap Google Sign-In Pill Button */}
+          <div style={{ width: '100%', marginBottom: '14px' }}>
             <button 
               type="button" 
               className="btn-oauth google" 
-              onClick={() => handleOAuth('google')}
-              disabled={!!oauthLoading || emailSending}
+              onClick={handleGoogleSignIn}
+              disabled={oauthLoading || emailSending}
             >
-              {oauthLoading === 'google' ? (
+              {oauthLoading ? (
                 <Loader2 className="animate-spin" size={18} />
               ) : (
                 <svg width="18" height="18" viewBox="0 0 24 24">
@@ -185,23 +178,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                 </svg>
               )}
-              <span>{oauthLoading === 'google' ? 'Connecting to Google...' : 'Continue with Google'}</span>
-            </button>
-
-            <button 
-              type="button" 
-              className="btn-oauth facebook" 
-              onClick={() => handleOAuth('facebook')}
-              disabled={!!oauthLoading || emailSending}
-            >
-              {oauthLoading === 'facebook' ? (
-                <Loader2 className="animate-spin" size={18} />
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-              )}
-              <span>{oauthLoading === 'facebook' ? 'Connecting to Facebook...' : 'Continue with Facebook'}</span>
+              <span>{oauthLoading ? 'Connecting to Google...' : 'Continue with Google'}</span>
             </button>
           </div>
 
