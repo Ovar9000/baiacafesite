@@ -408,7 +408,8 @@ main,
   gap: 10px;
 }
 
-.audio-toggle-btn {
+.audio-toggle-btn,
+.nav-loyalty-btn {
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.25);
   color: var(--white);
@@ -419,6 +420,7 @@ main,
   font-weight: 800;
   font-size: 0.8rem;
   letter-spacing: 0.02em;
+  text-decoration: none;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -428,8 +430,12 @@ main,
   transition: all var(--duration-fast);
 }
 
-.audio-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+.audio-toggle-btn:hover,
+.nav-loyalty-btn:hover {
+  background: var(--golden-amber);
+  color: var(--deep-navy);
+  border-color: var(--golden-amber);
+  transform: translateY(-1px);
 }
 
 .audio-toggle-btn.playing {
@@ -1131,7 +1137,8 @@ main,
     min-width: 36px;
     min-height: 36px;
   }
-  .audio-toggle-btn {
+  .audio-toggle-btn,
+  .nav-loyalty-btn {
     padding: 0 10px;
     font-size: 0.75rem;
     height: 34px;
