@@ -11,7 +11,8 @@ import {
   Lock, 
   UserCheck, 
   Send,
-  Loader2
+  Loader2,
+  ChevronRight
 } from 'lucide-react';
 import '../styles/loyalty.css';
 
