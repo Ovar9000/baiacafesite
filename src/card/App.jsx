@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabaseClient';
-import { calculateLoyaltyStatus, formatManilaDateTime } from '../lib/loyaltyHelpers';
+import { calculateLoyaltyStatus } from '../lib/loyaltyHelpers';
 import AuthModal from '../components/AuthModal';
 import RedemptionCountdown from '../components/RedemptionCountdown';
 import QrScanner from '../components/QrScanner';
@@ -15,12 +15,10 @@ import {
   LogOut, 
   ChevronRight, 
   QrCode, 
-  History, 
   ShieldCheck,
-  AlertTriangle,
   Flame,
   AlertCircle,
-  Loader2
+  ExternalLink
 } from 'lucide-react';
 import '../styles/loyalty.css';
 
@@ -31,7 +29,6 @@ export default function CardApp() {
   const [stamps, setStamps] = useState([]);
   const [redemptions, setRedemptions] = useState([]);
   const [redeemLoading, setRedeemLoading] = useState(false);
-  const [showRedeemConfirm, setShowRedeemConfirm] = useState(false);
   const [activeRedemption, setActiveRedemption] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   
@@ -122,68 +119,6 @@ export default function CardApp() {
     setSession(null);
     setStamps([]);
     setRedemptions([]);
-  };
-
-  const handleExecuteRedeem = async () => {
-    if (!session?.access_token) return;
-    try {
-      setRedeemLoading(true);
-      setErrorMsg('');
-
-      if (user?.id === 'baia-demo-user-001') {
-        const currentRedemptions = JSON.parse(localStorage.getItem('baia_demo_redemptions') || '[]');
-        const nextMilestone = currentRedemptions.length + 1;
-        const rewardType = (nextMilestone % 2 !== 0) ? 'coffee' : 'totebag';
-        const newRedemption = {
-          id: Math.floor(1000 + Math.random() * 9000),
-          reward_type: rewardType,
-          milestone_number: nextMilestone,
-          redeemed_at: new Date().toISOString()
-        };
-        currentRedemptions.unshift(newRedemption);
-        localStorage.setItem('baia_demo_redemptions', JSON.stringify(currentRedemptions));
-
-        setShowRedeemConfirm(false);
-        setActiveRedemption({
-          redemptionId: newRedemption.id,
-          rewardType: newRedemption.reward_type,
-          milestoneNumber: newRedemption.milestone_number,
-          redeemedAt: newRedemption.redeemed_at,
-          rewardTitle: rewardType === 'coffee' ? 'Free Specialty Coffee' : 'Free Baia Tote Bag'
-        });
-        loadLoyaltyData();
-        return;
-      }
-
-      const response = await fetch('/api/redeem-reward', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to redeem reward.');
-      }
-
-      setShowRedeemConfirm(false);
-      setActiveRedemption({
-        redemptionId: data.redemptionId,
-        rewardType: data.rewardType,
-        milestoneNumber: data.milestoneNumber,
-        redeemedAt: data.redeemedAt,
-        rewardTitle: data.rewardTitle
-      });
-
-      // Refresh loyalty records
-      loadLoyaltyData();
-    } catch (err) {
-      setErrorMsg(err.message || 'Error processing redemption.');
-    } finally {
-      setRedeemLoading(false);
-    }
   };
 
   const handleInAppScan = async (scannedToken) => {
@@ -288,6 +223,10 @@ export default function CardApp() {
 
   const loyaltyStatus = calculateLoyaltyStatus(stamps, redemptions);
 
+  // If user completed a cycle and has an unredeemed reward, show off the 10/10 filled gold card
+  const isCompletedCard = loyaltyStatus.hasPendingReward;
+  const displayProgress = isCompletedCard ? 10 : loyaltyStatus.currentCycleProgress;
+
   if (loading) {
     return (
       <div className="loyalty-app-wrapper" style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -315,7 +254,7 @@ export default function CardApp() {
 
         {user && (
           <button onClick={handleSignOut} className="btn-loyalty-signout" title="Sign Out">
-            <LogOut size={16} />
+            <LogOut size={14} />
             <span>Sign Out</span>
           </button>
         )}
@@ -353,34 +292,51 @@ export default function CardApp() {
             </div>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             
-            {/* Active Reward Available Banner */}
-            {loyaltyStatus.availableReward && (
-              <div className="reward-banner">
-                <div className="reward-banner-badge">
-                  <Gift size={22} />
+            {/* 1. Celebratory Milestone Reward Unlocked Info Tile */}
+            {loyaltyStatus.hasPendingReward && (
+              <div style={{
+                background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
+                border: '2px solid #F59E0B',
+                borderRadius: '20px',
+                padding: '18px 20px',
+                boxShadow: '0 8px 24px rgba(245, 158, 11, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                animation: 'pulse-glow 2.5s infinite'
+              }}>
+                <div style={{
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '14px',
+                  background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  boxShadow: '0 4px 12px rgba(217, 119, 6, 0.35)'
+                }}>
+                  <Gift size={24} />
                 </div>
-                <div className="reward-banner-content">
-                  <h4>
-                    {loyaltyStatus.availableReward === 'coffee' 
-                      ? 'Free Handcrafted Coffee Ready!' 
-                      : 'Free Baia Tote Bag Ready!'}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#B45309', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '2px' }}>
+                    ★ Milestone Reward Ready
+                  </div>
+                  <h4 style={{ fontSize: '1.02rem', color: '#78350F', fontWeight: 800, margin: '0 0 3px', lineHeight: '1.2' }}>
+                    {loyaltyStatus.nextRewardType === 'coffee' ? 'Free Specialty Coffee Unlocked! ☕' : 'Free BAIA Shoreline Tote Bag! 🛍️'}
                   </h4>
-                  <p>Present to your barista at the counter to redeem.</p>
+                  <p style={{ fontSize: '0.8rem', color: '#92400E', margin: 0, lineHeight: '1.4' }}>
+                    Show this completed digital card to your barista at the counter to claim your reward!
+                  </p>
                 </div>
-                <button 
-                  className="btn-redeem-trigger"
-                  onClick={() => setShowRedeemConfirm(true)}
-                >
-                  <Sparkles size={18} />
-                  <span>Redeem at Register →</span>
-                </button>
               </div>
             )}
 
-            {/* 1. Digital Loyalty Card */}
-            <div className="digital-card">
+            {/* 2. Signature BAIA Ocean Blue Digital Card */}
+            <div className={`digital-card ${isCompletedCard ? 'completed-cycle' : ''}`}>
               <div className="card-top-row">
                 <div>
                   <div className="card-holder-name">
@@ -391,7 +347,7 @@ export default function CardApp() {
                   </div>
                 </div>
                 <div className="card-tier-badge">
-                  <Flame size={14} />
+                  <Flame size={13} />
                   <span>Cycle {loyaltyStatus.milestoneNumber + 1}</span>
                 </div>
               </div>
@@ -399,19 +355,19 @@ export default function CardApp() {
               {/* 10-Stamp Visual Grid */}
               <div className="stamp-grid-container">
                 <div className="stamp-grid-title">
-                  <span>Current Stamp Cycle</span>
-                  <span>{loyaltyStatus.currentCycleProgress} / 10 Stamps</span>
+                  <span>{isCompletedCard ? '🎉 10/10 STAMPS COMPLETED!' : 'Current Stamp Cycle'}</span>
+                  <span>{displayProgress} / 10 Stamps</span>
                 </div>
 
                 <div className="stamp-grid-slots">
                   {Array.from({ length: 10 }).map((_, idx) => {
                     const slotNum = idx + 1;
-                    const isFilled = slotNum <= loyaltyStatus.currentCycleProgress;
+                    const isFilled = slotNum <= displayProgress;
                     const isRewardSlot = slotNum === 10;
                     return (
                       <div 
                         key={idx} 
-                        className={`stamp-slot ${isFilled ? 'filled' : 'empty'} ${isRewardSlot ? 'milestone-target' : ''}`}
+                        className={`stamp-slot ${isFilled ? (isCompletedCard ? 'filled full-gold' : 'filled') : 'empty'} ${isRewardSlot ? 'milestone-target' : ''}`}
                         title={isFilled ? `Stamp #${slotNum} earned` : `Stamp #${slotNum}`}
                       >
                         {isFilled ? (
@@ -429,16 +385,22 @@ export default function CardApp() {
 
               {/* Progress to Next Reward */}
               <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.12)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '6px', color: 'rgba(255, 255, 255, 0.85)' }}>
-                  <span>Next Reward: <strong>{loyaltyStatus.upcomingMilestoneType === 'coffee' ? 'Free Coffee ☕' : 'Free Tote Bag 🛍️'}</strong></span>
-                  <span style={{ color: '#FFE699', fontWeight: 700 }}>{loyaltyStatus.stampsUntilNextMilestone} drinks left</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '6px', color: 'rgba(255, 255, 255, 0.9)' }}>
+                  <span>
+                    {isCompletedCard 
+                      ? <strong style={{ color: '#FFE699' }}>Reward Ready at Counter!</strong>
+                      : <>Next Reward: <strong>{loyaltyStatus.upcomingMilestoneType === 'coffee' ? 'Free Coffee ☕' : 'Free Tote Bag 🛍️'}</strong></>}
+                  </span>
+                  <span style={{ color: '#FFE699', fontWeight: 700 }}>
+                    {isCompletedCard ? 'Completed' : `${loyaltyStatus.stampsUntilNextMilestone} drinks left`}
+                  </span>
                 </div>
                 <div style={{ height: '6px', background: 'rgba(255, 255, 255, 0.15)', borderRadius: '9999px', overflow: 'hidden' }}>
                   <div 
                     style={{ 
                       height: '100%', 
-                      background: 'linear-gradient(90deg, #FB923C, #F5A623)', 
-                      width: `${(loyaltyStatus.currentCycleProgress / 10) * 100}%`,
+                      background: isCompletedCard ? 'linear-gradient(90deg, #F5A623, #FCD34D)' : 'linear-gradient(90deg, #FB923C, #F5A623)', 
+                      width: isCompletedCard ? '100%' : `${(loyaltyStatus.currentCycleProgress / 10) * 100}%`,
                       transition: 'width 0.4s ease'
                     }}
                   />
@@ -451,7 +413,7 @@ export default function CardApp() {
               </div>
             </div>
 
-            {/* 2. In-App Camera Scan Trigger */}
+            {/* 3. In-App Camera Scan Trigger */}
             <button 
               type="button"
               onClick={() => {
@@ -467,7 +429,7 @@ export default function CardApp() {
                 background: '#FFFFFF',
                 border: '1.5px solid #E2E8F0',
                 padding: '14px 18px',
-                borderRadius: '16px',
+                borderRadius: '18px',
                 color: 'var(--loyalty-navy)',
                 boxShadow: 'var(--loyalty-shadow)',
                 cursor: 'pointer',
@@ -486,48 +448,67 @@ export default function CardApp() {
               <ChevronRight size={18} color="#94A3B8" />
             </button>
 
-            {/* 3. Compact Reward Guide & Activity History */}
-            <div style={{ textAlign: 'center', padding: '10px 0', fontSize: '0.78rem', color: '#64748B' }}>
-              <p style={{ marginBottom: '4px' }}>
-                ✨ <strong>10 Stamps</strong> = Free Coffee &bull; <strong>20 Stamps</strong> = Free Tote Bag
-              </p>
-              <p style={{ fontSize: '0.72rem', color: '#94A3B8' }}>
-                1 stamp per qualifying drink &bull; Max 1 stamp per day
-              </p>
-            </div>
-
-            {stamps.length > 0 && (
-              <div className="loyalty-section-card" style={{ padding: '14px 16px' }}>
-                <div className="section-card-title" style={{ fontSize: '0.9rem', marginBottom: '8px' }}>
-                  <History size={16} color="#1E4AFF" />
-                  <span>Recent Stamp Activity ({stamps.length})</span>
-                </div>
-
-                <div className="stamp-history-list">
-                  {stamps.slice(0, 5).map((stamp, idx) => (
-                    <div key={stamp.id || idx} className="stamp-history-item">
-                      <div className="history-item-left">
-                        <div className="history-icon-circle">
-                          <Coffee size={14} />
-                        </div>
-                        <div>
-                          <div className="history-item-title">
-                            {stamp.staff_note || 'Qualifying Beverage Stamp'}
-                          </div>
-                          <div className="history-item-date">
-                            {formatManilaDateTime(stamp.awarded_at)}
-                          </div>
-                        </div>
-                      </div>
-                      <span className="history-item-badge">+1 Stamp</span>
-                    </div>
-                  ))}
+            {/* 4. Featured Specialty Coffee Spotlight (Replaces Cluttered History List) */}
+            <div style={{
+              background: '#FFFFFF',
+              border: '1.5px solid #E2E8F0',
+              borderRadius: '20px',
+              overflow: 'hidden',
+              boxShadow: 'var(--loyalty-shadow)'
+            }}>
+              <div style={{ position: 'relative', height: '140px', overflow: 'hidden' }}>
+                <img 
+                  src="/images/classiccafe.webp" 
+                  alt="Featured BAIA Specialty Coffee" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+                <div style={{
+                  position: 'absolute',
+                  top: '12px',
+                  left: '12px',
+                  background: 'rgba(22, 37, 92, 0.85)',
+                  backdropFilter: 'blur(6px)',
+                  color: '#FFE699',
+                  padding: '4px 10px',
+                  borderRadius: '9999px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  <Sparkles size={12} />
+                  <span>What's Brewing</span>
                 </div>
               </div>
-            )}
 
-            {/* Bottom Footer Info */}
-            <div style={{ textAlign: 'center', padding: '8px 0', fontSize: '0.75rem', color: '#94A3B8' }}>
+              <div style={{ padding: '16px' }}>
+                <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--loyalty-navy)', fontSize: '1rem', fontWeight: 700, marginBottom: '4px' }}>
+                  Signature Spanish Latte & Sea Salt Cold Brew
+                </h4>
+                <p style={{ fontSize: '0.8rem', color: '#64748B', lineHeight: '1.4', marginBottom: '12px' }}>
+                  Handcrafted with premium artisan beans on the Masbate shoreline. Every specialty handcrafted beverage earns 1 stamp!
+                </p>
+                <a 
+                  href="/menu/"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    color: '#1E4AFF',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    textDecoration: 'none'
+                  }}
+                >
+                  <span>Explore Full Drink Menu</span>
+                  <ChevronRight size={14} />
+                </a>
+              </div>
+            </div>
+
+            {/* 5. Bottom Footer Info */}
+            <div style={{ textAlign: 'center', padding: '6px 0', fontSize: '0.75rem', color: '#94A3B8' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 <ShieldCheck size={14} />
                 <span>Geofenced & verified at Baia Café, Masbate</span>
@@ -542,7 +523,7 @@ export default function CardApp() {
                 borderRadius: '16px',
                 padding: '14px',
                 textAlign: 'center',
-                marginTop: '10px'
+                marginTop: '6px'
               }}>
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#92400E', marginBottom: '8px' }}>
                   🛠️ Dev Testing Simulation Controls
@@ -630,6 +611,33 @@ export default function CardApp() {
                   <button
                     type="button"
                     onClick={() => {
+                      // Simulate Barista redeeming and starting next cycle
+                      const currentRedemptions = JSON.parse(localStorage.getItem('baia_demo_redemptions') || '[]');
+                      currentRedemptions.push({
+                        id: Date.now(),
+                        user_id: 'baia-demo-user-001',
+                        redeemed_at: new Date().toISOString()
+                      });
+                      localStorage.setItem('baia_demo_redemptions', JSON.stringify(currentRedemptions));
+                      loadLoyaltyData();
+                    }}
+                    style={{
+                      background: '#16255C',
+                      color: '#FFF',
+                      border: 'none',
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Simulate Barista Redeem
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
                       localStorage.removeItem('baia_demo_stamps');
                       localStorage.removeItem('baia_demo_redemptions');
                       loadLoyaltyData();
@@ -706,69 +714,6 @@ export default function CardApp() {
             )}
           </div>
         </div>
-      )}
-
-      {/* Redemption Confirmation Warning Modal */}
-      {showRedeemConfirm && (
-        <div className="redeem-modal-overlay">
-          <div className="redeem-modal-card">
-            <div className="modal-warning-icon">
-              <AlertTriangle size={28} />
-            </div>
-
-            <h3>Are you in front of the barista?</h3>
-            <p>
-              Once confirmed, a <strong>2-minute animated timer</strong> will begin. The barista must witness and tap the active screen to serve your reward.
-            </p>
-
-            <div className="modal-warning-box">
-              ⚠️ Do not activate until you are ordering at the counter!
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button 
-                onClick={handleExecuteRedeem}
-                disabled={redeemLoading}
-                style={{
-                  background: '#16255C',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  padding: '13px',
-                  borderRadius: '9999px',
-                  fontWeight: 700,
-                  fontSize: '0.95rem',
-                  cursor: 'pointer'
-                }}
-              >
-                {redeemLoading ? 'Starting Timer...' : 'Confirm & Redeem Now →'}
-              </button>
-
-              <button 
-                onClick={() => setShowRedeemConfirm(false)}
-                disabled={redeemLoading}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#64748B',
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  padding: '6px'
-                }}
-              >
-                Cancel / Not at Counter Yet
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 2-Minute Animated Redemption Screen */}
-      {activeRedemption && (
-        <RedemptionCountdown 
-          redemptionData={activeRedemption}
-          user={user}
-          onClose={() => setActiveRedemption(null)}
-        />
       )}
     </div>
   );
