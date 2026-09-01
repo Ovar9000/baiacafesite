@@ -109,10 +109,10 @@ export default function RedemptionCountdown({ redemptionData, user, onClose }) {
           marginBottom: '16px'
         }}>
           <div style={{ display: 'inline-flex', padding: '10px', background: '#16255C', color: '#FFF', borderRadius: '12px', marginBottom: '8px' }}>
-            {isCoffee ? <Coffee size={28} /> : <ShoppingBag size={28} />}
+            <Coffee size={28} />
           </div>
           <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#16255C', fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase' }}>
-            {isCoffee ? 'FREE SPECIALTY COFFEE' : 'FREE BAIA TOTE BAG'}
+            FREE SPECIALTY COFFEE
           </h3>
           <p style={{ fontSize: '0.82rem', color: '#475569', marginTop: '4px' }}>
             Milestone #{redemptionData?.milestoneNumber} Reward
