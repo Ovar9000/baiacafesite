@@ -53,7 +53,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
       });
       if (error) throw error;
       setStep('input-otp');
-      setInfoMsg(`We sent a 6-digit verification code to ${email}`);
+      setInfoMsg(`Login email sent to ${email}! Enter the 6-digit code below or click the link in your email.`);
     } catch (err) {
       setErrorMsg(err.message || 'Failed to send OTP code.');
     } finally {
