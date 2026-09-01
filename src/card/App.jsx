@@ -16,12 +16,10 @@ import {
   ChevronRight, 
   QrCode, 
   ShieldCheck,
-  Flame,
   AlertCircle,
   Trophy,
   X,
-  Calendar,
-  Layers
+  Calendar
 } from 'lucide-react';
 import '../styles/loyalty.css';
 
@@ -31,8 +29,6 @@ export default function CardApp() {
   const [loading, setLoading] = useState(true);
   const [stamps, setStamps] = useState([]);
   const [redemptions, setRedemptions] = useState([]);
-  const [redeemLoading, setRedeemLoading] = useState(false);
-  const [activeRedemption, setActiveRedemption] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   
   // In-app QR Scanner state
@@ -140,7 +136,7 @@ export default function CardApp() {
         );
 
         if (alreadyClaimedToday) {
-          setScannerErrorMsg('You have already collected your coffee stamp for today! (1 stamp per day limit).');
+          setScannerErrorMsg('You have already collected your coffee stamp for today (1 stamp per day limit).');
           return;
         }
 
@@ -163,7 +159,7 @@ export default function CardApp() {
             });
           } catch (e) {}
 
-          setScannerStatusMsg('🎉 Stamp successfully recorded!');
+          setScannerStatusMsg('Stamp successfully recorded.');
           setTimeout(() => {
             setShowScannerModal(false);
             setScannerStatusMsg('');
@@ -210,7 +206,7 @@ export default function CardApp() {
             });
           } catch (e) {}
 
-          setScannerStatusMsg('🎉 Stamp successfully recorded!');
+          setScannerStatusMsg('Stamp successfully recorded.');
           setTimeout(() => {
             setShowScannerModal(false);
             setScannerStatusMsg('');
@@ -229,9 +225,16 @@ export default function CardApp() {
 
   const loyaltyStatus = calculateLoyaltyStatus(stamps, redemptions);
 
-  // If user completed a cycle and has an unredeemed reward, show off the 10/10 filled gold card
-  const isCompletedCard = loyaltyStatus.hasPendingReward;
-  const displayProgress = isCompletedCard ? 10 : loyaltyStatus.currentCycleProgress;
+  // A card is in completed 10/10 state ONLY when totalStamps is a multiple of 10 (>0) AND there is an unredeemed reward
+  const isCompletedCard = loyaltyStatus.totalStamps > 0 && (loyaltyStatus.totalStamps % 10 === 0) && loyaltyStatus.hasPendingReward;
+
+  // Active cycle progress: 10 if completed, else totalStamps % 10 (e.g. 1 to 9, or 0)
+  const displayProgress = isCompletedCard ? 10 : (loyaltyStatus.totalStamps % 10);
+
+  // Active cycle number
+  const activeCycleNumber = isCompletedCard
+    ? Math.floor(loyaltyStatus.totalStamps / 10)
+    : Math.floor(loyaltyStatus.totalStamps / 10) + 1;
 
   // Group historical stamps into completed cycle cards
   const numCompletedCycles = Math.floor(stamps.length / 10);
@@ -247,7 +250,7 @@ export default function CardApp() {
       cycleNumber: c,
       finishDate: finishDate ? formatManilaDateTime(finishDate) : 'Completed',
       rewardType,
-      rewardTitle: rewardType === 'coffee' ? 'Free Specialty Coffee ☕' : 'Custom Shoreline Tote Bag 🛍️',
+      rewardTitle: rewardType === 'coffee' ? 'Free Specialty Coffee' : 'Custom Shoreline Tote Bag',
       stamps: cycle10Stamps
     });
   }
@@ -319,7 +322,7 @@ export default function CardApp() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             
-            {/* 1. Celebratory Milestone Reward Unlocked Info Tile */}
+            {/* 1. Milestone Reward Unlocked Info Tile */}
             {loyaltyStatus.hasPendingReward && (
               <div style={{
                 background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
@@ -348,13 +351,13 @@ export default function CardApp() {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#B45309', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '2px' }}>
-                    ★ Milestone Reward Ready
+                    Milestone Reward Ready
                   </div>
                   <h4 style={{ fontSize: '1.02rem', color: '#78350F', fontWeight: 800, margin: '0 0 3px', lineHeight: '1.2' }}>
-                    {loyaltyStatus.nextRewardType === 'coffee' ? 'Free Specialty Coffee Unlocked! ☕' : 'Free BAIA Shoreline Tote Bag! 🛍️'}
+                    {loyaltyStatus.nextRewardType === 'coffee' ? 'Free Specialty Coffee Unlocked' : 'Free Baia Shoreline Tote Bag'}
                   </h4>
                   <p style={{ fontSize: '0.8rem', color: '#92400E', margin: 0, lineHeight: '1.4' }}>
-                    Show this completed digital card to your barista at the counter to claim your reward!
+                    Show this completed digital card to your barista at the counter to claim your reward.
                   </p>
                 </div>
               </div>
@@ -372,7 +375,7 @@ export default function CardApp() {
                   </div>
                 </div>
                 
-                {/* Interactive Cycle Badge (Tapping reveals completed stamp cards archive) */}
+                {/* Interactive Cycle Badge (Clean minimal typography, taps to reveal completed stamp cards) */}
                 <button
                   type="button"
                   onClick={() => setShowArchiveModal(true)}
@@ -384,20 +387,23 @@ export default function CardApp() {
                     color: '#FFE699',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '5px'
+                    justifyContent: 'center',
+                    padding: '5px 14px',
+                    borderRadius: '9999px',
+                    fontWeight: 700,
+                    fontSize: '0.75rem',
+                    letterSpacing: '0.3px'
                   }}
                   title="View Completed Card Collection"
                 >
-                  <Flame size={13} color="#FB923C" />
-                  <span>Cycle {loyaltyStatus.milestoneNumber + 1}</span>
-                  <Sparkles size={11} style={{ opacity: 0.8 }} />
+                  <span>Cycle {activeCycleNumber}</span>
                 </button>
               </div>
 
               {/* 10-Stamp Visual Grid */}
               <div className="stamp-grid-container">
                 <div className="stamp-grid-title">
-                  <span>{isCompletedCard ? '🎉 10/10 STAMPS COMPLETED!' : 'Current Stamp Cycle'}</span>
+                  <span>{isCompletedCard ? '10/10 Stamps Completed' : 'Current Stamp Cycle'}</span>
                   <span>{displayProgress} / 10 Stamps</span>
                 </div>
 
@@ -430,8 +436,8 @@ export default function CardApp() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '6px', color: 'rgba(255, 255, 255, 0.9)' }}>
                   <span>
                     {isCompletedCard 
-                      ? <strong style={{ color: '#FFE699' }}>Reward Ready at Counter!</strong>
-                      : <>Next Reward: <strong>{loyaltyStatus.upcomingMilestoneType === 'coffee' ? 'Free Coffee ☕' : 'Free Tote Bag 🛍️'}</strong></>}
+                      ? <strong style={{ color: '#FFE699' }}>Reward Ready at Counter</strong>
+                      : <>Next Reward: <strong>{loyaltyStatus.upcomingMilestoneType === 'coffee' ? 'Free Coffee' : 'Free Tote Bag'}</strong></>}
                   </span>
                   <span style={{ color: '#FFE699', fontWeight: 700 }}>
                     {isCompletedCard ? 'Completed' : `${loyaltyStatus.stampsUntilNextMilestone} drinks left`}
@@ -451,7 +457,7 @@ export default function CardApp() {
 
               <div className="card-stats-bottom" style={{ marginTop: '12px', paddingTop: '10px' }}>
                 <span className="stat-lifetime-label">Lifetime Stamps:</span>
-                <span className="stat-lifetime-value">{loyaltyStatus.totalStamps} ☕</span>
+                <span className="stat-lifetime-value">{loyaltyStatus.totalStamps}</span>
               </div>
             </div>
 
@@ -529,7 +535,7 @@ export default function CardApp() {
                   Signature Spanish Latte & Sea Salt Cold Brew
                 </h4>
                 <p style={{ fontSize: '0.8rem', color: '#64748B', lineHeight: '1.4', marginBottom: '12px' }}>
-                  Handcrafted with premium artisan beans on the Masbate shoreline. Every specialty handcrafted beverage earns 1 stamp!
+                  Handcrafted with premium artisan beans on the Masbate shoreline. Every specialty handcrafted beverage earns 1 stamp.
                 </p>
                 <a 
                   href="/menu/"
@@ -568,7 +574,7 @@ export default function CardApp() {
                 marginTop: '6px'
               }}>
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#92400E', marginBottom: '8px' }}>
-                  🛠️ Dev Testing Simulation Controls
+                  Dev Testing Controls
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
                   <button
@@ -621,7 +627,7 @@ export default function CardApp() {
                       cursor: 'pointer'
                     }}
                   >
-                    Fill 10 Stamps (Free Coffee)
+                    Fill 10 Stamps
                   </button>
 
                   <button
@@ -647,7 +653,7 @@ export default function CardApp() {
                       cursor: 'pointer'
                     }}
                   >
-                    Fill 20 Stamps (Free Tote)
+                    Fill 20 Stamps
                   </button>
 
                   <button
@@ -745,7 +751,7 @@ export default function CardApp() {
             </div>
 
             <div className="archive-modal-body">
-              {/* Summary Trophy Ribbon */}
+              {/* Summary Ribbon */}
               <div style={{
                 background: '#FFFFFF',
                 border: '1px solid #E2E8F0',
@@ -757,14 +763,14 @@ export default function CardApp() {
               }}>
                 <div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--loyalty-navy)', fontFamily: 'Space Grotesk, sans-serif' }}>
-                    {loyaltyStatus.totalStamps} ☕
+                    {loyaltyStatus.totalStamps}
                   </div>
                   <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Lifetime Drinks</div>
                 </div>
                 <div style={{ width: '1px', background: '#E2E8F0' }} />
                 <div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#D97706', fontFamily: 'Space Grotesk, sans-serif' }}>
-                    {numCompletedCycles} 🏆
+                    {numCompletedCycles}
                   </div>
                   <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Completed Cards</div>
                 </div>
@@ -831,7 +837,7 @@ export default function CardApp() {
                 <div style={{ textAlign: 'center', padding: '24px 16px', background: '#FFFFFF', borderRadius: '18px', border: '1px dashed #CBD5E1' }}>
                   <Coffee size={32} color="#94A3B8" style={{ margin: '0 auto 10px' }} />
                   <h4 style={{ color: 'var(--loyalty-navy)', fontSize: '0.95rem', marginBottom: '4px' }}>
-                    First Card In Progress!
+                    First Card In Progress
                   </h4>
                   <p style={{ fontSize: '0.78rem', color: '#64748B', maxWidth: '260px', margin: '0 auto' }}>
                     Collect 10 stamps on your active card to add your first completed card to this showcase archive.
@@ -843,10 +849,10 @@ export default function CardApp() {
               <div className="archive-item-card current">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <span style={{ fontWeight: 700, fontSize: '0.82rem', color: '#CBD5E1' }}>
-                    CURRENT CYCLE #{loyaltyStatus.milestoneNumber + 1}
+                    CURRENT CYCLE #{activeCycleNumber}
                   </span>
                   <span style={{ fontSize: '0.75rem', color: '#FB923C', fontWeight: 700 }}>
-                    {isCompletedCard ? '10/10 Ready to Redeem' : `${loyaltyStatus.currentCycleProgress}/10 Stamps`}
+                    {isCompletedCard ? '10/10 Ready to Redeem' : `${displayProgress}/10 Stamps`}
                   </span>
                 </div>
                 <div style={{ height: '5px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '9999px', overflow: 'hidden' }}>
