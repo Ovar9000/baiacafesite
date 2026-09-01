@@ -13,7 +13,7 @@ function devApiPlugin() {
       server.middlewares.use((req, res, next) => {
         const parsedUrl = url.parse(req.url, true);
         const pathname = parsedUrl.pathname;
-        const multiPages = ['/claim', '/card', '/admin', '/menu', '/location', '/floating-cottage'];
+        const multiPages = ['/claim', '/card', '/admin', '/admin/rewards', '/menu', '/location', '/floating-cottage'];
         if (multiPages.includes(pathname)) {
           req.url = `${pathname}/` + (parsedUrl.search || '') + (parsedUrl.hash || '');
         }
@@ -40,6 +40,8 @@ function devApiPlugin() {
             handlerModule = await import('./api/admin-token.js');
           } else if (endpoint === 'admin-manual-stamp') {
             handlerModule = await import('./api/admin-manual-stamp.js');
+          } else if (endpoint === 'admin-rewards') {
+            handlerModule = await import('./api/admin-rewards.js');
           } else if (endpoint === 'dev-login') {
             handlerModule = await import('./api/dev-login.js');
           } else {
@@ -132,7 +134,8 @@ export default defineConfig({
         location: resolve(__dirname, 'location/index.html'),
         card: resolve(__dirname, 'card/index.html'),
         claim: resolve(__dirname, 'claim/index.html'),
-        admin: resolve(__dirname, 'admin/index.html')
+        admin: resolve(__dirname, 'admin/index.html'),
+        adminRewards: resolve(__dirname, 'admin/rewards/index.html')
       }
     }
   },
