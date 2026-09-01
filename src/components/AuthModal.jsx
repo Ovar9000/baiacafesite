@@ -40,32 +40,29 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
     }
   };
 
-  const handleQuickDemoSignIn = async () => {
-    try {
-      setOauthLoading('demo');
-      setErrorMsg('');
+  const handleQuickDemoSignIn = () => {
+    setOauthLoading('demo');
+    setErrorMsg('');
 
-      const res = await fetch('/api/dev-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      const result = await res.json();
-      if (!res.ok) {
-        throw new Error(result.error || 'Demo sign-in failed.');
+    // Instant local demo session for testing without rate limits
+    const demoUser = {
+      id: 'baia-demo-user-001',
+      email: 'mark@baia.cafe',
+      user_metadata: {
+        full_name: 'Mark Lawrence (Test Account)',
+        avatar_url: '/images/Logo.webp'
       }
+    };
+    const demoSession = {
+      access_token: 'demo-token-baia-2026',
+      user: demoUser
+    };
 
-      if (result.session) {
-        await supabase.auth.setSession(result.session);
-        if (onSuccess) {
-          onSuccess(result.session);
-        }
-      }
-    } catch (err) {
-      setErrorMsg(err.message || 'Demo sign-in failed. Please try again.');
-    } finally {
-      setOauthLoading(null);
+    localStorage.setItem('baia_demo_session', JSON.stringify(demoSession));
+    if (onSuccess) {
+      onSuccess(demoSession);
     }
+    setOauthLoading(null);
   };
 
   const handleSendEmailLink = async (e) => {
@@ -241,7 +238,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
                 ) : (
                   <Zap size={16} color="#D97706" />
                 )}
-                <span>⚡ 1-Tap Dev Sign-In (Local Testing)</span>
+                <span>⚡ 1-Tap Dev Sign-In (Instant Testing)</span>
               </button>
             </div>
           )}
