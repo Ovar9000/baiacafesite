@@ -33,16 +33,30 @@ export default function CardApp() {
 
   // Fetch session on load
   useEffect(() => {
+    const savedDemo = localStorage.getItem('baia_demo_session');
+    if (savedDemo) {
+      try {
+        const parsed = JSON.parse(savedDemo);
+        setSession(parsed);
+        setUser(parsed.user);
+        setLoading(false);
+      } catch (e) {}
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+      if (!localStorage.getItem('baia_demo_session')) {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+      if (!localStorage.getItem('baia_demo_session')) {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -53,6 +67,15 @@ export default function CardApp() {
     if (!user) return;
     try {
       setErrorMsg('');
+
+      if (user.id === 'baia-demo-user-001') {
+        const demoStamps = JSON.parse(localStorage.getItem('baia_demo_stamps') || '[]');
+        const demoRedemptions = JSON.parse(localStorage.getItem('baia_demo_redemptions') || '[]');
+        setStamps(demoStamps);
+        setRedemptions(demoRedemptions);
+        return;
+      }
+
       // Fetch stamps
       const { data: stampsData, error: sErr } = await supabase
         .from('stamps')
@@ -84,6 +107,7 @@ export default function CardApp() {
   }, [user, loadLoyaltyData]);
 
   const handleSignOut = async () => {
+    localStorage.removeItem('baia_demo_session');
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
@@ -96,6 +120,31 @@ export default function CardApp() {
     try {
       setRedeemLoading(true);
       setErrorMsg('');
+
+      if (user?.id === 'baia-demo-user-001') {
+        const currentRedemptions = JSON.parse(localStorage.getItem('baia_demo_redemptions') || '[]');
+        const nextMilestone = currentRedemptions.length + 1;
+        const rewardType = (nextMilestone % 2 !== 0) ? 'coffee' : 'totebag';
+        const newRedemption = {
+          id: Math.floor(1000 + Math.random() * 9000),
+          reward_type: rewardType,
+          milestone_number: nextMilestone,
+          redeemed_at: new Date().toISOString()
+        };
+        currentRedemptions.unshift(newRedemption);
+        localStorage.setItem('baia_demo_redemptions', JSON.stringify(currentRedemptions));
+
+        setShowRedeemConfirm(false);
+        setActiveRedemption({
+          redemptionId: newRedemption.id,
+          rewardType: newRedemption.reward_type,
+          milestoneNumber: newRedemption.milestone_number,
+          redeemedAt: newRedemption.redeemed_at,
+          rewardTitle: rewardType === 'coffee' ? 'Free Specialty Coffee' : 'Free Baia Tote Bag'
+        });
+        loadLoyaltyData();
+        return;
+      }
 
       const response = await fetch('/api/redeem-reward', {
         method: 'POST',
