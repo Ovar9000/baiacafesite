@@ -31,121 +31,65 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Invalid admin credentials.' });
     }
 
-    // Default sample members for instant demo/offline verification
-    const sampleMembers = [
-      {
-        id: 'member-01',
-        email: 'sofia.reyes@gmail.com',
-        name: 'Sofia Reyes',
-        totalStamps: 9,
-        redemptionsCount: 0,
-        lastActive: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString()
-      },
-      {
-        id: 'member-02',
-        email: 'marco.delacruz@yahoo.com',
-        name: 'Marco Dela Cruz',
-        totalStamps: 10,
-        redemptionsCount: 0,
-        lastActive: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString()
-      },
-      {
-        id: 'member-03',
-        email: 'elena.roces@outlook.com',
-        name: 'Elena Roces',
-        totalStamps: 19,
-        redemptionsCount: 1,
-        lastActive: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString()
-      },
-      {
-        id: 'member-04',
-        email: 'miguel.tan@gmail.com',
-        name: 'Miguel Tan',
-        totalStamps: 8,
-        redemptionsCount: 0,
-        lastActive: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString()
-      },
-      {
-        id: 'member-05',
-        email: 'chloe.santos@gmail.com',
-        name: 'Chloe Santos',
-        totalStamps: 4,
-        redemptionsCount: 0,
-        lastActive: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString()
-      },
-      {
-        id: 'member-06',
-        email: 'gabriel.lim@gmail.com',
-        name: 'Gabriel Lim',
-        totalStamps: 20,
-        redemptionsCount: 1,
-        lastActive: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString()
-      }
-    ];
-
-    let members = [];
-
-    // Query real Supabase database if available
-    if (supabaseAdmin) {
-      try {
-        const { data: stamps, error: sErr } = await supabaseAdmin
-          .from('stamps')
-          .select('user_id, awarded_at, staff_note')
-          .order('awarded_at', { ascending: false });
-
-        const { data: redemptions, error: rErr } = await supabaseAdmin
-          .from('redemptions')
-          .select('user_id, redeemed_at');
-
-        if (!sErr && stamps && stamps.length > 0) {
-          const userMap = {};
-
-          stamps.forEach((s) => {
-            if (!userMap[s.user_id]) {
-              userMap[s.user_id] = {
-                id: s.user_id,
-                email: s.user_id.includes('@') ? s.user_id : `member_${s.user_id.slice(0, 6)}@baia.cafe`,
-                name: `Member #${s.user_id.slice(0, 5)}`,
-                totalStamps: 0,
-                redemptionsCount: 0,
-                lastActive: s.awarded_at
-              };
-            }
-            userMap[s.user_id].totalStamps += 1;
-            if (new Date(s.awarded_at) > new Date(userMap[s.user_id].lastActive)) {
-              userMap[s.user_id].lastActive = s.awarded_at;
-            }
-          });
-
-          if (redemptions) {
-            redemptions.forEach((r) => {
-              if (userMap[r.user_id]) {
-                userMap[r.user_id].redemptionsCount += 1;
-              }
-            });
-          }
-
-          members = Object.values(userMap);
-        }
-      } catch (dbErr) {
-        console.warn('Database query fallback to sample data:', dbErr.message);
-      }
+    if (!supabaseAdmin) {
+      return res.status(500).json({ error: 'Supabase client not initialized.' });
     }
 
-    if (members.length === 0) {
-      members = sampleMembers;
+    // 1. Fetch real registered customer profiles from Supabase
+    const { data: profiles, error: pErr } = await supabaseAdmin
+      .from('profiles')
+      .select('id, email, display_name, avatar_url, created_at')
+      .order('created_at', { ascending: false });
+
+    if (pErr) {
+      console.error('Error fetching Supabase profiles:', pErr);
+      return res.status(500).json({ error: 'Failed to fetch profiles from Supabase.' });
     }
 
-    // Process each member status
-    const processedMembers = members.map((m) => {
-      const milestoneNumber = Math.floor(m.totalStamps / 10);
-      const pendingRewardsCount = Math.max(0, milestoneNumber - m.redemptionsCount);
+    // 2. Fetch all stamps and redemptions
+    const { data: stamps, error: sErr } = await supabaseAdmin
+      .from('stamps')
+      .select('user_id, awarded_at, staff_note')
+      .order('awarded_at', { ascending: false });
+
+    const { data: redemptions, error: rErr } = await supabaseAdmin
+      .from('redemptions')
+      .select('user_id, redeemed_at, reward_type, milestone_number');
+
+    // Group stamps and redemptions by user_id
+    const userStampsMap = {};
+    const userRedemptionsMap = {};
+
+    (stamps || []).forEach((s) => {
+      if (!userStampsMap[s.user_id]) {
+        userStampsMap[s.user_id] = [];
+      }
+      userStampsMap[s.user_id].push(s);
+    });
+
+    (redemptions || []).forEach((r) => {
+      if (!userRedemptionsMap[r.user_id]) {
+        userRedemptionsMap[r.user_id] = [];
+      }
+      userRedemptionsMap[r.user_id].push(r);
+    });
+
+    // 3. Process each real Supabase member
+    const processedMembers = (profiles || []).map((p) => {
+      const userStamps = userStampsMap[p.id] || [];
+      const userRedemptions = userRedemptionsMap[p.id] || [];
+
+      const totalStamps = userStamps.length;
+      const redemptionsCount = userRedemptions.length;
+
+      const milestoneNumber = Math.floor(totalStamps / 10);
+      const pendingRewardsCount = Math.max(0, milestoneNumber - redemptionsCount);
       const hasPendingReward = pendingRewardsCount > 0;
 
-      const currentCycleProgress = m.totalStamps % 10;
+      const currentCycleProgress = totalStamps % 10;
       const stampsRemaining = 10 - currentCycleProgress;
 
-      const nextRewardMilestone = m.redemptionsCount + 1;
+      const nextRewardMilestone = redemptionsCount + 1;
       const nextRewardType = (nextRewardMilestone % 2 !== 0) ? 'coffee' : 'totebag';
       const nextRewardTitle = nextRewardType === 'coffee' ? 'Free Specialty Coffee' : 'Custom Shoreline Tote Bag';
 
@@ -158,12 +102,14 @@ export default async function handler(req, res) {
         urgency = 'midway';
       }
 
+      const lastActive = userStamps[0]?.awarded_at || p.created_at;
+
       return {
-        id: m.id,
-        name: m.name,
-        email: m.email,
-        totalStamps: m.totalStamps,
-        redemptionsCount: m.redemptionsCount,
+        id: p.id,
+        name: p.display_name || p.email?.split('@')[0] || 'Member',
+        email: p.email || 'No email provided',
+        totalStamps,
+        redemptionsCount,
         currentCycleProgress,
         stampsRemaining,
         hasPendingReward,
@@ -171,15 +117,19 @@ export default async function handler(req, res) {
         nextRewardType,
         nextRewardTitle,
         urgency,
-        lastActive: m.lastActive
+        lastActive,
+        registeredAt: p.created_at
       };
     });
 
-    // Sort: Reward Ready first, then closest to next reward (9 stamps, 8 stamps, etc.)
+    // Sort: Reward Ready first, then closest to next reward (9 stamps, 8 stamps...), then recent active
     processedMembers.sort((a, b) => {
       if (a.hasPendingReward && !b.hasPendingReward) return -1;
       if (!a.hasPendingReward && b.hasPendingReward) return 1;
-      return b.currentCycleProgress - a.currentCycleProgress;
+      if (b.currentCycleProgress !== a.currentCycleProgress) {
+        return b.currentCycleProgress - a.currentCycleProgress;
+      }
+      return new Date(b.lastActive) - new Date(a.lastActive);
     });
 
     const readyCount = processedMembers.filter((m) => m.hasPendingReward).length;
