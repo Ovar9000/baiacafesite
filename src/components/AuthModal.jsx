@@ -238,7 +238,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
                 ) : (
                   <Zap size={16} color="#D97706" />
                 )}
-                <span>⚡ 1-Tap Dev Sign-In (Instant Testing)</span>
+                <span>1-Tap Dev Sign-In (Instant Testing)</span>
               </button>
             </div>
           )}

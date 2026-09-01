@@ -267,7 +267,7 @@ export default function QrScanner({ onScan, onClose }) {
           }}
         >
           <Camera size={18} />
-          <span>Snap Photo with Camera 📸</span>
+          <span>Snap Photo with Camera</span>
         </button>
 
         <div style={{ fontSize: '0.75rem', color: '#94A3B8' }}>
