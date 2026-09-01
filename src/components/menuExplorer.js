@@ -5,28 +5,9 @@ export function initMenuExplorer() {
   const container = document.getElementById('menu-explorer-root');
   if (!container) return;
 
-  let activeBoard = 'food'; // 'food' | 'drinks'
+  let activeBoard = 'drinks'; // 'drinks' | 'food'
   let searchQuery = '';
   let openCategories = new Set();
-
-  const categoryIcons = {
-    // Food
-    'mirindal': '🧇',
-    'burgers': '🍔',
-    'bread-sandwich': '🥪',
-    'rice-meals': '🍚',
-    'pub': '🍗',
-    'pasta': '🍝',
-    'sides': '🍚',
-    // Drinks
-    'classic': '☕',
-    'house-special': '⭐',
-    'signature-coffee': '🌊',
-    'blended': '🥤',
-    'non-coffee': '🍵',
-    'fruit-soda': '🍹',
-    'iced-tea': '🧋'
-  };
 
   function getTotalBoardItemsCount() {
     const list = menuData[activeBoard] || [];
@@ -50,7 +31,6 @@ export function initMenuExplorer() {
       return {
         id: cat.id,
         name: cat.category,
-        icon: categoryIcons[cat.id] || '•',
         hasHotCold: cat.hasHotCold,
         hasSizes: cat.hasSizes,
         items: filteredItems,
@@ -65,18 +45,12 @@ export function initMenuExplorer() {
     const isSearching = searchQuery.trim().length > 0;
     const allExpanded = groupedItems.length > 0 && groupedItems.every(g => openCategories.has(g.id) || isSearching);
 
+    const drinkCount = menuData.drinks.reduce((s, c) => s + c.items.length, 0);
+    const foodCount = menuData.food.reduce((s, c) => s + c.items.length, 0);
+
     container.innerHTML = `
-      <!-- Board Switcher Tabs -->
+      <!-- Board Switcher Tabs (Drinks First) -->
       <div class="board-switcher" id="menu-board-switcher" role="tablist" aria-label="Menu Boards">
-        <button 
-          role="tab" 
-          aria-selected="${activeBoard === 'food'}" 
-          class="board-tab-btn ${activeBoard === 'food' ? 'active' : ''}" 
-          data-board="food"
-          id="tab-food"
-        >
-          🍔 Board 1 — Food & Smash Burgers (${menuData.food.reduce((s, c) => s + c.items.length, 0)} items)
-        </button>
         <button 
           role="tab" 
           aria-selected="${activeBoard === 'drinks'}" 
@@ -84,7 +58,18 @@ export function initMenuExplorer() {
           data-board="drinks"
           id="tab-drinks"
         >
-          ☕ Board 2 — Drinks & Espresso (${menuData.drinks.reduce((s, c) => s + c.items.length, 0)} items)
+          <span>Drinks &amp; Espresso</span>
+          <span class="board-count-pill">${drinkCount} items</span>
+        </button>
+        <button 
+          role="tab" 
+          aria-selected="${activeBoard === 'food'}" 
+          class="board-tab-btn ${activeBoard === 'food' ? 'active' : ''}" 
+          data-board="food"
+          id="tab-food"
+        >
+          <span>Food &amp; Kitchen Bites</span>
+          <span class="board-count-pill">${foodCount} items</span>
         </button>
       </div>
 
@@ -126,7 +111,6 @@ export function initMenuExplorer() {
             <div class="menu-accordion-card ${isOpen ? 'is-open' : ''}" id="cat-card-${group.id}">
               <button class="category-accordion-btn" data-category-id="${group.id}" aria-expanded="${isOpen}">
                 <div class="category-title-left">
-                  <span class="category-icon-emoji" aria-hidden="true">${group.icon}</span>
                   <h3 class="category-title-text">${group.name}</h3>
                   <span class="category-count-pill">${group.items.length} ${group.items.length === 1 ? 'item' : 'items'}</span>
                 </div>
@@ -139,8 +123,8 @@ export function initMenuExplorer() {
               <div class="category-accordion-body" ${isOpen ? '' : 'hidden'}>
                 <div class="category-items-grid">
                   ${group.items.map(item => {
-                    let priceDisplay = item.price ? `₱${item.price}` : '';
-                    let itemPrice = item.price;
+                    let priceDisplay = item.price ? `₱${item.price}` : 'Ask Cashier';
+                    let itemPrice = item.price || 0;
                     if (group.hasSizes || (!item.price && item.priceM)) {
                       priceDisplay = `M ₱${item.priceM} / L ₱${item.priceL}`;
                       itemPrice = item.priceM;
@@ -148,7 +132,7 @@ export function initMenuExplorer() {
 
                     let modifierTag = '';
                     if (group.hasHotCold) modifierTag = 'Hot or Cold';
-                    else if (group.hasSizes) modifierTag = '16oz / 22oz';
+                    else if (group.hasSizes) modifierTag = 'Medium / Large';
                     else if (item.subcategory) modifierTag = item.subcategory;
 
                     return `
@@ -159,7 +143,7 @@ export function initMenuExplorer() {
                               <h4 class="item-name">${item.name}</h4>
                               <div class="item-badges">
                                 ${item.isSpecialty ? '<span class="badge-special">Specialty</span>' : ''}
-                                ${item.isPopular ? '<span class="badge-pop">Best Seller</span>' : ''}
+                                ${item.isPopular ? '<span class="badge-pop">Popular</span>' : ''}
                               </div>
                             </div>
                             <div class="item-price-tag">${priceDisplay}</div>
@@ -180,7 +164,7 @@ export function initMenuExplorer() {
                             data-add-desc="${item.description || ''}"
                             aria-label="Add ${item.name} to order"
                           >
-                            <span>+ Order</span>
+                            <span>${itemPrice > 0 ? '+ Order' : 'Inquire'}</span>
                           </button>
                         </div>
                       </article>
@@ -193,9 +177,23 @@ export function initMenuExplorer() {
         }).join('')}
       </div>
 
+      <!-- Add-Ons Section on Drinks Board -->
+      ${activeBoard === 'drinks' && menuData.addOns ? `
+        <div class="menu-addons-card">
+          <h4 class="addons-title">Drink Customizations &amp; Add-ons</h4>
+          <div class="addons-grid">
+            ${menuData.addOns.map(addon => `
+              <div class="addon-pill">
+                <span class="addon-name">${addon.name}</span>
+                <span class="addon-price">+₱${addon.price}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
       <!-- Official Physical Menu Board Notice -->
       <div class="menu-disclaimer-card">
-        <div class="disclaimer-icon" aria-hidden="true">⚠️</div>
         <div class="disclaimer-text">
           <p><strong>BAIA CAFE SHORE NOTICE</strong></p>
           <p>${menuData.boardDisclaimer}</p>

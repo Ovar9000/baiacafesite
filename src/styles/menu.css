@@ -467,6 +467,65 @@
 }
 
 /* Official Physical Menu Board Disclaimer */
+/* Add-ons Section on Drinks Board */
+.menu-addons-card {
+  background: rgba(22, 37, 92, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  max-width: 900px;
+  margin: 0 auto 24px auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.addons-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--amber-contrast);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 14px;
+}
+
+.addons-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.addon-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--white);
+}
+
+.addon-price {
+  color: var(--golden-amber);
+  font-weight: 800;
+}
+
+.board-count-pill {
+  background: rgba(0, 0, 0, 0.12);
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.board-tab-btn.active .board-count-pill {
+  background: rgba(16, 28, 71, 0.2);
+}
+
 .menu-disclaimer-card {
   background: var(--cream);
   border: 2px dashed rgba(22, 37, 92, 0.3);
