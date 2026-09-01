@@ -274,6 +274,14 @@ async function fetchFacebookPosts(pageId, token, sinceId = null) {
     }
 
     if (!response.ok) {
+      console.warn(`\n⚠️ [Facebook Auth Warning] Graph API returned status ${response.status}:`);
+      console.warn(responseText);
+      if (responseText.includes('Session has expired') || responseText.includes('OAuthException') || responseText.includes('Error validating access token')) {
+        console.warn('\n👉 The Facebook Access Token has expired (short-lived token).');
+        console.warn('👉 Existing website drops remain active and safe on the live site.');
+        console.warn('👉 To resume background sync, update the FB_PAGE_ACCESS_TOKEN secret with a long-lived Page token.\n');
+        return [];
+      }
       throw new Error(`Facebook API Error (${response.status}): ${responseText}`);
     }
   }
@@ -549,6 +557,12 @@ async function runSync() {
 
   const posts = await fetchFacebookPosts(FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN, syncState.last_processed_id);
   console.log(`📥 Retrieved ${posts.length} posts to inspect.`);
+
+  if (!posts || posts.length === 0) {
+    console.log('ℹ️ No new Facebook posts fetched. Existing updates remain preserved.');
+    console.log('✨ [BAIA Sync Agent] Completed gracefully.\n');
+    return;
+  }
 
   const existingIds = new Set(currentUpdates.map(u => u.id));
   const newItemsToPublish = [];
