@@ -14,10 +14,14 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
     try {
       setLoading(true);
       setErrorMsg('');
+      const targetRedirect = window.location.pathname.includes('/claim')
+        ? `${window.location.origin}/claim${window.location.search}`
+        : `${window.location.origin}/card/`;
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: window.location.href
+          redirectTo: targetRedirect
         }
       });
       if (error) throw error;
@@ -37,10 +41,14 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
       setLoading(true);
       setErrorMsg('');
       setInfoMsg('');
+      const targetRedirect = window.location.pathname.includes('/claim')
+        ? `${window.location.origin}/claim${window.location.search}`
+        : `${window.location.origin}/card/`;
+
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
-          emailRedirectTo: window.location.href
+          emailRedirectTo: targetRedirect
         }
       });
       if (error) throw error;
