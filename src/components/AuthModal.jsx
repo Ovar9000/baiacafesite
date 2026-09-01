@@ -12,6 +12,23 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
   const [errorMsg, setErrorMsg] = useState('');
   const [infoMsg, setInfoMsg] = useState('');
 
+  // Handle URL errors on load and sanitize URL to prevent re-render loops
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('error=')) {
+      const params = new URLSearchParams(window.location.search);
+      const errorDesc = params.get('error_description') || params.get('error');
+      if (errorDesc) {
+        let msg = decodeURIComponent(errorDesc.replace(/\+/g, ' '));
+        if (msg.toLowerCase().includes('state not found') || msg.toLowerCase().includes('bad_oauth_state')) {
+          msg = 'Authentication session expired. Please tap "Continue with Google" to complete sign-in.';
+        }
+        setErrorMsg(msg);
+      }
+      // Clean query string from browser address bar
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   const handleOAuth = async (provider) => {
     try {
       setOauthLoading(provider);
@@ -23,7 +40,10 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: targetRedirect
+          redirectTo: targetRedirect,
+          queryParams: {
+            prompt: 'select_account'
+          }
         }
       });
       if (error) throw error;
