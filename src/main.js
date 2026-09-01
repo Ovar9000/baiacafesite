@@ -53,7 +53,18 @@ function initHeroLoyaltyCta() {
   } catch (e) {}
 }
 
+function handleRootAuthCallback() {
+  if (
+    window.location.search.includes('code=') ||
+    window.location.hash.includes('access_token=') ||
+    window.location.hash.includes('error=')
+  ) {
+    window.location.replace('/card/' + window.location.search + window.location.hash);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  handleRootAuthCallback();
   // Initialize primary interactive modules
   initHeroLoyaltyCta();
   initHero3D();
