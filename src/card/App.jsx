@@ -454,11 +454,6 @@ export default function CardApp() {
                   />
                 </div>
               </div>
-
-              <div className="card-stats-bottom" style={{ marginTop: '12px', paddingTop: '10px' }}>
-                <span className="stat-lifetime-label">Lifetime Stamps:</span>
-                <span className="stat-lifetime-value">{loyaltyStatus.totalStamps}</span>
-              </div>
             </div>
 
             {/* 3. In-App Camera Scan Trigger */}
@@ -763,9 +758,9 @@ export default function CardApp() {
               }}>
                 <div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--loyalty-navy)', fontFamily: 'Space Grotesk, sans-serif' }}>
-                    {loyaltyStatus.totalStamps}
+                    Cycle {activeCycleNumber}
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Lifetime Drinks</div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Active Journey</div>
                 </div>
                 <div style={{ width: '1px', background: '#E2E8F0' }} />
                 <div>
