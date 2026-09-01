@@ -370,7 +370,7 @@ export default function ClaimApp() {
                 </div>
 
                 <h2 style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--loyalty-navy)', fontSize: '1.45rem', marginBottom: '8px' }}>
-                  Stamp Collected! ☕
+                  Stamp Collected!
                 </h2>
 
                 <p style={{ fontSize: '0.92rem', color: '#475569', marginBottom: '20px', lineHeight: '1.4' }}>
