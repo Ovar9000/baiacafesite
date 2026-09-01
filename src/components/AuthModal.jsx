@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Mail, Sparkles, AlertCircle, CheckCircle, ArrowRight, ShieldCheck, KeyRound, RefreshCw, Loader2 } from 'lucide-react';
+import { Mail, Sparkles, AlertCircle, CheckCircle, ArrowRight, ShieldCheck, KeyRound, RefreshCw, Loader2, Zap } from 'lucide-react';
 
 export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty Card", subtitle = "Earn free drinks and tote bags with every coffee order." }) {
   const [email, setEmail] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [step, setStep] = useState('input-email'); // 'input-email' | 'check-email' | 'input-otp'
-  const [oauthLoading, setOauthLoading] = useState(null); // 'google' | 'facebook' | null
+  const [oauthLoading, setOauthLoading] = useState(null); // 'google' | 'facebook' | 'demo' | null
   const [emailSending, setEmailSending] = useState(false);
   const [otpVerifying, setOtpVerifying] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [infoMsg, setInfoMsg] = useState('');
+
+  const isLocalDev = typeof window !== 'undefined' && (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname.startsWith('192.168.') ||
+    window.location.hostname.startsWith('10.')
+  );
 
   const handleOAuth = async (provider) => {
     try {
@@ -29,6 +36,45 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
       if (error) throw error;
     } catch (err) {
       setErrorMsg(err.message || `Failed to sign in with ${provider}`);
+      setOauthLoading(null);
+    }
+  };
+
+  const handleQuickDemoSignIn = async () => {
+    try {
+      setOauthLoading('demo');
+      setErrorMsg('');
+      const demoEmail = 'testcustomer@baia.cafe';
+      const demoPass = 'BaiaDemoPass2026!';
+
+      let { data, error } = await supabase.auth.signInWithPassword({
+        email: demoEmail,
+        password: demoPass
+      });
+
+      if (error && (error.message.toLowerCase().includes('invalid') || error.message.toLowerCase().includes('credentials'))) {
+        const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+          email: demoEmail,
+          password: demoPass,
+          options: {
+            data: {
+              full_name: 'Mark Lawrence (Test Account)',
+              avatar_url: '/images/Logo.webp'
+            }
+          }
+        });
+        if (signUpErr) throw signUpErr;
+        data = signUpData;
+      } else if (error) {
+        throw error;
+      }
+
+      if (data?.session && onSuccess) {
+        onSuccess(data.session);
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'Demo sign-in failed. Please try again.');
+    } finally {
       setOauthLoading(null);
     }
   };
@@ -56,7 +102,11 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
       if (error) throw error;
       setStep('check-email');
     } catch (err) {
-      setErrorMsg(err.message || 'Failed to send login email.');
+      if (err.message?.toLowerCase().includes('rate limit')) {
+        setErrorMsg('Email rate limit reached for this hour. For instant testing, use the 1-Tap Demo button below or Google login!');
+      } else {
+        setErrorMsg(err.message || 'Failed to send login email.');
+      }
     } finally {
       setEmailSending(false);
     }
@@ -173,6 +223,39 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
               {emailSending ? 'Sending link...' : 'Send Sign-In Link →'}
             </button>
           </form>
+
+          {/* Local Testing Quick Sign-in */}
+          {isLocalDev && (
+            <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px dashed #CBD5E1' }}>
+              <button
+                type="button"
+                onClick={handleQuickDemoSignIn}
+                disabled={!!oauthLoading}
+                style={{
+                  width: '100%',
+                  background: '#FEF3C7',
+                  border: '1px solid #FCD34D',
+                  color: '#92400E',
+                  padding: '10px 14px',
+                  borderRadius: '12px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                {oauthLoading === 'demo' ? (
+                  <Loader2 className="animate-spin" size={16} />
+                ) : (
+                  <Zap size={16} color="#D97706" />
+                )}
+                <span>⚡ 1-Tap Dev Sign-In (Local Testing)</span>
+              </button>
+            </div>
+          )}
         </>
       )}
 
