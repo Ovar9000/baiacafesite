@@ -1,0 +1,690 @@
+/* ==========================================================================
+   BAIA CAFÉ — DIGITAL LOYALTY CARD & ADMIN DESIGN SYSTEM
+   ========================================================================== */
+
+:root {
+  --loyalty-navy: #16255C;
+  --loyalty-navy-card: #1E293B;
+  --loyalty-navy-deep: #0F172A;
+  --loyalty-sand: #FAF4EB;
+  --loyalty-sand-card: #FFFFFF;
+  --loyalty-cream: #F5E9D6;
+  --loyalty-orange: #FB923C;
+  --loyalty-orange-dark: #EA580C;
+  --loyalty-gold: #F5A623;
+  --loyalty-blue: #1E4AFF;
+  --loyalty-text-dark: #0F172A;
+  --loyalty-text-muted: #64748B;
+  --loyalty-border: #E2E8F0;
+  --loyalty-radius-sm: 8px;
+  --loyalty-radius-md: 16px;
+  --loyalty-radius-lg: 24px;
+  --loyalty-radius-full: 9999px;
+  --loyalty-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --loyalty-shadow-lg: 0 20px 30px -10px rgba(15, 23, 42, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--loyalty-sand);
+  color: var(--loyalty-text-dark);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.loyalty-app-wrapper {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--loyalty-sand);
+  position: relative;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.05);
+}
+
+/* Header */
+.loyalty-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.loyalty-logo-lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--loyalty-navy);
+}
+
+.loyalty-logo-img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.loyalty-logo-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+  color: var(--loyalty-navy);
+}
+
+.loyalty-logo-sub {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--loyalty-orange-dark);
+  text-transform: uppercase;
+}
+
+/* Main Container */
+.loyalty-content {
+  flex: 1;
+  padding: 20px 16px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Hero Digital Card */
+.digital-card {
+  background: linear-gradient(135deg, #16255C 0%, #1E293B 100%);
+  border-radius: var(--loyalty-radius-lg);
+  padding: 24px 20px;
+  color: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--loyalty-shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.digital-card::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.25) 0%, rgba(251, 146, 60, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.card-holder-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 2px;
+}
+
+.card-member-since {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.card-tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(251, 146, 60, 0.2);
+  border: 1px solid rgba(251, 146, 60, 0.5);
+  color: #FB923C;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--loyalty-radius-full);
+}
+
+/* 10-Stamp Visual Grid */
+.stamp-grid-container {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--loyalty-radius-md);
+  padding: 16px 12px;
+  margin-bottom: 16px;
+}
+
+.stamp-grid-title {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.stamp-grid-slots {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.stamp-slot {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.stamp-slot.empty {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px dashed rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.stamp-slot.filled {
+  background: linear-gradient(135deg, #FB923C 0%, #EA580C 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4);
+  border: 2px solid #FFE699;
+  transform: scale(1.04);
+}
+
+.stamp-slot.filled svg {
+  width: 20px;
+  height: 20px;
+}
+
+.stamp-slot.milestone-target {
+  border-color: #F5A623;
+  box-shadow: 0 0 10px rgba(245, 166, 35, 0.4);
+}
+
+.card-stats-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.85rem;
+}
+
+.stat-lifetime-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stat-lifetime-value {
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  color: #FFE699;
+  font-size: 1.1rem;
+}
+
+/* Active Reward Banner */
+.reward-banner-card {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border: 2px solid #FCD34D;
+  border-radius: var(--loyalty-radius-md);
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 8px 20px rgba(251, 191, 36, 0.2);
+  animation: pulse-glow 2.5s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2); }
+  50% { box-shadow: 0 8px 25px rgba(251, 191, 36, 0.45); }
+}
+
+.reward-banner-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reward-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #F59E0B;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.reward-banner-texts h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #78350F;
+}
+
+.reward-banner-texts p {
+  font-size: 0.8rem;
+  color: #92400E;
+}
+
+.btn-redeem-trigger {
+  width: 100%;
+  background: #16255C;
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 18px;
+  border-radius: var(--loyalty-radius-full);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn-redeem-trigger:hover {
+  background: #1E4AFF;
+}
+
+.btn-redeem-trigger:active {
+  transform: scale(0.98);
+}
+
+/* Info Cards & Roadmap */
+.loyalty-section-card {
+  background: #FFFFFF;
+  border-radius: var(--loyalty-radius-md);
+  padding: 20px 18px;
+  border: 1px solid var(--loyalty-border);
+  box-shadow: var(--loyalty-shadow);
+}
+
+.section-card-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--loyalty-navy);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.milestone-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.milestone-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.milestone-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.milestone-stamp-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #EFF6FF;
+  color: var(--loyalty-blue);
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.milestone-info h5 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--loyalty-text-dark);
+}
+
+.milestone-info p {
+  font-size: 0.75rem;
+  color: var(--loyalty-text-muted);
+}
+
+/* Auth Modal / Box */
+.auth-card {
+  background: #FFFFFF;
+  border-radius: var(--loyalty-radius-lg);
+  padding: 28px 22px;
+  border: 1px solid var(--loyalty-border);
+  box-shadow: var(--loyalty-shadow-lg);
+  text-align: center;
+}
+
+.auth-header-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #EFF6FF;
+  color: var(--loyalty-blue);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.auth-card h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--loyalty-navy);
+  margin-bottom: 8px;
+}
+
+.auth-card p {
+  font-size: 0.88rem;
+  color: var(--loyalty-text-muted);
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+
+.oauth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.btn-oauth {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--loyalty-radius-md);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--loyalty-border);
+  background: #FFFFFF;
+  color: var(--loyalty-text-dark);
+  transition: all 0.2s ease;
+}
+
+.btn-oauth:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.btn-oauth.google {
+  border-color: #E2E8F0;
+}
+
+.btn-oauth.facebook {
+  background: #1877F2;
+  color: #FFFFFF;
+  border-color: #1877F2;
+}
+
+.btn-oauth.facebook:hover {
+  background: #1464CC;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  color: #94A3B8;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #E2E8F0;
+}
+
+.email-otp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-email {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--loyalty-radius-md);
+  border: 1px solid var(--loyalty-border);
+  font-size: 0.95rem;
+  outline: none;
+  font-family: inherit;
+}
+
+.input-email:focus {
+  border-color: var(--loyalty-blue);
+  box-shadow: 0 0 0 3px rgba(30, 74, 255, 0.15);
+}
+
+.btn-submit-otp {
+  background: var(--loyalty-navy);
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 16px;
+  border-radius: var(--loyalty-radius-md);
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.btn-submit-otp:hover {
+  background: var(--loyalty-blue);
+}
+
+/* 2-Minute Redemption Animated Screen */
+.countdown-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.countdown-modal {
+  background: #FFFFFF;
+  border-radius: var(--loyalty-radius-lg);
+  width: 100%;
+  max-width: 400px;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+  animation: modal-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal-enter {
+  from { transform: scale(0.9) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.timer-circle-box {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-circle-svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.timer-circle-bg {
+  fill: none;
+  stroke: #F1F5F9;
+  stroke-width: 8;
+}
+
+.timer-circle-progress {
+  fill: none;
+  stroke: var(--loyalty-orange);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.timer-text-inner {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timer-seconds {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--loyalty-navy);
+  line-height: 1;
+}
+
+.timer-sublabel {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: var(--loyalty-text-muted);
+  letter-spacing: 0.5px;
+}
+
+.countdown-security-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+  padding: 6px 14px;
+  border-radius: var(--loyalty-radius-full);
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* Printable Standee Styles */
+.standee-print-card {
+  background: #FFFFFF;
+  border: 3px solid #16255C;
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: center;
+  max-width: 440px;
+  margin: 0 auto;
+  box-shadow: var(--loyalty-shadow-lg);
+}
+
+.standee-header-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  margin-bottom: 12px;
+}
+
+.standee-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #16255C;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.standee-subtitle {
+  font-size: 0.95rem;
+  color: #EA580C;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+
+.standee-qr-frame {
+  background: #FAF4EB;
+  border: 2px dashed #16255C;
+  border-radius: 16px;
+  padding: 20px;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.standee-date-pill {
+  background: #16255C;
+  color: #FFFFFF;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.standee-instructions {
+  font-size: 0.85rem;
+  color: #475569;
+  line-height: 1.4;
+}
+
+@media print {
+  body {
+    background: #FFFFFF !important;
+  }
+  .no-print,
+  .loyalty-header,
+  .admin-controls-card {
+    display: none !important;
+  }
+  .standee-print-card {
+    border: 3px solid #000000 !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    page-break-inside: avoid;
+  }
+}
