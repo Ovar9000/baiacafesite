@@ -291,8 +291,26 @@ export default function CardApp() {
                 </div>
               </div>
 
-              <div className="card-stats-bottom">
-                <span className="stat-lifetime-label">Lifetime Stamps Earned:</span>
+              {/* Progress to Next Reward */}
+              <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.12)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '6px', color: 'rgba(255, 255, 255, 0.85)' }}>
+                  <span>Next Reward: <strong>{loyaltyStatus.upcomingMilestoneType === 'coffee' ? 'Free Coffee ☕' : 'Free Tote Bag 🛍️'}</strong></span>
+                  <span style={{ color: '#FFE699', fontWeight: 700 }}>{loyaltyStatus.stampsUntilNextMilestone} drinks left</span>
+                </div>
+                <div style={{ height: '6px', background: 'rgba(255, 255, 255, 0.15)', borderRadius: '9999px', overflow: 'hidden' }}>
+                  <div 
+                    style={{ 
+                      height: '100%', 
+                      background: 'linear-gradient(90deg, #FB923C, #F5A623)', 
+                      width: `${(loyaltyStatus.currentCycleProgress / 10) * 100}%`,
+                      transition: 'width 0.4s ease'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="card-stats-bottom" style={{ marginTop: '12px', paddingTop: '10px' }}>
+                <span className="stat-lifetime-label">Lifetime Stamps:</span>
                 <span className="stat-lifetime-value">{loyaltyStatus.totalStamps} ☕</span>
               </div>
             </div>
@@ -305,7 +323,7 @@ export default function CardApp() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 background: '#FFFFFF',
-                border: '1px solid #CBD5E1',
+                border: '1.5px solid #E2E8F0',
                 padding: '14px 18px',
                 borderRadius: '16px',
                 textDecoration: 'none',
@@ -318,104 +336,49 @@ export default function CardApp() {
                   <QrCode size={22} />
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>At the Pickup Bar?</div>
+                  <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>At the Drink Pickup Bar?</div>
                   <div style={{ fontSize: '0.78rem', color: '#64748B' }}>Scan daily standee to collect today’s stamp</div>
                 </div>
               </div>
               <ChevronRight size={18} color="#94A3B8" />
             </a>
 
-            {/* 3. Milestone Rewards Roadmap */}
-            <div className="loyalty-section-card">
-              <div className="section-card-title">
-                <Award size={20} color="#FB923C" />
-                <span>Rewards Roadmap</span>
-              </div>
-
-              <div style={{ marginBottom: '14px', background: '#FAF4EB', padding: '12px', borderRadius: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', fontWeight: 600 }}>
-                  <span style={{ color: '#16255C' }}>Next Reward Goal:</span>
-                  <span style={{ color: '#EA580C' }}>{loyaltyStatus.stampsUntilNextMilestone} drinks away</span>
-                </div>
-                <div style={{ height: '8px', background: '#E2E8F0', borderRadius: '9999px', overflow: 'hidden' }}>
-                  <div 
-                    style={{ 
-                      height: '100%', 
-                      background: 'linear-gradient(90deg, #FB923C, #EA580C)', 
-                      width: `${(loyaltyStatus.currentCycleProgress / 10) * 100}%`,
-                      transition: 'width 0.4s ease'
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="milestone-item">
-                  <div className="milestone-left">
-                    <div className="milestone-stamp-circle">10</div>
-                    <div className="milestone-info">
-                      <h5>Free Classic / Signature Coffee</h5>
-                      <p>Milestone 10, 30, 50, 70...</p>
-                    </div>
-                  </div>
-                  {loyaltyStatus.totalStamps >= 10 ? <CheckCircle2 size={18} color="#16A34A" /> : <Coffee size={18} color="#94A3B8" />}
-                </div>
-
-                <div className="milestone-item">
-                  <div className="milestone-left">
-                    <div className="milestone-stamp-circle" style={{ background: '#FEF3C7', color: '#D97706' }}>20</div>
-                    <div className="milestone-info">
-                      <h5>Free Limited Edition Tote Bag</h5>
-                      <p>Milestone 20, 40, 60, 80...</p>
-                    </div>
-                  </div>
-                  {loyaltyStatus.totalStamps >= 20 ? <CheckCircle2 size={18} color="#16A34A" /> : <ShoppingBag size={18} color="#94A3B8" />}
-                </div>
-              </div>
+            {/* 3. Compact Reward Guide & Activity History */}
+            <div style={{ textAlign: 'center', padding: '10px 0', fontSize: '0.78rem', color: '#64748B' }}>
+              <p style={{ marginBottom: '4px' }}>
+                ✨ <strong>10 Stamps</strong> = Free Coffee &bull; <strong>20 Stamps</strong> = Free Tote Bag
+              </p>
+              <p style={{ fontSize: '0.72rem', color: '#94A3B8' }}>
+                1 stamp per qualifying drink &bull; Max 1 stamp per day
+              </p>
             </div>
 
-            {/* 4. Stamp History */}
-            <div className="loyalty-section-card">
-              <div className="section-card-title">
-                <History size={18} color="#1E4AFF" />
-                <span>Recent Activity</span>
-              </div>
-
-              {stamps.length === 0 ? (
-                <p style={{ fontSize: '0.82rem', color: '#94A3B8', textAlign: 'center', padding: '12px 0' }}>
-                  No stamps recorded yet. Scan the pickup bar QR code when ordering!
-                </p>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {stamps.slice(0, 5).map((stamp) => (
+            {stamps.length > 0 && (
+              <div className="loyalty-section-card" style={{ padding: '14px 16px' }}>
+                <div className="section-card-title" style={{ fontSize: '0.9rem', marginBottom: '8px' }}>
+                  <History size={16} color="#1E4AFF" />
+                  <span>Recent Stamp Activity ({stamps.length})</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {stamps.slice(0, 3).map((stamp) => (
                     <div 
                       key={stamp.id}
                       style={{
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        padding: '8px 0',
+                        padding: '6px 0',
                         borderBottom: '1px solid #F1F5F9',
-                        fontSize: '0.82rem'
+                        fontSize: '0.78rem'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ padding: '6px', background: '#EFF6FF', borderRadius: '8px', color: '#1E4AFF' }}>
-                          <Coffee size={14} />
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: 600, color: '#0F172A' }}>+1 Drink Stamp</div>
-                          <div style={{ fontSize: '0.72rem', color: '#94A3B8' }}>{formatManilaDateTime(stamp.awarded_at)}</div>
-                        </div>
-                      </div>
-                      <span style={{ fontSize: '0.75rem', color: '#16A34A', fontWeight: 600, background: '#DCFCE7', padding: '2px 8px', borderRadius: '9999px' }}>
-                        Verified
-                      </span>
+                      <span style={{ color: '#334155' }}>+1 Drink Stamp</span>
+                      <span style={{ color: '#94A3B8', fontSize: '0.72rem' }}>{formatManilaDateTime(stamp.awarded_at)}</span>
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </>
         )}
       </main>
