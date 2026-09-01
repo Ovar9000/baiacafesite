@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabaseClient';
-import { calculateLoyaltyStatus } from '../lib/loyaltyHelpers';
+import { calculateLoyaltyStatus, formatManilaDateTime } from '../lib/loyaltyHelpers';
 import AuthModal from '../components/AuthModal';
 import RedemptionCountdown from '../components/RedemptionCountdown';
 import QrScanner from '../components/QrScanner';
@@ -18,7 +18,10 @@ import {
   ShieldCheck,
   Flame,
   AlertCircle,
-  ExternalLink
+  Trophy,
+  X,
+  Calendar,
+  Layers
 } from 'lucide-react';
 import '../styles/loyalty.css';
 
@@ -36,6 +39,9 @@ export default function CardApp() {
   const [showScannerModal, setShowScannerModal] = useState(false);
   const [scannerStatusMsg, setScannerStatusMsg] = useState('');
   const [scannerErrorMsg, setScannerErrorMsg] = useState('');
+
+  // Stamp Card Collection Showcase Archive Modal
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
 
   // Fetch session on load
   useEffect(() => {
@@ -227,6 +233,25 @@ export default function CardApp() {
   const isCompletedCard = loyaltyStatus.hasPendingReward;
   const displayProgress = isCompletedCard ? 10 : loyaltyStatus.currentCycleProgress;
 
+  // Group historical stamps into completed cycle cards
+  const numCompletedCycles = Math.floor(stamps.length / 10);
+  const sortedAscStamps = [...stamps].sort((a, b) => new Date(a.awarded_at) - new Date(b.awarded_at));
+
+  const completedCycleCards = [];
+  for (let c = 1; c <= numCompletedCycles; c++) {
+    const cycle10Stamps = sortedAscStamps.slice((c - 1) * 10, c * 10);
+    const finishDate = cycle10Stamps[9]?.awarded_at;
+    const rewardType = (c % 2 !== 0) ? 'coffee' : 'totebag';
+
+    completedCycleCards.push({
+      cycleNumber: c,
+      finishDate: finishDate ? formatManilaDateTime(finishDate) : 'Completed',
+      rewardType,
+      rewardTitle: rewardType === 'coffee' ? 'Free Specialty Coffee ☕' : 'Custom Shoreline Tote Bag 🛍️',
+      stamps: cycle10Stamps
+    });
+  }
+
   if (loading) {
     return (
       <div className="loyalty-app-wrapper" style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -346,10 +371,27 @@ export default function CardApp() {
                     {user.email}
                   </div>
                 </div>
-                <div className="card-tier-badge">
-                  <Flame size={13} />
+                
+                {/* Interactive Cycle Badge (Tapping reveals completed stamp cards archive) */}
+                <button
+                  type="button"
+                  onClick={() => setShowArchiveModal(true)}
+                  className="card-tier-badge"
+                  style={{
+                    cursor: 'pointer',
+                    background: 'rgba(255, 255, 255, 0.18)',
+                    border: '1px solid rgba(255, 255, 255, 0.35)',
+                    color: '#FFE699',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}
+                  title="View Completed Card Collection"
+                >
+                  <Flame size={13} color="#FB923C" />
                   <span>Cycle {loyaltyStatus.milestoneNumber + 1}</span>
-                </div>
+                  <Sparkles size={11} style={{ opacity: 0.8 }} />
+                </button>
               </div>
 
               {/* 10-Stamp Visual Grid */}
@@ -448,7 +490,7 @@ export default function CardApp() {
               <ChevronRight size={18} color="#94A3B8" />
             </button>
 
-            {/* 4. Featured Specialty Coffee Spotlight (Replaces Cluttered History List) */}
+            {/* 4. Featured Specialty Coffee Spotlight */}
             <div style={{
               background: '#FFFFFF',
               border: '1.5px solid #E2E8F0',
@@ -662,6 +704,159 @@ export default function CardApp() {
           </div>
         )}
       </main>
+
+      {/* Stamp Card Collection Showcase Archive Modal */}
+      {showArchiveModal && (
+        <div className="archive-modal-overlay">
+          <div className="archive-modal-card">
+            <div className="archive-modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ padding: '8px', background: '#FEF3C7', color: '#D97706', borderRadius: '12px' }}>
+                  <Trophy size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--loyalty-navy)', fontWeight: 800, fontFamily: 'Space Grotesk, sans-serif' }}>
+                    Shore Club Collection
+                  </h3>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>
+                    Your completed coffee journeys with BAIA
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowArchiveModal(false)}
+                style={{
+                  background: '#F1F5F9',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#475569'
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="archive-modal-body">
+              {/* Summary Trophy Ribbon */}
+              <div style={{
+                background: '#FFFFFF',
+                border: '1px solid #E2E8F0',
+                borderRadius: '16px',
+                padding: '14px 16px',
+                display: 'flex',
+                justifyContent: 'space-around',
+                textAlign: 'center'
+              }}>
+                <div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--loyalty-navy)', fontFamily: 'Space Grotesk, sans-serif' }}>
+                    {loyaltyStatus.totalStamps} ☕
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Lifetime Drinks</div>
+                </div>
+                <div style={{ width: '1px', background: '#E2E8F0' }} />
+                <div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#D97706', fontFamily: 'Space Grotesk, sans-serif' }}>
+                    {numCompletedCycles} 🏆
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Completed Cards</div>
+                </div>
+              </div>
+
+              {/* Completed Cards List */}
+              {completedCycleCards.length > 0 ? (
+                completedCycleCards.map((card) => (
+                  <div key={card.cycleNumber} className="archive-item-card">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Award size={16} color="#F5A623" />
+                        <span style={{ fontWeight: 800, fontSize: '0.88rem', color: '#FFE699', letterSpacing: '0.5px' }}>
+                          CYCLE #{card.cycleNumber} COMPLETED
+                        </span>
+                      </div>
+                      <span style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.75)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Calendar size={12} />
+                        <span>{card.finishDate}</span>
+                      </span>
+                    </div>
+
+                    {/* Mini 10 Golden Cups Row */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '4px', marginBottom: '12px' }}>
+                      {Array.from({ length: 10 }).map((_, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            aspectRatio: 1,
+                            borderRadius: '50%',
+                            background: 'linear-gradient(135deg, #F5A623 0%, #D97706 100%)',
+                            color: '#FFF',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: '1px solid #FFE699'
+                          }}
+                        >
+                          <Coffee size={9} />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Reward Badge */}
+                    <div style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.18)',
+                      borderRadius: '10px',
+                      padding: '8px 12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}>
+                      <span style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.9)' }}>
+                        Reward Unlocked:
+                      </span>
+                      <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#FFE699' }}>
+                        {card.rewardTitle}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div style={{ textAlign: 'center', padding: '24px 16px', background: '#FFFFFF', borderRadius: '18px', border: '1px dashed #CBD5E1' }}>
+                  <Coffee size={32} color="#94A3B8" style={{ margin: '0 auto 10px' }} />
+                  <h4 style={{ color: 'var(--loyalty-navy)', fontSize: '0.95rem', marginBottom: '4px' }}>
+                    First Card In Progress!
+                  </h4>
+                  <p style={{ fontSize: '0.78rem', color: '#64748B', maxWidth: '260px', margin: '0 auto' }}>
+                    Collect 10 stamps on your active card to add your first completed card to this showcase archive.
+                  </p>
+                </div>
+              )}
+
+              {/* Current Active Cycle Preview */}
+              <div className="archive-item-card current">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontWeight: 700, fontSize: '0.82rem', color: '#CBD5E1' }}>
+                    CURRENT CYCLE #{loyaltyStatus.milestoneNumber + 1}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: '#FB923C', fontWeight: 700 }}>
+                    {isCompletedCard ? '10/10 Ready to Redeem' : `${loyaltyStatus.currentCycleProgress}/10 Stamps`}
+                  </span>
+                </div>
+                <div style={{ height: '5px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '9999px', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', background: '#FB923C', width: `${(displayProgress / 10) * 100}%` }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Live In-App Camera QR Scanner Modal */}
       {showScannerModal && (
