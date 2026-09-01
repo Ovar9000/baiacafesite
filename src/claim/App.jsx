@@ -16,6 +16,7 @@ import {
   KeyRound
 } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
+import QrScanner from '../components/QrScanner';
 import '../styles/loyalty.css';
 
 export default function ClaimApp() {
@@ -265,33 +266,21 @@ export default function ClaimApp() {
           </div>
         ) : (
           <div className="loyalty-section-card" style={{ textAlign: 'center', padding: '32px 20px' }}>
-            {/* Status: Idle without Token */}
+            {/* Status: Idle without Token -> Show In-App Live Camera Viewfinder */}
             {claimStatus === 'idle' && !qrToken && (
               <div>
-                <div style={{
-                  width: '64px',
-                  height: '64px',
-                  borderRadius: '50%',
-                  background: '#EFF6FF',
-                  color: '#1E4AFF',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '18px'
-                }}>
-                  <Camera size={32} />
-                </div>
-                <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--loyalty-navy)', marginBottom: '8px' }}>
-                  Scan Daily Standee QR
-                </h3>
-                <p style={{ fontSize: '0.88rem', color: 'var(--loyalty-text-muted)', maxWidth: '320px', margin: '0 auto 20px', lineHeight: '1.4' }}>
-                  Please open your <strong>Phone Camera</strong> app and scan the physical acrylic QR standee when the barista hands you your drink.
-                </p>
+                <QrScanner
+                  onScan={(scannedToken) => {
+                    setQrToken(scannedToken);
+                    sessionStorage.setItem('baia_pending_stamp_token', scannedToken);
+                    executeClaim(scannedToken, session);
+                  }}
+                />
 
-                <div style={{ background: '#FAF4EB', padding: '16px', borderRadius: '14px', border: '1px solid #E2E8F0', textAlign: 'left', marginBottom: '20px' }}>
+                <div style={{ background: '#FAF4EB', padding: '16px', borderRadius: '14px', border: '1px solid #E2E8F0', textAlign: 'left', marginTop: '20px', marginBottom: '20px' }}>
                   <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--loyalty-navy)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <KeyRound size={16} color="#FB923C" />
-                    <span>Dev & Testing Token Entry</span>
+                    <span>Or enter QR token manually:</span>
                   </div>
                   <form onSubmit={handleManualClaimSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <input
