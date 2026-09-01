@@ -192,8 +192,18 @@ export default function CardApp() {
       setScannerStatusMsg('Verifying QR token...');
 
       if (user?.id === 'baia-demo-user-001') {
+        const demoStamps = JSON.parse(localStorage.getItem('baia_demo_stamps') || '[]');
+        const todayStr = new Date().toDateString();
+        const alreadyClaimedToday = demoStamps.some(
+          (s) => new Date(s.awarded_at).toDateString() === todayStr
+        );
+
+        if (alreadyClaimedToday) {
+          setScannerErrorMsg('You have already collected your coffee stamp for today! (1 stamp per day limit).');
+          return;
+        }
+
         setTimeout(() => {
-          const demoStamps = JSON.parse(localStorage.getItem('baia_demo_stamps') || '[]');
           const newStamp = {
             id: Date.now(),
             user_id: 'baia-demo-user-001',
@@ -523,6 +533,123 @@ export default function CardApp() {
                 <span>Geofenced & verified at Baia Café, Masbate</span>
               </div>
             </div>
+
+            {/* Dev Testing Simulation Controls */}
+            {user?.id === 'baia-demo-user-001' && (
+              <div style={{
+                background: '#FEF3C7',
+                border: '1px dashed #F59E0B',
+                borderRadius: '16px',
+                padding: '14px',
+                textAlign: 'center',
+                marginTop: '10px'
+              }}>
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#92400E', marginBottom: '8px' }}>
+                  🛠️ Dev Testing Simulation Controls
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = JSON.parse(localStorage.getItem('baia_demo_stamps') || '[]');
+                      current.unshift({
+                        id: Date.now(),
+                        user_id: 'baia-demo-user-001',
+                        awarded_at: new Date(Date.now() - (current.length + 1) * 86400000).toISOString(),
+                        staff_note: `Drink #${current.length + 1}`
+                      });
+                      localStorage.setItem('baia_demo_stamps', JSON.stringify(current));
+                      loadLoyaltyData();
+                    }}
+                    style={{
+                      background: '#92400E',
+                      color: '#FFF',
+                      border: 'none',
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    +1 Stamp (Past Day)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const fake10 = Array.from({ length: 10 }).map((_, i) => ({
+                        id: Date.now() + i,
+                        user_id: 'baia-demo-user-001',
+                        awarded_at: new Date(Date.now() - (10 - i) * 86400000).toISOString(),
+                        staff_note: `Specialty Coffee #${i + 1}`
+                      }));
+                      localStorage.setItem('baia_demo_stamps', JSON.stringify(fake10));
+                      loadLoyaltyData();
+                    }}
+                    style={{
+                      background: '#D97706',
+                      color: '#FFF',
+                      border: 'none',
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Fill 10 Stamps (Free Coffee)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const fake20 = Array.from({ length: 20 }).map((_, i) => ({
+                        id: Date.now() + i,
+                        user_id: 'baia-demo-user-001',
+                        awarded_at: new Date(Date.now() - (20 - i) * 86400000).toISOString(),
+                        staff_note: `Specialty Drink #${i + 1}`
+                      }));
+                      localStorage.setItem('baia_demo_stamps', JSON.stringify(fake20));
+                      loadLoyaltyData();
+                    }}
+                    style={{
+                      background: '#B45309',
+                      color: '#FFF',
+                      border: 'none',
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Fill 20 Stamps (Free Tote)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      localStorage.removeItem('baia_demo_stamps');
+                      localStorage.removeItem('baia_demo_redemptions');
+                      loadLoyaltyData();
+                    }}
+                    style={{
+                      background: '#F1F5F9',
+                      color: '#475569',
+                      border: '1px solid #CBD5E1',
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Reset Card
+                  </button>
+                </div>
+              </div>
+            )}
 
           </div>
         )}
