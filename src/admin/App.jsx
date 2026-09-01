@@ -111,36 +111,75 @@ export default function AdminApp() {
   return (
     <div className="loyalty-app-wrapper" style={{ maxWidth: '640px' }}>
       {/* Header */}
-      <header className="loyalty-header no-print">
+      <header className="loyalty-header no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <a href="/" className="loyalty-logo-lockup">
           <img src="/images/Logo.webp" alt="BAIA Cafe Logo" className="loyalty-logo-img" />
           <div>
             <div className="loyalty-logo-title">BAIA CAFÉ</div>
-            <div className="loyalty-logo-sub">BARISTA & ADMIN PORTAL</div>
+            <div className="loyalty-logo-sub">BARISTA &amp; ADMIN PORTAL</div>
           </div>
         </a>
 
-        {isAuthenticated && (
-          <button 
-            onClick={() => {
-              sessionStorage.removeItem('baia_admin_pass');
-              setIsAuthenticated(false);
-              setPassword('');
-            }}
+        {/* Top Navigation Tabs */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div
             style={{
-              background: '#F1F5F9',
-              border: 'none',
-              padding: '6px 12px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 14px',
               borderRadius: '9999px',
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              color: '#475569',
-              cursor: 'pointer'
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              color: '#FFFFFF',
+              background: '#16255C'
             }}
           >
-            Lock Portal
-          </button>
-        )}
+            <QrCode size={14} />
+            <span>Daily Standee QR</span>
+          </div>
+
+          <a
+            href="/admin/rewards/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              textDecoration: 'none',
+              color: '#64748B',
+              background: '#F1F5F9'
+            }}
+          >
+            <span>Rewards Roster</span>
+            <ChevronRight size={14} />
+          </a>
+
+          {isAuthenticated && (
+            <button 
+              onClick={() => {
+                sessionStorage.removeItem('baia_admin_pass');
+                setIsAuthenticated(false);
+                setPassword('');
+              }}
+              style={{
+                background: '#F1F5F9',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: '9999px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                color: '#475569',
+                cursor: 'pointer'
+              }}
+            >
+              Lock
+            </button>
+          )}
+        </div>
       </header>
 
       <main className="loyalty-content">
