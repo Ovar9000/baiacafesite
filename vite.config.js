@@ -9,6 +9,16 @@ function devApiPlugin() {
   return {
     name: 'baia-dev-api-router',
     configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const parsedUrl = url.parse(req.url, true);
+        const pathname = parsedUrl.pathname;
+        const multiPages = ['/claim', '/card', '/admin', '/menu', '/location', '/floating-cottage'];
+        if (multiPages.includes(pathname)) {
+          req.url = `${pathname}/` + (parsedUrl.search || '') + (parsedUrl.hash || '');
+        }
+        next();
+      });
+
       server.middlewares.use(async (req, res, next) => {
         const parsedUrl = url.parse(req.url, true);
         const pathname = parsedUrl.pathname;
