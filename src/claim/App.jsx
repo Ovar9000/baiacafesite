@@ -10,7 +10,10 @@ import {
   Loader2, 
   ArrowRight, 
   RefreshCw,
-  Gift
+  Gift,
+  QrCode,
+  Camera,
+  KeyRound
 } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
 import '../styles/loyalty.css';
@@ -24,6 +27,7 @@ export default function ClaimApp() {
   const [errorDetails, setErrorDetails] = useState(null);
   const [claimResult, setClaimResult] = useState(null);
   const [qrToken, setQrToken] = useState('');
+  const [manualInputToken, setManualInputToken] = useState('');
 
   // Extract token from URL or sessionStorage
   useEffect(() => {
@@ -161,6 +165,14 @@ export default function ClaimApp() {
     }
   }, [loading, user, qrToken, claimStatus, session, executeClaim]);
 
+  const handleManualClaimSubmit = (e) => {
+    e.preventDefault();
+    if (!manualInputToken.trim()) return;
+    setQrToken(manualInputToken.trim());
+    sessionStorage.setItem('baia_pending_stamp_token', manualInputToken.trim());
+    executeClaim(manualInputToken.trim(), session);
+  };
+
   if (loading) {
     return (
       <div className="loyalty-app-wrapper" style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -203,6 +215,67 @@ export default function ClaimApp() {
           </div>
         ) : (
           <div className="loyalty-section-card" style={{ textAlign: 'center', padding: '32px 20px' }}>
+            {/* Status: Idle without Token */}
+            {claimStatus === 'idle' && !qrToken && (
+              <div>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  background: '#EFF6FF',
+                  color: '#1E4AFF',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '18px'
+                }}>
+                  <Camera size={32} />
+                </div>
+                <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--loyalty-navy)', marginBottom: '8px' }}>
+                  Scan Daily Standee QR
+                </h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--loyalty-text-muted)', maxWidth: '320px', margin: '0 auto 20px', lineHeight: '1.4' }}>
+                  Please open your <strong>Phone Camera</strong> app and scan the physical acrylic QR standee when the barista hands you your drink.
+                </p>
+
+                <div style={{ background: '#FAF4EB', padding: '16px', borderRadius: '14px', border: '1px solid #E2E8F0', textAlign: 'left', marginBottom: '20px' }}>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--loyalty-navy)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <KeyRound size={16} color="#FB923C" />
+                    <span>Dev & Testing Token Entry</span>
+                  </div>
+                  <form onSubmit={handleManualClaimSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <input
+                      type="text"
+                      placeholder="Paste daily QR token here"
+                      className="input-email"
+                      value={manualInputToken}
+                      onChange={(e) => setManualInputToken(e.target.value)}
+                      style={{ fontSize: '0.82rem' }}
+                    />
+                    <button type="submit" className="btn-submit-otp" style={{ padding: '10px' }}>
+                      Verify & Claim Stamp →
+                    </button>
+                  </form>
+                </div>
+
+                <a
+                  href="/card"
+                  style={{
+                    background: '#F1F5F9',
+                    color: '#475569',
+                    textDecoration: 'none',
+                    padding: '12px 20px',
+                    borderRadius: '9999px',
+                    fontWeight: 600,
+                    fontSize: '0.88rem',
+                    display: 'inline-block'
+                  }}
+                >
+                  Return to Digital Card
+                </a>
+              </div>
+            )}
+
             {/* Status: Locating / Claiming */}
             {(claimStatus === 'locating' || claimStatus === 'claiming') && (
               <div>
