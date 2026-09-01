@@ -366,7 +366,7 @@ export default function CardApp() {
 
             {/* 2. Scan QR Quick Action */}
             <a 
-              href="/claim" 
+              href="/claim/" 
               style={{
                 display: 'flex',
                 alignItems: 'center',
