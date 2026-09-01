@@ -12,7 +12,7 @@ function devApiPlugin() {
       server.middlewares.use((req, res, next) => {
         const parsedUrl = url.parse(req.url, true);
         const pathname = parsedUrl.pathname;
-        const multiPages = ['/claim', '/card', '/admin', '/admin/rewards', '/menu', '/location', '/floating-cottage'];
+        const multiPages = ['/claim', '/card', '/admin', '/admin/rewards', '/privacy', '/terms', '/menu', '/location', '/floating-cottage'];
         if (multiPages.includes(pathname)) {
           req.url = `${pathname}/` + (parsedUrl.search || '') + (parsedUrl.hash || '');
         }
@@ -131,7 +131,9 @@ export default defineConfig({
         card: resolve(__dirname, 'card/index.html'),
         claim: resolve(__dirname, 'claim/index.html'),
         admin: resolve(__dirname, 'admin/index.html'),
-        adminRewards: resolve(__dirname, 'admin/rewards/index.html')
+        adminRewards: resolve(__dirname, 'admin/rewards/index.html'),
+        privacy: resolve(__dirname, 'privacy/index.html'),
+        terms: resolve(__dirname, 'terms/index.html')
       }
     }
   },
