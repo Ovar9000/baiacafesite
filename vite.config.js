@@ -41,8 +41,6 @@ function devApiPlugin() {
             handlerModule = await import('./api/admin-manual-stamp.js');
           } else if (endpoint === 'admin-rewards') {
             handlerModule = await import('./api/admin-rewards.js');
-          } else if (endpoint === 'dev-login') {
-            handlerModule = await import('./api/dev-login.js');
           } else {
             return next();
           }
@@ -102,7 +100,7 @@ export default defineConfig({
       manifest: {
         name: 'Baia Café — Digital Loyalty Card',
         short_name: 'Baia Loyalty',
-        description: 'Collect daily coffee stamps and unlock free drinks & tote bags at Baia Café.',
+        description: 'Collect daily coffee stamps and unlock free drinks at Baia Café.',
         theme_color: '#16255C',
         background_color: '#FAF4EB',
         display: 'standalone',
