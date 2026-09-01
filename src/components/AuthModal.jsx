@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Mail, Sparkles, AlertCircle, CheckCircle, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Mail, Sparkles, AlertCircle, CheckCircle, ArrowRight, ShieldCheck, KeyRound, RefreshCw, ExternalLink } from 'lucide-react';
 
 export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty Card", subtitle = "Earn free drinks and tote bags with every coffee order." }) {
   const [email, setEmail] = useState('');
   const [otpCode, setOtpCode] = useState('');
-  const [step, setStep] = useState('input-email'); // 'input-email' | 'input-otp'
+  const [step, setStep] = useState('input-email'); // 'input-email' | 'check-email' | 'input-otp'
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [infoMsg, setInfoMsg] = useState('');
@@ -31,8 +31,8 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
     }
   };
 
-  const handleSendOtp = async (e) => {
-    e.preventDefault();
+  const handleSendEmailLink = async (e) => {
+    if (e) e.preventDefault();
     if (!email || !email.includes('@')) {
       setErrorMsg('Please enter a valid email address.');
       return;
@@ -52,10 +52,9 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
         }
       });
       if (error) throw error;
-      setStep('input-otp');
-      setInfoMsg(`Login email sent to ${email}! Enter the 6-digit code below or click the link in your email.`);
+      setStep('check-email');
     } catch (err) {
-      setErrorMsg(err.message || 'Failed to send OTP code.');
+      setErrorMsg(err.message || 'Failed to send login email.');
     } finally {
       setLoading(false);
     }
@@ -80,7 +79,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
         if (onSuccess) onSuccess(data.session);
       }
     } catch (err) {
-      setErrorMsg(err.message || 'Invalid or expired OTP code. Please try again.');
+      setErrorMsg(err.message || 'Invalid or expired code. Please tap the link in your email instead.');
     } finally {
       setLoading(false);
     }
@@ -89,10 +88,14 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
   return (
     <div className="auth-card">
       <div className="auth-header-icon">
-        <Sparkles size={28} />
+        {step === 'check-email' ? <Mail size={28} /> : <Sparkles size={28} />}
       </div>
-      <h3>{title}</h3>
-      <p>{subtitle}</p>
+      <h3>{step === 'check-email' ? 'Check Your Inbox' : title}</h3>
+      <p>
+        {step === 'check-email'
+          ? `We sent a direct sign-in link to ${email}.`
+          : subtitle}
+      </p>
 
       {errorMsg && (
         <div style={{
@@ -113,26 +116,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
         </div>
       )}
 
-      {infoMsg && (
-        <div style={{
-          background: '#F0FDF4',
-          border: '1px solid #86EFAC',
-          color: '#15803D',
-          borderRadius: '12px',
-          padding: '10px 14px',
-          fontSize: '0.85rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          marginBottom: '16px',
-          textAlign: 'left'
-        }}>
-          <CheckCircle size={18} style={{ flexShrink: 0 }} />
-          <span>{infoMsg}</span>
-        </div>
-      )}
-
-      {step === 'input-email' ? (
+      {step === 'input-email' && (
         <>
           <div className="oauth-buttons">
             <button 
@@ -165,7 +149,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
 
           <div className="auth-divider">or with email</div>
 
-          <form onSubmit={handleSendOtp} className="email-otp-form">
+          <form onSubmit={handleSendEmailLink} className="email-otp-form">
             <input
               type="email"
               placeholder="Enter your email address"
@@ -176,11 +160,84 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
               disabled={loading}
             />
             <button type="submit" className="btn-submit-otp" disabled={loading}>
-              {loading ? 'Sending code...' : 'Get 6-Digit Login Code →'}
+              {loading ? 'Sending link...' : 'Send Sign-In Link →'}
             </button>
           </form>
         </>
-      ) : (
+      )}
+
+      {step === 'check-email' && (
+        <div style={{ textAlign: 'center', padding: '6px 0' }}>
+          <div style={{
+            background: '#FAF4EB',
+            border: '1.5px dashed #FB923C',
+            borderRadius: '16px',
+            padding: '18px 14px',
+            marginBottom: '18px',
+            fontSize: '0.88rem',
+            color: '#16255C',
+            lineHeight: '1.5'
+          }}>
+            👉 Open the email from <strong>Supabase / BAIA Café</strong> and tap <strong>"Sign in"</strong> to open your digital loyalty card automatically.
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <button
+              type="button"
+              onClick={() => setStep('input-otp')}
+              style={{
+                background: '#F1F5F9',
+                border: '1px solid #CBD5E1',
+                color: '#334155',
+                padding: '10px 14px',
+                borderRadius: '9999px',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px'
+              }}
+            >
+              <KeyRound size={14} />
+              <span>Have a 6-digit code instead? Enter code &rarr;</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleSendEmailLink()}
+              disabled={loading}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#1E4AFF',
+                fontSize: '0.82rem',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              {loading ? 'Resending...' : 'Resend Email Link'}
+            </button>
+
+            <button 
+              type="button" 
+              onClick={() => { setStep('input-email'); setOtpCode(''); }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--loyalty-text-muted)',
+                fontSize: '0.82rem',
+                cursor: 'pointer'
+              }}
+            >
+              &larr; Use different email
+            </button>
+          </div>
+        </div>
+      )}
+
+      {step === 'input-otp' && (
         <form onSubmit={handleVerifyOtp} className="email-otp-form">
           <input
             type="text"
@@ -201,7 +258,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
           </button>
           <button 
             type="button" 
-            onClick={() => { setStep('input-email'); setOtpCode(''); }}
+            onClick={() => setStep('check-email')}
             style={{
               background: 'none',
               border: 'none',
@@ -211,7 +268,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
               marginTop: '6px'
             }}
           >
-            ← Use different email
+            ← Back to sign-in link instructions
           </button>
         </form>
       )}
