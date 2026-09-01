@@ -95,10 +95,21 @@ export default function ClaimApp() {
     setStatusMessage('Checking GPS location at Baia Café...');
     setErrorDetails(null);
 
-    // Handle Demo Account local testing
+    // Handle Demo Account local testing with 1-stamp-per-day enforcement
     if (currentSession?.user?.id === 'baia-demo-user-001') {
       setTimeout(() => {
         const demoStamps = JSON.parse(localStorage.getItem('baia_demo_stamps') || '[]');
+        const todayStr = new Date().toDateString();
+        const alreadyClaimedToday = demoStamps.some(
+          (s) => new Date(s.awarded_at).toDateString() === todayStr
+        );
+
+        if (alreadyClaimedToday) {
+          setClaimStatus('error');
+          setStatusMessage('You have already collected your coffee stamp today! Limit is 1 stamp per day. Come back tomorrow!');
+          return;
+        }
+
         const newStamp = {
           id: Date.now(),
           user_id: 'baia-demo-user-001',
@@ -127,7 +138,7 @@ export default function ClaimApp() {
             origin: { y: 0.5 }
           });
         } catch (e) {}
-      }, 1000);
+      }, 800);
       return;
     }
 
