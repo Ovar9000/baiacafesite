@@ -61,14 +61,10 @@ export default async function handler(req, res) {
       day: 'numeric'
     }).format(new Date());
 
-    const localIp = getLocalIpAddress();
-    const isDev = process.env.NODE_ENV !== 'production';
-
-    // In local development, encode the Wi-Fi IP so scanning with physical mobile phones reaches this machine!
-    const devUrl = `http://${localIp}:5173/claim/?t=${token}`;
+    const reqHost = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:5173';
+    const reqProto = req.headers['x-forwarded-proto'] || 'http';
+    const claimUrl = `${reqProto}://${reqHost}/claim/?t=${token}`;
     const productionUrl = `https://baia.cafe/claim/?t=${token}`;
-
-    const claimUrl = isDev ? devUrl : productionUrl;
 
     return res.status(200).json({
       success: true,
@@ -76,7 +72,6 @@ export default async function handler(req, res) {
       dateString: todayDateStr,
       formattedDate,
       claimUrl,
-      devUrl,
       productionUrl
     });
   } catch (err) {
