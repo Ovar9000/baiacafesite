@@ -694,6 +694,66 @@ body {
   margin-bottom: 20px;
 }
 
+/* Card Archive Showcase Modal */
+.archive-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.archive-modal-card {
+  background: #FAF4EB;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 28px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: modal-scale-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.archive-modal-header {
+  padding: 20px 22px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  background: #FFFFFF;
+}
+
+.archive-modal-body {
+  padding: 18px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.archive-item-card {
+  background: linear-gradient(145deg, #16255C 0%, #1c357f 60%, #0e1b48 100%);
+  border: 1.5px solid #F5A623;
+  border-radius: 18px;
+  padding: 16px;
+  color: #FFFFFF;
+  box-shadow: 0 8px 20px rgba(22, 37, 92, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.archive-item-card.current {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(145deg, #1E293B 0%, #0F172A 100%);
+}
+
 .standee-date-pill {
   background: #16255C;
   color: #FFFFFF;
