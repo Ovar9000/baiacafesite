@@ -89,9 +89,8 @@ export default async function handler(req, res) {
       const currentCycleProgress = totalStamps % 10;
       const stampsRemaining = 10 - currentCycleProgress;
 
-      const nextRewardMilestone = redemptionsCount + 1;
-      const nextRewardType = (nextRewardMilestone % 2 !== 0) ? 'coffee' : 'totebag';
-      const nextRewardTitle = nextRewardType === 'coffee' ? 'Free Specialty Coffee' : 'Custom Shoreline Tote Bag';
+      const nextRewardType = 'coffee';
+      const nextRewardTitle = 'Free Specialty Coffee';
 
       let urgency = 'active';
       if (hasPendingReward) {

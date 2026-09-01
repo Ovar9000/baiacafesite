@@ -48,30 +48,16 @@ export default function ClaimApp() {
 
   // Check auth session
   useEffect(() => {
-    const savedDemo = localStorage.getItem('baia_demo_session');
-    if (savedDemo) {
-      try {
-        const parsed = JSON.parse(savedDemo);
-        setSession(parsed);
-        setUser(parsed.user);
-        setLoading(false);
-      } catch (e) {}
-    }
-
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!localStorage.getItem('baia_demo_session')) {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!localStorage.getItem('baia_demo_session')) {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -95,56 +81,9 @@ export default function ClaimApp() {
     setStatusMessage('Checking GPS location at Baia Café...');
     setErrorDetails(null);
 
-    // Handle Demo Account local testing with 1-stamp-per-day enforcement
-    if (currentSession?.user?.id === 'baia-demo-user-001') {
-      setTimeout(() => {
-        const demoStamps = JSON.parse(localStorage.getItem('baia_demo_stamps') || '[]');
-        const todayStr = new Date().toDateString();
-        const alreadyClaimedToday = demoStamps.some(
-          (s) => new Date(s.awarded_at).toDateString() === todayStr
-        );
-
-        if (alreadyClaimedToday) {
-          setClaimStatus('error');
-          setStatusMessage('You have already collected your coffee stamp today! Limit is 1 stamp per day. Come back tomorrow!');
-          return;
-        }
-
-        const newStamp = {
-          id: Date.now(),
-          user_id: 'baia-demo-user-001',
-          awarded_at: new Date().toISOString(),
-          distance_meters: 12,
-          staff_note: 'Demo QR Scan'
-        };
-        demoStamps.unshift(newStamp);
-        localStorage.setItem('baia_demo_stamps', JSON.stringify(demoStamps));
-        sessionStorage.removeItem('baia_pending_stamp_token');
-
-        const total = demoStamps.length;
-        const unlockedNow = (total % 10 === 0);
-        setClaimResult({
-          success: true,
-          totalStamps: total,
-          rewardUnlockedNow: unlockedNow
-        });
-        setClaimStatus('success');
-        setStatusMessage(`Stamp #${total} recorded! Enjoy your beverage.`);
-
-        try {
-          confetti({
-            particleCount: 100,
-            spread: 80,
-            origin: { y: 0.5 }
-          });
-        } catch (e) {}
-      }, 800);
-      return;
-    }
-
     if (!navigator.geolocation) {
       setClaimStatus('error');
-      setStatusMessage('Geolocation is not supported by your browser. Please use Chrome, Safari, or your phone’s camera browser.');
+      setStatusMessage('Geolocation is not supported on this device. Please scan using a GPS-capable mobile phone.');
       return;
     }
 

@@ -69,7 +69,7 @@ export default async function handler(req, res) {
 
     // 3. Next milestone to redeem
     const milestoneNumberToRedeem = currentRedemptions + 1;
-    const rewardType = (milestoneNumberToRedeem % 2 !== 0) ? 'coffee' : 'totebag';
+    const rewardType = 'coffee';
     const serverTimestamp = new Date().toISOString();
 
     // 4. Insert into redemptions
@@ -95,7 +95,7 @@ export default async function handler(req, res) {
       rewardType,
       milestoneNumber: milestoneNumberToRedeem,
       redeemedAt: serverTimestamp,
-      rewardTitle: rewardType === 'coffee' ? 'Free Specialty Coffee' : 'Free Baia Tote Bag',
+      rewardTitle: 'Free Specialty Coffee',
       remainingPendingRewards: Math.max(0, earnedMilestones - milestoneNumberToRedeem)
     });
 
