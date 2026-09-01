@@ -39,8 +39,23 @@ function initSeasonalPromosToggle() {
   }
 }
 
+function initHeroLoyaltyCta() {
+  const ctaText = document.getElementById('hero-loyalty-cta-text');
+  if (!ctaText) return;
+
+  try {
+    const hasAuth = Object.keys(localStorage).some(
+      (k) => k.includes('auth-token') || k.startsWith('sb-')
+    );
+    if (hasAuth) {
+      ctaText.textContent = 'View Digital Card';
+    }
+  } catch (e) {}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize primary interactive modules
+  initHeroLoyaltyCta();
   initHero3D();
   initNewDrops();
   initMenuExplorer();
