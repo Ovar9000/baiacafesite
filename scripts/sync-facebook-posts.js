@@ -367,7 +367,7 @@ Classify and return ONE strict JSON object according to the system instructions.
 
   // 1. Try Gemini API if GEMINI_API_KEY is provided
   if (GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 5) {
-    const candidateModels = ['gemini-3.5-flash-lite', 'gemini-flash-latest', 'gemini-2.5-flash'];
+    const candidateModels = ['gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
     for (const model of candidateModels) {
       try {
         console.log(`✨ [LLM] Calling Google Gemini API (${model})...`);
