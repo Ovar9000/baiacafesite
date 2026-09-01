@@ -309,7 +309,7 @@ export default function ClaimApp() {
                 </div>
 
                 <a
-                  href="/card"
+                  href="/card/"
                   style={{
                     background: '#F1F5F9',
                     color: '#475569',
@@ -403,7 +403,7 @@ export default function ClaimApp() {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <a
-                    href="/card"
+                    href="/card/"
                     style={{
                       background: 'var(--loyalty-navy)',
                       color: '#FFFFFF',
@@ -488,7 +488,7 @@ export default function ClaimApp() {
                   </button>
 
                   <a
-                    href="/card"
+                    href="/card/"
                     style={{
                       background: '#F1F5F9',
                       color: '#475569',
