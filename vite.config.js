@@ -29,6 +29,8 @@ function devApiPlugin() {
             handlerModule = await import('./api/admin-token.js');
           } else if (endpoint === 'admin-manual-stamp') {
             handlerModule = await import('./api/admin-manual-stamp.js');
+          } else if (endpoint === 'dev-login') {
+            handlerModule = await import('./api/dev-login.js');
           } else {
             return next();
           }

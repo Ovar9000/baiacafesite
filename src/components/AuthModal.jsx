@@ -44,33 +44,22 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
     try {
       setOauthLoading('demo');
       setErrorMsg('');
-      const demoEmail = 'testcustomer@baia.cafe';
-      const demoPass = 'BaiaDemoPass2026!';
 
-      let { data, error } = await supabase.auth.signInWithPassword({
-        email: demoEmail,
-        password: demoPass
+      const res = await fetch('/api/dev-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
       });
 
-      if (error && (error.message.toLowerCase().includes('invalid') || error.message.toLowerCase().includes('credentials'))) {
-        const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-          email: demoEmail,
-          password: demoPass,
-          options: {
-            data: {
-              full_name: 'Mark Lawrence (Test Account)',
-              avatar_url: '/images/Logo.webp'
-            }
-          }
-        });
-        if (signUpErr) throw signUpErr;
-        data = signUpData;
-      } else if (error) {
-        throw error;
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error || 'Demo sign-in failed.');
       }
 
-      if (data?.session && onSuccess) {
-        onSuccess(data.session);
+      if (result.session) {
+        await supabase.auth.setSession(result.session);
+        if (onSuccess) {
+          onSuccess(result.session);
+        }
       }
     } catch (err) {
       setErrorMsg(err.message || 'Demo sign-in failed. Please try again.');
