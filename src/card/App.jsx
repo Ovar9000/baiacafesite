@@ -117,18 +117,27 @@ export default function CardApp() {
         if (voucherRows && voucherRows.length > 0) {
           setTodayVoucher(voucherRows[0]);
         } else {
-          const cached = sessionStorage.getItem('baia_today_wifi_voucher');
-          if (cached) {
-            try { setTodayVoucher(JSON.parse(cached)); } catch (e) {}
+          // Check if cached in sessionStorage for TODAY only
+          const cachedStr = sessionStorage.getItem('baia_today_wifi_voucher');
+          if (cachedStr) {
+            try {
+              const cached = JSON.parse(cachedStr);
+              if (cached && cached.date === todayManila) {
+                setTodayVoucher(cached);
+              } else {
+                // Expired from previous day -> clean up!
+                sessionStorage.removeItem('baia_today_wifi_voucher');
+                setTodayVoucher(null);
+              }
+            } catch (e) {
+              setTodayVoucher(null);
+            }
           } else {
             setTodayVoucher(null);
           }
         }
       } catch (vErr) {
-        const cached = sessionStorage.getItem('baia_today_wifi_voucher');
-        if (cached) {
-          try { setTodayVoucher(JSON.parse(cached)); } catch (e) {}
-        }
+        setTodayVoucher(null);
       }
     } catch (err) {
       console.error('Error loading loyalty data:', err);
@@ -230,9 +239,17 @@ export default function CardApp() {
 
       setToastMsg(data.message || 'Stamp successfully added to your card.');
       if (data.wifiVoucher) {
-        setTodayVoucher(data.wifiVoucher);
+        const todayManila = new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'Asia/Manila',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        }).format(new Date());
+
+        const voucherWithDate = { ...data.wifiVoucher, date: todayManila };
+        setTodayVoucher(voucherWithDate);
         try {
-          sessionStorage.setItem('baia_today_wifi_voucher', JSON.stringify(data.wifiVoucher));
+          sessionStorage.setItem('baia_today_wifi_voucher', JSON.stringify(voucherWithDate));
         } catch (e) {}
       }
       await loadLoyaltyData();
@@ -688,7 +705,7 @@ export default function CardApp() {
                 </div>
 
                 <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
-                  Valid for up to <strong>2 devices</strong> (phone + laptop) • 1 hour duration. Connect to <em>"BAIA Cafe Free Wi-Fi"</em> and enter this code.
+                  Valid for up to <strong>2 devices</strong> (phone + laptop) • 1 hour duration. Connect to <em>"BAIA Free Wifi"</em> and enter this code.
                 </p>
               </div>
             ) : null}
