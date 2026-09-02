@@ -61,8 +61,10 @@ drop policy if exists "Users can view own stamps" on public.stamps;
 create policy "Users can view own stamps" on public.stamps
   for select using (auth.uid() = user_id);
 
--- Direct client inserts are blocked. Stamps can only be inserted via backend/service_role
-drop policy if exists "Service role inserts stamps" on public.stamps;
+-- Authenticated user can insert own stamp
+drop policy if exists "Users can insert own stamps" on public.stamps;
+create policy "Users can insert own stamps" on public.stamps
+  for insert with check (auth.uid() = user_id);
 
 -- Redemptions Policies:
 -- Users can view their own redemption history
@@ -70,8 +72,10 @@ drop policy if exists "Users can view own redemptions" on public.redemptions;
 create policy "Users can view own redemptions" on public.redemptions
   for select using (auth.uid() = user_id);
 
--- Direct client inserts are blocked. Redemptions can only be inserted via backend/service_role
-drop policy if exists "Service role inserts redemptions" on public.redemptions;
+-- Authenticated user can insert own redemptions
+drop policy if exists "Users can insert own redemptions" on public.redemptions;
+create policy "Users can insert own redemptions" on public.redemptions
+  for insert with check (auth.uid() = user_id);
 
 -- ==============================================================================
 -- AUTOMATIC PROFILE CREATION TRIGGER

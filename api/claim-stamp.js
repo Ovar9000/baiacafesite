@@ -6,7 +6,6 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || proce
 const DAILY_QR_SECRET = process.env.DAILY_QR_SECRET || 'baia-cafe-secret-key-2026';
 const CAFE_LAT = parseFloat(process.env.CAFE_LAT || '13.6218');
 const CAFE_LNG = parseFloat(process.env.CAFE_LNG || '123.1948');
-const CAFE_MAX_RADIUS_METERS = parseFloat(process.env.CAFE_MAX_RADIUS_METERS || '75');
 const CAFE_TIMEZONE = process.env.CAFE_TIMEZONE || 'Asia/Manila';
 
 function getManilaDateString(date = new Date()) {
@@ -53,7 +52,7 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
 }
 
 export default async function handler(req, res) {
-  // Enable CORS if needed
+  // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -75,7 +74,12 @@ export default async function handler(req, res) {
 
     const accessToken = authHeader.replace('Bearer ', '').trim();
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-      auth: { persistSession: false }
+      auth: { persistSession: false },
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
     });
 
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(accessToken);
@@ -83,7 +87,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Invalid user session. Please sign in again.' });
     }
 
-    const { token, lat, lng, accuracy = 0 } = req.body || {};
+    const { token, lat, lng } = req.body || {};
 
     if (!token) {
       return res.status(400).json({ error: 'QR verification token is required.' });
@@ -149,7 +153,7 @@ export default async function handler(req, res) {
 
     if (insertError) {
       console.error('Failed to insert stamp:', insertError);
-      return res.status(500).json({ error: 'Failed to record stamp in database.' });
+      return res.status(500).json({ error: `Failed to record stamp in database: ${insertError.message}` });
     }
 
     // 6. Recalculate totals and milestone unlock
@@ -171,7 +175,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       totalStamps: currentTotal,
-      distanceMeters: Math.round(distance),
+      distanceMeters: distanceRecorded,
       rewardUnlockedNow,
       pendingRewards,
       milestoneNumber,
