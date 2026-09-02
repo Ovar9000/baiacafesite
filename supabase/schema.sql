@@ -25,6 +25,10 @@ create table if not exists public.stamps (
 -- Optimized index for user stamp history and daily limit lookups
 create index if not exists stamps_user_day_idx on public.stamps (user_id, awarded_at desc);
 
+-- Enforce maximum 1 stamp per user per Asia/Manila calendar date at the database engine level
+create unique index if not exists stamps_user_single_daily_stamp_idx 
+  on public.stamps (user_id, (timezone('Asia/Manila', awarded_at)::date));
+
 -- 3. Redemptions Table (One row per claimed reward)
 create table if not exists public.redemptions (
   id bigint generated always as identity primary key,

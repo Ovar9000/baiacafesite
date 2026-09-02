@@ -14,6 +14,15 @@ export default function QrScanner({ onScan, onClose }) {
     if (isScannedRef.current) return;
     isScannedRef.current = true;
 
+    // Immediately stop camera tracks
+    if (scannerRef.current) {
+      try {
+        if (scannerRef.current.isScanning) {
+          scannerRef.current.stop().catch(() => {});
+        }
+      } catch (e) {}
+    }
+
     let token = decodedText.trim();
     try {
       if (token.includes('?')) {
@@ -65,15 +74,7 @@ export default function QrScanner({ onScan, onClose }) {
           { facingMode: 'environment' },
           config,
           (decodedText) => {
-            if (scannerRef.current?.isScanning) {
-              scannerRef.current.stop().then(() => {
-                processDecodedText(decodedText);
-              }).catch(() => {
-                processDecodedText(decodedText);
-              });
-            } else {
-              processDecodedText(decodedText);
-            }
+            processDecodedText(decodedText);
           },
           (errorMessage) => {
             // Frame parsing error - normal while scanning

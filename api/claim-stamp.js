@@ -153,6 +153,11 @@ export default async function handler(req, res) {
 
     if (insertError) {
       console.error('Failed to insert stamp:', insertError);
+      if (insertError.code === '23505' || insertError.message?.toLowerCase().includes('unique') || insertError.message?.toLowerCase().includes('duplicate')) {
+        return res.status(400).json({
+          error: 'You have already collected today’s stamp! Enjoy your drink and come back tomorrow for another.'
+        });
+      }
       return res.status(500).json({ error: `Failed to record stamp in database: ${insertError.message}` });
     }
 
