@@ -179,11 +179,15 @@ export function initNewDrops() {
                   </span>
                 </div>
 
-                ${item.winner ? `
+                ${(isGiveaway && isGiveawayConcluded) ? `
+                  <div class="drop-date-tag tag-winner">
+                    Winner: ${item.winner || 'Cassandra Espinosa'}
+                  </div>
+                ` : (item.winner ? `
                   <div class="drop-date-tag tag-winner">
                     Winner: ${item.winner}
                   </div>
-                ` : (item.price ? `
+                ` : (!isEvent && item.price ? `
                   <div class="drop-price-tag">
                     ${item.price}
                   </div>
@@ -195,14 +199,14 @@ export function initNewDrops() {
                   <div class="drop-date-tag tag-advisory">
                     Reopened Next Day
                   </div>
-                ` : '')))}
+                ` : ''))))}
               </div>
 
               <!-- Content Area -->
               <div class="drop-content-body">
                 <div class="drop-meta-line">
                   <span class="drop-category-label">${categoryLabel}</span>
-                  ${item.winner ? `<span class="drop-date-label status-winner">Winner: ${item.winner}</span>` : (item.event_date ? `<span class="drop-date-label">${formatEventDate(item.event_date)}</span>` : (isAdvisory ? `<span class="drop-date-label status-open">Open Regular Hours</span>` : ''))}
+                  ${(isGiveaway && isGiveawayConcluded) ? `<span class="drop-date-label status-winner">Winner: ${item.winner || 'Cassandra Espinosa'}</span>` : (item.winner ? `<span class="drop-date-label status-winner">Winner: ${item.winner}</span>` : (item.event_date ? `<span class="drop-date-label">${formatEventDate(item.event_date)}</span>` : (isAdvisory ? `<span class="drop-date-label status-open">Open Regular Hours</span>` : '')))}
                 </div>
 
                 <h3 class="drop-card-title">${item.title}</h3>

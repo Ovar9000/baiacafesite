@@ -101,14 +101,14 @@
     "id": "640323492494372_122178928790834483",
     "category": "event",
     "title": "Burger Launch Giveaway: Guess & Win",
-    "description": "Community guessing contest on Facebook: The first correct guess of our newest Filipino breakfast burger wins a free burger on launch day!",
-    "price": "Free Giveaway",
-    "winner": null,
-    "status": null,
-    "event_date": "Every Saturday • 5:00 PM – 8:00 PM",
+    "description": "Community guessing contest on Facebook: Shoutout to our winner Cassandra Espinosa for correctly guessing the Longganisa Breakfast Burger and claiming her free launch burger!",
+    "price": null,
+    "winner": "Cassandra Espinosa",
+    "status": "concluded",
+    "event_date": "Winner Awarded",
     "image_url": "https://scontent-ord5-1.xx.fbcdn.net/v/t39.30808-6/752822805_122178927914834483_2701309912833582655_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=zj-ZhJja1KkQ7kNvwFb-Ly6&_nc_oc=AdrkdF-r4CeAY34O42wlra9L1Dol75VeGCwv2CDbk-f9lOqG9KSSrJcBoFb5VKbhV4U&_nc_zt=23&_nc_ht=scontent-ord5-1.xx&edm=AKIiGfEEAAAA&_nc_gid=cwjSeL9St9i1TuG23ias3w&_nc_tpa=Q5bMBQKEPKTGE63B4Drrx5zD-2hNKSYuqqDJ0TzDmczaPn66Dv_ZIpUB3iPfRAe0rxyrdkUGd1DajdzDcQ&oh=00_AQK7dHJMza3ffOtN2ddrKA8L771bBBaplFA2NlqJXmbviA&oe=6A9D4C64",
     "permalink": "https://www.facebook.com/122183033894834483/posts/122178928790834483",
     "published_at": "2026-07-22T12:35:40+0000",
-    "badge": "Giveaway"
+    "badge": "Winner Awarded"
   }
 ]
