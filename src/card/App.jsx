@@ -99,64 +99,49 @@ export default function CardApp() {
   const handleInAppScan = async (scannedToken) => {
     try {
       setScannerErrorMsg('');
-      setScannerStatusMsg('Verifying QR token...');
+      setScannerStatusMsg('Verifying QR code & claiming stamp...');
 
       if (!session?.access_token) {
         setScannerErrorMsg('Please sign in to collect your stamp.');
+        setScannerStatusMsg('');
         return;
       }
 
-      if (!navigator.geolocation) {
-        setScannerErrorMsg('Geolocation is not supported on this device.');
+      const res = await fetch('/api/claim-stamp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          token: scannedToken
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setScannerErrorMsg(data.error || 'Failed to claim stamp.');
+        setScannerStatusMsg('');
         return;
       }
 
-      setScannerStatusMsg('Checking GPS location at Baia Café...');
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const { latitude, longitude, accuracy } = pos.coords;
-          const res = await fetch('/api/claim-stamp', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${session.access_token}`
-            },
-            body: JSON.stringify({
-              token: scannedToken,
-              lat: latitude,
-              lng: longitude,
-              accuracy: accuracy || 0
-            })
-          });
+      try {
+        confetti({
+          particleCount: 100,
+          spread: 80,
+          origin: { y: 0.5 }
+        });
+      } catch (e) {}
 
-          const data = await res.json();
-          if (!res.ok) {
-            setScannerErrorMsg(data.error || 'Failed to claim stamp.');
-            return;
-          }
-
-          try {
-            confetti({
-              particleCount: 100,
-              spread: 80,
-              origin: { y: 0.5 }
-            });
-          } catch (e) {}
-
-          setScannerStatusMsg('Stamp successfully recorded.');
-          setTimeout(() => {
-            setShowScannerModal(false);
-            setScannerStatusMsg('');
-            loadLoyaltyData();
-          }, 1200);
-        },
-        (geoErr) => {
-          setScannerErrorMsg('GPS location required. Please allow location permissions.');
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
+      setScannerStatusMsg(data.message || 'Stamp successfully added to your card! 🎉');
+      setTimeout(() => {
+        setShowScannerModal(false);
+        setScannerStatusMsg('');
+        loadLoyaltyData();
+      }, 1200);
     } catch (err) {
       setScannerErrorMsg(err.message || 'Error processing scan.');
+      setScannerStatusMsg('');
     }
   };
 
