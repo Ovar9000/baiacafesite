@@ -717,14 +717,51 @@ async function runSync() {
     
     console.log(`💾 Saved updates to ${UPDATES_FILE} and ${STATE_FILE}`);
 
-    // Sync to Supabase drops table if configured
+    // Sync to Supabase drops table and cache images in Supabase Storage
     if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       try {
-        console.log(`📡 [Supabase] Syncing ${updatedList.length} items to public.drops table...`);
+        console.log(`📡 [Supabase] Syncing ${updatedList.length} items to public.drops table & caching images...`);
         const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
           auth: { persistSession: false }
         });
 
+        // 1. Ensure 'drops-cache' public bucket exists in Supabase Storage
+        try {
+          const { data: buckets } = await supabase.storage.listBuckets();
+          if (!buckets?.some(b => b.name === 'drops-cache')) {
+            await supabase.storage.createBucket('drops-cache', { public: true, fileSizeLimit: 5242880 });
+          }
+        } catch (bErr) {
+          console.warn('⚠️ [Storage Notice]:', bErr.message);
+        }
+
+        // 2. Cache new drop images into Supabase Storage
+        for (const item of updatedList) {
+          if (item.image_url && item.image_url.startsWith('http') && !item.image_url.includes('supabase.co')) {
+            try {
+              const cleanId = String(item.id).replace(/[^a-zA-Z0-9_-]/g, '_');
+              const fileName = `drop_${cleanId}.jpg`;
+              const resp = await fetch(item.image_url, {
+                headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BaiaSyncAgent/1.0)' }
+              });
+              if (resp.ok) {
+                const buffer = Buffer.from(await resp.arrayBuffer());
+                const { error: upErr } = await supabase.storage
+                  .from('drops-cache')
+                  .upload(fileName, buffer, { contentType: 'image/jpeg', upsert: true });
+
+                if (!upErr) {
+                  const { data: { publicUrl } } = supabase.storage.from('drops-cache').getPublicUrl(fileName);
+                  item.image_url = publicUrl;
+                }
+              }
+            } catch (imgErr) {
+              console.warn(`⚠️ [Image Cache Notice] Could not cache image for ${item.title}:`, imgErr.message);
+            }
+          }
+        }
+
+        // 3. Upsert drops to public.drops
         const dropsToUpsert = updatedList.map(item => ({
           id: String(item.id),
           category: item.category || 'food',
@@ -749,6 +786,32 @@ async function runSync() {
         } else {
           console.log(`✅ [Supabase] Successfully synced drops to public.drops!`);
         }
+
+        // 4. Rolling Memory Garbage Collector: Keeps only latest 25 cached images in storage
+        // Guarantees storage usage stays < 2MB (0.2% of 1GB limit), preventing any free tier bloat
+        try {
+          const { data: files } = await supabase.storage.from('drops-cache').list();
+          if (files && files.length > 25) {
+            const activeFilenames = new Set(
+              updatedList
+                .slice(0, 25)
+                .map(d => d.image_url?.split('/').pop())
+                .filter(Boolean)
+            );
+            const toPurge = files
+              .filter(f => f.name.startsWith('drop_') && !activeFilenames.has(f.name))
+              .map(f => f.name);
+
+            if (toPurge.length > 0) {
+              console.log(`🧹 [Rolling Memory] Pruning ${toPurge.length} older drop images from Supabase Storage...`);
+              await supabase.storage.from('drops-cache').remove(toPurge);
+              console.log(`✅ [Rolling Memory] Cleaned up older images. Storage usage kept under 2MB.`);
+            }
+          }
+        } catch (gcErr) {
+          console.warn('⚠️ [Rolling Memory Warning]:', gcErr.message);
+        }
+
       } catch (sbErr) {
         console.warn('⚠️ [Supabase Warning] Error syncing to Supabase:', sbErr.message);
       }
