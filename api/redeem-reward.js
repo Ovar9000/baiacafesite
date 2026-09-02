@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://cqtcmrqlafgtcrcfaojz.supabase.co';
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_DPUxis9LXG23_4k8VqXHjQ_JCyxrf3U';
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -23,14 +23,14 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Missing or invalid Authorization header' });
     }
 
+    if (!SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Server configuration error: SUPABASE_SERVICE_ROLE_KEY is missing.');
+      return res.status(500).json({ error: 'Server database configuration error. Please contact administrator.' });
+    }
+
     const accessToken = authHeader.replace('Bearer ', '').trim();
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-      auth: { persistSession: false },
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      }
+      auth: { persistSession: false }
     });
 
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(accessToken);

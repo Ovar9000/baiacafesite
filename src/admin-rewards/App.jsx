@@ -31,7 +31,7 @@ export default function AdminRewardsApp() {
   const [filterCategory, setFilterCategory] = useState('all'); // 'all' | 'ready' | 'nearing' | 'active'
 
   useEffect(() => {
-    const savedPass = sessionStorage.getItem('baia_admin_key');
+    const savedPass = sessionStorage.getItem('baia_admin_pass');
     if (savedPass) {
       setPassword(savedPass);
       fetchInsights(savedPass);
@@ -56,7 +56,7 @@ export default function AdminRewardsApp() {
       }
 
       setIsAuthenticated(true);
-      sessionStorage.setItem('baia_admin_key', passToUse || password);
+      sessionStorage.setItem('baia_admin_pass', passToUse || password);
       setMembers(data.members || []);
       setSummary(data.summary || { totalMembers: 0, readyCount: 0, nearingCount: 0 });
     } catch (err) {
@@ -136,6 +136,28 @@ export default function AdminRewardsApp() {
             <Users size={14} />
             <span>Rewards Roster</span>
           </div>
+
+          {isAuthenticated && (
+            <button 
+              onClick={() => {
+                sessionStorage.removeItem('baia_admin_pass');
+                setIsAuthenticated(false);
+                setPassword('');
+              }}
+              style={{
+                background: '#F1F5F9',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: '9999px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                color: '#475569',
+                cursor: 'pointer'
+              }}
+            >
+              Lock
+            </button>
+          )}
         </div>
       </header>
 
