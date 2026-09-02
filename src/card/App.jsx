@@ -26,11 +26,13 @@ export default function CardApp() {
   const [stamps, setStamps] = useState([]);
   const [redemptions, setRedemptions] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
+  const [toastMsg, setToastMsg] = useState('');
   
   // In-app QR Scanner state
   const [showScannerModal, setShowScannerModal] = useState(false);
   const [scannerStatusMsg, setScannerStatusMsg] = useState('');
   const [scannerErrorMsg, setScannerErrorMsg] = useState('');
+  const isClaimingRef = useRef(false);
 
   // Stamp Card Collection Showcase Archive Modal
   const [showArchiveModal, setShowArchiveModal] = useState(false);
@@ -78,7 +80,8 @@ export default function CardApp() {
       if (rErr) throw rErr;
       setRedemptions(redemptionsData || []);
     } catch (err) {
-      console.error('Error fetching loyalty data:', err);
+      console.error('Error loading loyalty data:', err);
+      setErrorMsg('Could not refresh card stamps.');
     }
   }, [user]);
 
@@ -97,13 +100,20 @@ export default function CardApp() {
   };
 
   const handleInAppScan = async (scannedToken) => {
-    try {
-      setScannerErrorMsg('');
-      setScannerStatusMsg('Verifying QR code & claiming stamp...');
+    if (isClaimingRef.current) return;
+    isClaimingRef.current = true;
 
+    // Immediately close camera modal smoothly
+    setShowScannerModal(false);
+    setScannerErrorMsg('');
+    setScannerStatusMsg('');
+    setToastMsg('Verifying QR code & adding your stamp...');
+
+    try {
       if (!session?.access_token) {
-        setScannerErrorMsg('Please sign in to collect your stamp.');
-        setScannerStatusMsg('');
+        setErrorMsg('Please sign in to collect your stamp.');
+        setToastMsg('');
+        isClaimingRef.current = false;
         return;
       }
 
@@ -120,8 +130,9 @@ export default function CardApp() {
 
       const data = await res.json();
       if (!res.ok) {
-        setScannerErrorMsg(data.error || 'Failed to claim stamp.');
-        setScannerStatusMsg('');
+        setErrorMsg(data.error || 'Failed to claim stamp.');
+        setToastMsg('');
+        isClaimingRef.current = false;
         return;
       }
 
@@ -133,15 +144,17 @@ export default function CardApp() {
         });
       } catch (e) {}
 
-      setScannerStatusMsg(data.message || 'Stamp successfully added to your card! 🎉');
+      setToastMsg(data.message || 'Stamp successfully added to your card! 🎉');
+      await loadLoyaltyData();
+
       setTimeout(() => {
-        setShowScannerModal(false);
-        setScannerStatusMsg('');
-        loadLoyaltyData();
-      }, 1200);
+        setToastMsg('');
+        isClaimingRef.current = false;
+      }, 3500);
     } catch (err) {
-      setScannerErrorMsg(err.message || 'Error processing scan.');
-      setScannerStatusMsg('');
+      setErrorMsg(err.message || 'Error processing scan.');
+      setToastMsg('');
+      isClaimingRef.current = false;
     }
   };
 
@@ -241,6 +254,41 @@ export default function CardApp() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+
+            {/* Live Scan Floating Toast / Status */}
+            {toastMsg && (
+              <div style={{
+                background: '#F0FDF4',
+                border: '1.5px solid #86EFAC',
+                color: '#15803D',
+                borderRadius: '16px',
+                padding: '14px 18px',
+                fontSize: '0.88rem',
+                fontWeight: 700,
+                textAlign: 'center',
+                boxShadow: '0 4px 14px rgba(21, 128, 61, 0.12)',
+                animation: 'pulse-glow 2s infinite'
+              }}>
+                {toastMsg}
+              </div>
+            )}
+
+            {/* Error Message Alert */}
+            {errorMsg && (
+              <div style={{
+                background: '#FEF2F2',
+                border: '1.5px solid #FCA5A5',
+                color: '#B91C1C',
+                borderRadius: '16px',
+                padding: '14px 18px',
+                fontSize: '0.88rem',
+                fontWeight: 600,
+                textAlign: 'center',
+                boxShadow: '0 4px 14px rgba(185, 28, 28, 0.08)'
+              }}>
+                {errorMsg}
+              </div>
+            )}
             
             {/* 1. Milestone Reward Unlocked Info Tile */}
             {loyaltyStatus.hasPendingReward && (
