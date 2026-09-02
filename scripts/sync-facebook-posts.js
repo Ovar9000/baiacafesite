@@ -98,8 +98,14 @@ When an announcement is a temporary closure (e.g., weather break, maintenance):
 RULE 4 — Giveaways & Contest Status Lifecycle
 When a post is a community giveaway or contest:
 - Classify as category: "event".
-- If the post/comments indicate a winner was awarded (or if the launch date has passed), set "status": "concluded", "winner": "<Winner Name if known, else null>", and highlight the winner in the description.
-- If the giveaway is still active and open for entries, set "status": "active", "winner": null.
+- Inspect both the post message AND the post comments.
+- If the comments or post mention that a winner was declared/awarded (or if the contest end/launch date mentioned in the post is in the past):
+  - Set "status": "concluded".
+  - Set "badge": "Winner Awarded".
+  - Set "winner": "<Winner Name, e.g. Cassandra Espinosa>".
+  - Set "event_date": "Winner Awarded".
+  - Set "description" to summarize the contest outcome and congratulate the winner.
+- ONLY set "status": "active" and "badge": "Giveaway" if the deadline is currently in the future and NO winner has been declared yet.
 
 RULE 5 — Official Website Launch & Brand Debut
 When a post announces a major digital rollout or brand debut (e.g., "BAIA, now online", official website launch at www.baia.cafe, new apparel/stickers collection debut):
@@ -234,7 +240,7 @@ async function fetchFacebookPosts(pageId, token, sinceId = null) {
   }
 
   let effectiveToken = token;
-  const endpoint = (t) => `https://graph.facebook.com/v19.0/${encodeURIComponent(pageId)}/posts?fields=id,message,created_time,permalink_url,attachments{media_type,type,media,subattachments,unshimmed_url}&limit=60&access_token=${encodeURIComponent(t)}`;
+  const endpoint = (t) => `https://graph.facebook.com/v19.0/${encodeURIComponent(pageId)}/posts?fields=id,message,created_time,permalink_url,attachments{media_type,type,media,subattachments,unshimmed_url},comments.limit(25){message,from,created_time}&limit=60&access_token=${encodeURIComponent(t)}`;
   
   console.log(`📡 [Fetch] Querying Facebook Graph API for page: ${pageId}...`);
   let response = await fetch(endpoint(effectiveToken));
@@ -359,10 +365,17 @@ function extractImageUrls(post) {
  */
 async function classifyPostWithLLM(post) {
   const imageUrls = extractImageUrls(post);
+  const comments = post.comments?.data?.map(c => ({
+    from: c.from?.name || 'User',
+    message: c.message || '',
+    created_time: c.created_time
+  })) || [];
+
   const inputPayload = {
     post_id: post.id,
     message: post.message || '',
     created_time: post.created_time,
+    comments: comments,
     image_urls: imageUrls,
     permalink_url: post.permalink_url || `https://www.facebook.com/${FB_PAGE_ID}/posts/${post.id}`
   };
