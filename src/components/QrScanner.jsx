@@ -48,10 +48,17 @@ export default function QrScanner({ onScan, onClose }) {
           return;
         }
 
+        const qrboxFunction = (viewfinderWidth, viewfinderHeight) => {
+          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+          const size = Math.max(180, Math.floor(minEdge * 0.72));
+          return { width: size, height: size };
+        };
+
         const config = {
           fps: 15,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0
+          qrbox: qrboxFunction,
+          aspectRatio: 1.0,
+          disableFlip: false
         };
 
         await html5QrCode.start(
@@ -169,13 +176,15 @@ export default function QrScanner({ onScan, onClose }) {
       <div style={{
         position: 'relative',
         width: '100%',
-        height: '240px',
+        aspectRatio: '1 / 1',
+        maxHeight: '300px',
         borderRadius: '16px',
         overflow: 'hidden',
         background: '#0F172A',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        margin: '0 auto'
       }}>
         <div id="baia-qr-scanner-viewport" style={{ width: '100%', height: '100%' }} />
 
