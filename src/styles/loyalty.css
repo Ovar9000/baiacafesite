@@ -813,3 +813,43 @@ body {
     page-break-inside: avoid;
   }
 }
+
+/* QR Scanner Responsive Viewfinder & Crop Fix */
+#baia-qr-scanner-viewport {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #0F172A !important;
+}
+
+#baia-qr-scanner-viewport video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 16px !important;
+}
+
+#baia-qr-scanner-viewport__scan_region {
+  aspect-ratio: 1 / 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#baia-qr-scanner-viewport__scan_region svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#baia-qr-scanner-viewport img[alt="Info icon"] {
+  display: none !important;
+}
+
+#baia-qr-scanner-viewport__dashboard_section_csr {
+  display: none !important;
+}

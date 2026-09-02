@@ -98,28 +98,14 @@ export default async function handler(req, res) {
       });
     }
 
-    // 2. Anti-fraud Geofence Check
-    if (lat === undefined || lng === undefined) {
-      return res.status(400).json({ error: 'GPS location is required to claim a stamp.' });
-    }
-
-    const userLat = parseFloat(lat);
-    const userLng = parseFloat(lng);
-    const userAccuracy = parseFloat(accuracy) || 0;
-
-    if (isNaN(userLat) || isNaN(userLng)) {
-      return res.status(400).json({ error: 'Invalid GPS coordinates provided.' });
-    }
-
-    const distance = haversineDistance(userLat, userLng, CAFE_LAT, CAFE_LNG);
-    const effectiveDistance = Math.max(0, distance - userAccuracy);
-
-    if (effectiveDistance > CAFE_MAX_RADIUS_METERS) {
-      return res.status(403).json({
-        error: `Location verification failed. You are ${Math.round(distance)}m from Baia Café (maximum radius is ${CAFE_MAX_RADIUS_METERS}m). Please ensure you are at the pickup bar.`,
-        distance: Math.round(distance),
-        maxRadius: CAFE_MAX_RADIUS_METERS
-      });
+    // 2. Optional location recording (no blocking / no GPS requirement)
+    let distanceRecorded = null;
+    if (lat !== undefined && lng !== undefined) {
+      const userLat = parseFloat(lat);
+      const userLng = parseFloat(lng);
+      if (!isNaN(userLat) && !isNaN(userLng)) {
+        distanceRecorded = Math.round(haversineDistance(userLat, userLng, CAFE_LAT, CAFE_LNG));
+      }
     }
 
     // 3. Ensure user profile exists
@@ -157,7 +143,7 @@ export default async function handler(req, res) {
       .from('stamps')
       .insert({
         user_id: user.id,
-        distance_meters: Math.round(distance),
+        distance_meters: distanceRecorded,
         staff_note: 'QR Barista Standee Scan'
       });
 

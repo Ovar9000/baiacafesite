@@ -77,86 +77,51 @@ export default function ClaimApp() {
       return;
     }
 
-    setClaimStatus('locating');
-    setStatusMessage('Checking GPS location at Baia Café...');
+    setClaimStatus('claiming');
+    setStatusMessage('Verifying drink stamp with Baia server...');
     setErrorDetails(null);
 
-    if (!navigator.geolocation) {
-      setClaimStatus('error');
-      setStatusMessage('Geolocation is not supported on this device. Please scan using a GPS-capable mobile phone.');
-      return;
-    }
+    try {
+      const res = await fetch('/api/claim-stamp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentSession.access_token}`
+        },
+        body: JSON.stringify({
+          token: tokenToUse
+        })
+      });
 
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude, accuracy } = pos.coords;
-        setClaimStatus('claiming');
-        setStatusMessage('Verifying drink stamp with Baia server...');
+      const data = await res.json();
 
-        try {
-          const res = await fetch('/api/claim-stamp', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${currentSession.access_token}`
-            },
-            body: JSON.stringify({
-              token: tokenToUse,
-              lat: latitude,
-              lng: longitude,
-              accuracy: accuracy || 0
-            })
-          });
-
-          const data = await res.json();
-
-          if (!res.ok) {
-            setClaimStatus('error');
-            setStatusMessage(data.error || 'Failed to claim stamp.');
-            setErrorDetails(data);
-            return;
-          }
-
-          // Clear stored token
-          sessionStorage.removeItem('baia_pending_stamp_token');
-
-          setClaimResult(data);
-          setClaimStatus('success');
-          setStatusMessage(data.message || 'Stamp successfully added to your digital card!');
-
-          // Fire celebratory confetti
-          try {
-            confetti({
-              particleCount: 100,
-              spread: 80,
-              origin: { y: 0.5 }
-            });
-          } catch (e) {}
-
-        } catch (err) {
-          setClaimStatus('error');
-          setStatusMessage(err.message || 'Network error occurred while claiming stamp.');
-        }
-      },
-      (geoErr) => {
-        console.error('Geolocation error:', geoErr);
+      if (!res.ok) {
         setClaimStatus('error');
-        if (geoErr.code === 1) {
-          setStatusMessage('Location permission was denied. Please allow GPS location in your phone browser settings to verify you are at Baia Café.');
-        } else if (geoErr.code === 2) {
-          setStatusMessage('Location unavailable. Please make sure your phone GPS is turned on.');
-        } else if (geoErr.code === 3) {
-          setStatusMessage('Location request timed out. Please try again.');
-        } else {
-          setStatusMessage('Could not determine your GPS location. Please try again.');
-        }
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 12000,
-        maximumAge: 0
+        setStatusMessage(data.error || 'Failed to claim stamp.');
+        setErrorDetails(data);
+        return;
       }
-    );
+
+      // Clear stored token
+      sessionStorage.removeItem('baia_pending_stamp_token');
+
+      setClaimResult(data);
+      setClaimStatus('success');
+      setStatusMessage(data.message || 'Stamp successfully added to your digital card!');
+
+      // Fire celebratory confetti
+      try {
+        confetti({
+          particleCount: 100,
+          spread: 80,
+          origin: { y: 0.5 }
+        });
+      } catch (e) {}
+
+    } catch (err) {
+      setClaimStatus('error');
+      setStatusMessage(err.message || 'Network error occurred while claiming stamp.');
+    }
   }, []);
 
   // Auto-trigger claim once authenticated and token is present
