@@ -70,14 +70,14 @@ export function initBayVibesAudio() {
       }
       isPlaying = true;
       toggleBtn.classList.add('active');
-      toggleBtn.innerHTML = `<span>🌊 Sound: On</span>`;
+      toggleBtn.innerHTML = `<span>Sound: On</span>`;
     } else {
       if (audioCtx) {
         audioCtx.suspend();
       }
       isPlaying = false;
       toggleBtn.classList.remove('active');
-      toggleBtn.innerHTML = `<span>🔈 Bay Sound</span>`;
+      toggleBtn.innerHTML = `<span>Bay Sound</span>`;
     }
   });
 }

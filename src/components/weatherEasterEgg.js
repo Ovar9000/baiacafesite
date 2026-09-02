@@ -134,7 +134,7 @@ export function setLiveRainState(isRaining, weatherDescription = '') {
       canvas.classList.add('active');
       if (!animationFrameId) loop();
       if (weatherDescription) {
-        showShowcaseToast('🌧️ Tropical Rain in Laurente, Masbate', weatherDescription, '🌧️');
+        showShowcaseToast('Tropical Rain in Laurente, Masbate', weatherDescription);
       }
     }
   } else {

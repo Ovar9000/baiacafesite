@@ -10,7 +10,7 @@ export function initBoardsRental() {
     cottageContainer.innerHTML = `
       <div class="cottage-showcase-box">
         <div>
-          <span class="cottage-badge-tag">🌊 Official Booking Partner</span>
+          <span class="cottage-badge-tag">Official Booking Partner</span>
           <h3 class="cottage-title">${cottageData.title}</h3>
           <p class="cottage-partner">${cottageData.subtitle} • Operating ${cottageData.hours}</p>
 

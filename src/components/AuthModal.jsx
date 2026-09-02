@@ -213,7 +213,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
             color: '#16255C',
             lineHeight: '1.5'
           }}>
-            👉 Open the email from <strong>Supabase / BAIA Café</strong> and tap <strong>"Sign in"</strong> to open your digital loyalty card automatically.
+            Open the email from <strong>Supabase / BAIA Café</strong> and tap <strong>"Sign in"</strong> to open your digital loyalty card automatically.
           </div>
 
           <div style={{ fontSize: '0.8rem', color: '#64748B', marginBottom: '14px' }}>
