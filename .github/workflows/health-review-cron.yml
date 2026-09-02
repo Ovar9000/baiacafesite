@@ -1,0 +1,53 @@
+name: Continuous Codebase & Backend Health Review
+
+on:
+  schedule:
+    # Runs daily at 00:00 UTC (08:00 AM Asia/Manila Time)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+concurrency:
+  group: health-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit-and-verify:
+    name: Codebase, Schema & Build Health Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🏗️ Verify Production Vite Build
+        run: npm run build
+
+      - name: 🔍 Run Backend Health & Schema Verification
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://cqtcmrqlafgtcrcfaojz.supabase.co' }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || secrets.SUPABASE_ANON_KEY }}
+          DAILY_QR_SECRET: ${{ secrets.DAILY_QR_SECRET || 'baia_daily_secret_key_2026_x89a' }}
+          CAFE_TIMEZONE: 'Asia/Manila'
+        run: npm run verify
+
+      - name: 📊 Job Summary Report
+        if: always()
+        run: |
+          echo "### ☕ BAIA Cafe Codebase Health Review Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Execution Time**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Automation Mode**: Continuous Daily Verification" >> $GITHUB_STEP_SUMMARY

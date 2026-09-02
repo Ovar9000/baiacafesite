@@ -38,7 +38,20 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Invalid user session. Please sign in again.' });
     }
 
-    // 1. Fetch total stamps
+    // 1. Try atomic PostgreSQL Stored Procedure first (Zero race conditions)
+    const { data: rpcResult, error: rpcError } = await supabaseAdmin.rpc('redeem_loyalty_reward', {
+      p_user_id: user.id,
+      p_reward_type: 'coffee'
+    });
+
+    if (!rpcError && rpcResult) {
+      if (!rpcResult.success) {
+        return res.status(400).json(rpcResult);
+      }
+      return res.status(200).json(rpcResult);
+    }
+
+    // 2. Fallback: Sequential database queries if RPC is not yet created in Supabase SQL editor
     const { count: totalStamps, error: stampsError } = await supabaseAdmin
       .from('stamps')
       .select('*', { count: 'exact', head: true })
@@ -49,7 +62,6 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to verify stamps.' });
     }
 
-    // 2. Fetch total redemptions
     const { count: redemptionsCount, error: redemptionsError } = await supabaseAdmin
       .from('redemptions')
       .select('*', { count: 'exact', head: true })
@@ -72,12 +84,10 @@ export default async function handler(req, res) {
       });
     }
 
-    // 3. Next milestone to redeem
     const milestoneNumberToRedeem = currentRedemptions + 1;
     const rewardType = 'coffee';
     const serverTimestamp = new Date().toISOString();
 
-    // 4. Insert into redemptions
     const { data: insertedRedemption, error: insertError } = await supabaseAdmin
       .from('redemptions')
       .insert({
