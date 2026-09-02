@@ -66,58 +66,26 @@ export function initHero3D() {
 
   if (heroCard && !prefersReducedMotion) {
     VanillaTilt.init(heroCard, {
-      max: 12,
-      speed: 500,
+      max: 10,
+      speed: 400,
       glare: false,
       perspective: 1200,
       scale: 1.02
     });
-
-    // Prismatic / Holographic Trading Card Foil Sheen Physics
-    heroCard.addEventListener('tiltChange', (event) => {
-      const { percentX, percentY } = event.detail || {};
-      if (percentX === undefined || percentY === undefined) return;
-
-      const x = Math.round((percentX + 1) * 50);
-      const y = Math.round((percentY + 1) * 50);
-      const angle = Math.round(125 + percentX * 45);
-      const opacity = (0.45 + Math.abs(percentX) * 0.35).toFixed(2);
-      const glareOpacity = (0.35 + Math.abs(percentY) * 0.3).toFixed(2);
-
-      heroCard.style.setProperty('--foil-x', `${x}%`);
-      heroCard.style.setProperty('--foil-y', `${y}%`);
-      heroCard.style.setProperty('--foil-angle', `${angle}deg`);
-      heroCard.style.setProperty('--foil-opacity', opacity);
-      heroCard.style.setProperty('--glare-opacity', glareOpacity);
-    });
-
-    heroCard.addEventListener('mouseleave', () => {
-      heroCard.style.removeProperty('--foil-x');
-      heroCard.style.removeProperty('--foil-y');
-      heroCard.style.removeProperty('--foil-angle');
-      heroCard.style.removeProperty('--foil-opacity');
-      heroCard.style.removeProperty('--glare-opacity');
-    });
   }
 
-  // 6-Hour Showcase Rotation (Option A)
+  // Automatic 6-Hour Showcase Rotation (Locked to system time — no manual user overriding)
   const showcaseImg = document.getElementById('hero-showcase-img');
   const flavorPill = document.getElementById('hero-flavor-pill');
   const flavorBadge = document.getElementById('hero-flavor-badge');
   const flavorTitle = document.getElementById('hero-flavor-title');
-  const dots = document.querySelectorAll('.showcase-dot');
 
   let activeIndex = getManila6HourSlotIndex();
 
-  function applySlot(idx, animate = true) {
+  function applySlot(idx, animate = false) {
     const item = HERO_SHOWCASE_ITEMS[idx];
     if (!item || !showcaseImg) return;
     activeIndex = idx;
-
-    // Update active dot indicator
-    dots.forEach((dot, dIdx) => {
-      dot.classList.toggle('active', dIdx === idx);
-    });
 
     if (animate) {
       showcaseImg.classList.add('showcase-fading');
@@ -135,7 +103,7 @@ export function initHero3D() {
         }
         showcaseImg.classList.remove('showcase-fading');
         if (flavorPill) flavorPill.classList.remove('pill-fading');
-      }, 200);
+      }, 250);
     } else {
       showcaseImg.src = item.img;
       showcaseImg.alt = item.alt;
@@ -149,33 +117,10 @@ export function initHero3D() {
     }
   }
 
-  // Initialize initial 6-hour slot on load
+  // Apply initial 6-hour slot on load
   applySlot(activeIndex, false);
 
-  // Allow clicking on dot navigator
-  dots.forEach((dot) => {
-    dot.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const slotIdx = parseInt(dot.getAttribute('data-slot'), 10);
-      if (!isNaN(slotIdx) && slotIdx !== activeIndex) {
-        applySlot(slotIdx, true);
-      }
-    });
-  });
-
-  // Tapping the card cycles to next featured item
-  if (heroCard) {
-    heroCard.addEventListener('click', (e) => {
-      if (e.target.closest('.hero-showcase-nav') || e.target.closest('a') || e.target.closest('button')) {
-        return;
-      }
-      const nextSlot = (activeIndex + 1) % HERO_SHOWCASE_ITEMS.length;
-      applySlot(nextSlot, true);
-    });
-  }
-
-  // Periodic check: if 6-hour boundary changes while page remains open
+  // Periodic check: if 6-hour boundary changes while page remains open, crossfade to next feature
   setInterval(() => {
     const currentSlot = getManila6HourSlotIndex();
     if (currentSlot !== activeIndex) {
