@@ -1,12 +1,21 @@
+import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://cqtcmrqlafgtcrcfaojz.supabase.co';
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_DPUxis9LXG23_4k8VqXHjQ_JCyxrf3U';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'baia-admin-2026';
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-let supabaseAdmin = null;
-if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
-  supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+function safeVerifyAdminPassword(providedPassword) {
+  if (!providedPassword || typeof providedPassword !== 'string') return false;
+  const expectedPassword = process.env.ADMIN_PASSWORD || 'baia-admin-2026';
+  const providedBuf = Buffer.from(providedPassword, 'utf8');
+  const expectedBuf = Buffer.from(expectedPassword, 'utf8');
+  if (providedBuf.length !== expectedBuf.length) return false;
+  return crypto.timingSafeEqual(providedBuf, expectedBuf);
+}
+
+function getSupabaseAdmin() {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return null;
+  return createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
     auth: { persistSession: false, autoRefreshToken: false }
   });
 }
@@ -27,12 +36,14 @@ export default async function handler(req, res) {
 
   try {
     const { password } = req.body || {};
-    if (!password || password !== ADMIN_PASSWORD) {
+    if (!safeVerifyAdminPassword(password)) {
       return res.status(401).json({ error: 'Invalid admin credentials.' });
     }
 
+    const supabaseAdmin = getSupabaseAdmin();
     if (!supabaseAdmin) {
-      return res.status(500).json({ error: 'Supabase client not initialized.' });
+      console.error('Server configuration error: SUPABASE_SERVICE_ROLE_KEY is missing.');
+      return res.status(500).json({ error: 'Server database configuration error. Please contact administrator.' });
     }
 
     // 1. Fetch real registered customer profiles from Supabase

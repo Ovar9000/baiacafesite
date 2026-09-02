@@ -30,6 +30,15 @@ function getManilaDateString(date = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
+function safeVerifyAdminPassword(providedPassword) {
+  if (!providedPassword || typeof providedPassword !== 'string') return false;
+  const expectedPassword = process.env.ADMIN_PASSWORD || 'baia-admin-2026';
+  const providedBuf = Buffer.from(providedPassword, 'utf8');
+  const expectedBuf = Buffer.from(expectedPassword, 'utf8');
+  if (providedBuf.length !== expectedBuf.length) return false;
+  return crypto.timingSafeEqual(providedBuf, expectedBuf);
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -46,7 +55,7 @@ export default async function handler(req, res) {
 
   try {
     const { password } = req.body || {};
-    if (!password || password !== ADMIN_PASSWORD) {
+    if (!safeVerifyAdminPassword(password)) {
       return res.status(401).json({ error: 'Invalid admin credentials.' });
     }
 

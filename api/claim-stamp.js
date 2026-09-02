@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://cqtcmrqlafgtcrcfaojz.supabase.co';
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_DPUxis9LXG23_4k8VqXHjQ_JCyxrf3U';
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const DAILY_QR_SECRET = process.env.DAILY_QR_SECRET || 'baia_daily_secret_key_2026_x89a';
 const CAFE_LAT = parseFloat(process.env.CAFE_LAT || '13.6218');
 const CAFE_LNG = parseFloat(process.env.CAFE_LNG || '123.1948');
@@ -72,14 +72,14 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Missing or invalid Authorization header' });
     }
 
+    if (!SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Server configuration error: SUPABASE_SERVICE_ROLE_KEY is missing.');
+      return res.status(500).json({ error: 'Server database configuration error. Please contact administrator.' });
+    }
+
     const accessToken = authHeader.replace('Bearer ', '').trim();
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-      auth: { persistSession: false },
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      }
+      auth: { persistSession: false }
     });
 
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(accessToken);

@@ -1,8 +1,17 @@
+import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://cqtcmrqlafgtcrcfaojz.supabase.co';
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_DPUxis9LXG23_4k8VqXHjQ_JCyxrf3U';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'baia-admin-2026';
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+function safeVerifyAdminPassword(providedPassword) {
+  if (!providedPassword || typeof providedPassword !== 'string') return false;
+  const expectedPassword = process.env.ADMIN_PASSWORD || 'baia-admin-2026';
+  const providedBuf = Buffer.from(providedPassword, 'utf8');
+  const expectedBuf = Buffer.from(expectedPassword, 'utf8');
+  if (providedBuf.length !== expectedBuf.length) return false;
+  return crypto.timingSafeEqual(providedBuf, expectedBuf);
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -21,8 +30,13 @@ export default async function handler(req, res) {
   try {
     const { password, email, staffNote } = req.body || {};
 
-    if (!password || password !== ADMIN_PASSWORD) {
+    if (!safeVerifyAdminPassword(password)) {
       return res.status(401).json({ error: 'Invalid admin credentials.' });
+    }
+
+    if (!SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Server configuration error: SUPABASE_SERVICE_ROLE_KEY is missing.');
+      return res.status(500).json({ error: 'Server database configuration error. Please contact administrator.' });
     }
 
     if (!email || typeof email !== 'string') {
@@ -85,7 +99,12 @@ export default async function handler(req, res) {
 
     if (insertErr) {
       console.error('Manual stamp insert error:', insertErr);
-      return res.status(500).json({ error: 'Failed to award stamp in database.' });
+      if (insertErr.code === '23505' || insertErr.message?.toLowerCase().includes('unique') || insertErr.message?.toLowerCase().includes('duplicate')) {
+        return res.status(400).json({
+          error: `Customer (${displayName}) has already received a stamp for today. Only 1 stamp per day is permitted.`
+        });
+      }
+      return res.status(500).json({ error: `Failed to award stamp in database: ${insertErr.message}` });
     }
 
     // 3. Get updated count
