@@ -12,6 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createClient } from '@supabase/supabase-js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,6 +40,8 @@ function loadEnv() {
 
 loadEnv();
 
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 const FB_PAGE_ID = process.env.FB_PAGE_ID || process.env.FACEBOOK_PAGE_ID || 'thebaiacafe';
 const FB_PAGE_ACCESS_TOKEN = process.env.FB_PAGE_ACCESS_TOKEN || process.env.FACEBOOK_PAGE_ACCESS_TOKEN || process.env.FB_ACCESS_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
@@ -713,8 +716,45 @@ async function runSync() {
     fs.writeFileSync(STATE_FILE, JSON.stringify(syncState, null, 2), 'utf-8');
     
     console.log(`💾 Saved updates to ${UPDATES_FILE} and ${STATE_FILE}`);
+
+    // Sync to Supabase drops table if configured
+    if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        console.log(`📡 [Supabase] Syncing ${updatedList.length} items to public.drops table...`);
+        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+          auth: { persistSession: false }
+        });
+
+        const dropsToUpsert = updatedList.map(item => ({
+          id: String(item.id),
+          category: item.category || 'food',
+          title: item.title,
+          description: item.description,
+          price: item.price || null,
+          event_date: item.event_date || null,
+          badge: item.badge || null,
+          winner: item.winner || null,
+          status: item.status || null,
+          image_url: item.image_url || null,
+          permalink: item.permalink || null,
+          published_at: item.published_at || new Date().toISOString()
+        }));
+
+        const { error: upsertErr } = await supabase
+          .from('drops')
+          .upsert(dropsToUpsert, { onConflict: 'id' });
+
+        if (upsertErr) {
+          console.warn('⚠️ [Supabase Warning] Could not upsert drops to database:', upsertErr.message);
+        } else {
+          console.log(`✅ [Supabase] Successfully synced drops to public.drops!`);
+        }
+      } catch (sbErr) {
+        console.warn('⚠️ [Supabase Warning] Error syncing to Supabase:', sbErr.message);
+      }
+    }
   } else {
-    console.log(`🔍 [Dry Run] Skipped writing to disk.`);
+    console.log(`🔍 [Dry Run] Skipped writing to disk / database.`);
   }
 
   console.log('✨ [BAIA Sync Agent] Completed successfully.\n');

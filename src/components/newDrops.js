@@ -12,12 +12,14 @@
 
 import updatesData from '../data/updates.json';
 import { cartStore } from './cartStore.js';
+import { supabase } from '../lib/supabaseClient.js';
 
 export function initNewDrops() {
   const container = document.getElementById('new-drops-root');
   if (!container) return;
 
   let activeCategory = 'all';
+  let currentItems = (updatesData || []).filter(item => !String(item.id).startsWith('fb_post_'));
 
   function formatTimeAgo(isoString) {
     if (!isoString) return 'Recently';
@@ -52,9 +54,7 @@ export function initNewDrops() {
   }
 
   function render() {
-    // Filter out mock items, keeping all real Facebook drops & events
-    const rawItems = updatesData || [];
-    const items = rawItems.filter(item => !String(item.id).startsWith('fb_post_'));
+    const items = currentItems;
     const filteredItems = activeCategory === 'all' 
       ? items 
       : items.filter(item => item.category === activeCategory);
@@ -303,6 +303,34 @@ export function initNewDrops() {
     });
   }
 
-  // Initial Render
+  // 1. Instant Initial Render from cached/bundled updates
   render();
+
+  // 2. Background Real-time Hydration from Supabase drops table
+  async function hydrateFromSupabase() {
+    try {
+      const { data: dbDrops, error } = await supabase
+        .from('drops')
+        .select('*')
+        .order('published_at', { ascending: false })
+        .limit(30);
+
+      if (!error && dbDrops && dbDrops.length > 0) {
+        const validDbDrops = dbDrops.filter(item => !String(item.id).startsWith('fb_post_'));
+        if (validDbDrops.length > 0) {
+          // Check if data is different before re-rendering
+          const currentIds = currentItems.map(i => i.id).join(',');
+          const newIds = validDbDrops.map(i => i.id).join(',');
+          if (currentIds !== newIds || validDbDrops.length !== currentItems.length) {
+            currentItems = validDbDrops;
+            render();
+          }
+        }
+      }
+    } catch (e) {
+      // Graceful fallback to initial bundled data
+    }
+  }
+
+  hydrateFromSupabase();
 }
