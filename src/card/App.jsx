@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabaseClient';
 import { calculateLoyaltyStatus, formatManilaDateTime } from '../lib/loyaltyHelpers';
