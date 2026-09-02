@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient';
 import { calculateLoyaltyStatus, formatManilaDateTime } from '../lib/loyaltyHelpers';
 import AuthModal from '../components/AuthModal';
 import QrScanner from '../components/QrScanner';
+import RedemptionCountdown from '../components/RedemptionCountdown';
 import { 
   Coffee, 
   Gift, 
@@ -28,6 +29,11 @@ export default function CardApp() {
   const [errorMsg, setErrorMsg] = useState('');
   const [toastMsg, setToastMsg] = useState('');
   
+  // Reward redemption state
+  const [activeRedemption, setActiveRedemption] = useState(null);
+  const [redeeming, setRedeeming] = useState(false);
+  const [showRedeemConfirm, setShowRedeemConfirm] = useState(false);
+
   // In-app QR Scanner state
   const [showScannerModal, setShowScannerModal] = useState(false);
   const [scannerStatusMsg, setScannerStatusMsg] = useState('');
@@ -97,6 +103,37 @@ export default function CardApp() {
     setSession(null);
     setStamps([]);
     setRedemptions([]);
+  };
+
+  const handleRedeemReward = async () => {
+    if (redeeming) return;
+    if (!session?.access_token) {
+      setErrorMsg('Please sign in to redeem your reward.');
+      return;
+    }
+    try {
+      setRedeeming(true);
+      setErrorMsg('');
+      const res = await fetch('/api/redeem-reward', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to redeem reward.');
+      }
+      setShowRedeemConfirm(false);
+      setActiveRedemption(data);
+      await loadLoyaltyData();
+    } catch (err) {
+      console.error('Redeem error:', err);
+      setErrorMsg(err.message || 'Error processing reward redemption.');
+    } finally {
+      setRedeeming(false);
+    }
   };
 
   const handleInAppScan = async (scannedToken) => {
@@ -299,35 +336,117 @@ export default function CardApp() {
                 padding: '18px 20px',
                 boxShadow: '0 8px 24px rgba(245, 158, 11, 0.25)',
                 display: 'flex',
-                alignItems: 'center',
+                flexDirection: 'column',
                 gap: '14px',
                 animation: 'pulse-glow 2.5s infinite'
               }}>
-                <div style={{
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '14px',
-                  background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                  color: '#FFFFFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  boxShadow: '0 4px 12px rgba(217, 119, 6, 0.35)'
-                }}>
-                  <Gift size={24} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#B45309', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '2px' }}>
-                    Milestone Reward Ready
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div style={{
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '14px',
+                    background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                    color: '#FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    boxShadow: '0 4px 12px rgba(217, 119, 6, 0.35)'
+                  }}>
+                    <Gift size={24} />
                   </div>
-                  <h4 style={{ fontSize: '1.02rem', color: '#78350F', fontWeight: 800, margin: '0 0 3px', lineHeight: '1.2' }}>
-                    Free Specialty Coffee Unlocked
-                  </h4>
-                  <p style={{ fontSize: '0.8rem', color: '#92400E', margin: 0, lineHeight: '1.4' }}>
-                    Show this completed digital card to your barista at the counter to claim your reward.
-                  </p>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#B45309', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '2px' }}>
+                      Milestone Reward Ready
+                    </div>
+                    <h4 style={{ fontSize: '1.02rem', color: '#78350F', fontWeight: 800, margin: '0 0 3px', lineHeight: '1.2' }}>
+                      Free Specialty Coffee Unlocked
+                    </h4>
+                    <p style={{ fontSize: '0.8rem', color: '#92400E', margin: 0, lineHeight: '1.4' }}>
+                      Ready to order? Activate your reward at the counter with your barista to redeem.
+                    </p>
+                  </div>
                 </div>
+
+                {!showRedeemConfirm ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowRedeemConfirm(true)}
+                    style={{
+                      width: '100%',
+                      background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      padding: '12px 18px',
+                      borderRadius: '14px',
+                      fontWeight: 700,
+                      fontSize: '0.88rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(180, 83, 9, 0.25)'
+                    }}
+                  >
+                    <Sparkles size={16} />
+                    <span>Redeem Free Coffee with Barista →</span>
+                  </button>
+                ) : (
+                  <div style={{
+                    background: '#FFFFFF',
+                    border: '1.5px solid #F59E0B',
+                    borderRadius: '14px',
+                    padding: '14px',
+                    textAlign: 'center'
+                  }}>
+                    <p style={{ fontSize: '0.82rem', color: '#78350F', fontWeight: 600, margin: '0 0 10px' }}>
+                      ⚠️ Are you currently at the BAIA drink counter placing your order?
+                    </p>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowRedeemConfirm(false)}
+                        disabled={redeeming}
+                        style={{
+                          flex: 1,
+                          background: '#F1F5F9',
+                          color: '#475569',
+                          border: 'none',
+                          padding: '10px',
+                          borderRadius: '10px',
+                          fontWeight: 600,
+                          fontSize: '0.82rem',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleRedeemReward}
+                        disabled={redeeming}
+                        style={{
+                          flex: 1.5,
+                          background: '#16255C',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          padding: '10px',
+                          borderRadius: '10px',
+                          fontWeight: 700,
+                          fontSize: '0.82rem',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        {redeeming ? 'Redeeming...' : 'Yes, Activate Now →'}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -734,6 +853,18 @@ export default function CardApp() {
             )}
           </div>
         </div>
+      )}
+
+      {/* Live Animated Barista Redemption Countdown */}
+      {activeRedemption && (
+        <RedemptionCountdown
+          redemptionData={activeRedemption}
+          user={user}
+          onClose={() => {
+            setActiveRedemption(null);
+            loadLoyaltyData();
+          }}
+        />
       )}
     </div>
   );
