@@ -13,7 +13,10 @@ import {
   Gift,
   QrCode,
   Camera,
-  KeyRound
+  KeyRound,
+  Wifi,
+  Copy,
+  Check
 } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
 import QrScanner from '../components/QrScanner';
@@ -29,6 +32,7 @@ export default function ClaimApp() {
   const [claimResult, setClaimResult] = useState(null);
   const [qrToken, setQrToken] = useState('');
   const [manualInputToken, setManualInputToken] = useState('');
+  const [copiedVoucher, setCopiedVoucher] = useState(false);
 
   // Extract token from URL or sessionStorage
   useEffect(() => {
@@ -287,7 +291,7 @@ export default function ClaimApp() {
                     border: '2px solid #FCD34D',
                     borderRadius: '16px',
                     padding: '16px',
-                    marginBottom: '24px',
+                    marginBottom: '20px',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
@@ -297,11 +301,91 @@ export default function ClaimApp() {
                       <Gift size={24} />
                     </div>
                     <div>
-                      <h4 style={{ color: '#78350F', fontSize: '0.95rem' }}>Milestone Reward Unlocked!</h4>
-                      <p style={{ color: '#92400E', fontSize: '0.8rem' }}>
-                        You now have a reward ready to redeem at the counter!
+                       <h4 style={{ color: '#78350F', fontSize: '0.95rem', margin: '0 0 4px' }}>Milestone Reward Unlocked!</h4>
+                      <p style={{ color: '#92400E', fontSize: '0.8rem', margin: 0 }}>
+                        You now have a free coffee reward ready to redeem at the counter!
                       </p>
                     </div>
+                  </div>
+                )}
+
+                {/* Free Beach Wi-Fi Voucher (Omada Hotspot) */}
+                {claimResult?.wifiVoucher && (
+                  <div style={{
+                    background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+                    border: '2px solid #60A5FA',
+                    borderRadius: '16px',
+                    padding: '16px',
+                    marginBottom: '20px',
+                    textAlign: 'left',
+                    boxShadow: '0 4px 14px rgba(37, 99, 235, 0.08)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                      <div style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '8px',
+                        background: '#2563EB',
+                        color: '#FFF',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        <Wifi size={16} />
+                      </div>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#1E40AF', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Free Beach Wi-Fi Voucher
+                      </span>
+                    </div>
+
+                    <div style={{
+                      background: '#FFFFFF',
+                      border: '1.5px dashed #93C5FD',
+                      borderRadius: '12px',
+                      padding: '10px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: '10px'
+                    }}>
+                      <div>
+                        <div style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 700 }}>HOTSPOT VOUCHER CODE</div>
+                        <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1E3A8A', letterSpacing: '2.5px', fontFamily: 'monospace' }}>
+                          {claimResult.wifiVoucher.code}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (navigator.clipboard) {
+                            navigator.clipboard.writeText(claimResult.wifiVoucher.code);
+                            setCopiedVoucher(true);
+                            setTimeout(() => setCopiedVoucher(false), 2500);
+                          }
+                        }}
+                        style={{
+                          background: copiedVoucher ? '#16A34A' : '#2563EB',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          padding: '8px 14px',
+                          borderRadius: '8px',
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          transition: 'background 0.2s ease'
+                        }}
+                      >
+                        {copiedVoucher ? <Check size={14} /> : <Copy size={14} />}
+                        <span>{copiedVoucher ? 'Copied' : 'Copy'}</span>
+                      </button>
+                    </div>
+
+                    <p style={{ fontSize: '0.76rem', color: '#1E40AF', margin: 0, lineHeight: '1.4' }}>
+                      ⚡ <strong>1 Hour Duration</strong> • Valid for up to <strong>2 devices</strong> (phone + laptop). Connect to <em>"BAIA Cafe Free Wi-Fi"</em> and paste this voucher code into the login portal!
+                    </p>
                   </div>
                 )}
 

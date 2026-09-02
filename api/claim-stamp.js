@@ -177,6 +177,23 @@ export default async function handler(req, res) {
     const rewardUnlockedNow = (currentTotal % 10 === 0);
     const pendingRewards = Math.max(0, milestoneNumber - (redemptionsCount || 0));
 
+    // 7. Dispense Omada Wi-Fi Voucher (gracefully fails safe if pool not seeded yet)
+    let wifiVoucher = null;
+    try {
+      const { data: voucherData, error: voucherErr } = await supabaseAdmin
+        .rpc('claim_next_wifi_voucher', { p_user_id: user.id });
+
+      if (!voucherErr && voucherData && voucherData.length > 0) {
+        wifiVoucher = {
+          code: voucherData[0].voucher_code,
+          durationHours: voucherData[0].duration || 1,
+          deviceLimit: voucherData[0].devices || 2
+        };
+      }
+    } catch (vErr) {
+      console.warn('Wi-Fi voucher dispensing non-fatal notice:', vErr.message);
+    }
+
     return res.status(200).json({
       success: true,
       totalStamps: currentTotal,
@@ -184,6 +201,7 @@ export default async function handler(req, res) {
       rewardUnlockedNow,
       pendingRewards,
       milestoneNumber,
+      wifiVoucher,
       message: rewardUnlockedNow
         ? `Milestone Reached! You unlocked a Free Specialty Coffee!`
         : `Stamp recorded! You now have ${currentTotal} ${currentTotal === 1 ? 'stamp' : 'stamps'}.`
