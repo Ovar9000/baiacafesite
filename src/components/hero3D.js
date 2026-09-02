@@ -1,7 +1,9 @@
 import VanillaTilt from 'vanilla-tilt';
+import { supabase } from '../lib/supabaseClient.js';
 
 // 4 Curated Aesthetic Showcase Slots (Rotates deterministically every 6 hours by Manila Time)
-const HERO_SHOWCASE_ITEMS = [
+// Default curated fallbacks:
+const DEFAULT_SHOWCASE_ITEMS = [
   {
     slot: 0,
     timeWindow: '12 AM – 6 AM • Shore Dawn',
@@ -39,6 +41,8 @@ const HERO_SHOWCASE_ITEMS = [
     tagColor: '#8B5CF6'
   }
 ];
+
+let showcaseSlots = [...DEFAULT_SHOWCASE_ITEMS];
 
 function getManila6HourSlotIndex() {
   try {
@@ -83,7 +87,7 @@ export function initHero3D() {
   let activeIndex = getManila6HourSlotIndex();
 
   function applySlot(idx, animate = false) {
-    const item = HERO_SHOWCASE_ITEMS[idx];
+    const item = showcaseSlots[idx] || DEFAULT_SHOWCASE_ITEMS[idx];
     if (!item || !showcaseImg) return;
     activeIndex = idx;
 
@@ -117,10 +121,49 @@ export function initHero3D() {
     }
   }
 
-  // Apply initial 6-hour slot on load
+  // 1. Apply initial 6-hour slot on load with curated beach defaults
   applySlot(activeIndex, false);
 
-  // Periodic check: if 6-hour boundary changes while page remains open, crossfade to next feature
+  // 2. Hydrate showcase slots with latest Facebook posts & HD photos cached in Supabase
+  async function hydrateHeroFromSupabase() {
+    try {
+      const { data: drops, error } = await supabase
+        .from('drops')
+        .select('id, title, description, badge, image_url, category')
+        .not('image_url', 'is', null)
+        .order('published_at', { ascending: false })
+        .limit(4);
+
+      if (!error && drops && drops.length > 0) {
+        const validDrops = drops.filter(d => d.image_url && d.image_url.startsWith('http') && !String(d.id).startsWith('fb_post_'));
+        if (validDrops.length > 0) {
+          validDrops.forEach((d, idx) => {
+            if (idx < 4) {
+              const categoryBadge = d.badge || (d.category === 'drink' ? 'Latest Drink' : d.category === 'food' ? 'Kitchen Drop' : 'Special Feature');
+              showcaseSlots[idx] = {
+                slot: idx,
+                timeWindow: DEFAULT_SHOWCASE_ITEMS[idx].timeWindow,
+                badge: categoryBadge,
+                title: d.title,
+                img: d.image_url,
+                alt: `BAIA Cafe — ${d.title}: ${d.description || 'Special Release'}`,
+                tagColor: DEFAULT_SHOWCASE_ITEMS[idx].tagColor
+              };
+            }
+          });
+
+          // Smoothly re-apply current 6-hour slot with the fresh Facebook HD photo
+          applySlot(getManila6HourSlotIndex(), true);
+        }
+      }
+    } catch (e) {
+      // Graceful fallback to local curated defaults
+    }
+  }
+
+  hydrateHeroFromSupabase();
+
+  // 3. Periodic check: if 6-hour boundary changes while page remains open, crossfade to next feature
   setInterval(() => {
     const currentSlot = getManila6HourSlotIndex();
     if (currentSlot !== activeIndex) {
