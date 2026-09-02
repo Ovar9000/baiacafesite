@@ -1,18 +1,187 @@
 import VanillaTilt from 'vanilla-tilt';
 
+// 4 Curated Aesthetic Showcase Slots (Rotates deterministically every 6 hours by Manila Time)
+const HERO_SHOWCASE_ITEMS = [
+  {
+    slot: 0,
+    timeWindow: '12 AM – 6 AM • Shore Dawn',
+    badge: 'House Special',
+    title: 'Iced Hazelnut Latte & Skimboard',
+    img: './images/Baia%20skimboard%20and%20coffee.webp',
+    alt: 'BAIA Iced Hazelnut Latte and custom branded skimboard on the beach sand at Laurente shore',
+    tagColor: 'var(--hot-pink)'
+  },
+  {
+    slot: 1,
+    timeWindow: '6 AM – 12 PM • Morning Brew',
+    badge: 'Signature Brew',
+    title: 'Bohol Asin Tibuok Sea Salt Latte',
+    img: './images/classiccafe.webp',
+    alt: 'BAIA Bohol Asin Tibuok Sea Salt artisan latte on the beach',
+    tagColor: '#D97706'
+  },
+  {
+    slot: 2,
+    timeWindow: '12 PM – 6 PM • Beachside Grill',
+    badge: 'Beachside Grill',
+    title: 'Double Smash Burger & Crisp Fries',
+    img: './images/smashburger.webp',
+    alt: 'BAIA freshly seared double smash burger on brioche bun',
+    tagColor: '#EF4444'
+  },
+  {
+    slot: 3,
+    timeWindow: '6 PM – 12 AM • Golden Sunset',
+    badge: 'Sunset Refresher',
+    title: 'Shore Hibiscus Berry Refresher',
+    img: './images/Hibiscus%20berry%20refresher.webp',
+    alt: 'BAIA iced hibiscus berry iced refresher beverage',
+    tagColor: '#8B5CF6'
+  }
+];
+
+function getManila6HourSlotIndex() {
+  try {
+    const manilaHour = parseInt(
+      new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Manila',
+        hour: 'numeric',
+        hour12: false
+      }).format(new Date()),
+      10
+    );
+    // 00:00 - 05:59 -> Slot 0
+    // 06:00 - 11:59 -> Slot 1
+    // 12:00 - 17:59 -> Slot 2
+    // 18:00 - 23:59 -> Slot 3
+    return Math.min(3, Math.max(0, Math.floor(manilaHour / 6)));
+  } catch (e) {
+    return Math.floor(Date.now() / 21600000) % 4;
+  }
+}
+
 export function initHero3D() {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const heroCard = document.querySelector('.hero-3d-card');
 
   if (heroCard && !prefersReducedMotion) {
     VanillaTilt.init(heroCard, {
-      max: 10,
-      speed: 400,
+      max: 12,
+      speed: 500,
       glare: false,
       perspective: 1200,
       scale: 1.02
     });
+
+    // Prismatic / Holographic Trading Card Foil Sheen Physics
+    heroCard.addEventListener('tiltChange', (event) => {
+      const { percentX, percentY } = event.detail || {};
+      if (percentX === undefined || percentY === undefined) return;
+
+      const x = Math.round((percentX + 1) * 50);
+      const y = Math.round((percentY + 1) * 50);
+      const angle = Math.round(125 + percentX * 45);
+      const opacity = (0.45 + Math.abs(percentX) * 0.35).toFixed(2);
+      const glareOpacity = (0.35 + Math.abs(percentY) * 0.3).toFixed(2);
+
+      heroCard.style.setProperty('--foil-x', `${x}%`);
+      heroCard.style.setProperty('--foil-y', `${y}%`);
+      heroCard.style.setProperty('--foil-angle', `${angle}deg`);
+      heroCard.style.setProperty('--foil-opacity', opacity);
+      heroCard.style.setProperty('--glare-opacity', glareOpacity);
+    });
+
+    heroCard.addEventListener('mouseleave', () => {
+      heroCard.style.removeProperty('--foil-x');
+      heroCard.style.removeProperty('--foil-y');
+      heroCard.style.removeProperty('--foil-angle');
+      heroCard.style.removeProperty('--foil-opacity');
+      heroCard.style.removeProperty('--glare-opacity');
+    });
   }
+
+  // 6-Hour Showcase Rotation (Option A)
+  const showcaseImg = document.getElementById('hero-showcase-img');
+  const flavorPill = document.getElementById('hero-flavor-pill');
+  const flavorBadge = document.getElementById('hero-flavor-badge');
+  const flavorTitle = document.getElementById('hero-flavor-title');
+  const dots = document.querySelectorAll('.showcase-dot');
+
+  let activeIndex = getManila6HourSlotIndex();
+
+  function applySlot(idx, animate = true) {
+    const item = HERO_SHOWCASE_ITEMS[idx];
+    if (!item || !showcaseImg) return;
+    activeIndex = idx;
+
+    // Update active dot indicator
+    dots.forEach((dot, dIdx) => {
+      dot.classList.toggle('active', dIdx === idx);
+    });
+
+    if (animate) {
+      showcaseImg.classList.add('showcase-fading');
+      if (flavorPill) flavorPill.classList.add('pill-fading');
+
+      setTimeout(() => {
+        showcaseImg.src = item.img;
+        showcaseImg.alt = item.alt;
+        if (flavorBadge) {
+          flavorBadge.textContent = item.badge;
+          if (item.tagColor) flavorBadge.style.background = item.tagColor;
+        }
+        if (flavorTitle) {
+          flavorTitle.textContent = item.title;
+        }
+        showcaseImg.classList.remove('showcase-fading');
+        if (flavorPill) flavorPill.classList.remove('pill-fading');
+      }, 200);
+    } else {
+      showcaseImg.src = item.img;
+      showcaseImg.alt = item.alt;
+      if (flavorBadge) {
+        flavorBadge.textContent = item.badge;
+        if (item.tagColor) flavorBadge.style.background = item.tagColor;
+      }
+      if (flavorTitle) {
+        flavorTitle.textContent = item.title;
+      }
+    }
+  }
+
+  // Initialize initial 6-hour slot on load
+  applySlot(activeIndex, false);
+
+  // Allow clicking on dot navigator
+  dots.forEach((dot) => {
+    dot.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const slotIdx = parseInt(dot.getAttribute('data-slot'), 10);
+      if (!isNaN(slotIdx) && slotIdx !== activeIndex) {
+        applySlot(slotIdx, true);
+      }
+    });
+  });
+
+  // Tapping the card cycles to next featured item
+  if (heroCard) {
+    heroCard.addEventListener('click', (e) => {
+      if (e.target.closest('.hero-showcase-nav') || e.target.closest('a') || e.target.closest('button')) {
+        return;
+      }
+      const nextSlot = (activeIndex + 1) % HERO_SHOWCASE_ITEMS.length;
+      applySlot(nextSlot, true);
+    });
+  }
+
+  // Periodic check: if 6-hour boundary changes while page remains open
+  setInterval(() => {
+    const currentSlot = getManila6HourSlotIndex();
+    if (currentSlot !== activeIndex) {
+      applySlot(currentSlot, true);
+    }
+  }, 10 * 60 * 1000);
 
   // Floating Badge Click -> scrolls to Menu
   const orderBadge = document.querySelector('.floating-order-badge');
