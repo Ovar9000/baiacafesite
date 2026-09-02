@@ -480,39 +480,52 @@ function fallbackRuleClassifier(post) {
 
   const isGiveaway = (lower.includes('guess') && lower.includes('free')) || lower.includes('giveaway') || lower.includes('contest');
   const isClosure = lower.includes('closed for the day') || lower.includes('weather break') || lower.includes('closed today');
-  const isNew = lower.includes('new drop') || lower.includes('newest') || lower.includes('flavor') || lower.includes('joining our') || lower.includes('available now') || lower.includes('introducing') || lower.includes('bean selection') || lower.includes('#new');
-  const isEvent = isGiveaway || isClosure || lower.includes('live') || lower.includes('acoustic') || lower.includes('saturday') || lower.includes('grand opening') || lower.includes('promo weekend') || lower.includes('holiday');
+  const isWebsiteLaunch = lower.includes('baia, now online') || lower.includes('baia.cafe') || lower.includes('now online');
+  const isNew = lower.includes('new drop') || lower.includes('newest') || lower.includes('flavor') || lower.includes('joining our') || lower.includes('available now') || lower.includes('introducing') || lower.includes('bean selection') || lower.includes('#new') || isWebsiteLaunch;
+  const isEvent = isGiveaway || isClosure || isWebsiteLaunch || lower.includes('live') || lower.includes('acoustic') || lower.includes('grand opening') || lower.includes('promo weekend') || lower.includes('holiday');
 
   if (!isNew && !isEvent) {
     return { action: 'skip', reason: 'not-new' };
   }
 
-  // Detect category & title
   let category = 'food';
   let title = 'New Food Drop';
   let description = msg;
+  let badge = 'Fresh Drop';
+  let winner = null;
+  let status = null;
+  let event_date = null;
+  let price = null;
 
   if (isGiveaway) {
     category = 'event';
     title = 'Burger Launch Giveaway: Guess & Win';
-    description = 'Community guessing contest on Facebook: The first correct guess of our newest Filipino breakfast burger wins a free burger on launch day!';
+    description = 'Community guessing contest on Facebook: Shoutout to our winner Cassandra Espinosa for correctly guessing the Longganisa Breakfast Burger and claiming her free launch burger!';
+    badge = 'Winner Awarded';
+    winner = 'Cassandra Espinosa';
+    status = 'concluded';
+    event_date = 'Winner Awarded';
   } else if (isClosure) {
     category = 'event';
-    title = '1-Day Weather Advisory (Reopened Next Day)';
-    description = 'Temporary 1-day weather break due to unfavorable conditions. BAIA Cafe resumed normal operations the following day.';
-  } else if (isEvent) {
+    title = '1-Day Weather Advisory';
+    description = 'Temporary 1-day weather break due to coastal rain. BAIA Cafe resumed normal operations the following day.';
+    badge = '1-Day Advisory';
+    event_date = '1-Day Break • Now Open';
+  } else if (isWebsiteLaunch) {
     category = 'event';
-    title = 'Sunset Beach Acoustic Sessions';
-    if (msg.includes('Acoustic')) title = 'Sunset Acoustic by the Shore';
-    description = 'Live acoustic sets, fairy lights, and signature Asin Tibuok iced lattes right on the Laurente sand.';
-  } else if (lower.includes('bean') || lower.includes('latte') || lower.includes('coffee') || lower.includes('honey') || lower.includes('drink') || lower.includes('soda')) {
+    title = 'BAIA, Now Online';
+    description = 'A new digital home for everything BAIA. Explore what\'s new, browse our beachside menu and prices before ordering, discover shore activities, and book your stay at Laurente Cottage.';
+    badge = 'Website Launch';
+    event_date = 'Live Now • baia.cafe';
+  } else if (lower.includes('bean') || lower.includes('latte') || lower.includes('coffee') || lower.includes('drink') || lower.includes('soda')) {
     category = 'drink';
+    badge = 'Drink Drop';
     if (lower.includes('bean')) {
       title = 'New Coffee Bean Selection';
-      description = 'A fresh new bean selection is now available at the cafe for you to try today.';
+      description = 'We are open today with a brand new coffee bean selection waiting for you to try.';
     } else if (lower.includes('hazelnut')) {
       title = 'Iced Shaken Hazelnut Latte';
-      description = 'Our newest Iced Shaken Hazelnut Latte features espresso shaken with brown sugar, cinnamon, and hazelnut.';
+      description = 'Our newest Iced Shaken Hazelnut Latte features espresso shaken with brown sugar, cinnamon, and hazelnut. Available now for your daily plans.';
     } else {
       title = 'Whipped Honey Foam Latte';
       description = 'Golden whipped wild honey foam layered over rich espresso. Available on all specialty coffee pours.';
@@ -520,19 +533,24 @@ function fallbackRuleClassifier(post) {
   } else if (lower.includes('longganisa') || lower.includes('breakfast burger')) {
     category = 'food';
     title = 'Longganisa Breakfast Burger';
-    description = 'Loaded with two patties (beef patty + homemade longganisa patty), Holy Smoke Sauce, and a sunny side up egg.';
+    description = 'Introducing the new Longganisa Breakfast Burger, loaded with a beef patty, homemade longganisa patty, Holy Smoke Sauce, and a sunny side up egg. Available now.';
+    badge = 'Fresh Drop';
   } else if (lower.includes('nacho') || lower.includes('tenders')) {
     category = 'food';
     title = 'Nacho-Crusted Chicken Tenders';
-    description = 'Crispy nacho-crusted chicken tenders served with a white garlic cajun sauce. Also new: Whipped Honey, available as a topping on any drink.';
+    description = 'Crispy nacho-crusted chicken tenders served with a white garlic cajun sauce. Also available now: Whipped Honey as a new drink topping.';
+    badge = 'Fresh Drop';
   } else if (lower.includes('yangnyeom') || lower.includes('wings')) {
     category = 'food';
     title = 'Yangnyeom Wings';
-    description = 'A new Korean-inspired wing flavor with a sweet-savory glaze and a touch of heat, available now.';
+    description = 'A new Korean-inspired wing flavor featuring a sweet-savory glaze and a touch of heat, available now at BAIA.';
+    badge = 'Fresh Drop';
   }
 
   const priceMatch = msg.match(/₱\s*(\d+)/);
-  const price = priceMatch ? `₱${priceMatch[1]}` : (isGiveaway ? 'Free Giveaway' : null);
+  if (priceMatch) {
+    price = `₱${priceMatch[1]}`;
+  }
 
   return {
     action: 'publish',
@@ -541,7 +559,10 @@ function fallbackRuleClassifier(post) {
     title,
     description,
     price,
-    event_date: isEvent ? 'Every Saturday • 5:00 PM – 8:00 PM' : null,
+    event_date,
+    badge,
+    winner,
+    status,
     image_url: imageUrls[0] || './images/Baia%20skimboard%20and%20coffee.webp',
     permalink: post.permalink_url || `https://www.facebook.com/${FB_PAGE_ID}/posts/${post.id}`,
     published_at: post.created_time || new Date().toISOString()
