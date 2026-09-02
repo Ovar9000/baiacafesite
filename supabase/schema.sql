@@ -117,7 +117,11 @@ create policy "Anyone can view drops" on public.drops
 -- Auto-populates public.profiles on user sign up (OAuth or Magic Link/OTP)
 -- ==============================================================================
 create or replace function public.handle_new_user()
-returns trigger as $$
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
 begin
   insert into public.profiles (id, email, display_name, avatar_url)
   values (
@@ -137,7 +141,10 @@ begin
     avatar_url = coalesce(excluded.avatar_url, public.profiles.avatar_url);
   return new;
 end;
-$$ language plpgsql security definer;
+$$;
+
+-- Revoke execute from public/authenticated (runs solely as trigger)
+revoke all on function public.handle_new_user() from public, anon, authenticated;
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
@@ -155,6 +162,7 @@ create or replace function public.redeem_loyalty_reward(
 returns jsonb
 language plpgsql
 security definer
+set search_path = public, pg_temp
 as $$
 declare
   v_total_stamps int;
@@ -203,6 +211,10 @@ begin
 end;
 $$;
 
+-- Restrict execution to backend service role only (called by /api/redeem-reward)
+revoke all on function public.redeem_loyalty_reward(uuid, text) from public, anon, authenticated;
+grant execute on function public.redeem_loyalty_reward(uuid, text) to service_role;
+
 -- ==============================================================================
 -- 7. TP-Link Omada Wi-Fi Hotspot Voucher Pool
 -- (1 Hour Duration, 2 Devices per Voucher)
@@ -243,6 +255,7 @@ returns table (
 )
 language plpgsql
 security definer
+set search_path = public, pg_temp
 as $$
 declare
   v_id bigint;
@@ -281,3 +294,7 @@ begin
   end if;
 end;
 $$;
+
+-- Restrict execution to backend service role only (called by /api/claim-stamp)
+revoke all on function public.claim_next_wifi_voucher(uuid) from public, anon, authenticated;
+grant execute on function public.claim_next_wifi_voucher(uuid) to service_role;
