@@ -42,6 +42,7 @@ returns table (
 )
 language plpgsql
 security definer
+set search_path = public, pg_temp
 as $$
 declare
   v_id bigint;
@@ -82,3 +83,7 @@ begin
   end if;
 end;
 $$;
+
+-- Restrict execution to backend service role only
+revoke all on function public.claim_next_wifi_voucher(uuid) from public, anon, authenticated;
+grant execute on function public.claim_next_wifi_voucher(uuid) to service_role;
