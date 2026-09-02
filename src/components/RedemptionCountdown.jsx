@@ -137,7 +137,7 @@ export default function RedemptionCountdown({ redemptionData, user, onClose }) {
         </div>
 
         <p style={{ fontSize: '0.78rem', color: '#64748B', marginBottom: '16px' }}>
-          👉 Please show this active animated screen to the cashier or barista when picking up your beverage.
+          Please show this screen to the cashier or barista when picking up your beverage.
         </p>
 
         <button 

@@ -181,7 +181,7 @@ export default function CardApp() {
         });
       } catch (e) {}
 
-      setToastMsg(data.message || 'Stamp successfully added to your card! 🎉');
+      setToastMsg(data.message || 'Stamp successfully added to your card.');
       await loadLoyaltyData();
 
       setTimeout(() => {
@@ -401,7 +401,7 @@ export default function CardApp() {
                     textAlign: 'center'
                   }}>
                     <p style={{ fontSize: '0.82rem', color: '#78350F', fontWeight: 600, margin: '0 0 10px' }}>
-                      ⚠️ Are you currently at the BAIA drink counter placing your order?
+                      Are you currently at the BAIA drink counter placing your order?
                     </p>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button
