@@ -25,7 +25,12 @@ export default async function handler(req, res) {
 
     const accessToken = authHeader.replace('Bearer ', '').trim();
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-      auth: { persistSession: false }
+      auth: { persistSession: false },
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
     });
 
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(accessToken);
@@ -86,7 +91,7 @@ export default async function handler(req, res) {
 
     if (insertError) {
       console.error('Failed to insert redemption:', insertError);
-      return res.status(500).json({ error: 'Failed to record reward redemption.' });
+      return res.status(500).json({ error: `Failed to record reward redemption: ${insertError.message}` });
     }
 
     return res.status(200).json({
