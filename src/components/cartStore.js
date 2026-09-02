@@ -130,7 +130,7 @@ class CartStore {
     if (this.items.length === 0) return '';
     const totals = this.getTotals();
     const lines = [
-      'Hi BAIA Cafe! 👋 I’d like to place an order ahead via messenger:',
+      'Hi BAIA Cafe, I would like to place an order ahead via Messenger:',
       '',
       ...this.items.map(i => {
         const meta = [];

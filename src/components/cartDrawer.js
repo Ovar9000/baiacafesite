@@ -86,7 +86,7 @@ export function initCartDrawer() {
       btn.classList.add('active');
       btn.setAttribute('aria-pressed', 'true');
       cartStore.orderType = btn.dataset.spot || 'Dine-In at Cafe';
-      cartStore.showToast('Order Type Set', `${cartStore.orderType}`, '📍');
+      cartStore.showToast('Order Type Set', `${cartStore.orderType}`);
     });
   });
 
@@ -101,7 +101,7 @@ export function initCartDrawer() {
   checkoutBtn?.addEventListener('click', () => {
     const totals = cartStore.getTotals();
     if (totals.itemCount === 0) {
-      cartStore.showToast('Order List is Empty', 'Add your favorite coffee or smash burger first!', 'ℹ️');
+      cartStore.showToast('Order List is Empty', 'Add your favorite coffee or smash burger first.');
       return;
     }
     showCheckoutModal(totals);
@@ -147,7 +147,15 @@ export function initCartDrawer() {
     if (store.items.length === 0) {
       itemsContainer.innerHTML = `
         <div class="empty-cart-state">
-          <div class="empty-cart-icon" aria-hidden="true">☕</div>
+          <div class="empty-cart-icon" aria-hidden="true">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 8h1a4 4 0 1 1 0 8h-1"></path>
+              <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path>
+              <line x1="6" y1="2" x2="6" y2="4"></line>
+              <line x1="10" y1="2" x2="10" y2="4"></line>
+              <line x1="14" y1="2" x2="14" y2="4"></line>
+            </svg>
+          </div>
           <h4>Your Order List is Empty</h4>
           <p>Explore our menu and build your order list to message directly via Facebook Messenger!</p>
           <button class="btn-story-pill" style="margin-top: 14px;" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'}); cartStore.closeDrawer();">
@@ -221,7 +229,7 @@ export function initCartDrawer() {
     modal.innerHTML = `
       <div class="modal-dialog-card">
         <div class="modal-header">
-          <div class="modal-badge">💬 Fast Dispatch via Messenger</div>
+          <div class="modal-badge">Fast Dispatch via Messenger</div>
           <h3 id="checkout-modal-title" style="font-family: var(--font-display); font-size: 1.35rem; color: var(--deep-navy); margin-top: 6px;">
             Send Order to BAIA Cafe
           </h3>
@@ -230,7 +238,7 @@ export function initCartDrawer() {
         <div class="modal-body-content">
           <div class="order-summary-box">
             <div class="summary-spot-line">
-              <span>📍 Order Type:</span>
+              <span>Order Type:</span>
               <strong>${cartStore.orderType}</strong>
             </div>
             <div class="summary-items-list">

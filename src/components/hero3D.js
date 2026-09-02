@@ -146,7 +146,7 @@ export function initHero3D() {
       if (storySec) {
         storySec.scrollIntoView({ behavior: 'smooth' });
       }
-      showShowcaseToast('🏄‍♂️ Coffee by the Bay', 'Fresh brews & free guest skimboards right on the sand!', '🌊');
+      showShowcaseToast('Coffee by the Bay', 'Fresh brews and free guest skimboards right on the sand.', '✓');
     };
 
     mascot.addEventListener('click', handleMascotAction);

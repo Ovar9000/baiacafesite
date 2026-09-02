@@ -384,7 +384,7 @@ export default function ClaimApp() {
                     </div>
 
                     <p style={{ fontSize: '0.76rem', color: '#1E40AF', margin: 0, lineHeight: '1.4' }}>
-                      ⚡ <strong>1 Hour Duration</strong> • Valid for up to <strong>2 devices</strong> (phone + laptop). Connect to <em>"BAIA Cafe Free Wi-Fi"</em> and paste this voucher code into the login portal!
+                      <strong>1 Hour Duration</strong> • Valid for up to <strong>2 devices</strong> (phone + laptop). Connect to <em>"BAIA Cafe Free Wi-Fi"</em> and paste this voucher code into the login portal.
                     </p>
                   </div>
                 )}
