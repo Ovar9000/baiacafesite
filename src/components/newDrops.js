@@ -118,7 +118,8 @@ export function initNewDrops() {
 
           // Event sub-types (strictly scoped to events)
           const isGiveaway = isEvent && (item.badge === 'Giveaway' || item.badge === 'Winner Awarded' || Boolean(item.winner) || /\b(giveaway|contest|guess)\b/i.test(item.title));
-          const isGiveawayConcluded = isGiveaway && (item.status === 'concluded' || Boolean(item.winner) || item.badge === 'Winner Awarded');
+          const isDatePast = Boolean(item.event_date && !isNaN(new Date(item.event_date).getTime()) && new Date(item.event_date) < new Date());
+          const isGiveawayConcluded = isGiveaway && (item.status === 'concluded' || Boolean(item.winner) || item.badge === 'Winner Awarded' || isDatePast);
           const isAdvisory = isEvent && !isGiveaway && (item.badge === '1-Day Advisory' || /\b(advisory|closure|weather)\b/i.test(item.title));
 
           let badgeClass = 'badge-drop';
