@@ -16,7 +16,10 @@ import {
   ShieldCheck, 
   Trophy, 
   X, 
-  Calendar 
+  Calendar,
+  Wifi,
+  Copy,
+  Check
 } from 'lucide-react';
 import '../styles/loyalty.css';
 
@@ -42,6 +45,10 @@ export default function CardApp() {
 
   // Stamp Card Collection Showcase Archive Modal
   const [showArchiveModal, setShowArchiveModal] = useState(false);
+
+  // Active Wi-Fi Voucher state
+  const [todayVoucher, setTodayVoucher] = useState(null);
+  const [copiedVoucher, setCopiedVoucher] = useState(false);
 
   // Fetch Supabase session on load
   useEffect(() => {
@@ -85,6 +92,44 @@ export default function CardApp() {
 
       if (rErr) throw rErr;
       setRedemptions(redemptionsData || []);
+
+      // Fetch today's active Wi-Fi voucher
+      try {
+        const todayManila = new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'Asia/Manila',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        }).format(new Date());
+
+        const startOfDay = new Date(`${todayManila}T00:00:00+08:00`).toISOString();
+        const endOfDay = new Date(`${todayManila}T23:59:59.999+08:00`).toISOString();
+
+        const { data: voucherRows } = await supabase
+          .from('wifi_vouchers')
+          .select('code, duration_hours, device_limit, claimed_at')
+          .eq('claimed_by', user.id)
+          .gte('claimed_at', startOfDay)
+          .lte('claimed_at', endOfDay)
+          .order('claimed_at', { ascending: false })
+          .limit(1);
+
+        if (voucherRows && voucherRows.length > 0) {
+          setTodayVoucher(voucherRows[0]);
+        } else {
+          const cached = sessionStorage.getItem('baia_today_wifi_voucher');
+          if (cached) {
+            try { setTodayVoucher(JSON.parse(cached)); } catch (e) {}
+          } else {
+            setTodayVoucher(null);
+          }
+        }
+      } catch (vErr) {
+        const cached = sessionStorage.getItem('baia_today_wifi_voucher');
+        if (cached) {
+          try { setTodayVoucher(JSON.parse(cached)); } catch (e) {}
+        }
+      }
     } catch (err) {
       console.error('Error loading loyalty data:', err);
       setErrorMsg('Could not refresh card stamps.');
@@ -103,6 +148,8 @@ export default function CardApp() {
     setSession(null);
     setStamps([]);
     setRedemptions([]);
+    setTodayVoucher(null);
+    sessionStorage.removeItem('baia_today_wifi_voucher');
   };
 
   const handleRedeemReward = async () => {
@@ -182,6 +229,12 @@ export default function CardApp() {
       } catch (e) {}
 
       setToastMsg(data.message || 'Stamp successfully added to your card.');
+      if (data.wifiVoucher) {
+        setTodayVoucher(data.wifiVoucher);
+        try {
+          sessionStorage.setItem('baia_today_wifi_voucher', JSON.stringify(data.wifiVoucher));
+        } catch (e) {}
+      }
       await loadLoyaltyData();
 
       setTimeout(() => {
@@ -542,6 +595,103 @@ export default function CardApp() {
                 </div>
               </div>
             </div>
+
+            {/* Active Beach Wi-Fi Voucher Tile (View again anytime today) */}
+            {todayVoucher ? (
+              <div style={{
+                background: '#FFFFFF',
+                border: '1.5px solid #BFDBFE',
+                borderRadius: '20px',
+                padding: '16px 18px',
+                boxShadow: '0 4px 16px rgba(37, 99, 235, 0.08)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '10px',
+                      background: '#EFF6FF',
+                      color: '#2563EB',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <Wifi size={18} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.68rem', fontWeight: 800, color: '#2563EB', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                        Active Today
+                      </div>
+                      <h4 style={{ fontSize: '0.96rem', color: 'var(--loyalty-navy)', fontWeight: 700, margin: 0 }}>
+                        Beach Wi-Fi Voucher
+                      </h4>
+                    </div>
+                  </div>
+                  <span style={{
+                    fontSize: '0.72rem',
+                    color: '#16A34A',
+                    background: '#DCFCE7',
+                    padding: '3px 10px',
+                    borderRadius: '9999px',
+                    fontWeight: 700
+                  }}>
+                    Unlocked
+                  </span>
+                </div>
+
+                <div style={{
+                  background: '#F8FAFC',
+                  border: '1px dashed #93C5FD',
+                  borderRadius: '12px',
+                  padding: '10px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div>
+                    <div style={{ fontSize: '0.66rem', color: '#64748B', fontWeight: 700, letterSpacing: '0.5px' }}>HOTSPOT CODE</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#1E3A8A', letterSpacing: '2.5px', fontFamily: 'monospace' }}>
+                      {todayVoucher.code}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (navigator.clipboard) {
+                        navigator.clipboard.writeText(todayVoucher.code);
+                        setCopiedVoucher(true);
+                        setTimeout(() => setCopiedVoucher(false), 2200);
+                      }
+                    }}
+                    style={{
+                      background: copiedVoucher ? '#16A34A' : 'var(--loyalty-navy)',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      padding: '8px 14px',
+                      borderRadius: '8px',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {copiedVoucher ? <Check size={14} /> : <Copy size={14} />}
+                    <span>{copiedVoucher ? 'Copied' : 'Copy'}</span>
+                  </button>
+                </div>
+
+                <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
+                  Valid for up to <strong>2 devices</strong> (phone + laptop) • 1 hour duration. Connect to <em>"BAIA Cafe Free Wi-Fi"</em> and enter this code.
+                </p>
+              </div>
+            ) : null}
 
             {/* 3. In-App Camera Scan Trigger */}
             <button 
