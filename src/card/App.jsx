@@ -19,7 +19,10 @@ import {
   Calendar,
   Wifi,
   Copy,
-  Check
+  Check,
+  HelpCircle,
+  Trash2,
+  CheckCircle2
 } from 'lucide-react';
 import '../styles/loyalty.css';
 
@@ -49,6 +52,11 @@ export default function CardApp() {
   // Active Wi-Fi Voucher state
   const [todayVoucher, setTodayVoucher] = useState(null);
   const [copiedVoucher, setCopiedVoucher] = useState(false);
+
+  // Tutorial & Account Deletion Modals
+  const [showTutorialModal, setShowTutorialModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   // Fetch Supabase session on load
   useEffect(() => {
@@ -159,6 +167,40 @@ export default function CardApp() {
     setRedemptions([]);
     setTodayVoucher(null);
     sessionStorage.removeItem('baia_today_wifi_voucher');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deletingAccount || !session?.access_token) return;
+    try {
+      setDeletingAccount(true);
+      setErrorMsg('');
+      const res = await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to delete account.');
+      }
+      setShowDeleteModal(false);
+      await supabase.auth.signOut();
+      setUser(null);
+      setSession(null);
+      setStamps([]);
+      setRedemptions([]);
+      setTodayVoucher(null);
+      sessionStorage.removeItem('baia_today_wifi_voucher');
+      setToastMsg('Your account and stamp data have been permanently deleted.');
+      setTimeout(() => setToastMsg(''), 4000);
+    } catch (err) {
+      console.error('Delete account error:', err);
+      setErrorMsg(err.message || 'Error deleting account.');
+    } finally {
+      setDeletingAccount(false);
+    }
   };
 
   const handleRedeemReward = async () => {
@@ -342,12 +384,24 @@ export default function CardApp() {
           </div>
         </a>
 
-        {user && (
-          <button onClick={handleSignOut} className="btn-loyalty-signout" title="Sign Out">
-            <LogOut size={14} />
-            <span>Sign Out</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button 
+            type="button" 
+            onClick={() => setShowTutorialModal(true)} 
+            className="btn-loyalty-signout" 
+            style={{ background: 'transparent', border: '1px solid #E2E8F0', color: 'var(--loyalty-navy)' }}
+            title="How Shore Club Works"
+          >
+            <HelpCircle size={14} />
+            <span>How It Works</span>
           </button>
-        )}
+          {user && (
+            <button onClick={handleSignOut} className="btn-loyalty-signout" title="Sign Out">
+              <LogOut size={14} />
+              <span>Sign Out</span>
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Main Content */}
@@ -359,26 +413,74 @@ export default function CardApp() {
               setUser(s.user);
             }} />
 
-            <div className="loyalty-section-card" style={{ marginTop: '20px', textAlign: 'center' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: '#FAF4EB',
-                color: '#FB923C',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '12px'
-              }}>
-                <Gift size={24} />
+            {/* Shore Club Loyalty Card Web Tutorial & Perks Guide */}
+            <div className="loyalty-section-card" style={{ marginTop: '20px', padding: '24px 20px' }}>
+              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#1E4AFF', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  Member Benefits Guide
+                </span>
+                <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--loyalty-navy)', fontSize: '1.25rem', fontWeight: 800, margin: '4px 0 6px' }}>
+                  How Your Loyalty Card Works
+                </h3>
+                <p style={{ fontSize: '0.8rem', color: '#64748B', margin: 0 }}>
+                  Enjoy handcrafted perks every time you visit the shores of Laurente.
+                </p>
               </div>
-              <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--loyalty-navy)', marginBottom: '6px' }}>
-                Collect Stamps. Sip Free Coffee.
-              </h4>
-              <p style={{ fontSize: '0.82rem', color: 'var(--loyalty-text-muted)', lineHeight: '1.5' }}>
-                Order any qualifying specialty handcrafted beverage at Baia Café, scan the standee QR code at pickup, and unlock a complimentary artisan coffee every 10 stamps!
-              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {/* Step 1 */}
+                <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', background: '#F8FAFC', padding: '14px 16px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#16255C', color: '#FFE699', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', flexShrink: 0 }}>
+                    1
+                  </div>
+                  <div>
+                    <h5 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--loyalty-navy)', margin: '0 0 3px' }}>
+                      1-Tap Sign Up (Free &amp; Instant)
+                    </h5>
+                    <p style={{ fontSize: '0.78rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
+                      Sign in above with Google or your email. No app store download or password required—your loyalty card loads directly in your mobile browser.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', background: '#F8FAFC', padding: '14px 16px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#1E4AFF', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', flexShrink: 0 }}>
+                    2
+                  </div>
+                  <div>
+                    <h5 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--loyalty-navy)', margin: '0 0 3px' }}>
+                      Collect Daily Stamps &amp; Free Wi-Fi
+                    </h5>
+                    <p style={{ fontSize: '0.78rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
+                      Order any handcrafted beverage at Baia Café, then tap <strong>Scan Counter Standee</strong> at the pickup bar. Each scan earns 1 stamp and instantly dispenses a <strong>1-hour voucher for "BAIA Free Wifi"</strong> for up to 2 devices.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', background: '#F8FAFC', padding: '14px 16px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#15803D', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', flexShrink: 0 }}>
+                    3
+                  </div>
+                  <div>
+                    <h5 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--loyalty-navy)', margin: '0 0 3px' }}>
+                      Unlock Free Specialty Coffee
+                    </h5>
+                    <p style={{ fontSize: '0.78rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
+                      Every 10 stamps completes a card cycle and unlocks a <strong>complimentary handcrafted coffee</strong> of your choice. Activate your reward on screen and present it to your barista at the counter.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Legal Links Footer */}
+              <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #F1F5F9', textAlign: 'center', fontSize: '0.74rem', color: '#94A3B8' }}>
+                <span>Program governance: </span>
+                <a href="/terms/" target="_blank" rel="noreferrer" style={{ color: '#16255C', fontWeight: 600, textDecoration: 'underline' }}>Terms of Service</a>
+                <span style={{ margin: '0 6px' }}>•</span>
+                <a href="/privacy/" target="_blank" rel="noreferrer" style={{ color: '#16255C', fontWeight: 600, textDecoration: 'underline' }}>Privacy Policy</a>
+              </div>
             </div>
           </div>
         ) : (
@@ -870,6 +972,22 @@ export default function CardApp() {
                 <span>•</span>
                 <a href="/privacy/" style={{ color: '#94A3B8', textDecoration: 'none', fontWeight: 600 }}>Privacy Policy</a>
               </div>
+              <div style={{ marginTop: '12px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(true)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#94A3B8',
+                    fontSize: '0.7rem',
+                    cursor: 'pointer',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  Delete Account &amp; Stamp Data
+                </button>
+              </div>
             </div>
 
           </div>
@@ -1092,6 +1210,152 @@ export default function CardApp() {
             loadLoyaltyData();
           }}
         />
+      )}
+      {/* Shore Club Tutorial Modal (Accessible via 'How It Works' in header) */}
+      {showTutorialModal && (
+        <div className="archive-modal-overlay">
+          <div className="archive-modal-card" style={{ maxWidth: '440px' }}>
+            <div className="archive-modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ padding: '8px', background: '#EFF6FF', color: '#1E4AFF', borderRadius: '12px' }}>
+                  <HelpCircle size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--loyalty-navy)', fontWeight: 800, fontFamily: 'Space Grotesk, sans-serif' }}>
+                    Shore Club Loyalty Guide
+                  </h3>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>
+                    How your stamps, Wi-Fi, and rewards work
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowTutorialModal(false)}
+                className="btn-archive-close"
+                aria-label="Close guide"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', gap: '12px', background: '#F8FAFC', padding: '12px 14px', borderRadius: '14px', border: '1px solid #E2E8F0' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#16255C', color: '#FFE699', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
+                  1
+                </div>
+                <div>
+                  <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--loyalty-navy)', margin: '0 0 2px' }}>
+                    1 Drink = 1 Daily Stamp
+                  </h5>
+                  <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
+                    Purchase any handcrafted specialty beverage, then tap <strong>Scan Counter Standee</strong> at our pickup bar.
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', background: '#F8FAFC', padding: '12px 14px', borderRadius: '14px', border: '1px solid #E2E8F0' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#1E4AFF', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
+                  2
+                </div>
+                <div>
+                  <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--loyalty-navy)', margin: '0 0 2px' }}>
+                    Free Beach Wi-Fi with Every Scan
+                  </h5>
+                  <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
+                    Every daily scan dispenses a 1-hour access voucher for <strong>"BAIA Free Wifi"</strong> valid for up to 2 devices (phone + laptop).
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', background: '#F8FAFC', padding: '12px 14px', borderRadius: '14px', border: '1px solid #E2E8F0' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#15803D', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
+                  3
+                </div>
+                <div>
+                  <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--loyalty-navy)', margin: '0 0 2px' }}>
+                    Free Coffee Every 10 Stamps
+                  </h5>
+                  <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
+                    Complete 10 stamps to unlock your reward. Activate it when ordering and show your screen to the barista to redeem.
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ textAlign: 'center', paddingTop: '8px', fontSize: '0.75rem', color: '#94A3B8' }}>
+                <a href="/terms/" target="_blank" rel="noreferrer" style={{ color: '#16255C', fontWeight: 600, textDecoration: 'underline' }}>Terms of Service</a>
+                <span style={{ margin: '0 6px' }}>•</span>
+                <a href="/privacy/" target="_blank" rel="noreferrer" style={{ color: '#16255C', fontWeight: 600, textDecoration: 'underline' }}>Privacy Policy</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Self-Service Account & Data Deletion Modal */}
+      {showDeleteModal && (
+        <div className="archive-modal-overlay">
+          <div className="archive-modal-card" style={{ maxWidth: '380px', textAlign: 'center', padding: '24px 20px' }}>
+            <div style={{
+              width: '44px',
+              height: '44px',
+              borderRadius: '50%',
+              background: '#FEE2E2',
+              color: '#DC2626',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '14px'
+            }}>
+              <Trash2 size={22} />
+            </div>
+            <h3 style={{ color: '#16255C', margin: '0 0 8px', fontSize: '1.1rem', fontWeight: 800 }}>
+              Delete Loyalty Account?
+            </h3>
+            <p style={{ fontSize: '0.82rem', color: '#64748B', lineHeight: '1.5', margin: '0 0 20px' }}>
+              This will permanently delete your account, earned stamps, active Wi-Fi vouchers, and reward history. This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deletingAccount}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: '12px',
+                  border: '1px solid #CBD5E1',
+                  background: '#FFFFFF',
+                  color: '#475569',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deletingAccount}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: '#DC2626',
+                  color: '#FFFFFF',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer'
+                }}
+              >
+                {deletingAccount ? 'Deleting...' : 'Yes, Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

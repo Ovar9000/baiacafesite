@@ -48,7 +48,7 @@ function initHeroLoyaltyCta() {
       (k) => k.includes('auth-token') || k.startsWith('sb-')
     );
     if (hasAuth) {
-      ctaText.textContent = 'View Digital Card';
+      ctaText.textContent = 'View Loyalty Card';
     }
   } catch (e) {}
 }

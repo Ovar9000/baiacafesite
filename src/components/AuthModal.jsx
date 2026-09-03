@@ -120,6 +120,28 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
       <h3>{title}</h3>
       <p>{subtitle}</p>
 
+      {/* 3-Step Loyalty Perks Tutorial Strip */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '8px',
+        margin: '16px 0 20px',
+        textAlign: 'center'
+      }}>
+        <div style={{ background: '#FAF4EB', padding: '10px 6px', borderRadius: '14px', border: '1px solid #FDE68A' }}>
+          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#16255C' }}>1 Tap Join</div>
+          <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>Instant &amp; free</div>
+        </div>
+        <div style={{ background: '#EFF6FF', padding: '10px 6px', borderRadius: '14px', border: '1px solid #BFDBFE' }}>
+          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#1E4AFF' }}>Free Wi-Fi</div>
+          <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>With daily scan</div>
+        </div>
+        <div style={{ background: '#ECFDF5', padding: '10px 6px', borderRadius: '14px', border: '1px solid #A7F3D0' }}>
+          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#15803D' }}>Free Coffee</div>
+          <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>Every 10 stamps</div>
+        </div>
+      </div>
+
       {errorMsg && (
         <div style={{
           background: '#FEF2F2',
@@ -198,6 +220,18 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
               {emailSending ? 'Sending link...' : 'Send Sign-In Link →'}
             </button>
           </form>
+
+          {/* Explicit Legal Notice During Signup */}
+          <p style={{ fontSize: '0.74rem', color: '#64748B', margin: '14px 0 0', textAlign: 'center', lineHeight: '1.4' }}>
+            By signing in, you agree to the{' '}
+            <a href="/terms/" target="_blank" rel="noreferrer" style={{ color: '#16255C', fontWeight: 600, textDecoration: 'underline' }}>
+              Terms of Service
+            </a>{' '}
+            and{' '}
+            <a href="/privacy/" target="_blank" rel="noreferrer" style={{ color: '#16255C', fontWeight: 600, textDecoration: 'underline' }}>
+              Privacy Policy
+            </a>.
+          </p>
         </>
       )}
 
@@ -213,7 +247,7 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
             color: '#16255C',
             lineHeight: '1.5'
           }}>
-            Open the email from <strong>Supabase / BAIA Café</strong> and tap <strong>"Sign in"</strong> to open your digital loyalty card automatically.
+            Open the email from <strong>Supabase / BAIA Café</strong> and tap <strong>"Sign in"</strong> to open your loyalty card automatically.
           </div>
 
           <div style={{ fontSize: '0.8rem', color: '#64748B', marginBottom: '14px' }}>

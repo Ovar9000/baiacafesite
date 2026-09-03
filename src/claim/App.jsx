@@ -111,7 +111,7 @@ export default function ClaimApp() {
 
       setClaimResult(data);
       setClaimStatus('success');
-      setStatusMessage(data.message || 'Stamp successfully added to your digital card!');
+      setStatusMessage(data.message || 'Stamp successfully added to your loyalty card!');
 
       // Fire celebratory confetti
       try {
@@ -229,7 +229,7 @@ export default function ClaimApp() {
                     display: 'inline-block'
                   }}
                 >
-                  Return to Digital Card
+                  Return to Loyalty Card
                 </a>
               </div>
             )}
@@ -488,7 +488,7 @@ export default function ClaimApp() {
                       display: 'inline-block'
                     }}
                   >
-                    Go to Digital Card
+                    Go to Loyalty Card
                   </a>
                 </div>
               </div>
