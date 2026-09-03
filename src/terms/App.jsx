@@ -48,10 +48,11 @@ export default function TermsApp() {
               2. Shore Club Loyalty Program Rules
             </h2>
             <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <li><strong>Earning Stamps:</strong> Customers receive 1 digital stamp per qualifying specialty handcrafted beverage purchased at Baia Café by scanning the official daily pickup standee QR code.</li>
-              <li><strong>Daily Claim Limit:</strong> A maximum of 1 stamp may be earned per registered account per calendar day in Asia/Manila timezone.</li>
-              <li><strong>Physical Presence Verification:</strong> To prevent fraud, stamp claiming requires temporary geolocation validation confirming physical presence at our counter (within 75 meters of the café).</li>
-              <li><strong>Reward Redemption:</strong> Every 10 collected stamps earns 1 complimentary specialty coffee. Rewards must be redeemed in-person at our counter by showing the active reward status to our barista staff. Rewards cannot be exchanged for cash.</li>
+              <li><strong>Earning Stamps:</strong> Customers receive 1 digital stamp per qualifying handcrafted beverage purchased at Baia Café by scanning the official daily pickup standee QR code.</li>
+              <li><strong>Daily Claim Limit:</strong> A maximum of 1 stamp may be earned per registered account per calendar day (Asia/Manila timezone).</li>
+              <li><strong>In-Store Standee Verification:</strong> To guarantee fair play, stamp claiming requires scanning the physical daily counter standee at Baia Café. Each code is cryptographically signed and changes daily at midnight.</li>
+              <li><strong>Complimentary Beach Wi-Fi:</strong> Each daily stamp scan dispenses a 1-hour access voucher for the <em>"BAIA Free Wifi"</em> hotspot, valid for up to 2 devices (phone + laptop).</li>
+              <li><strong>Reward Redemption:</strong> Every 10 collected stamps earns 1 complimentary specialty coffee. Rewards must be activated and redeemed in-person at our counter with our barista staff. Rewards cannot be exchanged for cash.</li>
             </ul>
           </section>
 
@@ -60,7 +61,7 @@ export default function TermsApp() {
               3. User Accounts &amp; Security
             </h2>
             <p>
-              You are responsible for maintaining the confidentiality of your authentication credentials. Any fraudulent behavior, including spoofing geolocation or attempting to manipulate cryptographic verification tokens, may result in immediate suspension or termination of your loyalty card.
+              You are responsible for maintaining the confidentiality of your authentication credentials. Any fraudulent behavior, including attempting to forge cryptographic QR tokens or automate claims, may result in immediate cancellation of rewards and termination of your loyalty card.
             </p>
           </section>
 
