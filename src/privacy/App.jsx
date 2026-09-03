@@ -58,7 +58,10 @@ export default function PrivacyPolicyApp() {
                 <strong>Account &amp; Profile Information:</strong> When you sign in using <strong>Google Sign-In</strong> or your email address, we receive your basic profile info including your <em>name, email address, and profile picture avatar</em>. We use this exclusively to authenticate you and display your loyalty progress.
               </li>
               <li>
-                <strong>Location Data (GPS Geofencing):</strong> When you scan the daily QR standee at our drink pickup counter to claim a stamp, your browser asks for temporary GPS permission. We evaluate whether your coordinates are within <strong>75 meters of Baia Café</strong> to prevent fraudulent remote claims. We <strong>do not</strong> track your location in the background, and your raw GPS coordinates are not stored after verification.
+                <strong>Zero Location / GPS Tracking:</strong> We <strong>do not</strong> request, track, or store your device's GPS coordinates or geographic location. In-store visit validation is handled cryptographically via physical counter standee QR codes and on-site Wi-Fi presence.
+              </li>
+              <li>
+                <strong>Beach Wi-Fi Vouchers:</strong> We record your dispensed 1-hour Wi-Fi voucher code and claim date to ensure fair access for up to 2 devices on our <em>"BAIA Free Wifi"</em> hotspot.
               </li>
               <li>
                 <strong>Loyalty Transaction Records:</strong> We record the timestamp of stamps awarded and milestone rewards redeemed (e.g. Free Specialty Coffee).
@@ -73,9 +76,9 @@ export default function PrivacyPolicyApp() {
             <p>We process your information strictly for the following purposes:</p>
             <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <li>To maintain and calculate your 10-stamp digital loyalty card progression.</li>
+              <li>To dispense your complimentary 1-hour "BAIA Free Wifi" hotspot voucher.</li>
               <li>To notify you and our baristas when you are eligible for complimentary beverage rewards.</li>
-              <li>To verify physical presence at our counter when claiming daily stamps.</li>
-              <li>To prevent unauthorized, automated, or fraudulent redemptions.</li>
+              <li>To prevent unauthorized, automated, or fraudulent stamp claims.</li>
             </ul>
             <p style={{ marginTop: '8px', fontWeight: 600, color: '#16255C' }}>
               We will never sell, rent, or monetize your personal data to third parties or advertisers.
