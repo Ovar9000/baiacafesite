@@ -267,6 +267,28 @@ export default function CardApp() {
 
   const loyaltyStatus = calculateLoyaltyStatus(stamps, redemptions);
 
+  // Check if today's stamp or Wi-Fi voucher has already been claimed for current Manila date
+  const todayManila = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Manila',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date());
+
+  const hasScannedToday = Boolean(todayVoucher) || stamps.some(s => {
+    try {
+      const stampDate = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Manila',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).format(new Date(s.awarded_at));
+      return stampDate === todayManila;
+    } catch (e) {
+      return false;
+    }
+  });
+
   // A card is in completed 10/10 state ONLY when totalStamps is a multiple of 10 (>0) AND there is an unredeemed reward
   const isCompletedCard = loyaltyStatus.totalStamps > 0 && (loyaltyStatus.totalStamps % 10 === 0) && loyaltyStatus.hasPendingReward;
 
@@ -710,40 +732,73 @@ export default function CardApp() {
               </div>
             ) : null}
 
-            {/* 3. In-App Camera Scan Trigger */}
-            <button 
-              type="button"
-              onClick={() => {
-                setScannerErrorMsg('');
-                setScannerStatusMsg('');
-                setShowScannerModal(true);
-              }}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: '#FFFFFF',
-                border: '1.5px solid #E2E8F0',
-                padding: '14px 18px',
-                borderRadius: '18px',
-                color: 'var(--loyalty-navy)',
-                boxShadow: 'var(--loyalty-shadow)',
-                cursor: 'pointer',
-                textAlign: 'left'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ padding: '10px', background: '#EFF6FF', color: '#1E4AFF', borderRadius: '12px' }}>
-                  <QrCode size={22} />
+            {/* 3. In-App Camera Scan Trigger (Hidden once already scanned today) */}
+            {!hasScannedToday && (
+              <button 
+                type="button"
+                onClick={() => {
+                  setScannerErrorMsg('');
+                  setScannerStatusMsg('');
+                  setShowScannerModal(true);
+                }}
+                className="scan-cta-button"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: 'linear-gradient(135deg, #16255C 0%, #1E3A8A 100%)',
+                  border: 'none',
+                  padding: '16px 20px',
+                  borderRadius: '20px',
+                  color: '#FFFFFF',
+                  boxShadow: '0 8px 24px rgba(22, 37, 92, 0.22)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'transform 0.15s ease, box-shadow 0.15s ease'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div style={{ 
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '14px',
+                    background: 'rgba(255, 255, 255, 0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#FFE699',
+                    flexShrink: 0
+                  }}>
+                    <QrCode size={22} />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: '0.98rem', color: '#FFFFFF', letterSpacing: '0.2px' }}>
+                      Scan Counter Standee
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.82)', marginTop: '2px' }}>
+                      Collect today's drink stamp &amp; Wi-Fi
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>At the Drink Pickup Bar?</div>
-                  <div style={{ fontSize: '0.78rem', color: '#64748B' }}>Tap to scan daily counter standee</div>
+                
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.18)',
+                  padding: '6px 12px',
+                  borderRadius: '9999px',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  color: '#FFE699',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  flexShrink: 0
+                }}>
+                  <span>Scan</span>
+                  <ChevronRight size={14} />
                 </div>
-              </div>
-              <ChevronRight size={18} color="#94A3B8" />
-            </button>
+              </button>
+            )}
 
             {/* 4. Featured Specialty Coffee Spotlight */}
             <div style={{
@@ -804,11 +859,16 @@ export default function CardApp() {
               </div>
             </div>
 
-            {/* 5. Bottom Footer Info */}
-            <div style={{ textAlign: 'center', padding: '6px 0', fontSize: '0.75rem', color: '#94A3B8' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            {/* 5. Bottom Footer Info & Terms */}
+            <div style={{ textAlign: 'center', padding: '12px 0 6px', fontSize: '0.75rem', color: '#94A3B8' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
                 <ShieldCheck size={14} />
-                <span>Geofenced & verified at Baia Café, Masbate</span>
+                <span>Verified in-store at Baia Café, Masbate</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                <a href="/terms/" style={{ color: '#94A3B8', textDecoration: 'none', fontWeight: 600 }}>Terms of Service</a>
+                <span>•</span>
+                <a href="/privacy/" style={{ color: '#94A3B8', textDecoration: 'none', fontWeight: 600 }}>Privacy Policy</a>
               </div>
             </div>
 
