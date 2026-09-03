@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Sparkles, AlertCircle, CheckCircle, ShieldCheck, Loader2 } from 'lucide-react';
+import { AlertCircle, CheckCircle, ShieldCheck, Loader2 } from 'lucide-react';
 
 export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty Card", subtitle = "Earn free handcrafted coffee with every order at Baia Café." }) {
   const [email, setEmail] = useState('');
@@ -114,7 +114,11 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
   return (
     <div className="auth-card">
       <div className="auth-header-icon">
-        <Sparkles size={28} />
+        <img 
+          src="/images/baia-cup-icon.webp" 
+          alt="BAIA Café" 
+          style={{ width: '32px', height: '32px', objectFit: 'contain' }} 
+        />
       </div>
 
       <h3>{title}</h3>
