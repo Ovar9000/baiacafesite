@@ -124,40 +124,113 @@ export function initHero3D() {
   // 1. Apply initial 6-hour slot on load with curated beach defaults
   applySlot(activeIndex, false);
 
-  // 2. Hydrate showcase slots with latest Facebook posts & HD photos cached in Supabase
+  // 2. Hydrate showcase slots with time-appropriate food/drink items from Supabase
+  // The Hero card is strictly a food & drink showcase by time-of-day:
+  // - Morning (6 AM – 12 PM): Coffee / Morning Brew
+  // - Afternoon (12 PM – 6 PM): Burgers / Beachside Grill
+  // - Golden Sunset (6 PM – 12 AM): Refreshers & Coolers
+  // - Shore Dawn (12 AM – 6 AM): House Special Coffee & Skimboard
+  // Announcements, advisories, and website launch posts belong in the New Drops section, never the hero food showcase.
   async function hydrateHeroFromSupabase() {
     try {
-      const { data: drops, error } = await supabase
+      // A. Check for optional dedicated 'showcase' table in Supabase
+      const { data: customShowcase, error: showcaseErr } = await supabase
+        .from('showcase')
+        .select('*')
+        .order('slot', { ascending: true });
+
+      if (!showcaseErr && customShowcase && customShowcase.length > 0) {
+        customShowcase.forEach(item => {
+          const slotIdx = item.slot ?? item.slot_index;
+          if (slotIdx >= 0 && slotIdx < 4 && item.image_url) {
+            showcaseSlots[slotIdx] = {
+              slot: slotIdx,
+              timeWindow: DEFAULT_SHOWCASE_ITEMS[slotIdx].timeWindow,
+              badge: item.badge || DEFAULT_SHOWCASE_ITEMS[slotIdx].badge,
+              title: item.title || DEFAULT_SHOWCASE_ITEMS[slotIdx].title,
+              img: item.image_url,
+              alt: `BAIA Cafe — ${item.title}: ${item.description || DEFAULT_SHOWCASE_ITEMS[slotIdx].alt}`,
+              tagColor: item.tag_color || DEFAULT_SHOWCASE_ITEMS[slotIdx].tagColor
+            };
+          }
+        });
+        applySlot(getManila6HourSlotIndex(), true);
+        return;
+      }
+
+      // B. Intelligent Food/Drink matching from public.drops
+      const { data: drops, error: dropsErr } = await supabase
         .from('drops')
         .select('id, title, description, badge, image_url, category')
+        .neq('category', 'event') // Strictly exclude events, advisories, and launches
         .not('image_url', 'is', null)
         .order('published_at', { ascending: false })
-        .limit(4);
+        .limit(20);
 
-      if (!error && drops && drops.length > 0) {
-        const validDrops = drops.filter(d => d.image_url && d.image_url.startsWith('http') && !String(d.id).startsWith('fb_post_'));
-        if (validDrops.length > 0) {
-          validDrops.forEach((d, idx) => {
-            if (idx < 4) {
-              const categoryBadge = d.badge || (d.category === 'drink' ? 'Latest Drink' : d.category === 'food' ? 'Kitchen Drop' : 'Special Feature');
-              showcaseSlots[idx] = {
-                slot: idx,
-                timeWindow: DEFAULT_SHOWCASE_ITEMS[idx].timeWindow,
-                badge: categoryBadge,
-                title: d.title,
-                img: d.image_url,
-                alt: `BAIA Cafe — ${d.title}: ${d.description || 'Special Release'}`,
-                tagColor: DEFAULT_SHOWCASE_ITEMS[idx].tagColor
-              };
-            }
-          });
+      if (!dropsErr && drops && drops.length > 0) {
+        const validFoodDrinks = drops.filter(d => 
+          d.image_url && 
+          d.image_url.startsWith('http') && 
+          !String(d.id).startsWith('fb_post_') &&
+          !/\b(advisory|closure|launch|website|contest|giveaway|winner|hours|weather)\b/i.test(d.title)
+        );
 
-          // Smoothly re-apply current 6-hour slot with the fresh Facebook HD photo
-          applySlot(getManila6HourSlotIndex(), true);
+        // Slot 1: Morning Coffee / Brew (6 AM – 12 PM)
+        const latestCoffee = validFoodDrinks.find(d => 
+          d.category === 'drink' && 
+          /\b(coffee|latte|brew|espresso|bean|cappuccino|americano|mocha)\b/i.test(d.title + ' ' + (d.description || ''))
+        );
+        if (latestCoffee) {
+          showcaseSlots[1] = {
+            slot: 1,
+            timeWindow: DEFAULT_SHOWCASE_ITEMS[1].timeWindow,
+            badge: latestCoffee.badge || 'Morning Brew',
+            title: latestCoffee.title,
+            img: latestCoffee.image_url,
+            alt: `BAIA Cafe — ${latestCoffee.title}`,
+            tagColor: DEFAULT_SHOWCASE_ITEMS[1].tagColor
+          };
         }
+
+        // Slot 2: Afternoon Burger / Grill (12 PM – 6 PM)
+        const latestBurger = validFoodDrinks.find(d => 
+          d.category === 'food' && 
+          /\b(burger|smash|patty|grill|sandwich)\b/i.test(d.title + ' ' + (d.description || ''))
+        );
+        if (latestBurger) {
+          showcaseSlots[2] = {
+            slot: 2,
+            timeWindow: DEFAULT_SHOWCASE_ITEMS[2].timeWindow,
+            badge: latestBurger.badge || 'Beachside Grill',
+            title: latestBurger.title,
+            img: latestBurger.image_url,
+            alt: `BAIA Cafe — ${latestBurger.title}`,
+            tagColor: DEFAULT_SHOWCASE_ITEMS[2].tagColor
+          };
+        }
+
+        // Slot 3: Sunset Refresher / Cooler (6 PM – 12 AM)
+        const latestRefresher = validFoodDrinks.find(d => 
+          d.category === 'drink' && 
+          /\b(refresher|berry|hibiscus|tea|cooler|fruit|lemonade|citrus)\b/i.test(d.title + ' ' + (d.description || ''))
+        );
+        if (latestRefresher) {
+          showcaseSlots[3] = {
+            slot: 3,
+            timeWindow: DEFAULT_SHOWCASE_ITEMS[3].timeWindow,
+            badge: latestRefresher.badge || 'Sunset Refresher',
+            title: latestRefresher.title,
+            img: latestRefresher.image_url,
+            alt: `BAIA Cafe — ${latestRefresher.title}`,
+            tagColor: DEFAULT_SHOWCASE_ITEMS[3].tagColor
+          };
+        }
+
+        // Smoothly re-apply current time-of-day slot
+        applySlot(getManila6HourSlotIndex(), true);
       }
     } catch (e) {
-      // Graceful fallback to local curated defaults
+      // Graceful fallback to curated beach defaults
     }
   }
 

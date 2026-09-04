@@ -1,12 +1,29 @@
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://cqtcmrqlafgtcrcfaojz.supabase.co';
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+function getEnvVar(key, defaultValue = '') {
+  if (process.env[key]) return process.env[key];
+  try {
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf-8');
+      const regex = new RegExp(`^${key}\\s*=\\s*(.+)$`, 'm');
+      const match = content.match(regex);
+      if (match) {
+        const val = match[1].trim().replace(/^["']|["']$/g, '');
+        process.env[key] = val;
+        return val;
+      }
+    }
+  } catch (e) {}
+  return defaultValue;
+}
 
 function safeVerifyAdminPassword(providedPassword) {
   if (!providedPassword || typeof providedPassword !== 'string') return false;
-  const expectedPassword = process.env.ADMIN_PASSWORD || 'baia-admin-2026';
+  const expectedPassword = getEnvVar('ADMIN_PASSWORD', 'baia-admin-2026');
   const providedBuf = Buffer.from(providedPassword, 'utf8');
   const expectedBuf = Buffer.from(expectedPassword, 'utf8');
   if (providedBuf.length !== expectedBuf.length) return false;
@@ -14,8 +31,10 @@ function safeVerifyAdminPassword(providedPassword) {
 }
 
 function getSupabaseAdmin() {
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return null;
-  return createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  const supabaseUrl = getEnvVar('SUPABASE_URL') || getEnvVar('NEXT_PUBLIC_SUPABASE_URL') || getEnvVar('VITE_SUPABASE_URL') || 'https://cqtcmrqlafgtcrcfaojz.supabase.co';
+  const serviceKey = getEnvVar('SUPABASE_SERVICE_ROLE_KEY');
+  if (!supabaseUrl || !serviceKey) return null;
+  return createClient(supabaseUrl, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false }
   });
 }

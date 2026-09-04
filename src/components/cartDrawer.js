@@ -225,14 +225,27 @@ export function initCartDrawer() {
     }
 
     const orderMsg = cartStore.generateOrderMessage();
+    const encodedOrder = encodeURIComponent(orderMsg);
+    const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+    const messengerUrl = isMobile 
+      ? `https://m.me/thebaiacafe?text=${encodedOrder}` 
+      : `https://www.facebook.com/messages/t/thebaiacafe?text=${encodedOrder}`;
 
     modal.innerHTML = `
       <div class="modal-dialog-card">
-        <div class="modal-header">
-          <div class="modal-badge">Fast Dispatch via Messenger</div>
-          <h3 id="checkout-modal-title" style="font-family: var(--font-display); font-size: 1.35rem; color: var(--deep-navy); margin-top: 6px;">
-            Send Order to BAIA Cafe
-          </h3>
+        <div class="modal-header" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+          <div>
+            <div class="modal-badge">Direct Dispatch via Messenger</div>
+            <h3 id="checkout-modal-title" style="font-family: var(--font-display); font-size: 1.3rem; color: var(--deep-navy); margin: 6px 0 2px;">
+              Send Order to BAIA Cafe
+            </h3>
+            <p style="font-size: 0.8rem; color: #64748b; margin: 0;">
+              Pickups &amp; dine-in orders are confirmed via Messenger.
+            </p>
+          </div>
+          <button type="button" class="btn-archive-close modal-dialog-close-btn" id="modal-top-close-btn" aria-label="Close checkout modal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
 
         <div class="modal-body-content">
@@ -261,23 +274,51 @@ export function initCartDrawer() {
             </div>
           </div>
 
-          <p style="font-size: 0.85rem; color: #475569; line-height: 1.45; margin: 12px 0;">
-            All orders &amp; pickups are prioritized via <strong>Facebook Messenger</strong>. Click below to copy your order and chat directly with our counter team!
-          </p>
+          <!-- Step Guidance for Web & Mobile Clarity -->
+          <div class="order-dispatch-guide-strip">
+            <div class="dispatch-step-item">
+              <span class="step-num">1</span>
+              <span>Tap <strong>Open Messenger</strong> (automatically copies your order)</span>
+            </div>
+            <div class="dispatch-step-item">
+              <span class="step-num">2</span>
+              <span>In Messenger chat, press <strong style="color: #1E4AFF; background: #DBEAFE; padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono);">Ctrl + V</strong> (Paste) &amp; Send!</span>
+            </div>
+          </div>
+
+          <!-- Live Order Text Preview Box for Web & Desktop Transparency -->
+          <div style="margin: 10px 0 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">
+                Order Message Preview
+              </span>
+              <span style="font-size: 0.72rem; color: #94a3b8;">Click to copy manually</span>
+            </div>
+            <div class="order-message-preview" id="order-msg-preview-box" title="Click to copy order text" style="cursor: pointer;">${orderMsg}</div>
+          </div>
 
           <div class="modal-action-buttons">
-            <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow modal-btn send-fb-btn" style="justify-content: center; width: 100%; background: #0084FF; color: #FFFFFF; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 132, 255, 0.4);">
-              <span>Send via Facebook Messenger (Recommended)</span>
+            <button 
+              type="button"
+              class="btn-primary-glow modal-btn send-fb-btn" 
+              id="modal-send-fb-btn"
+              style="justify-content: center; width: 100%; background: #0084FF; color: #FFFFFF; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 132, 255, 0.4); border: none; cursor: pointer;"
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" style="display:inline-block; vertical-align: -2px;">
+                <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
+              </svg>
+              <span id="modal-fb-btn-label">Open Facebook Messenger &amp; Order</span>
               <span aria-hidden="true">↗</span>
-            </a>
-            <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill modal-btn send-ig-btn" style="justify-content: center; width: 100%; border-color: #cbd5e1; color: #475569; font-size: 0.88rem;">
-              <span>Message via Instagram DM</span>
-              <span aria-hidden="true">↗</span>
-            </a>
-            <button class="btn-secondary-pill modal-btn copy-order-btn" style="justify-content: center; width: 100%; border-color: var(--deep-navy); color: var(--deep-navy);">
-              <span>Copy Order Text</span>
             </button>
-            <button class="btn-close-modal" id="close-checkout-modal-btn">Back to Edit</button>
+
+            <button 
+              type="button"
+              class="btn-secondary-pill modal-btn copy-order-btn" 
+              id="modal-copy-order-btn"
+              style="justify-content: center; width: 100%; border-color: var(--deep-navy); color: var(--deep-navy); font-weight: 700;"
+            >
+              <span>Copy Order Text Only</span>
+            </button>
           </div>
         </div>
       </div>
@@ -285,26 +326,86 @@ export function initCartDrawer() {
 
     modal.classList.add('active');
 
-    // Clipboard copy helper
-    const copyToClipboard = () => {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(orderMsg);
-        cartStore.showToast('Order Copied', 'Paste directly into Facebook Messenger or Instagram chat', '✓');
+    // Rock-solid Synchronous Clipboard Copy Helper
+    const copyOrderToClipboard = () => {
+      let copied = false;
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = orderMsg;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        textarea.style.top = '0';
+        textarea.setAttribute('readonly', '');
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        textarea.setSelectionRange(0, 99999);
+        copied = document.execCommand('copy');
+        document.body.removeChild(textarea);
+      } catch (e) {
+        copied = false;
       }
+
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          navigator.clipboard.writeText(orderMsg).catch(() => {});
+          copied = true;
+        } catch (e) {}
+      }
+      return copied;
     };
 
-    modal.querySelector('.send-fb-btn')?.addEventListener('click', copyToClipboard);
-    modal.querySelector('.send-ig-btn')?.addEventListener('click', copyToClipboard);
-    modal.querySelector('.copy-order-btn')?.addEventListener('click', copyToClipboard);
-
-    document.getElementById('close-checkout-modal-btn')?.addEventListener('click', () => {
-      modal.classList.remove('active');
-    });
-
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.remove('active');
+    // Send via FB button handler
+    const sendFbBtn = modal.querySelector('#modal-send-fb-btn');
+    const fbBtnLabel = modal.querySelector('#modal-fb-btn-label');
+    sendFbBtn?.addEventListener('click', () => {
+      copyOrderToClipboard();
+      if (fbBtnLabel) {
+        fbBtnLabel.textContent = '✓ Copied! Opening Messenger (Paste with Ctrl+V)';
+        setTimeout(() => {
+          fbBtnLabel.textContent = 'Open Facebook Messenger & Order';
+        }, 5000);
       }
+      cartStore.showToast('Order Copied to Clipboard!', 'Press Ctrl+V (or Paste) in Messenger to send.', '✓');
+      window.open(messengerUrl, '_blank', 'noopener,noreferrer');
     });
+
+    // Copy Order Text Only button handler
+    const copyBtn = modal.querySelector('#modal-copy-order-btn');
+    copyBtn?.addEventListener('click', () => {
+      copyOrderToClipboard();
+      const labelSpan = copyBtn.querySelector('span');
+      if (labelSpan) {
+        labelSpan.textContent = '✓ Order Text Copied!';
+        copyBtn.style.borderColor = '#15803D';
+        copyBtn.style.color = '#15803D';
+        setTimeout(() => {
+          labelSpan.textContent = 'Copy Order Text Only';
+          copyBtn.style.borderColor = 'var(--deep-navy)';
+          copyBtn.style.color = 'var(--deep-navy)';
+        }, 3000);
+      }
+      cartStore.showToast('Order Copied!', 'Paste into Messenger or WhatsApp to order.', '✓');
+    });
+
+    // Click Preview Box to copy
+    const previewBox = modal.querySelector('#order-msg-preview-box');
+    previewBox?.addEventListener('click', () => {
+      copyOrderToClipboard();
+      cartStore.showToast('Order Copied!', 'Order message copied to clipboard.', '✓');
+    });
+
+    // Close handlers with smooth exit
+    const closeModal = () => {
+      modal.classList.remove('active');
+    };
+
+    modal.querySelector('#modal-top-close-btn')?.addEventListener('click', closeModal);
+
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    };
   }
 }

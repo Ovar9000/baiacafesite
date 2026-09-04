@@ -257,18 +257,20 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 14px;
+  gap: 16px;
 }
 
 .footer-copy-text {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.65);
+  line-height: 1.5;
 }
 
 .footer-social-links {
   display: flex;
   align-items: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 8px 14px;
 }
 
 .social-link {
@@ -277,11 +279,20 @@
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 700;
-  transition: color var(--duration-fast);
+  white-space: nowrap;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  transition: color var(--duration-fast), background-color var(--duration-fast);
 }
 
 .social-link:hover {
   color: var(--golden-amber);
+}
+
+.footer-sep {
+  color: rgba(255, 255, 255, 0.3);
+  user-select: none;
+  font-size: 0.8rem;
 }
 
 /* Responsive */
@@ -292,5 +303,47 @@
   }
   .sunset-countdown-card {
     max-width: 480px;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-bottom-strip {
+    /* Provide comfortable bottom breathing room to clear fixed mobile sticky bar */
+    padding: 24px 0 calc(28px + 72px) 0;
+  }
+
+  .footer-bottom-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .footer-copy-text {
+    text-align: center;
+    font-size: 0.775rem;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .footer-social-links {
+    justify-content: center;
+    gap: 8px 12px;
+  }
+
+  .social-link {
+    font-size: 0.78rem;
+    padding: 4px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Hide bullet dots on narrow mobile so orphan dots never hang between wrapped lines */
+  .footer-sep {
+    display: none;
+  }
+
+  .footer-social-links {
+    gap: 6px 14px;
   }
 }
