@@ -297,16 +297,9 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
         </div>
       )}
 
-      <div style={{ marginTop: '18px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', fontSize: '0.72rem', color: '#94A3B8' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <ShieldCheck size={14} />
-          <span>Official BAIA Shore Club Authentication</span>
-        </div>
-        <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
-          <a href="/privacy/" target="_blank" rel="noreferrer" style={{ color: '#64748B', textDecoration: 'underline' }}>Privacy Policy</a>
-          <span>•</span>
-          <a href="/terms/" target="_blank" rel="noreferrer" style={{ color: '#64748B', textDecoration: 'underline' }}>Terms of Service</a>
-        </div>
+      <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.72rem', color: '#94A3B8' }}>
+        <ShieldCheck size={14} />
+        <span>Official BAIA Shore Club Authentication</span>
       </div>
     </div>
   );

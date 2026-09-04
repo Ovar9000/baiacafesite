@@ -2,16 +2,16 @@
   {
     "id": "640323492494372_122183128280834483",
     "category": "event",
-    "title": "BAIA Cafe Official Website Launch",
-    "description": "BAIA is now online at www.baia.cafe! Explore the new digital home to browse menu prices, discover activities, and book your stay at Laurente Cottage, with upcoming apparel and sticker debuts on the way.",
+    "title": "BAIA, Now Online",
+    "description": "A new digital home for everything BAIA. Explore what's new, browse our beachside menu and prices before ordering, discover shore activities, and book your stay at Laurente Cottage.",
     "price": null,
     "event_date": "Live Now • baia.cafe",
-    "image_url": "https://cqtcmrqlafgtcrcfaojz.supabase.co/storage/v1/object/public/drops-cache/drop_640323492494372_122183128280834483.jpg",
+    "image_url": "https://scontent-mnl3-1.xx.fbcdn.net/v/t39.30808-6/788413728_122183127458834483_6883146577583826826_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=xKaeH6YR9akQ7kNvwFKGbXP&_nc_oc=AdpMcFhsmufPVPa4wJ_3Q467YWNr8Z5Cy4xNIiQQy6pOdHMWcuprgtECsJTjxlh8nUg&_nc_zt=23&_nc_ht=scontent-mnl3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=fw5bMSLt3JUaYmQTk78rvw&_nc_tpa=Q5bMBQIzOZY3vqqYGr4Qj25fnZXz95JmvDnAXf3We1pRKLl2PMijTI82_Sl5FvfSZ46TRvAnqMmtRaMmQg&oh=00_AQJxhNWD41CjoHUuYVVKDxjQf5wCh47-siDA5fTLppv0ug&oe=6AA08E56",
     "permalink": "https://www.facebook.com/122183033894834483/posts/122183128280834483",
     "published_at": "2026-09-01T05:39:45+0000",
     "badge": "Live Event",
     "winner": null,
-    "status": "active"
+    "status": null
   },
   {
     "id": "640323492494372_122182424138834483",
@@ -100,15 +100,15 @@
   {
     "id": "640323492494372_122178928790834483",
     "category": "event",
-    "title": "Guess the New Burger Giveaway",
-    "description": "Guess the new Filipino breakfast-inspired burger to win a free meal on launch day. Two new menu items arrive on July 29.",
+    "title": "Burger Launch Giveaway: Guess & Win",
+    "description": "Community guessing contest on Facebook: Shoutout to our winner Cassandra Espinosa for correctly guessing the Longganisa Breakfast Burger and claiming her free launch burger!",
     "price": null,
-    "winner": null,
-    "status": "active",
-    "event_date": "2026-07-29",
-    "image_url": "https://cqtcmrqlafgtcrcfaojz.supabase.co/storage/v1/object/public/drops-cache/drop_640323492494372_122178928790834483.jpg",
+    "winner": "Cassandra Espinosa",
+    "status": "concluded",
+    "event_date": "Winner Awarded",
+    "image_url": "https://scontent-mnl1-1.xx.fbcdn.net/v/t39.30808-6/752822805_122178927914834483_2701309912833582655_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=zjpg_0SlZmcQ7kNvwEpzMGr&_nc_oc=AdpxzBaDTTdPd8hwSt4gvOUxgCVOJ01X4SzdC3mj2bmBknYSKswjYxOp80DD8mRYzGg&_nc_zt=23&_nc_ht=scontent-mnl1-1.xx&edm=AKIiGfEEAAAA&_nc_gid=fw5bMSLt3JUaYmQTk78rvw&_nc_tpa=Q5bMBQLAZtVLYvqUaISubHJUNoop6GcYel55tYrz-QHwLEe8dfvgG9Fxp-mX3KkNjXPQtbx9y_qclQEokQ&oh=00_AQJRkD1e-Vb2VmuGEK4-XaGtx4FC58q6YTUgfV13FV34sQ&oe=6AA09824",
     "permalink": "https://www.facebook.com/122183033894834483/posts/122178928790834483",
     "published_at": "2026-07-22T12:35:40+0000",
-    "badge": "Giveaway"
+    "badge": "Winner Awarded"
   }
 ]

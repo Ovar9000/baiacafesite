@@ -1,5 +1,6 @@
 import { menuData } from '../data/menuData.js';
 import { cartStore } from './cartStore.js';
+import { motionSystem } from '../utils/motionSystem.js';
 
 export function initMenuExplorer() {
   const container = document.getElementById('menu-explorer-root');
@@ -102,25 +103,81 @@ export function initMenuExplorer() {
         ${groupedItems.length === 0 ? `
           <div class="menu-no-results">
             <h3>No items match "${searchQuery}"</h3>
-            <p>Try another search or browse by switching boards above.</p>
-          </div>
         ` : groupedItems.map(group => {
           const isOpen = isSearching ? true : openCategories.has(group.id);
+          // Dynamically size the tasting notes to fill available space without awkward "+1 more"
+          const maxAllowed = 8;
+          let maxSneak = Math.min(group.items.length, maxAllowed);
+          if (group.items.length - maxSneak === 1) {
+            maxSneak = group.items.length;
+          }
+          const sneakPeekItems = group.items.slice(0, maxSneak);
+          const remainingCount = group.items.length - maxSneak;
+
+          let minPrice = Infinity;
+          group.items.forEach(item => {
+            const p = item.price || item.priceM;
+            if (p && p < minPrice) minPrice = p;
+          });
+          const priceTeaserMarkup = minPrice !== Infinity ? `<span class="category-price-pill">From ₱${minPrice}</span>` : '';
+
+          const previewCapsulesMarkup = `
+            ${sneakPeekItems.map((item, idx) => {
+              const isFeatured = item.isPopular || item.isSpecialty;
+              const isLast = idx === sneakPeekItems.length - 1 && remainingCount <= 0;
+              return `
+                <span 
+                  class="sneak-peek-pill ${isFeatured ? 'is-featured' : ''}" 
+                  data-target-item-id="${item.id}"
+                  data-parent-category-id="${group.id}"
+                  title="Explore ${item.name}"
+                >
+                  ${isFeatured ? '<span class="note-star" aria-hidden="true">★</span>' : ''}
+                  <span class="pill-name">${item.name}</span>
+                </span>
+                ${!isLast ? '<span class="tasting-dot" aria-hidden="true">·</span>' : ''}
+              `;
+            }).join('')}
+            ${remainingCount > 0 ? `
+              <span 
+                class="tasting-more" 
+                data-parent-category-id="${group.id}"
+                title="View all ${group.items.length} items in ${group.name}"
+              >
+                +${remainingCount} more
+              </span>
+            ` : ''}
+          `;
 
           return `
             <div class="menu-accordion-card ${isOpen ? 'is-open' : ''}" id="cat-card-${group.id}">
-              <button class="category-accordion-btn" data-category-id="${group.id}" aria-expanded="${isOpen}">
-                <div class="category-title-left">
-                  <h3 class="category-title-text">${group.name}</h3>
-                  <span class="category-count-pill">${group.items.length} ${group.items.length === 1 ? 'item' : 'items'}</span>
-                </div>
-                <div class="category-toggle-indicator">
-                  <span>${isOpen ? 'Hide' : 'View'}</span>
-                  <span class="chevron-icon" aria-hidden="true">▼</span>
-                </div>
-              </button>
+              <div 
+                class="category-accordion-btn" 
+                data-category-id="${group.id}" 
+                role="button" 
+                tabindex="0" 
+                aria-expanded="${isOpen}"
+                aria-controls="cat-body-${group.id}"
+              >
+                <div class="category-header-main">
+                  <div class="category-title-left">
+                    <h3 class="category-title-text">${group.name}</h3>
+                    <span class="category-count-pill">${group.items.length} ${group.items.length === 1 ? 'item' : 'items'}</span>
+                    ${priceTeaserMarkup}
+                  </div>
 
-              <div class="category-accordion-body" ${isOpen ? '' : 'hidden'}>
+                  <div class="category-sneak-peek-track" aria-label="Sneak peek of ${group.name}">
+                    ${previewCapsulesMarkup}
+                  </div>
+
+                  <div class="category-toggle-indicator">
+                    <span>${isOpen ? 'Hide' : 'View'}</span>
+                    <span class="chevron-icon" aria-hidden="true">▼</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="category-accordion-body" id="cat-body-${group.id}" ${isOpen ? '' : 'hidden'}>
                 <div class="category-items-grid">
                   ${group.items.map(item => {
                     let priceDisplay = item.price ? `₱${item.price}` : 'Ask Cashier';
@@ -215,16 +272,197 @@ export function initMenuExplorer() {
       });
     });
 
-    // Accordion Header Buttons (Expand / Collapse)
-    container.querySelectorAll('.category-accordion-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const catId = btn.dataset.categoryId;
-        if (openCategories.has(catId)) {
-          openCategories.delete(catId);
-        } else {
+    // Helper to sync Toggle All button text
+    const syncToggleAllButton = () => {
+      const toggleAllBtn = document.getElementById('toggle-all-categories-btn');
+      if (toggleAllBtn) {
+        const groupedItems = getGroupedItems();
+        const allExpanded = groupedItems.length > 0 && groupedItems.every(g => openCategories.has(g.id));
+        toggleAllBtn.textContent = allExpanded ? 'Collapse All' : 'Expand All';
+      }
+    };
+
+    // Morph accordion pills into cards (and reverse) using View Transition API
+    const toggleAccordion = (card, catId, willOpen, btn, indicatorText) => {
+      if (!card) return;
+
+      const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+      if (isMobile || !document.startViewTransition) {
+        // Fallback / Mobile Viewports: standard instant toggle with clean CSS transitions
+        card.querySelectorAll('.menu-card').forEach(c => c.classList.remove('morph-settled'));
+        if (willOpen) {
           openCategories.add(catId);
+          motionSystem.animateCategoryPillsFlight(card, true);
+          card.classList.add('is-open');
+          btn?.setAttribute('aria-expanded', 'true');
+          if (indicatorText) indicatorText.textContent = 'Hide';
+        } else {
+          openCategories.delete(catId);
+          motionSystem.animateCategoryPillsFlight(card, false);
+          card.classList.remove('is-open');
+          btn?.setAttribute('aria-expanded', 'false');
+          if (indicatorText) indicatorText.textContent = 'View';
         }
-        render();
+        syncToggleAllButton();
+        return;
+      }
+
+      // Cancel any ongoing transition on this card
+      if (card._activeVT) {
+        try {
+          card._activeVT.skipTransition();
+        } catch (_) {}
+        card._activeVT = null;
+      }
+
+      const pills = Array.from(card.querySelectorAll('.category-sneak-peek-track .sneak-peek-pill')).slice(0, 5);
+      const logo = document.querySelector('.brand-logo-img, .loyalty-logo-img');
+
+      if (willOpen) {
+        // Suppress brand logo during in-page accordion morph so it doesn't freeze the page for 1.5s
+        if (logo) logo.style.viewTransitionName = 'none';
+
+        pills.forEach((pill, idx) => {
+          pill.style.viewTransitionName = `morph-${idx}`;
+        });
+        document.documentElement.classList.add('vt-morph-active');
+        card.classList.add('vt-morphing');
+
+        const transition = document.startViewTransition(() => {
+          pills.forEach(p => { p.style.viewTransitionName = ''; });
+
+          openCategories.add(catId);
+          motionSystem.animateCategoryPillsFlight(card, true);
+          card.classList.add('is-open');
+          btn?.setAttribute('aria-expanded', 'true');
+          if (indicatorText) indicatorText.textContent = 'Hide';
+          syncToggleAllButton();
+
+          const cards = Array.from(card.querySelectorAll('.category-items-grid .menu-card')).slice(0, pills.length);
+          cards.forEach((itemCard, idx) => {
+            itemCard.style.viewTransitionName = `morph-${idx}`;
+            itemCard.setAttribute('data-vt-morph', 'true');
+            itemCard.classList.add('morph-settled');
+          });
+        });
+
+        card._activeVT = transition;
+
+        const cleanup = () => {
+          document.documentElement.classList.remove('vt-morph-active');
+          card.classList.remove('vt-morphing');
+          if (logo) logo.style.viewTransitionName = '';
+          pills.forEach(p => { p.style.viewTransitionName = ''; });
+          card.querySelectorAll('.menu-card').forEach(c => {
+            c.style.viewTransitionName = '';
+            c.removeAttribute('data-vt-morph');
+            // Retain .morph-settled so CSS cascade animation doesn't re-trigger
+          });
+          card._activeVT = null;
+        };
+
+        transition.finished.then(cleanup, cleanup);
+      } else {
+        if (logo) logo.style.viewTransitionName = 'none';
+
+        const cards = Array.from(card.querySelectorAll('.category-items-grid .menu-card')).slice(0, pills.length);
+        cards.forEach((itemCard, idx) => {
+          itemCard.style.viewTransitionName = `morph-${idx}`;
+          itemCard.setAttribute('data-vt-morph', 'true');
+        });
+        document.documentElement.classList.add('vt-morph-active');
+        card.classList.add('vt-morphing');
+
+        const transition = document.startViewTransition(() => {
+          cards.forEach(c => {
+            c.style.viewTransitionName = '';
+            c.classList.remove('morph-settled');
+          });
+
+          openCategories.delete(catId);
+          motionSystem.animateCategoryPillsFlight(card, false);
+          card.classList.remove('is-open');
+          btn?.setAttribute('aria-expanded', 'false');
+          if (indicatorText) indicatorText.textContent = 'View';
+          syncToggleAllButton();
+
+          pills.forEach((pill, idx) => {
+            pill.style.viewTransitionName = `morph-${idx}`;
+          });
+        });
+
+        card._activeVT = transition;
+
+        const cleanup = () => {
+          document.documentElement.classList.remove('vt-morph-active');
+          card.classList.remove('vt-morphing');
+          if (logo) logo.style.viewTransitionName = '';
+          cards.forEach(c => {
+            c.style.viewTransitionName = '';
+            c.removeAttribute('data-vt-morph');
+            c.classList.remove('morph-settled');
+          });
+          pills.forEach(p => {
+            p.style.viewTransitionName = '';
+          });
+          card._activeVT = null;
+        };
+
+        transition.finished.then(cleanup, cleanup);
+      }
+    };
+
+    // Accordion Header Buttons (Expand / Collapse with Smooth In-Place Animation & Capsule Jumps)
+    container.querySelectorAll('.category-accordion-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // If the click was on a sneak peek capsule or overflow pill, handle targeted jump
+        const pill = e.target.closest('.sneak-peek-pill, .sneak-peek-overflow');
+        if (pill) {
+          e.stopPropagation();
+          const catId = pill.dataset.parentCategoryId || btn.dataset.categoryId;
+          const targetItemId = pill.dataset.targetItemId;
+          const card = document.getElementById(`cat-card-${catId}`) || btn.closest('.menu-accordion-card');
+          const indicatorText = btn.querySelector('.category-toggle-indicator span:first-child');
+
+          // Ensure category is opened
+          if (!card?.classList.contains('is-open')) {
+            toggleAccordion(card, catId, true, btn, indicatorText);
+          }
+
+          // If a specific item was clicked, smooth-scroll to it and pulse-highlight it
+          if (targetItemId) {
+            setTimeout(() => {
+              const targetEl = card?.querySelector(`[data-item-id="${targetItemId}"]`);
+              if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                targetEl.classList.remove('item-highlight-pulse');
+                void targetEl.offsetWidth; // Force CSS reflow to re-trigger pulse
+                targetEl.classList.add('item-highlight-pulse');
+                setTimeout(() => {
+                  targetEl.classList.remove('item-highlight-pulse');
+                }, 1600);
+              }
+            }, 250);
+          }
+          return;
+        }
+
+        // Standard accordion header toggle
+        const catId = btn.dataset.categoryId;
+        const card = document.getElementById(`cat-card-${catId}`) || btn.closest('.menu-accordion-card');
+        const indicatorText = btn.querySelector('.category-toggle-indicator span:first-child');
+        const willOpen = !card?.classList.contains('is-open');
+
+        toggleAccordion(card, catId, willOpen, btn, indicatorText);
+      });
+
+      // Keyboard accessibility (Enter / Space)
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          if (e.target.closest('.sneak-peek-pill, .sneak-peek-overflow')) return;
+          e.preventDefault();
+          btn.click();
+        }
       });
     });
 
@@ -233,13 +471,31 @@ export function initMenuExplorer() {
     if (toggleAllBtn) {
       toggleAllBtn.addEventListener('click', () => {
         const groupedItems = getGroupedItems();
-        const allExpanded = groupedItems.every(g => openCategories.has(g.id));
-        if (allExpanded) {
-          openCategories.clear();
-        } else {
-          groupedItems.forEach(g => openCategories.add(g.id));
-        }
-        render();
+        const allExpanded = groupedItems.length > 0 && groupedItems.every(g => openCategories.has(g.id));
+        
+        groupedItems.forEach(g => {
+          const card = document.getElementById(`cat-card-${g.id}`);
+          const btn = card?.querySelector('.category-accordion-btn');
+          const indicatorText = btn?.querySelector('.category-toggle-indicator span:first-child');
+          
+          if (allExpanded) {
+            openCategories.delete(g.id);
+            motionSystem.animateCategoryPillsFlight(card, false);
+            card?.querySelectorAll('.menu-card').forEach(c => c.classList.remove('morph-settled'));
+            card?.classList.remove('is-open');
+            btn?.setAttribute('aria-expanded', 'false');
+            if (indicatorText) indicatorText.textContent = 'View';
+          } else {
+            openCategories.add(g.id);
+            motionSystem.animateCategoryPillsFlight(card, true);
+            card?.querySelectorAll('.menu-card').forEach(c => c.classList.remove('morph-settled'));
+            card?.classList.add('is-open');
+            btn?.setAttribute('aria-expanded', 'true');
+            if (indicatorText) indicatorText.textContent = 'Hide';
+          }
+        });
+
+        toggleAllBtn.textContent = allExpanded ? 'Expand All' : 'Collapse All';
       });
     }
 
@@ -276,10 +532,6 @@ export function initMenuExplorer() {
     });
   }
 
-  // Initial render
-  if (container.children.length === 0) {
-    render();
-  } else {
-    attachEventListeners();
-  }
+  // Initial render (ensures dynamic preview capsules & event listeners mount on both / and /menu/)
+  render();
 }

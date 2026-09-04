@@ -10,9 +10,196 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles/loyalty.css" />
+
+  <!-- Speculation Rules API for Instant Prerender of Home Page (No Flash Reload) -->
+  <script type="speculationrules">
+  {
+    "prerender": [
+      {
+        "source": "list",
+        "urls": ["/"],
+        "eagerness": "immediate"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Cross-Document View Transitions & Shared Element Logo Motion -->
+  <style>
+    *, *::before, *::after {
+      -webkit-tap-highlight-color: transparent;
+    }
+    :focus:not(:focus-visible) {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    html, body {
+      font-family: 'Outfit', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: #FAF4EB !important;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+    :root {
+      --motion-duration-logo: 1.5s;
+      --motion-duration-page: 1.05s;
+      --motion-duration-fade: 0.65s;
+      --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @media (max-width: 768px) {
+      :root {
+        --motion-duration-logo: 0.52s;
+        --motion-duration-page: 0.42s;
+        --motion-duration-fade: 0.22s;
+        --motion-ease-logo: cubic-bezier(0.34, 1.38, 0.64, 1);
+      }
+    }
+    @view-transition {
+      navigation: auto;
+    }
+    ::view-transition {
+      background-color: #FAF4EB;
+    }
+    ::view-transition-old(root) {
+      animation: pageOldFadeOut var(--motion-duration-fade, 0.65s) cubic-bezier(0.4, 0, 1, 1) both !important;
+      z-index: 1;
+    }
+    ::view-transition-new(root) {
+      animation: pageNewSlideIn var(--motion-duration-page, 1.05s) cubic-bezier(0.16, 1, 0.3, 1) both !important;
+      z-index: 2;
+      mix-blend-mode: normal;
+    }
+    @keyframes pageOldFadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    @keyframes pageNewSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .loyalty-logo-img {
+      view-transition-name: baia-brand-logo;
+      contain: paint;
+      transform: translateZ(0);
+      will-change: transform;
+    }
+    ::view-transition-group(baia-brand-logo) {
+      z-index: 999;
+      animation-duration: var(--motion-duration-logo, 1.5s);
+      animation-timing-function: var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1));
+    }
+    ::view-transition-old(baia-brand-logo),
+    ::view-transition-new(baia-brand-logo) {
+      animation-duration: var(--motion-duration-logo, 1.5s);
+      animation-timing-function: var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1));
+    }
+
+    /* Initial Shell styling for seamless view transition & zero white flash */
+    .loyalty-app-wrapper {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: #FAF4EB;
+      display: flex;
+      flex-direction: column;
+    }
+    .loyalty-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(22, 37, 92, 0.08);
+      background: #FAF4EB;
+    }
+    .loyalty-logo-lockup {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .loyalty-logo-img {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(22, 37, 92, 0.12);
+      border: 1.5px solid rgba(22, 37, 92, 0.08);
+      transform: translateZ(0);
+      will-change: transform;
+    }
+    .loyalty-logo-title-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .loyalty-logo-title {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+      color: #16255C;
+      line-height: 1.1;
+    }
+    .loyalty-logo-sub {
+      font-family: 'Outfit', system-ui, sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #F5A623;
+      text-transform: uppercase;
+    }
+    .btn-loyalty-signout {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      color: #475569;
+      border-radius: 9999px;
+      padding: 6px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    @keyframes spinShell {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div class="loyalty-app-wrapper">
+    <!-- Persistent header — outside React root for uninterrupted view transitions -->
+    <header class="loyalty-header" id="loyalty-header-static">
+      <a href="/" class="loyalty-logo-lockup" title="Return to BAIA Café">
+        <img src="/images/Logo.webp" alt="BAIA Cafe Logo" class="loyalty-logo-img" />
+        <div class="loyalty-logo-title-group">
+          <div class="loyalty-logo-title">BAIA CAFÉ</div>
+          <div class="loyalty-logo-sub">SHORE CLUB LOYALTY</div>
+        </div>
+      </a>
+      <div id="loyalty-header-actions" style="display: flex; align-items: center; gap: 8px;"></div>
+    </header>
+    <div id="root" style="display: flex; flex-direction: column; flex: 1;">
+      <!-- React renders below the static header -->
+      <main class="loyalty-main-content" style="flex: 1; padding: 20px 16px;">
+        <div style="text-align: center; padding: 60px 20px;">
+          <div style="width: 38px; height: 38px; border: 3px solid rgba(22, 37, 92, 0.12); border-top-color: #16255C; border-radius: 50%; display: inline-block; animation: spinShell 0.8s linear infinite;"></div>
+          <p style="color: #64748B; margin-top: 16px; font-size: 0.9rem; font-family: 'Outfit', sans-serif;">Loading your Shore Club card...</p>
+        </div>
+      </main>
+    </div>
+  </div>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script type="module" src="/src/card/main.jsx"></script>
 </body>

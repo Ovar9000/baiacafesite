@@ -3,6 +3,28 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import url from 'url';
+import fs from 'fs';
+import path from 'path';
+
+// Automatically load local .env variables into Node's process.env for local dev server API endpoints
+try {
+  const envPath = path.resolve(process.cwd(), '.env');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf-8');
+    envContent.split('\n').forEach(line => {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
+        const [key, ...rest] = trimmed.split('=');
+        const val = rest.join('=').trim().replace(/^["']|["']$/g, '');
+        if (!process.env[key.trim()]) {
+          process.env[key.trim()] = val;
+        }
+      }
+    });
+  }
+} catch (e) {
+  // Ignore in environments without local file access
+}
 
 // Vite dev server API simulation plugin to test /api endpoints locally
 function devApiPlugin() {
@@ -12,7 +34,7 @@ function devApiPlugin() {
       server.middlewares.use((req, res, next) => {
         const parsedUrl = url.parse(req.url, true);
         const pathname = parsedUrl.pathname;
-        const multiPages = ['/claim', '/card', '/admin', '/admin/rewards', '/privacy', '/terms', '/menu', '/location', '/floating-cottage'];
+        const multiPages = ['/claim', '/card', '/admin', '/admin/rewards', '/admin/activity', '/privacy', '/terms', '/menu', '/location', '/floating-cottage'];
         if (multiPages.includes(pathname)) {
           req.url = `${pathname}/` + (parsedUrl.search || '') + (parsedUrl.hash || '');
         }
@@ -41,6 +63,8 @@ function devApiPlugin() {
             handlerModule = await import('./api/admin-manual-stamp.js');
           } else if (endpoint === 'admin-rewards') {
             handlerModule = await import('./api/admin-rewards.js');
+          } else if (endpoint === 'admin-activity') {
+            handlerModule = await import('./api/admin-activity.js');
           } else {
             return next();
           }
@@ -132,6 +156,7 @@ export default defineConfig({
         claim: resolve(__dirname, 'claim/index.html'),
         admin: resolve(__dirname, 'admin/index.html'),
         adminRewards: resolve(__dirname, 'admin/rewards/index.html'),
+        adminActivity: resolve(__dirname, 'admin/activity/index.html'),
         privacy: resolve(__dirname, 'privacy/index.html'),
         terms: resolve(__dirname, 'terms/index.html')
       }

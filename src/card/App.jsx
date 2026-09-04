@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabaseClient';
 import { calculateLoyaltyStatus, formatManilaDateTime } from '../lib/loyaltyHelpers';
@@ -359,32 +360,13 @@ export default function CardApp() {
     });
   }
 
-  if (loading) {
-    return (
-      <div className="loyalty-app-wrapper" style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <div style={{ textAlign: 'center', padding: '40px' }}>
-          <div className="spinner-border" />
-          <p style={{ color: 'var(--loyalty-text-muted)', marginTop: '16px', fontSize: '0.9rem' }}>
-            Loading your Shore Club card...
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const headerActionsEl = typeof document !== 'undefined' ? document.getElementById('loyalty-header-actions') : null;
 
   return (
-    <div className="loyalty-app-wrapper">
-      {/* Header */}
-      <header className="loyalty-header">
-        <a href="/" className="loyalty-logo-lockup">
-          <img src="/images/Logo.webp" alt="BAIA Cafe Logo" className="loyalty-logo-img" />
-          <div>
-            <div className="loyalty-logo-title">BAIA CAFÉ</div>
-            <div className="loyalty-logo-sub">SHORE CLUB LOYALTY</div>
-          </div>
-        </a>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <>
+      {/* Dynamic Header Actions rendered into persistent header shell */}
+      {headerActionsEl && ReactDOM.createPortal(
+        <>
           <button 
             type="button" 
             onClick={() => setShowTutorialModal(true)} 
@@ -401,12 +383,20 @@ export default function CardApp() {
               <span>Sign Out</span>
             </button>
           )}
-        </div>
-      </header>
+        </>,
+        headerActionsEl
+      )}
 
-      {/* Main Content */}
-      <main className="loyalty-content">
-        {!user ? (
+      {/* Main Content Area */}
+      <main className="loyalty-main-content" style={{ flex: 1, padding: '20px 16px' }}>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div className="spinner-border" />
+            <p style={{ color: 'var(--loyalty-text-muted)', marginTop: '16px', fontSize: '0.9rem' }}>
+              Loading your Shore Club card...
+            </p>
+          </div>
+        ) : !user ? (
           <div>
             <AuthModal onSuccess={(s) => {
               setSession(s);
@@ -472,14 +462,6 @@ export default function CardApp() {
                     </p>
                   </div>
                 </div>
-              </div>
-
-              {/* Legal Links Footer */}
-              <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #F1F5F9', textAlign: 'center', fontSize: '0.74rem', color: '#94A3B8' }}>
-                <span>Program governance: </span>
-                <a href="/terms/" target="_blank" rel="noreferrer" style={{ color: '#16255C', fontWeight: 600, textDecoration: 'underline' }}>Terms of Service</a>
-                <span style={{ margin: '0 6px' }}>•</span>
-                <a href="/privacy/" target="_blank" rel="noreferrer" style={{ color: '#16255C', fontWeight: 600, textDecoration: 'underline' }}>Privacy Policy</a>
               </div>
             </div>
           </div>
@@ -1016,20 +998,10 @@ export default function CardApp() {
               <button
                 type="button"
                 onClick={() => setShowArchiveModal(false)}
-                style={{
-                  background: '#F1F5F9',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '32px',
-                  height: '32px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  color: '#475569'
-                }}
+                className="btn-archive-close"
+                aria-label="Close collection"
               >
-                <X size={16} />
+                <X size={16} strokeWidth={2.5} />
               </button>
             </div>
 
@@ -1236,7 +1208,7 @@ export default function CardApp() {
                 className="btn-archive-close"
                 aria-label="Close guide"
               >
-                <X size={18} />
+                <X size={16} strokeWidth={2.5} />
               </button>
             </div>
 
@@ -1283,11 +1255,6 @@ export default function CardApp() {
                 </div>
               </div>
 
-              <div style={{ textAlign: 'center', paddingTop: '8px', fontSize: '0.75rem', color: '#94A3B8' }}>
-                <a href="/terms/" target="_blank" rel="noreferrer" style={{ color: '#16255C', fontWeight: 600, textDecoration: 'underline' }}>Terms of Service</a>
-                <span style={{ margin: '0 6px' }}>•</span>
-                <a href="/privacy/" target="_blank" rel="noreferrer" style={{ color: '#16255C', fontWeight: 600, textDecoration: 'underline' }}>Privacy Policy</a>
-              </div>
             </div>
           </div>
         </div>
@@ -1357,6 +1324,6 @@ export default function CardApp() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
