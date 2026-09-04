@@ -35,10 +35,87 @@
   <meta name="twitter:title" content="BAIA Cafe Menu &amp; Prices — Specialty Coffee Masbate" />
   <meta name="twitter:description"
     content="Artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers, and shore refreshers in San Pascual, Masbate. Order ahead via Messenger." />
-  <meta name="twitter:image" content="https://www.baia.cafe/images/smashburger.webp" />
+  <!-- Speculation Rules API for Instant Prerender of /card/ and / -->
+  <script type="speculationrules">
+  {
+    "prerender": [
+      {
+        "source": "list",
+        "urls": ["/card/", "/"],
+        "eagerness": "immediate"
+      }
+    ]
+  }
+  </script>
 
   <!-- Critical Above-The-Fold CSS -->
   <style id="critical-subpage-css">
+  *, *::before, *::after {
+    -webkit-tap-highlight-color: transparent;
+  }
+  :focus:not(:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  :root {
+    --motion-duration-logo: 1.5s;
+    --motion-duration-page: 1.05s;
+    --motion-duration-fade: 0.65s;
+    --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @media (max-width: 768px) {
+    :root {
+      --motion-duration-logo: 0.52s;
+      --motion-duration-page: 0.42s;
+      --motion-duration-fade: 0.22s;
+      --motion-ease-logo: cubic-bezier(0.34, 1.38, 0.64, 1);
+    }
+  }
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition {
+    background-color: #1E4AFF;
+  }
+  ::view-transition-old(root) {
+    animation: pageOldFadeOut var(--motion-duration-fade, 0.65s) cubic-bezier(0.4, 0, 1, 1) both !important;
+    z-index: 1;
+  }
+  ::view-transition-new(root) {
+    animation: pageNewSlideIn var(--motion-duration-page, 1.05s) cubic-bezier(0.16, 1, 0.3, 1) both !important;
+    z-index: 2;
+    mix-blend-mode: normal;
+  }
+  @keyframes pageOldFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes pageNewSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .brand-logo-img {
+    view-transition-name: baia-brand-logo;
+    contain: paint;
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  ::view-transition-group(baia-brand-logo) {
+    z-index: 999;
+    animation-duration: var(--motion-duration-logo, 1.5s);
+    animation-timing-function: var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+  ::view-transition-old(baia-brand-logo),
+  ::view-transition-new(baia-brand-logo) {
+    animation-duration: var(--motion-duration-logo, 1.5s);
+    animation-timing-function: var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1));
+  }
 
 :root {
   --royal-blue: #1E4AFF;
@@ -99,14 +176,7 @@ img { max-width: 100%; height: auto; display: block; }
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&amp;family=Outfit:wght@400;600;800;900&amp;family=Space+Grotesk:wght@700;900&amp;display=swap"
-    media="print"
-    onload="this.media='all'" />
-  <noscript>
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&amp;family=Outfit:wght@400;600;800;900&amp;family=Space+Grotesk:wght@700;900&amp;display=swap" />
-  </noscript>
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800;900&display=swap" />
 
   <!-- Master Stylesheet and Main Entry Module -->
   <link rel="stylesheet" href="/src/styles/main.css" />
@@ -2153,10 +2223,10 @@ img { max-width: 100%; height: auto; display: block; }
           © 2026 BAIA Cafe. All rights reserved. Coffee by the Bay.
         </p>
         <div class="footer-social-links">
-          <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="social-link">Facebook Messenger</a>
-          <span style="color: rgba(255,255,255,0.3);" aria-hidden="true">•</span>
-          <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="social-link">Instagram (@thebaiacafe)</a>
-          <span style="color: rgba(255,255,255,0.3);" aria-hidden="true">•</span>
+          <a href="/privacy/" class="social-link">Privacy Policy</a>
+          <span class="footer-sep" aria-hidden="true">•</span>
+          <a href="/terms/" class="social-link">Terms of Service</a>
+          <span class="footer-sep" aria-hidden="true">•</span>
           <a href="#main-menu-content" class="social-link">Back to Top ↑</a>
         </div>
       </div>

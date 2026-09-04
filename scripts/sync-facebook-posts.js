@@ -390,12 +390,12 @@ Classify and return ONE strict JSON object according to the system instructions.
 
   // 1. Try Gemini API if GEMINI_API_KEY is provided
   if (GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 5) {
-    const candidateModels = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
+    const candidateModels = ['gemini-flash-latest'];
     for (const model of candidateModels) {
       try {
         console.log(`✨ [LLM] Calling Google Gemini API (${model})...`);
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 12000);
+        const timeout = setTimeout(() => controller.abort(), 6000);
         
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY.trim()}`;
         const response = await fetch(url, {
@@ -628,6 +628,12 @@ async function runSync() {
 
     if (isTrivialPost(post)) {
       console.log(`⏭️ [Deterministic Skip] Post has minimal/emoji-only text. Skipping.`);
+      continue;
+    }
+
+    const existing = currentUpdates.find(u => u.id === post.id);
+    if (existing && existing.status !== 'active') {
+      console.log(`⚡ [Cache Hit] Post ${post.id} already classified: "${existing.title}". Skipping re-classification.`);
       continue;
     }
 

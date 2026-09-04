@@ -1,4 +1,5 @@
 import './styles/main.css';
+import { motionSystem } from './utils/motionSystem.js';
 import { initHero3D } from './components/hero3D.js';
 import { initMenuExplorer } from './components/menuExplorer.js';
 import { initBoardsRental } from './components/boardsRental.js';
@@ -63,23 +64,58 @@ function handleRootAuthCallback() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  handleRootAuthCallback();
-  // Initialize primary interactive modules
-  initHeroLoyaltyCta();
-  initHero3D();
-  initNewDrops();
-  initMenuExplorer();
-  initBoardsRental();
-  initCartDrawer();
-  initSeasonalPromosToggle();
+function initLoyaltyPrefetch() {
+  const cardLinks = document.querySelectorAll('a[href*="/card"]');
+  let prefetched = false;
+
+  const prefetchCard = () => {
+    if (prefetched) return;
+    prefetched = true;
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = '/card/';
+    document.head.appendChild(link);
+  };
+
+  // Trigger prefetch immediately so first-time click is already warm
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    prefetchCard();
+  } else {
+    window.addEventListener('DOMContentLoaded', prefetchCard, { once: true });
+  }
+
+  cardLinks.forEach(link => {
+    link.addEventListener('mouseenter', prefetchCard, { passive: true });
+    link.addEventListener('touchstart', prefetchCard, { passive: true });
+  });
+}
+
+function initApp() {
+  const safeInit = (name, fn) => {
+    try {
+      fn();
+    } catch (e) {
+      console.warn(`[BAIA] Error initializing ${name}:`, e);
+    }
+  };
+
+  safeInit('rootAuth', handleRootAuthCallback);
+  safeInit('heroLoyaltyCta', initHeroLoyaltyCta);
+  safeInit('loyaltyPrefetch', initLoyaltyPrefetch);
+  safeInit('hero3D', initHero3D);
+  safeInit('newDrops', initNewDrops);
+  safeInit('menuExplorer', initMenuExplorer);
+  safeInit('boardsRental', initBoardsRental);
+  safeInit('cartDrawer', initCartDrawer);
+  safeInit('seasonalPromos', initSeasonalPromosToggle);
+  safeInit('polaroidWall', initPolaroidWall);
 
   // Defer non-critical ambient features to idle time
   const initAmbientFeatures = () => {
-    initBayVibesAudio();
-    initShoreConditions();
-    initLiquidFloaties();
-    initWeatherEasterEgg();
+    safeInit('bayVibesAudio', initBayVibesAudio);
+    safeInit('shoreConditions', initShoreConditions);
+    safeInit('liquidFloaties', initLiquidFloaties);
+    safeInit('weatherEasterEgg', initWeatherEasterEgg);
   };
 
   if ('requestIdleCallback' in window) {
@@ -142,4 +178,81 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   initScrollAwareStickyBar();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+/**
+ * Interactive Lightbox for Wall of Supporters Polaroid Gallery
+ */
+function initPolaroidWall() {
+  const modal = document.getElementById('polaroid-modal');
+  const closeBtn = document.getElementById('polaroid-modal-close');
+  const modalImg = document.getElementById('polaroid-modal-img');
+  const modalQuote = document.getElementById('polaroid-modal-quote');
+  const modalAuthor = document.getElementById('polaroid-modal-author');
+  const modalMeta = document.getElementById('polaroid-modal-meta');
+  const modalFbBtn = document.getElementById('polaroid-modal-fb-btn');
+  const cards = document.querySelectorAll('.mosaic-photo-card, .polaroid-card');
+
+  if (!modal || !cards.length) return;
+
+  const openModal = (card) => {
+    const photo = card.dataset.photo || card.querySelector('img')?.src;
+    const quote = card.dataset.quote || card.querySelector('.polaroid-quote')?.textContent?.trim();
+    const author = card.dataset.author || card.querySelector('.polaroid-author-name')?.textContent?.trim();
+    const meta = card.dataset.meta || card.querySelector('.polaroid-author-meta')?.textContent?.trim();
+    const permalink = card.dataset.permalink || 'https://www.facebook.com/thebaiacafe';
+
+    if (modalImg && photo) {
+      modalImg.src = photo;
+      modalImg.alt = author ? `Customer moment by ${author}` : 'Community photo';
+    }
+    if (modalQuote) modalQuote.textContent = quote ? `"${quote.replace(/^["']|["']$/g, '')}"` : '';
+    if (modalAuthor) modalAuthor.textContent = author || 'BAIA Cafe Guest';
+    if (modalMeta) modalMeta.textContent = meta || 'Shared Community Moment';
+    if (modalFbBtn) modalFbBtn.href = permalink;
+
+    modal.classList.add('is-active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    modal.classList.remove('is-active');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+
+  cards.forEach((card) => {
+    card.addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal(card);
+    });
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openModal(card);
+      }
+    });
+  });
+
+  closeBtn?.addEventListener('click', closeModal);
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('is-active')) {
+      closeModal();
+    }
+  });
+}
+

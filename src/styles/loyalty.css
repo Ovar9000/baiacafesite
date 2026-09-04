@@ -24,10 +24,34 @@
   --loyalty-shadow-lg: 0 20px 30px -10px rgba(15, 23, 42, 0.15);
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  font-family: 'Outfit', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--loyalty-text-dark);
+  -webkit-tap-highlight-color: transparent;
+}
+
+a, button, input, select, textarea, [role="button"], [tabindex], label, summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Remove standard outline and persistent focus rings for click/touch */
+:focus:not(:focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Accessible Focus States for Desktop Keyboard Users */
+:focus-visible {
+  outline: 2px solid var(--loyalty-blue) !important;
+  outline-offset: 2px !important;
+  border-radius: 4px;
 }
 
 body {
@@ -55,8 +79,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #FFFFFF;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  background: #FAF4EB;
+  border-bottom: 1px solid rgba(22, 37, 92, 0.08);
   position: sticky;
   top: 0;
   z-index: 40;
@@ -71,25 +95,37 @@ body {
 }
 
 .loyalty-logo-img {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 12px;
   object-fit: cover;
+  box-shadow: 0 4px 12px rgba(22, 37, 92, 0.12);
+  border: 1.5px solid rgba(22, 37, 92, 0.08);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.loyalty-logo-title-group {
+  display: flex;
+  flex-direction: column;
 }
 
 .loyalty-logo-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: 1.15rem;
-  letter-spacing: 0.5px;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
   line-height: 1.1;
   color: var(--loyalty-navy);
 }
 
 .loyalty-logo-sub {
+  font-family: 'Outfit', system-ui, sans-serif;
   font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 1.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   color: var(--loyalty-orange-dark);
   text-transform: uppercase;
 }
@@ -719,17 +755,30 @@ body {
   margin-bottom: 20px;
 }
 
-/* Card Archive Showcase Modal */
+/* Card Archive & Guide Showcase Modal */
 .archive-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(6px);
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
   padding: 20px;
+  animation: modalBackdropFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, backdrop-filter;
+}
+
+@keyframes modalBackdropFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
 }
 
 .archive-modal-card {
@@ -742,8 +791,20 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  animation: modal-scale-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.35);
+  animation: modalSpringUp 0.38s cubic-bezier(0.34, 1.35, 0.64, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes modalSpringUp {
+  0% {
+    opacity: 0;
+    transform: scale(0.88) translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .archive-modal-header {
@@ -753,6 +814,35 @@ body {
   justify-content: space-between;
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
   background: #FFFFFF;
+}
+
+.btn-archive-close {
+  background: #F1F5F9;
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748B;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+  outline: none;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.btn-archive-close:hover {
+  background: #E2E8F0;
+  color: var(--loyalty-navy);
+  transform: scale(1.08) rotate(90deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-archive-close:active {
+  transform: scale(0.92);
 }
 
 .archive-modal-body {
@@ -846,10 +936,95 @@ body {
   height: 100% !important;
 }
 
-#baia-qr-scanner-viewport img[alt="Info icon"] {
-  display: none !important;
-}
-
 #baia-qr-scanner-viewport__dashboard_section_csr {
   display: none !important;
 }
+
+:root {
+  --motion-duration-logo: 1.5s;
+  --motion-duration-page: 1.05s;
+  --motion-duration-fade: 0.65s;
+  --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --motion-duration-logo: 0.52s;
+    --motion-duration-page: 0.42s;
+    --motion-duration-fade: 0.22s;
+    --motion-ease-logo: cubic-bezier(0.34, 1.38, 0.64, 1);
+  }
+}
+
+/* Cross-Document View Transitions */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition {
+  background-color: #FAF4EB;
+}
+
+::view-transition-old(root) {
+  animation: pageOldFadeOut var(--motion-duration-fade, 0.65s) cubic-bezier(0.4, 0, 1, 1) both !important;
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  animation: pageNewSlideIn var(--motion-duration-page, 1.05s) cubic-bezier(0.16, 1, 0.3, 1) both !important;
+  z-index: 2;
+  mix-blend-mode: normal;
+}
+
+@keyframes pageOldFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes pageNewSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loyalty-logo-img {
+  view-transition-name: baia-brand-logo;
+  contain: paint;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+::view-transition-group(baia-brand-logo) {
+  z-index: 999;
+  animation-duration: var(--motion-duration-logo, 1.5s);
+  animation-timing-function: var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+::view-transition-old(baia-brand-logo),
+::view-transition-new(baia-brand-logo) {
+  animation-duration: var(--motion-duration-logo, 1.5s);
+  animation-timing-function: var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+/* Smooth Admin Tab Switching Animation */
+.admin-tab-pane {
+  animation: adminTabFade 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+@keyframes adminTabFade {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
