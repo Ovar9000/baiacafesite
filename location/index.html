@@ -40,6 +40,9 @@
   <!-- Critical Above-The-Fold CSS -->
   <style id="critical-subpage-css">
   *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
     -webkit-tap-highlight-color: transparent;
   }
   :focus:not(:focus-visible) {
@@ -157,7 +160,8 @@ img { max-width: 100%; height: auto; display: block; }
 .hero-trust-pill { display: inline-flex; align-items: center; gap: 8px 10px; background: rgba(22, 37, 92, 0.5); backdrop-filter: blur(12px); border: 1.2px solid rgba(255, 255, 255, 0.22); padding: 6px 16px; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--white); }
 .btn-primary-glow { display: inline-flex; align-items: center; gap: 10px; background: var(--golden-amber); color: var(--deep-navy); font-family: var(--font-display); font-weight: 900; font-size: 1.05rem; text-transform: uppercase; text-decoration: none; padding: 14px 28px; border-radius: var(--radius-pill); box-shadow: 0 8px 24px rgba(245, 166, 35, 0.45); border: none; cursor: pointer; }
 .btn-secondary-pill { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: var(--white); font-family: var(--font-display); font-weight: 800; font-size: 0.95rem; text-transform: uppercase; text-decoration: none; padding: 12px 24px; border-radius: var(--radius-pill); border: 2px solid rgba(255, 255, 255, 0.35); cursor: pointer; }
-
+.location-grid-responsive { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+@media (max-width: 860px) { .location-grid-responsive { grid-template-columns: 1fr !important; gap: 32px !important; } }
   </style>
 
   <!-- Preconnect and Google Fonts -->
@@ -165,7 +169,14 @@ img { max-width: 100%; height: auto; display: block; }
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800;900&display=swap" />
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800;900&display=swap"
+    media="print"
+    onload="this.media='all'" />
+  <noscript>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800;900&display=swap" />
+  </noscript>
 
   <!-- Master Stylesheet and Main Entry Module -->
   <link rel="stylesheet" href="/src/styles/main.css" />
@@ -281,7 +292,7 @@ img { max-width: 100%; height: auto; display: block; }
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;" class="location-grid-responsive">
+        <div class="location-grid-responsive">
           <!-- Left Column: Commute & Arrival Guide -->
           <div>
             <span class="story-badge">Commute Guide</span>
@@ -313,7 +324,7 @@ img { max-width: 100%; height: auto; display: block; }
             </div>
 
             <div style="margin-top: 28px;">
-              <a href="https://maps.app.goo.gl/vNYohzy8UWbM4d5P6" target="_blank" rel="noopener" class="btn-primary-glow" style="background: #1E4AFF; display: inline-flex;">
+              <a href="https://maps.app.goo.gl/vNYohzy8UWbM4d5P6" target="_blank" rel="noopener" class="btn-primary-glow" style="background: #1038D4; color: #ffffff !important; display: inline-flex;">
                 <span>Open Google Maps Pin (13.1362° N, 123.0233° E) ↗</span>
               </a>
             </div>
@@ -392,7 +403,7 @@ img { max-width: 100%; height: auto; display: block; }
             Need real-time navigation help or directions? Reach out to our crew directly on Facebook Messenger.
           </p>
           <div class="footer-buttons-stack">
-            <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow footer-social-btn" style="background: #0084FF;">
+            <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow footer-social-btn" style="background: #005FD8; color: #ffffff !important;">
               <span>Message on Messenger</span>
               <span aria-hidden="true">↗</span>
             </a>

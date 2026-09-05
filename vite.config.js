@@ -120,6 +120,7 @@ export default defineConfig({
     devApiPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'script-defer',
       includeAssets: ['favicon.ico', 'images/Logo.webp', 'images/crew.webp'],
       manifest: {
         name: 'Baia Café — Digital Loyalty Card',

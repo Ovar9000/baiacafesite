@@ -43,21 +43,64 @@ class CartStore {
   addItem(item) {
     const key = this.getItemKey(item);
     const existingIndex = this.items.findIndex(i => i.key === key);
-    const price = item.calculatedPrice || item.price || item.priceM || 0;
+    const basePrice = item.price || item.priceM || 0;
+    const addOnsTotal = (item.addOns || []).reduce((sum, a) => sum + (a.price || 0), 0);
+    const price = item.calculatedPrice !== undefined ? item.calculatedPrice : (basePrice + addOnsTotal);
 
     if (existingIndex > -1) {
       this.items[existingIndex].quantity += (item.quantity || 1);
     } else {
       this.items.push({
         ...item,
+        basePrice,
+        addOns: item.addOns ? [...item.addOns] : [],
         key,
         quantity: item.quantity || 1,
         unitPrice: price
       });
     }
 
-    this.showToast('Added to Order List', `${item.name} (${this.formatCurrency(price)})`, '✓');
+    const customizationNote = (item.addOns && item.addOns.length > 0) ? ` (+${item.addOns.length} add-on${item.addOns.length > 1 ? 's' : ''})` : '';
+    this.showToast('Added to Order List', `${item.name}${customizationNote} (${this.formatCurrency(price)})`, '✓');
     this.openDrawer();
+  }
+
+  toggleItemAddOn(key, addOn) {
+    const itemIndex = this.items.findIndex(i => i.key === key);
+    if (itemIndex === -1) return;
+
+    const item = this.items[itemIndex];
+    let newAddOns = [...(item.addOns || [])];
+    const exists = newAddOns.some(a => a.id === addOn.id);
+
+    if (exists) {
+      newAddOns = newAddOns.filter(a => a.id !== addOn.id);
+    } else {
+      newAddOns.push(addOn);
+    }
+
+    const basePrice = item.basePrice || item.price || item.priceM || 0;
+    const addOnsTotal = newAddOns.reduce((sum, a) => sum + (a.price || 0), 0);
+    const newPrice = basePrice + addOnsTotal;
+
+    const updatedItem = {
+      ...item,
+      basePrice,
+      addOns: newAddOns,
+      unitPrice: newPrice
+    };
+    updatedItem.key = this.getItemKey(updatedItem);
+
+    // If an item with the new key already exists, merge them
+    const conflictIndex = this.items.findIndex((it, idx) => idx !== itemIndex && it.key === updatedItem.key);
+    if (conflictIndex > -1) {
+      this.items[conflictIndex].quantity += item.quantity;
+      this.items.splice(itemIndex, 1);
+    } else {
+      this.items[itemIndex] = updatedItem;
+    }
+
+    this.notify();
   }
 
   addDoubleTroubleBundle() {
@@ -136,6 +179,9 @@ class CartStore {
         const meta = [];
         if (i.temp) meta.push(i.temp);
         if (i.size) meta.push(`Size ${i.size}`);
+        if (i.addOns && i.addOns.length > 0) {
+          i.addOns.forEach(a => meta.push(`+ ${a.name}`));
+        }
         const metaStr = meta.length > 0 ? ` (${meta.join(', ')})` : '';
         return `• ${i.quantity}x ${i.name}${metaStr} — ${this.formatCurrency(i.unitPrice * i.quantity)}`;
       }),

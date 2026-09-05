@@ -197,7 +197,7 @@ function initPolaroidWall() {
   const modalAuthor = document.getElementById('polaroid-modal-author');
   const modalMeta = document.getElementById('polaroid-modal-meta');
   const modalFbBtn = document.getElementById('polaroid-modal-fb-btn');
-  const cards = document.querySelectorAll('.mosaic-photo-card, .polaroid-card');
+  const cards = document.querySelectorAll('.mosaic-photo-card');
 
   if (!modal || !cards.length) return;
 

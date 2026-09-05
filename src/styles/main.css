@@ -211,6 +211,7 @@ a, button, input, select, textarea, [role="button"], [tabindex], label, summary 
 
 .skip-link:focus {
   top: 16px;
+  transition: none !important;
 }
 
 /* Global SVG & Image Safety Constraints */
@@ -225,16 +226,28 @@ img {
   display: block;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar — Modern, Subtle & Translucent (Never bright neon yellow) */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--deep-navy);
+  background: rgba(14, 26, 69, 0.6);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--golden-amber);
+  background: rgba(255, 255, 255, 0.22);
   border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* On Touch & Mobile Viewports: Hide custom scrollbar to eliminate any awkward side strip */
+@media (hover: none), (max-width: 768px) {
+  ::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
 }
 
 /* Global Container & Section Stacking Context */
@@ -796,13 +809,33 @@ main,
   transform: scale(1.08);
 }
 
-/* Hide mobile cup by default on desktop */
+/* Hide mobile cup by default on desktop & tablets */
 .baia-coffee-cup-mobile {
   display: none !important;
 }
 
-/* Mobile: BAIA Coffee Mug with Handle & Steam (7 Columns x 6 Rows) */
-@media (max-width: 768px) {
+/* Tablet Layout (601px - 1024px, including iPad Mini 768px & iPad Pro): Heroic Scale Mosaic */
+@media (max-width: 1024px) {
+  .baia-coffee-cup-desktop {
+    grid-template-columns: repeat(14, clamp(38px, 5.8vw, 48px));
+    grid-template-rows: 38px 38px 48px 48px 48px 48px 44px 38px;
+    max-width: 96%;
+    margin: 0 auto;
+    padding: 4px 0 20px 0;
+    justify-content: center;
+    align-items: center;
+  }
+  .baia-coffee-cup-desktop .mosaic-photo-card {
+    width: clamp(44px, 6.8vw, 56px);
+    padding: 2.5px 2.5px 6px 2.5px;
+  }
+  .baia-coffee-cup-desktop .mosaic-photo-card.is-steam {
+    width: clamp(32px, 5vw, 42px);
+  }
+}
+
+/* Mobile Phones (<= 600px): Clean Compact Mug with Scaled Readable Photos */
+@media (max-width: 600px) {
   .reviews-section {
     padding-top: 36px;
     padding-bottom: 52px;
@@ -810,7 +843,7 @@ main,
   }
 
   .reviews-header-block {
-    margin: 0 auto 24px auto;
+    margin: 0 auto 20px auto;
   }
 
   .reviews-title {
@@ -834,28 +867,28 @@ main,
 
   .baia-coffee-cup-mobile {
     display: grid !important;
-    grid-template-columns: repeat(7, 30px);
-    grid-template-rows: 28px 38px 38px 38px 34px 30px;
+    grid-template-columns: repeat(7, clamp(36px, 11vw, 44px));
+    grid-template-rows: 32px 42px 42px 42px 38px 34px;
     justify-content: center;
     align-items: center;
-    max-width: 240px;
+    max-width: 330px;
     margin: 10px auto 0 auto;
     padding: 4px 0 16px 0;
     position: relative;
   }
 
   .baia-coffee-cup-mobile .mosaic-photo-card {
-    width: 34px;
+    width: clamp(40px, 12vw, 48px);
     aspect-ratio: 4 / 5;
-    padding: 1.5px 1.5px 3.5px 1.5px;
-    border-radius: 1.5px;
+    padding: 2px 2px 5px 2px;
+    border-radius: 2px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
   }
 
   .baia-coffee-cup-mobile .mosaic-photo-card.is-steam {
-    width: 25px;
+    width: clamp(28px, 8.5vw, 34px);
     aspect-ratio: 1 / 1;
-    padding: 1px 1px 2.5px 1px;
+    padding: 1.5px 1.5px 3.5px 1.5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   }
 
@@ -882,7 +915,7 @@ main,
   backdrop-filter: blur(16px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
   z-index: 999999 !important;
-  display: flex !important;
+  display: none !important;
   align-items: center !important;
   justify-content: center !important;
   padding: 16px !important;
@@ -894,6 +927,7 @@ main,
 }
 
 .polaroid-modal-backdrop.is-active {
+  display: flex !important;
   opacity: 1;
   pointer-events: auto;
 }
@@ -1413,7 +1447,102 @@ main,
 /* ==========================================================================
    RESPONSIVE LAYOUTS & PREFERS-REDUCED-MOTION
    ========================================================================== */
-@media (max-width: 992px) {
+
+/* Laptops & Tablets Landscape (<= 1200px) */
+@media (max-width: 1200px) {
+  .main-nav-links {
+    gap: 10px;
+  }
+  .nav-link {
+    font-size: 0.82rem;
+    padding: 4px 8px;
+    letter-spacing: 0.02em;
+  }
+  .nav-actions {
+    gap: 8px;
+  }
+  .audio-toggle-btn,
+  .nav-loyalty-btn {
+    padding: 0 10px;
+    font-size: 0.78rem;
+    height: 36px;
+  }
+  .nav-cart-btn {
+    padding: 0 12px;
+    font-size: 0.8rem;
+    height: 36px;
+  }
+}
+
+/* iPad Pro Portrait & Medium Tablets (<= 1024px) */
+@media (max-width: 1024px) {
+  .brand-logo-img {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+  }
+  .brand-title {
+    font-size: 1.25rem;
+  }
+  .brand-subtitle {
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+  }
+  .main-nav-links {
+    gap: 6px;
+  }
+  .nav-link {
+    font-size: 0.76rem;
+    padding: 4px 6px;
+    letter-spacing: 0.01em;
+  }
+  .nav-drop-badge {
+    font-size: 0.52rem;
+    padding: 1px 4px;
+    margin-right: 2px;
+  }
+  .nav-actions {
+    gap: 6px;
+  }
+  .nav-loyalty-btn {
+    padding: 0 8px;
+    height: 36px;
+    font-size: 0.74rem;
+    gap: 4px;
+  }
+  .nav-loyalty-btn-label {
+    display: inline;
+  }
+  .nav-phone-link {
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  .nav-phone-text {
+    display: none;
+  }
+  .nav-cart-btn {
+    padding: 0 10px;
+    height: 36px;
+    font-size: 0.76rem;
+    gap: 6px;
+  }
+  .cart-count-badge {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    font-size: 0.68rem;
+  }
+}
+
+/* Tablets (<= 900px) */
+@media (max-width: 900px) {
   .main-nav-links {
     display: none;
   }

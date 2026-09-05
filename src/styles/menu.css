@@ -887,50 +887,251 @@ html.vt-morph-active::view-transition-new(baia-brand-logo) {
 }
 
 /* Official Physical Menu Board Disclaimer */
-/* Add-ons Section on Drinks Board */
-.menu-addons-card {
-  background: rgba(22, 37, 92, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-lg);
-  padding: 24px 28px;
-  max-width: 900px;
-  margin: 0 auto 24px auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+/* Drink Customizer Modal */
+.drink-customizer-backdrop {
+  z-index: 1050;
 }
 
-.addons-title {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1.1rem;
-  color: var(--amber-contrast);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 14px;
-}
-
-.addons-grid {
+.drink-customizer-card {
+  max-width: 480px;
+  background: #FFFFFF;
+  color: var(--deep-navy);
+  border-radius: 28px;
+  box-shadow: 0 25px 60px -12px rgba(16, 28, 71, 0.4);
+  padding: 24px 26px;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.customizer-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: 12px;
 }
 
-.addon-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  padding: 8px 16px;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--white);
+.customizer-drink-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--deep-navy);
+  margin: 4px 0 2px 0;
 }
 
-.addon-price {
-  color: var(--golden-amber);
+.customizer-drink-desc {
+  font-size: 0.84rem;
+  color: #64748B;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.customizer-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.customizer-section-title {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
   font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #475569;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.customizer-segmented-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.customizer-option-btn {
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.customizer-option-btn:hover {
+  border-color: #CBD5E1;
+  background: #F1F5F9;
+}
+
+.customizer-option-btn.is-selected {
+  background: #EFF6FF;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 1px #2563EB;
+}
+
+.customizer-option-label {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--deep-navy);
+}
+
+.customizer-option-sub {
+  font-size: 0.75rem;
+  color: #64748B;
+}
+
+.customizer-addons-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.customizer-addon-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid #E2E8F0;
+  background: #F8FAFC;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.customizer-addon-row:hover {
+  border-color: #CBD5E1;
+  background: #F1F5F9;
+}
+
+.customizer-addon-row.is-checked {
+  background: #FFFBEB;
+  border-color: var(--golden-amber);
+  box-shadow: 0 0 0 1px var(--golden-amber);
+}
+
+.addon-left-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.addon-checkbox-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid #CBD5E1;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: transparent;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+
+.customizer-addon-row.is-checked .addon-checkbox-indicator {
+  background: var(--golden-amber);
+  border-color: var(--golden-amber);
+  color: var(--deep-navy);
+}
+
+.addon-row-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--deep-navy);
+}
+
+.addon-row-price {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #D97706;
+  white-space: nowrap;
+}
+
+.customizer-footer-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px solid #E2E8F0;
+}
+
+.customizer-qty-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: var(--radius-pill);
+  padding: 4px 8px;
+}
+
+.btn-customizer-qty {
+  background: transparent;
+  border: none;
+  width: 28px;
+  height: 28px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--deep-navy);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.15s ease;
+}
+
+.btn-customizer-qty:hover {
+  background: #E2E8F0;
+}
+
+.customizer-qty-val {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 800;
+  min-width: 20px;
+  text-align: center;
+  color: var(--deep-navy);
+}
+
+.btn-customizer-submit {
+  flex: 1;
+  background: var(--golden-amber);
+  color: var(--deep-navy);
+  border: none;
+  height: 46px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(245, 166, 35, 0.4);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-customizer-submit:hover {
+  background: #F59E0B;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(245, 166, 35, 0.5);
 }
 
 .board-count-pill {

@@ -151,7 +151,7 @@
   padding: 12px 12px 24px 12px;
   border-radius: 6px;
   box-shadow: 0 16px 36px rgba(22, 37, 92, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
+  cursor: default;
   transform-style: preserve-3d;
   transition: transform 0.4s var(--ease-spring), box-shadow 0.4s ease, z-index 0s;
   user-select: none;
