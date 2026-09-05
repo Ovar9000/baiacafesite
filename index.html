@@ -95,6 +95,8 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; font-size: 16px; -webkit-font-smoothing: antialiased; overflow-x: hidden; max-width: 100vw; }
 body { font-family: var(--font-body); background-color: var(--electric-blue); color: var(--white); line-height: 1.5; overflow-x: hidden; max-width: 100vw; position: relative; }
+.skip-link { position: absolute; top: -120px; left: 16px; background: var(--golden-amber); color: var(--deep-navy); font-weight: 800; padding: 12px 20px; border-radius: var(--radius-sm); z-index: 9999; text-decoration: none; }
+.skip-link:focus { top: 16px !important; }
 .container { width: 100%; max-width: var(--max-width); margin-left: auto; margin-right: auto; padding-left: var(--container-padding); padding-right: var(--container-padding); }
 img { max-width: 100%; height: auto; display: block; }
 svg { display: block; max-width: 100%; }
@@ -138,6 +140,17 @@ svg { display: block; max-width: 100%; }
 .mobile-sticky-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 990; background: rgba(22, 37, 92, 0.96); backdrop-filter: blur(16px); border-top: 2px solid var(--golden-amber); padding: 10px 16px; box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.3); transform: translateY(115%); opacity: 0; pointer-events: none; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease; }
 .mobile-sticky-bar.is-visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
 @media (max-width: 1024px) {
+  .brand-logo-img { width: 38px; height: 38px; min-width: 38px; min-height: 38px; }
+  .brand-title { font-size: 1.25rem; }
+  .brand-subtitle { font-size: 0.58rem; letter-spacing: 0.08em; }
+  .main-nav-links { gap: 6px; }
+  .nav-link { font-size: 0.76rem; padding: 4px 6px; letter-spacing: 0.01em; }
+  .nav-actions { gap: 6px; }
+  .nav-loyalty-btn { padding: 0 8px; height: 36px; font-size: 0.74rem; gap: 4px; }
+  .nav-phone-link { padding: 0; width: 36px; height: 36px; min-width: 36px; min-height: 36px; justify-content: center; border-radius: 50%; }
+  .nav-phone-text { display: none; }
+  .nav-cart-btn { padding: 0 10px; height: 36px; font-size: 0.76rem; gap: 6px; }
+  .cart-count-badge { width: 18px; height: 18px; min-width: 18px; min-height: 18px; font-size: 0.68rem; }
   .hero-section { min-height: auto; padding-top: calc(var(--header-height) + 16px); padding-bottom: 64px; display: block; }
   .hero-grid { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0; }
   .hero-content { display: contents; }
@@ -291,7 +304,7 @@ svg { display: block; max-width: 100%; }
         </a>
 
         <!-- Header Cart Trigger Button -->
-        <button class="nav-cart-btn" data-open-cart aria-label="View current order list">
+        <button class="nav-cart-btn" data-open-cart aria-label="Order List — View active orders">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
             <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -729,7 +742,7 @@ svg { display: block; max-width: 100%; }
         <!-- Coffee Cup Shaped Community Collage Wrap -->
         <div class="baia-coffee-silhouette-wrap" role="region" aria-label="BAIA Family Coffee Cup Community Mosaic">
 <!-- 1. Desktop: BAIA Ceramic Coffee Mug with Handle & Steam (57 Unique Real Photos) -->
-          <div class="baia-coffee-cup-desktop" aria-hidden="false">
+          <div class="baia-coffee-cup-desktop">
             <button type="button" class="mosaic-photo-card is-steam" style="--gc: 4; --gr: 1; --rot: -8deg; --z: 2;"
               data-photo="/images/skimboard.webp"
               data-quote="Skimboarding on the morning tide, then grabbing an iced pour-over on the shore. Pure island rhythm! 🏄‍♂️☕️"
@@ -1417,7 +1430,7 @@ svg { display: block; max-width: 100%; }
           </div>
 
                     <!-- 2. Mobile: BAIA Ceramic Coffee Mug with Handle & Steam (28 Unique Real Photos) -->
-          <div class="baia-coffee-cup-mobile" aria-hidden="true">
+          <div class="baia-coffee-cup-mobile">
             <button type="button" class="mosaic-photo-card is-steam" style="--gc: 2; --gr: 1; --rot: -8deg; --z: 2;"
               data-photo="/images/afternoonchill.webp"
               data-quote="Warm breeze, iced drinks, and great conversations under the palm canopy. Never want to leave! 🌴✨"

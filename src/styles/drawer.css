@@ -343,3 +343,123 @@
     max-width: 100vw;
   }
 }
+
+/* Cart Item Customization Badges & Add-on Popover */
+.cart-item-addons-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.cart-addon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.btn-remove-addon {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #B45309;
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-remove-addon:hover {
+  color: #78350F;
+}
+
+.btn-cart-quick-addon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #EFF6FF;
+  border: 1px dashed #93C5FD;
+  color: #1D4ED8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-cart-quick-addon:hover {
+  background: #DBEAFE;
+  border-color: #3B82F6;
+}
+
+.cart-addon-popover {
+  margin-top: 8px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.cart-addon-popover-header {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #475569;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.cart-addon-popover-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cart-addon-popover-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cart-addon-popover-item:hover {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+}
+
+.cart-addon-popover-item.is-active {
+  background: #FFFBEB;
+  border-color: #FCD34D;
+  color: #92400E;
+}
+
+.popover-item-name {
+  font-weight: 600;
+}
+
+.popover-item-price {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  color: #D97706;
+}

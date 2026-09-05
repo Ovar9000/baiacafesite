@@ -1,4 +1,5 @@
 import { cartStore } from './cartStore.js';
+import { menuData, getAvailableDrinkAddOns } from '../data/menuData.js';
 
 export function initCartDrawer() {
   const backdrop = document.getElementById('cart-drawer-backdrop');
@@ -173,24 +174,64 @@ export function initCartDrawer() {
       if (item.size) metaParts.push(`Size ${item.size}`);
       if (item.isBundle) metaParts.push('Popular Shore Pairing');
 
+      const availableAddOns = getAvailableDrinkAddOns(item.id);
+      const hasCustomizations = availableAddOns.length > 0;
+      const isDrink = item.isDrink || Boolean(item.temp || item.size || (item.addOns && item.addOns.length > 0));
+      const addOnsList = item.addOns || [];
+      const cleanKey = item.key.replace(/[^a-zA-Z0-9_-]/g, '_');
+
       return `
         <div class="cart-item-card" data-key="${item.key}">
           <div class="cart-item-top">
             <div>
               <p class="cart-item-name"><strong>${item.name}</strong></p>
               ${metaParts.length > 0 ? `<div class="cart-item-meta">${metaParts.join(' • ')}</div>` : ''}
+              ${addOnsList.length > 0 ? `
+                <div class="cart-item-addons-list">
+                  ${addOnsList.map(a => `
+                    <span class="cart-addon-badge">
+                      <span>+ ${a.name} (+₱${a.price})</span>
+                      <button type="button" class="btn-remove-addon" data-key="${item.key}" data-addon-id="${a.id}" aria-label="Remove ${a.name}">×</button>
+                    </span>
+                  `).join('')}
+                </div>
+              ` : ''}
             </div>
             <div class="cart-item-price">${store.formatCurrency(item.unitPrice * item.quantity)}</div>
           </div>
 
           <div class="cart-item-bottom">
-            <div class="quantity-stepper" role="group" aria-label="Item quantity controls">
-              <button class="btn-step" data-action="decrease" data-key="${item.key}" aria-label="Decrease quantity of ${item.name}">−</button>
-              <span class="step-count" aria-live="polite">${item.quantity}</span>
-              <button class="btn-step" data-action="increase" data-key="${item.key}" aria-label="Increase quantity of ${item.name}">+</button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="quantity-stepper" role="group" aria-label="Item quantity controls">
+                <button class="btn-step" data-action="decrease" data-key="${item.key}" aria-label="Decrease quantity of ${item.name}">−</button>
+                <span class="step-count" aria-live="polite">${item.quantity}</span>
+                <button class="btn-step" data-action="increase" data-key="${item.key}" aria-label="Increase quantity of ${item.name}">+</button>
+              </div>
+              ${hasCustomizations ? `
+                <button type="button" class="btn-cart-quick-addon" data-action="toggle-custom-popover" data-target="popover-${cleanKey}" aria-label="Customize add-ons for ${item.name}">
+                  <span>+ Customization</span>
+                </button>
+              ` : ''}
             </div>
             <button class="btn-item-remove" data-key="${item.key}" aria-label="Remove ${item.name} from order list">Remove</button>
           </div>
+
+          ${hasCustomizations ? `
+            <div class="cart-addon-popover" id="popover-${cleanKey}" style="display: none;">
+              <div class="cart-addon-popover-header">Drink Customizations &amp; Add-ons</div>
+              <div class="cart-addon-popover-items">
+                ${availableAddOns.map(addon => {
+                  const hasIt = addOnsList.some(a => a.id === addon.id);
+                  return `
+                    <div class="cart-addon-popover-item ${hasIt ? 'is-active' : ''}" data-key="${item.key}" data-addon-id="${addon.id}" role="button" tabindex="0">
+                      <span class="popover-item-name">${hasIt ? '✓ ' : '+ '}${addon.name}</span>
+                      <strong class="popover-item-price">+₱${addon.price}</strong>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          ` : ''}
         </div>
       `;
     }).join('');
@@ -208,6 +249,50 @@ export function initCartDrawer() {
       btn.addEventListener('click', () => {
         const key = btn.dataset.key;
         cartStore.removeItem(key);
+      });
+    });
+
+    // Remove specific add-on from pill
+    itemsContainer.querySelectorAll('.btn-remove-addon').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const key = btn.dataset.key;
+        const addonId = btn.dataset.addonId;
+        const found = (menuData.addOns || []).find(a => a.id === addonId) || { id: addonId, price: 0 };
+        cartStore.toggleItemAddOn(key, found);
+      });
+    });
+
+    // Toggle in-drawer add-ons popover
+    itemsContainer.querySelectorAll('[data-action="toggle-custom-popover"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const targetId = btn.dataset.target;
+        const pop = document.getElementById(targetId);
+        if (pop) {
+          const isOpen = pop.style.display === 'flex';
+          itemsContainer.querySelectorAll('.cart-addon-popover').forEach(p => p.style.display = 'none');
+          pop.style.display = isOpen ? 'none' : 'flex';
+        }
+      });
+    });
+
+    // Toggle add-on from popover
+    itemsContainer.querySelectorAll('.cart-addon-popover-item').forEach(itemBtn => {
+      const handleToggle = () => {
+        const key = itemBtn.dataset.key;
+        const addonId = itemBtn.dataset.addonId;
+        const found = (menuData.addOns || []).find(a => a.id === addonId);
+        if (found) {
+          cartStore.toggleItemAddOn(key, found);
+        }
+      };
+      itemBtn.addEventListener('click', handleToggle);
+      itemBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleToggle();
+        }
       });
     });
   }
@@ -255,12 +340,24 @@ export function initCartDrawer() {
               <strong>${cartStore.orderType}</strong>
             </div>
             <div class="summary-items-list">
-              ${cartStore.items.map(i => `
-                <div class="summary-item-row">
-                  <span>${i.quantity}x ${i.name}</span>
-                  <span>${cartStore.formatCurrency(i.unitPrice * i.quantity)}</span>
-                </div>
-              `).join('')}
+              ${cartStore.items.map(i => {
+                const meta = [];
+                if (i.temp) meta.push(i.temp);
+                if (i.size) meta.push(`Size ${i.size}`);
+                if (i.addOns && i.addOns.length > 0) {
+                  i.addOns.forEach(a => meta.push(`+${a.name}`));
+                }
+                const metaStr = meta.length > 0 ? meta.join(', ') : '';
+                return `
+                  <div class="summary-item-row">
+                    <div>
+                      <span>${i.quantity}x ${i.name}</span>
+                      ${metaStr ? `<div style="font-size: 0.72rem; color: #64748b; margin-top: 1px;">${metaStr}</div>` : ''}
+                    </div>
+                    <span>${cartStore.formatCurrency(i.unitPrice * i.quantity)}</span>
+                  </div>
+                `;
+              }).join('')}
             </div>
             ${totals.savings > 0 ? `
               <div class="summary-savings-row">

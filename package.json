@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "verify": "node scripts/verify-backend.js",
+    "audit": "node run-preview-audit.js",
     "sync:fb": "node scripts/sync-facebook-posts.js",
     "sync:fb:mock": "node scripts/sync-facebook-posts.js --test-mock",
     "sync:community": "node scripts/sync-guest-photos.js"

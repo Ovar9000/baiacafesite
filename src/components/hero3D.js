@@ -1,5 +1,4 @@
 import VanillaTilt from 'vanilla-tilt';
-import { supabase } from '../lib/supabaseClient.js';
 
 // 4 Curated Aesthetic Showcase Slots (Rotates deterministically every 6 hours by Manila Time)
 // Default curated fallbacks:
@@ -20,7 +19,7 @@ const DEFAULT_SHOWCASE_ITEMS = [
     title: 'Bohol Asin Tibuok Sea Salt Latte',
     img: './images/classiccafe.webp',
     alt: 'BAIA Bohol Asin Tibuok Sea Salt artisan latte on the beach',
-    tagColor: '#D97706'
+    tagColor: '#B45309'
   },
   {
     slot: 2,
@@ -121,8 +120,13 @@ export function initHero3D() {
     }
   }
 
-  // 1. Apply initial 6-hour slot on load with curated beach defaults
-  applySlot(activeIndex, false);
+  // 1. Let preloaded signature hero image render immediately for instant LCP.
+  // If the current Manila time slot is different, smoothly crossfade to it after initial paint.
+  if (activeIndex !== 0) {
+    setTimeout(() => {
+      applySlot(activeIndex, true);
+    }, 2000);
+  }
 
   // 2. Hydrate showcase slots with time-appropriate food/drink items from Supabase
   // The Hero card is strictly a food & drink showcase by time-of-day:
@@ -133,6 +137,7 @@ export function initHero3D() {
   // Announcements, advisories, and website launch posts belong in the New Drops section, never the hero food showcase.
   async function hydrateHeroFromSupabase() {
     try {
+      const { supabase } = await import('../lib/supabaseClient.js');
       // A. Check for optional dedicated 'showcase' table in Supabase
       const { data: customShowcase, error: showcaseErr } = await supabase
         .from('showcase')

@@ -1,4 +1,4 @@
-import { menuData } from '../data/menuData.js';
+import { menuData, getAvailableDrinkAddOns, shouldOpenDrinkCustomizer } from '../data/menuData.js';
 import { cartStore } from './cartStore.js';
 import { motionSystem } from '../utils/motionSystem.js';
 
@@ -219,6 +219,12 @@ export function initMenuExplorer() {
                             data-add-name="${item.name}"
                             data-add-price="${itemPrice}"
                             data-add-desc="${item.description || ''}"
+                            data-add-board="${activeBoard}"
+                            data-category-id="${group.id}"
+                            data-has-hot-cold="${group.hasHotCold ? 'true' : 'false'}"
+                            data-has-sizes="${group.hasSizes ? 'true' : 'false'}"
+                            data-price-m="${item.priceM || ''}"
+                            data-price-l="${item.priceL || ''}"
                             aria-label="Add ${item.name} to order"
                           >
                             <span>${itemPrice > 0 ? '+ Order' : 'Inquire'}</span>
@@ -233,21 +239,6 @@ export function initMenuExplorer() {
           `;
         }).join('')}
       </div>
-
-      <!-- Add-Ons Section on Drinks Board -->
-      ${activeBoard === 'drinks' && menuData.addOns ? `
-        <div class="menu-addons-card">
-          <h4 class="addons-title">Drink Customizations &amp; Add-ons</h4>
-          <div class="addons-grid">
-            ${menuData.addOns.map(addon => `
-              <div class="addon-pill">
-                <span class="addon-name">${addon.name}</span>
-                <span class="addon-price">+₱${addon.price}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      ` : ''}
 
       <!-- Official Physical Menu Board Notice -->
       <div class="menu-disclaimer-card">
@@ -521,15 +512,272 @@ export function initMenuExplorer() {
         const name = btn.dataset.addName;
         const price = parseFloat(btn.dataset.addPrice) || 0;
         const description = btn.dataset.addDesc;
+        const categoryId = btn.dataset.categoryId;
+        const board = btn.dataset.addBoard;
+        const hasHotCold = btn.dataset.hasHotCold === 'true';
+        const hasSizes = btn.dataset.hasSizes === 'true';
+        const priceM = parseFloat(btn.dataset.priceM) || price;
+        const priceL = parseFloat(btn.dataset.priceL) || price;
 
-        cartStore.addItem({
+        if (price === 0) {
+          // Inquiry item (e.g. craft beer)
+          window.open('https://m.me/thebaiacafe', '_blank', 'noopener');
+          return;
+        }
+
+        const drinkItem = {
           id,
           name,
           price,
-          description
-        });
+          priceM,
+          priceL,
+          description,
+          hasHotCold,
+          hasSizes,
+          categoryId
+        };
+
+        if (board === 'drinks' && shouldOpenDrinkCustomizer(drinkItem, categoryId)) {
+          openDrinkCustomizer(drinkItem);
+        } else {
+          // Food items or fixed drinks (fruit sodas, iced teas): direct 1-click add
+          cartStore.addItem({
+            id,
+            name,
+            price,
+            description,
+            isDrink: board === 'drinks',
+            categoryId
+          });
+        }
       });
     });
+  }
+
+  function openDrinkCustomizer(itemData) {
+    let modal = document.getElementById('drink-customizer-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'drink-customizer-modal';
+      modal.className = 'modal-backdrop drink-customizer-backdrop';
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.setAttribute('aria-labelledby', 'drink-customizer-title');
+      document.body.appendChild(modal);
+    }
+
+    const hasHotCold = itemData.hasHotCold;
+    const hasSizes = itemData.hasSizes;
+    const priceM = itemData.priceM || itemData.price || 0;
+    const priceL = itemData.priceL || (itemData.price ? itemData.price + 20 : 0);
+
+    let selectedTemp = hasHotCold ? 'Iced' : null;
+    let selectedSize = hasSizes ? 'M' : null;
+    let selectedAddOns = new Set();
+    let quantity = 1;
+
+    const addOnsList = getAvailableDrinkAddOns(itemData.id);
+
+    function calculateCurrentUnitPrice() {
+      let base = itemData.price || 0;
+      if (hasSizes) {
+        base = selectedSize === 'L' ? priceL : priceM;
+      }
+      const addOnsCost = Array.from(selectedAddOns).reduce((sum, addOnId) => {
+        const found = addOnsList.find(a => a.id === addOnId);
+        return sum + (found ? found.price : 0);
+      }, 0);
+      return base + addOnsCost;
+    }
+
+    function renderModalContent() {
+      const unitPrice = calculateCurrentUnitPrice();
+      const grandTotal = unitPrice * quantity;
+
+      modal.innerHTML = `
+        <div class="modal-dialog-card drink-customizer-card">
+          <div class="customizer-header-row">
+            <div>
+              <div class="modal-badge">Drink Customization</div>
+              <h3 id="drink-customizer-title" class="customizer-drink-title">${itemData.name}</h3>
+              <p class="customizer-drink-desc">${itemData.description || 'Crafted fresh on the shore with artisanal ingredients.'}</p>
+            </div>
+            <button type="button" class="modal-dialog-close-btn" id="customizer-close-btn" aria-label="Close customizer">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+
+          ${hasHotCold ? `
+            <div class="customizer-section">
+              <div class="customizer-section-title">Serving Temperature</div>
+              <div class="customizer-segmented-grid">
+                <button type="button" class="customizer-option-btn ${selectedTemp === 'Iced' ? 'is-selected' : ''}" data-temp="Iced">
+                  <span class="customizer-option-label">Iced</span>
+                  <span class="customizer-option-sub">Chilled over beachside ice</span>
+                </button>
+                <button type="button" class="customizer-option-btn ${selectedTemp === 'Hot' ? 'is-selected' : ''}" data-temp="Hot">
+                  <span class="customizer-option-label">Hot</span>
+                  <span class="customizer-option-sub">Steamed &amp; velvety warm</span>
+                </button>
+              </div>
+            </div>
+          ` : ''}
+
+          ${hasSizes ? `
+            <div class="customizer-section">
+              <div class="customizer-section-title">Cup Size</div>
+              <div class="customizer-segmented-grid">
+                <button type="button" class="customizer-option-btn ${selectedSize === 'M' ? 'is-selected' : ''}" data-size="M">
+                  <span class="customizer-option-label">Medium (16oz)</span>
+                  <span class="customizer-option-sub">₱${priceM}</span>
+                </button>
+                <button type="button" class="customizer-option-btn ${selectedSize === 'L' ? 'is-selected' : ''}" data-size="L">
+                  <span class="customizer-option-label">Large (22oz)</span>
+                  <span class="customizer-option-sub">₱${priceL}</span>
+                </button>
+              </div>
+            </div>
+          ` : ''}
+
+          ${addOnsList.length > 0 ? `
+            <div class="customizer-section">
+              <div class="customizer-section-title">
+                <span>Drink Customizations &amp; Add-ons</span>
+                <span style="font-weight: 500; font-size: 0.7rem; color: #64748B;">Optional</span>
+              </div>
+              <div class="customizer-addons-stack">
+                ${addOnsList.map(addon => {
+                  const isChecked = selectedAddOns.has(addon.id);
+                  return `
+                    <div class="customizer-addon-row ${isChecked ? 'is-checked' : ''}" data-addon-id="${addon.id}" role="checkbox" aria-checked="${isChecked}" tabindex="0">
+                      <div class="addon-left-info">
+                        <div class="addon-checkbox-indicator">${isChecked ? '✓' : ''}</div>
+                        <span class="addon-row-name">${addon.name}</span>
+                      </div>
+                      <span class="addon-row-price">+₱${addon.price}</span>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="customizer-footer-row">
+            <div class="customizer-qty-stepper" role="group" aria-label="Quantity">
+              <button type="button" class="btn-customizer-qty" id="customizer-qty-minus" aria-label="Decrease quantity">−</button>
+              <span class="customizer-qty-val">${quantity}</span>
+              <button type="button" class="btn-customizer-qty" id="customizer-qty-plus" aria-label="Increase quantity">+</button>
+            </div>
+            <button type="button" class="btn-customizer-submit" id="customizer-submit-btn">
+              <span>Add to Order</span>
+              <span>•</span>
+              <span>₱${grandTotal.toLocaleString()}</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Attach events inside modal
+      modal.querySelector('#customizer-close-btn')?.addEventListener('click', closeModal);
+
+      modal.querySelectorAll('[data-temp]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedTemp = btn.dataset.temp;
+          renderModalContent();
+        });
+      });
+
+      modal.querySelectorAll('[data-size]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedSize = btn.dataset.size;
+          renderModalContent();
+        });
+      });
+
+      modal.querySelectorAll('.customizer-addon-row').forEach(row => {
+        const toggle = () => {
+          const aId = row.dataset.addonId;
+          if (selectedAddOns.has(aId)) {
+            selectedAddOns.delete(aId);
+          } else {
+            selectedAddOns.add(aId);
+          }
+          renderModalContent();
+        };
+        row.addEventListener('click', toggle);
+        row.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+          }
+        });
+      });
+
+      modal.querySelector('#customizer-qty-minus')?.addEventListener('click', () => {
+        if (quantity > 1) {
+          quantity -= 1;
+          renderModalContent();
+        }
+      });
+
+      modal.querySelector('#customizer-qty-plus')?.addEventListener('click', () => {
+        quantity += 1;
+        renderModalContent();
+      });
+
+      modal.querySelector('#customizer-submit-btn')?.addEventListener('click', () => {
+        const chosenAddOns = Array.from(selectedAddOns).map(id => addOnsList.find(a => a.id === id)).filter(Boolean);
+        let basePrice = itemData.price || 0;
+        if (hasSizes) {
+          basePrice = selectedSize === 'L' ? priceL : priceM;
+        }
+
+        cartStore.addItem({
+          id: itemData.id,
+          name: itemData.name,
+          price: basePrice,
+          description: itemData.description,
+          temp: selectedTemp,
+          size: selectedSize,
+          addOns: chosenAddOns,
+          quantity: quantity,
+          isDrink: true,
+          categoryId: itemData.categoryId
+        });
+
+        closeModal();
+      });
+    }
+
+    function openModal() {
+      renderModalContent();
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      const onKey = (e) => {
+        if (e.key === 'Escape') {
+          closeModal();
+        }
+      };
+      window.addEventListener('keydown', onKey);
+      modal._escHandler = onKey;
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+      if (modal._escHandler) {
+        window.removeEventListener('keydown', modal._escHandler);
+        modal._escHandler = null;
+      }
+    }
+
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    };
+
+    openModal();
   }
 
   // Initial render (ensures dynamic preview capsules & event listeners mount on both / and /menu/)
