@@ -5,23 +5,23 @@
 .boards-section {
   background: var(--depth-navy-deep, #0E1A45);
   color: var(--white);
-  padding-top: 48px;
-  padding-bottom: 110px;
+  padding-top: 40px;
+  padding-bottom: 64px;
   position: relative;
   overflow: hidden;
 }
 
 @media (max-width: 768px) {
   .boards-section {
-    padding-top: 36px;
-    padding-bottom: 80px;
+    padding-top: 30px;
+    padding-bottom: 48px;
   }
 }
 
 .boards-header {
   text-align: center;
   max-width: 760px;
-  margin: 0 auto 48px auto;
+  margin: 0 auto 40px auto;
 }
 
 .boards-tag {
@@ -260,33 +260,42 @@
   flex-wrap: wrap;
 }
 
-/* Boards Grid — 3 Columns on Desktop, 2 on Tablet, 1 on Mobile */
+/* Boards Grid — 3 Columns on Desktop, Swipe Reel on Tablet & Mobile */
 .boards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 28px;
+  position: relative;
+  z-index: 2;
 }
 
 @media (max-width: 1024px) {
   .boards-grid {
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    gap: 16px;
+    padding: 8px 4px 18px 4px;
+    scrollbar-width: none;
   }
-  .boards-grid .board-card:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
+  .boards-grid::-webkit-scrollbar {
+    display: none;
   }
-}
-
-@media (max-width: 768px) {
-  .boards-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
+  .board-card {
+    flex: 0 0 clamp(285px, 78vw, 330px);
+    max-width: 340px;
+    scroll-snap-align: start;
+    padding: 18px 20px;
   }
 }
 
 .board-card {
   background: #192a6b;
   border-radius: var(--radius-xl);
-  padding: 24px;
+  padding: 20px;
   border: 2px solid rgba(255, 255, 255, 0.15);
   display: flex;
   flex-direction: column;
@@ -303,11 +312,11 @@
 
 .board-photo-frame {
   width: 100%;
-  height: 220px;
-  max-height: 220px;
+  height: 160px;
+  max-height: 160px;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   background: #0f172a;
 }
 

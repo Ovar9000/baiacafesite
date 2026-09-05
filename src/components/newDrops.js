@@ -12,7 +12,6 @@
 
 import updatesData from '../data/updates.json';
 import { cartStore } from './cartStore.js';
-import { supabase } from '../lib/supabaseClient.js';
 
 export function initNewDrops() {
   const container = document.getElementById('new-drops-root');
@@ -101,9 +100,14 @@ export function initNewDrops() {
         </div>
       </div>
 
-      <!-- Drops Cards Grid -->
-      <div class="drops-cards-grid">
-        ${filteredItems.length === 0 ? `
+      <!-- Drops Cards Carousel Reel Wrapper -->
+      <div class="drops-reel-wrapper">
+        <button type="button" class="drops-reel-nav drops-reel-prev" id="drops-reel-prev" aria-label="Previous releases">
+          <span aria-hidden="true">‹</span>
+        </button>
+
+        <div class="drops-cards-grid" id="drops-cards-track">
+          ${filteredItems.length === 0 ? `
           <div class="drops-empty-state">
             <h3>No drops in this category right now</h3>
             <p>Check back soon or follow our Facebook page for the next flavor drop.</p>
@@ -258,6 +262,11 @@ export function initNewDrops() {
             </article>
           `;
         }).join('')}
+        </div>
+
+        <button type="button" class="drops-reel-nav drops-reel-next" id="drops-reel-next" aria-label="Next releases">
+          <span aria-hidden="true">›</span>
+        </button>
       </div>
 
       <!-- Bottom Facebook Live Anchor -->
@@ -273,16 +282,49 @@ export function initNewDrops() {
       </div>
     `;
 
-    // Attach Category Tab Listeners
+    // Attach Category Tab Listeners & Scroll Reset
     container.querySelectorAll('.drops-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const cat = e.currentTarget.dataset.cat;
         if (cat && cat !== activeCategory) {
           activeCategory = cat;
           render();
+          const track = container.querySelector('#drops-cards-track');
+          if (track) track.scrollTo({ left: 0, behavior: 'smooth' });
         }
       });
     });
+
+    // Reel Carousel Navigation Controls
+    const track = container.querySelector('#drops-cards-track');
+    const prevBtn = container.querySelector('#drops-reel-prev');
+    const nextBtn = container.querySelector('#drops-reel-next');
+
+    if (track && prevBtn && nextBtn) {
+      const updateNavButtons = () => {
+        const atStart = track.scrollLeft <= 8;
+        const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 12;
+        prevBtn.disabled = atStart;
+        nextBtn.disabled = atEnd;
+        prevBtn.style.opacity = atStart ? '0.35' : '1';
+        nextBtn.style.opacity = atEnd ? '0.35' : '1';
+        prevBtn.style.pointerEvents = atStart ? 'none' : 'auto';
+        nextBtn.style.pointerEvents = atEnd ? 'none' : 'auto';
+      };
+
+      prevBtn.addEventListener('click', () => {
+        const scrollAmount = Math.max(280, Math.floor(track.clientWidth * 0.75));
+        track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      });
+
+      nextBtn.addEventListener('click', () => {
+        const scrollAmount = Math.max(280, Math.floor(track.clientWidth * 0.75));
+        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      });
+
+      track.addEventListener('scroll', updateNavButtons, { passive: true });
+      updateNavButtons();
+    }
 
     // Attach Order Buttons to CartStore
     container.querySelectorAll('[data-order-drop]').forEach(btn => {
@@ -309,6 +351,7 @@ export function initNewDrops() {
   // 2. Background Real-time Hydration from Supabase drops table
   async function hydrateFromSupabase() {
     try {
+      const { supabase } = await import('../lib/supabaseClient.js');
       const { data: dbDrops, error } = await supabase
         .from('drops')
         .select('*')

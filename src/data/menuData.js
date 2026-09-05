@@ -203,3 +203,68 @@ export const menuData = {
   ],
   boardDisclaimer: "Prices are subject to change without prior notice due to fluctuations in raw ingredient costs, and customers who accidentally break any glassware will be responsible for covering the full replacement cost."
 };
+
+export function getDrinkCategory(itemId) {
+  if (!itemId) return null;
+  for (const group of menuData.drinks) {
+    if (group.items && group.items.some(i => i.id === itemId)) {
+      return group.id;
+    }
+  }
+  return null;
+}
+
+export function isCoffeeDrink(itemId) {
+  const cat = getDrinkCategory(itemId);
+  if (cat === 'classic' || cat === 'house-special' || cat === 'signature-coffee') {
+    return true;
+  }
+  if (cat === 'blended') {
+    const coffeeBlends = [
+      'blend-mocha',
+      'blend-whitemocha',
+      'blend-caramel',
+      'blend-biscoff',
+      'blend-javachip',
+      'blend-butterfinger'
+    ];
+    return coffeeBlends.includes(itemId);
+  }
+  return false;
+}
+
+export function getAvailableDrinkAddOns(itemId) {
+  const cat = getDrinkCategory(itemId);
+  if (!cat) return [];
+
+  // Sodas, iced teas, and craft beers do not take milk/espresso add-ons
+  if (cat === 'fruit-soda' || cat === 'iced-tea' || cat === 'craft-beer') {
+    return [];
+  }
+
+  const allAddOns = menuData.addOns || [];
+
+  // Coffee drinks: Alternative Milk, Syrup, Extra Espresso Shot
+  if (isCoffeeDrink(itemId)) {
+    return allAddOns;
+  }
+
+  // Non-coffee (Cacao Calm, Matcha, etc.) and Milkshakes:
+  // Allow Alternative Milk and Syrup, but EXCLUDE Extra Espresso Shot!
+  return allAddOns.filter(a => a.id !== 'addon-shot');
+}
+
+export function shouldOpenDrinkCustomizer(item, categoryId) {
+  const cat = categoryId || getDrinkCategory(item.id);
+  if (!cat) return false;
+
+  // Sodas, Iced Teas, and Craft Beer have fixed recipes/sizes and no milk/espresso add-ons:
+  // Allow direct 1-click addition to cart!
+  if (cat === 'fruit-soda' || cat === 'iced-tea' || cat === 'craft-beer') {
+    return false;
+  }
+
+  // If item has temperature options, size options, or available add-ons, open customizer
+  const availableAddOns = getAvailableDrinkAddOns(item.id);
+  return Boolean(item.hasHotCold || item.hasSizes || availableAddOns.length > 0);
+}

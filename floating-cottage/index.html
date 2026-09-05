@@ -40,6 +40,9 @@
   <!-- Critical Above-The-Fold CSS -->
   <style id="critical-subpage-css">
   *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
     -webkit-tap-highlight-color: transparent;
   }
   :focus:not(:focus-visible) {
@@ -166,6 +169,7 @@ img { max-width: 100%; height: auto; display: block; }
   <link
     rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800;900&display=swap" />
+  <link rel="preload" as="image" href="/images/Cottage%20rental.webp" fetchpriority="high" />
 
   <!-- Master Stylesheet and Main Entry Module -->
   <link rel="stylesheet" href="/src/styles/main.css" />
@@ -334,7 +338,7 @@ img { max-width: 100%; height: auto; display: block; }
                 alt="Barangay Laurente Floating Cottage in San Pascual Masbate with BAIA Cafe booking partner" 
                 width="1200" 
                 height="630" 
-                loading="lazy" 
+                fetchpriority="high"
                 decoding="async" 
               />
             </div>

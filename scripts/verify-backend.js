@@ -149,12 +149,50 @@ async function runHealthCheck() {
         assert(true, `Successfully verified 'stamps' table in Supabase!`);
       }
 
+      const { data: redemptionsData, error: redErr } = await supabase
+        .from('redemptions')
+        .select('id')
+        .limit(1);
+
+      if (redErr) {
+        warn(`Table 'redemptions' query returned: ${redErr.message}`);
+      } else {
+        assert(true, `Successfully verified 'redemptions' table in Supabase!`);
+      }
+
+      const { data: voucherData, error: vouchErr } = await supabase
+        .from('wifi_vouchers')
+        .select('id')
+        .limit(1);
+
+      if (vouchErr) {
+        warn(`Table 'wifi_vouchers' query returned: ${vouchErr.message}`);
+      } else {
+        assert(true, `Successfully verified 'wifi_vouchers' table in Supabase!`);
+      }
+
     } catch (sbEx) {
       warn(`Supabase network check exception: ${sbEx.message}`);
     }
   } else {
     warn('Skipping live Supabase connection (no SUPABASE_SERVICE_ROLE_KEY in environment)');
   }
+
+  // Test 6: API Endpoints & Serverless Function Contracts
+  console.log('\n6. Serverless API Endpoint Contracts:');
+  const apis = ['claim-stamp.js', 'redeem-reward.js', 'admin-token.js', 'delete-account.js'];
+  apis.forEach(api => {
+    const apiFile = path.join(ROOT_DIR, 'api', api);
+    assert(fs.existsSync(apiFile), `api/${api} exists`);
+  });
+
+  // Test 7: Motion & Animation System Sanity
+  console.log('\n7. Motion & Animation Tokens:');
+  const motionFile = path.join(ROOT_DIR, 'src', 'utils', 'motionSystem.js');
+  assert(fs.existsSync(motionFile), 'src/utils/motionSystem.js exists');
+  const motionContent = fs.readFileSync(motionFile, 'utf-8');
+  assert(motionContent.includes('--motion-duration-logo'), 'Motion system registers --motion-duration-logo');
+  assert(motionContent.includes('--motion-duration-page'), 'Motion system registers --motion-duration-page');
 
   // Summary
   console.log('\n====================================================');
