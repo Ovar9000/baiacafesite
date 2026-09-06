@@ -2,6 +2,16 @@ import { menuData, getAvailableDrinkAddOns, shouldOpenDrinkCustomizer } from '..
 import { cartStore } from './cartStore.js';
 import { motionSystem } from '../utils/motionSystem.js';
 
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export function initMenuExplorer() {
   const container = document.getElementById('menu-explorer-root');
   if (!container) return;
@@ -84,7 +94,7 @@ export function initMenuExplorer() {
             type="text" 
             class="menu-search-input" 
             placeholder="Search ${activeBoard === 'drinks' ? 'lattes, frappes, fruit sodas, iced teas...' : 'smash burgers, waffles, rice meals, pasta...'}"
-            value="${searchQuery}"
+            value="${escapeHtml(searchQuery)}"
             id="menu-search-field"
             aria-label="Search menu items"
           />
@@ -102,7 +112,7 @@ export function initMenuExplorer() {
       <div class="menu-accordion-wrapper">
         ${groupedItems.length === 0 ? `
           <div class="menu-no-results">
-            <h3>No items match "${searchQuery}"</h3>
+            <h3>No items match "${escapeHtml(searchQuery)}"</h3>
         ` : groupedItems.map(group => {
           const isOpen = isSearching ? true : openCategories.has(group.id);
           // Dynamically size the tasting notes to fill available space without awkward "+1 more"
