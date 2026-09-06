@@ -122,6 +122,17 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'script-defer',
       includeAssets: ['favicon.ico', 'images/Logo.webp', 'images/crew.webp'],
+      workbox: {
+        globIgnores: [
+          'admin/**',
+          '**/admin/**',
+          '**/AdminPortal*.js',
+          '**/adminRewards*.js',
+          '**/adminActivity*.js',
+          '**/admin-*.js',
+          '**/QrScanner*.js'
+        ]
+      },
       manifest: {
         name: 'Baia Café — Digital Loyalty Card',
         short_name: 'Baia Loyalty',
