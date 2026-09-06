@@ -244,7 +244,8 @@
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   gap: 20px;
-  padding: 16px 12px 36px 12px;
+  padding: 16px 6px 36px 6px;
+  scroll-padding-inline: 6px;
   margin-bottom: 16px;
   position: relative;
   z-index: 2;
@@ -277,10 +278,10 @@
   box-shadow: none !important;
 }
 
-/* Desktop Large (>= 1200px): Exactly 4 complete cards per screen width with ZERO trailing slivers */
+/* Desktop Large (>= 1200px): Exactly 4 complete cards per screen width */
 .drop-card {
-  flex: 0 0 calc((100% - (3 * 20px)) / 4);
-  max-width: calc((100% - (3 * 20px)) / 4);
+  flex: 0 0 calc((100% - (3 * 20px) - 12px) / 4);
+  max-width: calc((100% - (3 * 20px) - 12px) / 4);
   min-width: 270px;
   scroll-snap-align: start;
 }
@@ -291,39 +292,34 @@
     gap: 18px;
   }
   .drop-card {
-    flex: 0 0 calc((100% - (2 * 18px)) / 3);
-    max-width: calc((100% - (2 * 18px)) / 3);
+    flex: 0 0 calc((100% - (2 * 18px) - 12px) / 3);
+    max-width: calc((100% - (2 * 18px) - 12px) / 3);
   }
 }
 
-/* Tablet & Mobile (<= 1024px): Full edge-to-edge touch swipe bleed with clean card widths */
+/* Tablet & Mobile (<= 1024px): Match boards reel margin & clean card widths without flush edge clipping */
 @media (max-width: 1024px) {
   .drops-cards-grid {
-    margin-left: calc(-1 * var(--container-padding));
-    margin-right: calc(-1 * var(--container-padding));
-    padding-left: var(--container-padding);
-    padding-right: var(--container-padding);
-    width: calc(100% + (2 * var(--container-padding)));
     gap: 16px;
-    padding-top: 14px;
-    padding-bottom: 32px;
+    padding: 14px 6px 32px 6px;
+    scroll-padding-inline: 6px;
     margin-bottom: 12px;
   }
   .drop-card {
-    flex: 0 0 clamp(280px, 44vw, 320px);
+    flex: 0 0 clamp(280px, 78vw, 320px);
     max-width: 320px;
   }
   .drops-reel-prev {
-    left: 8px;
+    left: -12px;
   }
   .drops-reel-next {
-    right: 8px;
+    right: -12px;
   }
 }
 
 @media (max-width: 640px) {
   .drop-card {
-    flex: 0 0 clamp(270px, 80vw, 310px);
+    flex: 0 0 clamp(270px, 78vw, 310px);
     max-width: 310px;
   }
   .drops-reel-nav {
