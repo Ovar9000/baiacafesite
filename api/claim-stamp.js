@@ -7,6 +7,17 @@ const DAILY_QR_SECRET = process.env.DAILY_QR_SECRET || '***REMOVED_DAILY_QR_SECR
 const CAFE_LAT = parseFloat(process.env.CAFE_LAT || '13.6218');
 const CAFE_LNG = parseFloat(process.env.CAFE_LNG || '123.1948');
 const CAFE_TIMEZONE = process.env.CAFE_TIMEZONE || 'Asia/Manila';
+const CAFE_OPEN_HOUR = parseInt(process.env.CAFE_OPEN_HOUR || '9', 10);
+const CAFE_CLOSE_HOUR = parseInt(process.env.CAFE_CLOSE_HOUR || '23', 10);
+
+function isCafeOperatingHours(date = new Date()) {
+  const hour = parseInt(new Intl.DateTimeFormat('en-US', {
+    timeZone: CAFE_TIMEZONE,
+    hour: 'numeric',
+    hourCycle: 'h23'
+  }).format(date), 10);
+  return hour >= CAFE_OPEN_HOUR && hour < CAFE_CLOSE_HOUR;
+}
 
 function getManilaDateString(date = new Date()) {
   const parts = new Intl.DateTimeFormat('en-CA', {
@@ -105,7 +116,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'QR verification token is required.' });
     }
 
-    // 1. Verify daily token
+    // 1. Operating Hours Enforcement (Closed 11:00 PM - 9:00 AM Manila time)
+    if (!isCafeOperatingHours()) {
+      return res.status(403).json({
+        error: 'Baia Café is currently closed. Stamp claims are only available during operating hours (9:00 AM – 11:00 PM).'
+      });
+    }
+
+    // 2. Verify daily token
     const todayManila = getManilaDateString();
     const expectedToken = generateExpectedToken(todayManila);
     if (!safeCompareTokens(token, expectedToken)) {

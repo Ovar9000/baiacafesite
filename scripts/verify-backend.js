@@ -72,6 +72,21 @@ async function runHealthCheck() {
   const manilaDateStr = `${y}-${m}-${d}`;
   assert(/^\d{4}-\d{2}-\d{2}$/.test(manilaDateStr), `Calculated valid Manila date format: ${manilaDateStr}`);
 
+  // Operating Hours (9:00 AM - 11:00 PM Manila)
+  function isCafeOpen(date) {
+    const hour = parseInt(new Intl.DateTimeFormat('en-US', {
+      timeZone: CAFE_TIMEZONE,
+      hour: 'numeric',
+      hourCycle: 'h23'
+    }).format(date), 10);
+    return hour >= 9 && hour < 23;
+  }
+  assert(isCafeOpen(new Date('2026-09-06T08:59:00+08:00')) === false, 'Rejects scan before 9:00 AM (8:59 AM)');
+  assert(isCafeOpen(new Date('2026-09-06T09:00:00+08:00')) === true, 'Accepts scan at opening (9:00 AM)');
+  assert(isCafeOpen(new Date('2026-09-06T22:59:59+08:00')) === true, 'Accepts scan right before closing (10:59 PM)');
+  assert(isCafeOpen(new Date('2026-09-06T23:00:00+08:00')) === false, 'Rejects scan at closing (11:00 PM)');
+  assert(isCafeOpen(new Date('2026-09-06T02:00:00+08:00')) === false, 'Rejects scan during midnight/closed hours (2:00 AM)');
+
   // Test 2: Cryptographic QR Signature & Verification
   console.log('\n2. Daily QR Signature & Timing-Safe Verification:');
   const token = crypto.createHmac('sha256', DAILY_QR_SECRET).update(manilaDateStr).digest('hex');
