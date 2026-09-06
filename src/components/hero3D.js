@@ -138,32 +138,8 @@ export function initHero3D() {
   async function hydrateHeroFromSupabase() {
     try {
       const { supabase } = await import('../lib/supabaseClient.js');
-      // A. Check for optional dedicated 'showcase' table in Supabase
-      const { data: customShowcase, error: showcaseErr } = await supabase
-        .from('showcase')
-        .select('*')
-        .order('slot', { ascending: true });
 
-      if (!showcaseErr && customShowcase && customShowcase.length > 0) {
-        customShowcase.forEach(item => {
-          const slotIdx = item.slot ?? item.slot_index;
-          if (slotIdx >= 0 && slotIdx < 4 && item.image_url) {
-            showcaseSlots[slotIdx] = {
-              slot: slotIdx,
-              timeWindow: DEFAULT_SHOWCASE_ITEMS[slotIdx].timeWindow,
-              badge: item.badge || DEFAULT_SHOWCASE_ITEMS[slotIdx].badge,
-              title: item.title || DEFAULT_SHOWCASE_ITEMS[slotIdx].title,
-              img: item.image_url,
-              alt: `BAIA Cafe — ${item.title}: ${item.description || DEFAULT_SHOWCASE_ITEMS[slotIdx].alt}`,
-              tagColor: item.tag_color || DEFAULT_SHOWCASE_ITEMS[slotIdx].tagColor
-            };
-          }
-        });
-        applySlot(getManila6HourSlotIndex(), true);
-        return;
-      }
-
-      // B. Intelligent Food/Drink matching from public.drops
+      // Intelligent Food/Drink matching from public.drops
       const { data: drops, error: dropsErr } = await supabase
         .from('drops')
         .select('id, title, description, badge, image_url, category')
