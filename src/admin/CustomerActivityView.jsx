@@ -163,7 +163,7 @@ export default function CustomerActivityView({ password, data, setData, loading,
             {/* Card 2: Registered Members */}
             <div style={{ background: '#FFFFFF', padding: 'clamp(14px, 2.5vw, 20px)', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>Shore Club Members</span>
+                <span style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>BAIA Café Members</span>
                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FDF4FF', color: '#A855F7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Users size={18} />
                 </div>

@@ -39,13 +39,13 @@ export default function TermsApp() {
               1. Acceptance of Terms
             </h2>
             <p>
-              By accessing our website (<strong>https://www.baia.cafe</strong>) and participating in the <strong>Baia Café Shore Club Loyalty Program</strong>, you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use the loyalty card application.
+              By accessing our website (<strong>https://www.baia.cafe</strong>) and participating in the <strong>BAIA Café Loyalty Program</strong>, you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use the loyalty card application.
             </p>
           </section>
 
           <section>
             <h2 style={{ fontSize: '1.15rem', color: '#16255C', fontWeight: 700, marginBottom: '8px' }}>
-              2. Shore Club Loyalty Program Rules
+              2. BAIA Café Loyalty Program Rules
             </h2>
             <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <li><strong>Earning Stamps:</strong> Customers receive 1 digital stamp per qualifying handcrafted beverage purchased at Baia Café by scanning the official daily pickup standee QR code.</li>
@@ -82,8 +82,8 @@ export default function TermsApp() {
               These Terms shall be governed by and construed in accordance with the laws of the Republic of the Philippines. For inquiries, contact us at:
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.88rem', color: '#475569' }}>
-              <div><strong>Baia Café</strong></div>
-              <div>Masbate, Philippines</div>
+              <div><strong>BAIA Café</strong></div>
+              <div>Barangay Laurente, San Pascual, Burias Island, Masbate, Philippines</div>
               <div><strong>Email:</strong> <a href="mailto:quibotmark@gmail.com" style={{ color: '#1E4AFF', fontWeight: 600 }}>quibotmark@gmail.com</a></div>
             </div>
           </section>
@@ -92,7 +92,7 @@ export default function TermsApp() {
 
         {/* Footer info */}
         <div style={{ marginTop: '36px', paddingTop: '20px', borderTop: '1px solid #F1F5F9', textAlign: 'center', fontSize: '0.78rem', color: '#94A3B8' }}>
-          &copy; {new Date().getFullYear()} Baia Café. All rights reserved. • Masbate, Philippines
+          &copy; {new Date().getFullYear()} BAIA Café. All rights reserved. • San Pascual, Burias Island, Masbate
         </div>
 
       </div>

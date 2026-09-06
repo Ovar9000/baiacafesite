@@ -1,7 +1,13 @@
-import React, { useEffect } from 'react';
-import { X, ShieldCheck, FileText, ExternalLink } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 export default function LegalModal({ type, onClose }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (!type) return;
     const handleKeyDown = (e) => {
@@ -17,11 +23,11 @@ export default function LegalModal({ type, onClose }) {
     };
   }, [type, onClose]);
 
-  if (!type) return null;
+  if (!type || !mounted) return null;
 
   const isTerms = type === 'terms';
 
-  return (
+  return createPortal(
     <div 
       className="legal-modal-overlay" 
       onClick={onClose}
@@ -56,88 +62,39 @@ export default function LegalModal({ type, onClose }) {
           boxShadow: '0 25px 60px -12px rgba(15, 23, 42, 0.35)',
           border: '1.5px solid rgba(22, 37, 92, 0.08)',
           overflow: 'hidden',
+          textAlign: 'left',
           animation: 'legalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards'
         }}
       >
-        {/* Header */}
+        {/* Header: Flush left-aligned matching the body's horizontal margin */}
         <div style={{
-          padding: '16px 20px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          padding: '22px 24px 18px',
           borderBottom: '1px solid #F1F5F9',
-          background: '#FAF4EB'
+          background: '#FAF4EB',
+          textAlign: 'left'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {isTerms ? (
-              <FileText size={20} color="#1E4AFF" />
-            ) : (
-              <ShieldCheck size={20} color="#15803D" />
-            )}
-            <div>
-              <h3 
-                id="legal-modal-title"
-                style={{
-                  fontFamily: 'Space Grotesk, sans-serif',
-                  fontSize: '1.15rem',
-                  fontWeight: 800,
-                  color: '#16255C',
-                  margin: 0,
-                  lineHeight: 1.2
-                }}
-              >
-                {isTerms ? 'Terms of Service' : 'Privacy Policy'}
-              </h3>
-              <p style={{ margin: 0, fontSize: '0.7rem', color: '#64748B' }}>
-                BAIA Shore Club • Masbate, Philippines
-              </p>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <a
-              href={isTerms ? '/terms/' : '/privacy/'}
-              target="_blank"
-              rel="noreferrer"
-              title="Open in new window"
-              style={{
-                color: '#64748B',
-                padding: '6px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                borderRadius: '8px',
-                textDecoration: 'none'
-              }}
-            >
-              <ExternalLink size={16} />
-            </a>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close legal modal"
-              style={{
-                background: '#FFFFFF',
-                border: '1px solid #E2E8F0',
-                borderRadius: '50%',
-                width: '32px',
-                height: '32px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                color: '#16255C',
-                fontWeight: 800,
-                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)'
-              }}
-            >
-              <X size={16} />
-            </button>
-          </div>
+          <h2 
+            id="legal-modal-title"
+            style={{
+              fontFamily: 'Space Grotesk, sans-serif',
+              fontSize: '1.35rem',
+              fontWeight: 800,
+              color: '#16255C',
+              margin: '0 0 4px',
+              lineHeight: 1.25,
+              textAlign: 'left'
+            }}
+          >
+            {isTerms ? 'Terms of Service' : 'Privacy Policy'}
+          </h2>
+          <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748B', textAlign: 'left' }}>
+            BAIA Café • San Pascual, Burias Island
+          </p>
         </div>
 
-        {/* Scrollable Body */}
+        {/* Scrollable Body: Flush left at 24px padding matching the header */}
         <div style={{
-          padding: '22px 20px',
+          padding: '22px 24px',
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
           fontSize: '0.86rem',
@@ -153,12 +110,12 @@ export default function LegalModal({ type, onClose }) {
               <section>
                 <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>1. Acceptance of Terms</h4>
                 <p style={{ margin: 0, textAlign: 'left' }}>
-                  By accessing <strong>https://www.baia.cafe</strong> and participating in the <strong>BAIA Shore Club Loyalty Program</strong>, you agree to these Terms. If you do not agree, you may freely browse the site without creating an account.
+                  By accessing <strong>https://www.baia.cafe</strong> and participating in the <strong>BAIA Café Loyalty Program</strong>, you agree to these Terms. If you do not agree, you may freely browse the site without creating an account.
                 </p>
               </section>
 
               <section>
-                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>2. Shore Club Loyalty Rules</h4>
+                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>2. BAIA Café Loyalty Rules</h4>
                 <ul style={{ margin: '0', paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', textAlign: 'left' }}>
                   <li><strong>Earning Stamps:</strong> Receive 1 digital stamp per qualifying handcrafted beverage purchased at BAIA Café by scanning the official daily standee QR code.</li>
                   <li><strong>Daily Limit:</strong> Maximum of 1 stamp per account per calendar day (Asia/Manila timezone).</li>
@@ -178,7 +135,7 @@ export default function LegalModal({ type, onClose }) {
               <section>
                 <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>4. Governing Law &amp; Contact</h4>
                 <p style={{ margin: 0, textAlign: 'left' }}>
-                  These terms are governed by the laws of the Republic of the Philippines. For inquiries, email us at <a href="mailto:quibotmark@gmail.com" style={{ color: '#1E4AFF', fontWeight: 600 }}>quibotmark@gmail.com</a>.
+                  These terms are governed by the laws of the Republic of the Philippines. For inquiries, email us at <a href="mailto:quibotmark@gmail.com" style={{ color: '#1E4AFF', fontWeight: 600 }}>quibotmark@gmail.com</a> or visit us at Barangay Laurente, San Pascual, Burias Island, Masbate.
                 </p>
               </section>
             </>
@@ -220,7 +177,7 @@ export default function LegalModal({ type, onClose }) {
 
         {/* Footer with action button */}
         <div style={{
-          padding: '12px 20px',
+          padding: '14px 24px',
           borderTop: '1px solid #F1F5F9',
           background: '#F8FAFC',
           display: 'flex',
@@ -234,7 +191,7 @@ export default function LegalModal({ type, onClose }) {
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '9999px',
-              padding: '9px 22px',
+              padding: '9px 24px',
               fontFamily: 'inherit',
               fontWeight: 700,
               fontSize: '0.84rem',
@@ -246,6 +203,7 @@ export default function LegalModal({ type, onClose }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

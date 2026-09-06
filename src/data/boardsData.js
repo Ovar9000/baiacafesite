@@ -1,7 +1,7 @@
 export const boardsData = [
   {
     id: "board-skimboard",
-    name: "BAIA Shore Skimboard",
+    name: "BAIA Cafe Skimboard",
     type: "Recreational Gear",
     image: "./images/skimboard.webp",
     length: "41\"",

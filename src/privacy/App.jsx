@@ -39,7 +39,7 @@ export default function PrivacyPolicyApp() {
               1. Overview &amp; Who We Are
             </h2>
             <p>
-              Welcome to <strong>Baia Café</strong> (“we,” “us,” or “our”), accessible at <strong>https://www.baia.cafe</strong>. We operate an oceanfront specialty café in Masbate, Philippines, offering artisan coffee, shoreline floating cottage experiences, and our digital customer loyalty rewards program (the “Shore Club”).
+              Welcome to <strong>BAIA Café</strong> (“we,” “us,” or “our”), accessible at <strong>https://www.baia.cafe</strong>. We operate an oceanfront specialty café in Barangay Laurente, San Pascual, Burias Island, Masbate, Philippines, offering artisan coffee, floating cottage experiences, and our digital customer loyalty rewards program.
             </p>
             <p>
               This Privacy Policy explains in clear, transparent detail how we collect, use, store, and protect your information when you use our website and digital loyalty card application.
@@ -125,8 +125,8 @@ export default function PrivacyPolicyApp() {
               If you have any questions or concerns regarding our privacy practices, please contact our team:
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.88rem', color: '#475569' }}>
-              <div><strong>Entity:</strong> Baia Café</div>
-              <div><strong>Location:</strong> Masbate, Philippines</div>
+              <div><strong>Entity:</strong> BAIA Café</div>
+              <div><strong>Location:</strong> Barangay Laurente, San Pascual, Burias Island, Masbate, Philippines</div>
               <div><strong>Primary Contact Email:</strong> <a href="mailto:quibotmark@gmail.com" style={{ color: '#1E4AFF', fontWeight: 600 }}>quibotmark@gmail.com</a></div>
               <div><strong>Official Website:</strong> <a href="https://www.baia.cafe" target="_blank" rel="noreferrer" style={{ color: '#1E4AFF', fontWeight: 600 }}>https://www.baia.cafe</a></div>
             </div>
@@ -136,7 +136,7 @@ export default function PrivacyPolicyApp() {
 
         {/* Footer info */}
         <div style={{ marginTop: '36px', paddingTop: '20px', borderTop: '1px solid #F1F5F9', textAlign: 'center', fontSize: '0.78rem', color: '#94A3B8' }}>
-          &copy; {new Date().getFullYear()} Baia Café. All rights reserved. • Masbate, Philippines
+          &copy; {new Date().getFullYear()} BAIA Café. All rights reserved. • San Pascual, Burias Island, Masbate
         </div>
 
       </div>
