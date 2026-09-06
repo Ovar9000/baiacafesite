@@ -65,23 +65,25 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
   };
 
   return (
-    <div className="admin-tab-pane" style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '640px', margin: '0 auto', width: '100%' }}>
+    <div className="admin-tab-pane" style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '640px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
       {/* Action Bar (No Print) */}
       <div className="admin-controls-card no-print" style={{
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',
         background: '#FFFFFF',
-        padding: '16px 20px',
+        padding: 'clamp(14px, 3vw, 18px) clamp(14px, 3vw, 20px)',
         borderRadius: '16px',
-        border: '1px solid var(--loyalty-border)'
+        border: '1px solid var(--loyalty-border)',
+        boxSizing: 'border-box',
+        width: '100%'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h3 style={{ fontSize: '1rem', color: 'var(--loyalty-navy)', fontWeight: 700 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+          <div style={{ minWidth: 0 }}>
+            <h3 style={{ fontSize: '1rem', color: 'var(--loyalty-navy)', fontWeight: 700, margin: 0 }}>
               Daily Standee QR Code
             </h3>
-            <p style={{ fontSize: '0.78rem', color: '#64748B' }}>
+            <p style={{ fontSize: '0.78rem', color: '#64748B', margin: '2px 0 0 0' }}>
               {tokenData?.formattedDate || 'Today’s QR Token Active'}
             </p>
           </div>
@@ -92,14 +94,15 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
               background: 'var(--loyalty-navy)',
               color: '#FFFFFF',
               border: 'none',
-              padding: '10px 18px',
+              padding: '8px 16px',
               borderRadius: '9999px',
               fontWeight: 700,
-              fontSize: '0.88rem',
-              display: 'flex',
+              fontSize: '0.84rem',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              flexShrink: 0
             }}
           >
             <Printer size={16} />
@@ -108,8 +111,26 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
         </div>
 
         {tokenData?.claimUrl && (
-          <div style={{ background: '#FAF4EB', padding: '10px 14px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-            <code style={{ fontSize: '0.75rem', color: '#16255C', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ 
+            background: '#FAF4EB', 
+            padding: '10px 14px', 
+            borderRadius: '12px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            gap: '8px',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}>
+            <code style={{ 
+              fontSize: '0.75rem', 
+              color: '#16255C', 
+              overflow: 'hidden', 
+              textOverflow: 'ellipsis', 
+              whiteSpace: 'nowrap',
+              minWidth: 0,
+              flex: 1
+            }}>
               {tokenData.claimUrl}
             </code>
             <a
@@ -124,7 +145,8 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
                 borderRadius: '9999px',
                 fontSize: '0.75rem',
                 fontWeight: 700,
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                flexShrink: 0
               }}
             >
               Test Claim Link &rarr;
@@ -134,18 +156,19 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
       </div>
 
       {/* Printable Acrylic Standee Card */}
-      <div className="standee-print-card">
+      <div className="standee-print-card" style={{ width: '100%', boxSizing: 'border-box' }}>
         <img src="/images/Logo.webp" alt="BAIA Cafe Logo" className="standee-header-logo" />
         <h1 className="standee-title">BAIA CAFÉ</h1>
         <div className="standee-subtitle">SHORE LOYALTY CARD</div>
 
-        <div className="standee-qr-frame">
+        <div className="standee-qr-frame" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
           {tokenData?.claimUrl ? (
             <QRCodeSVG 
               value={tokenData.claimUrl}
               size={220}
               level="H"
               includeMargin={false}
+              style={{ maxWidth: '100%', height: 'auto', display: 'block', margin: '0 auto' }}
               imageSettings={{
                 src: "/images/Logo.webp",
                 x: undefined,
@@ -156,7 +179,7 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
               }}
             />
           ) : (
-            <div style={{ width: 220, height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 220, height: 220, maxWidth: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Loader2 className="animate-spin" size={32} />
             </div>
           )}
@@ -175,7 +198,7 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
       </div>
 
       {/* Manual Stamp Grant Section (No Print) */}
-      <div className="loyalty-section-card no-print">
+      <div className="loyalty-section-card no-print" style={{ width: '100%', boxSizing: 'border-box' }}>
         <div className="section-card-title">
           <Award size={20} color="#FB923C" />
           <span>Emergency Manual Stamp Override</span>

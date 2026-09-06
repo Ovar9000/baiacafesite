@@ -1015,6 +1015,8 @@ body {
 .admin-tab-pane {
   animation: adminTabFade 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: opacity, transform;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @keyframes adminTabFade {
@@ -1025,6 +1027,72 @@ body {
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   ADMIN PORTAL RESPONSIVE ARCHITECTURE
+   ========================================================================== */
+body.admin-body {
+  background-color: #F8FAFC !important;
+  color: #0F172A;
+  min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.admin-portal-wrapper {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #F8FAFC;
+  position: relative;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+@media (min-width: 920px) {
+  .admin-portal-wrapper {
+    box-shadow: 0 0 50px rgba(15, 23, 42, 0.04);
+    border-left: 1px solid #E2E8F0;
+    border-right: 1px solid #E2E8F0;
+  }
+}
+
+/* Standee Responsive Styles */
+@media (max-width: 480px) {
+  .standee-print-card {
+    padding: 24px 16px !important;
+    border-radius: 16px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .standee-header-logo {
+    width: 60px !important;
+    height: 60px !important;
+    margin-bottom: 8px !important;
+  }
+  .standee-title {
+    font-size: 1.35rem !important;
+    letter-spacing: 0.5px !important;
+  }
+  .standee-subtitle {
+    font-size: 0.85rem !important;
+    letter-spacing: 1.5px !important;
+    margin-bottom: 14px !important;
+  }
+  .standee-qr-frame {
+    padding: 12px !important;
+    max-width: 100% !important;
+    margin-bottom: 14px !important;
+    box-sizing: border-box !important;
+  }
+  .standee-qr-frame svg {
+    max-width: 100% !important;
+    height: auto !important;
   }
 }
 
