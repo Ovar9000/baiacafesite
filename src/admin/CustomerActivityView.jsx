@@ -99,12 +99,12 @@ export default function CustomerActivityView({ password, data, setData, loading,
   );
 
   return (
-    <div className="admin-tab-pane" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="admin-tab-pane" style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', boxSizing: 'border-box' }}>
       {/* Top Overview Action Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>Customer Activity &amp; Foot-Traffic</h2>
-          <p style={{ fontSize: '0.85rem', color: '#64748B', margin: '4px 0 0 0' }}>
+        <div style={{ minWidth: 0, flex: '1 1 260px' }}>
+          <h2 style={{ fontSize: 'clamp(1.2rem, 3.5vw, 1.4rem)', fontWeight: 800, color: '#0F172A', margin: 0 }}>Customer Activity &amp; Foot-Traffic</h2>
+          <p style={{ fontSize: '0.85rem', color: '#64748B', margin: '4px 0 0 0', lineHeight: 1.4 }}>
             Real-time in-store customer behavior, scan peak hours, and retention depth on Laurente shore.
           </p>
         </div>
@@ -122,7 +122,8 @@ export default function CustomerActivityView({ password, data, setData, loading,
             color: '#1E293B',
             fontSize: '0.8rem',
             fontWeight: 700,
-            cursor: 'pointer'
+            cursor: 'pointer',
+            flexShrink: 0
           }}
         >
           <RotateCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -131,19 +132,25 @@ export default function CustomerActivityView({ password, data, setData, loading,
       </div>
 
       {loading && !data ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px', background: '#FFFFFF', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
+        <div style={{ textAlign: 'center', padding: '60px 20px', background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
           <Loader2 className="animate-spin" size={32} color="#16255C" style={{ margin: '0 auto 12px' }} />
           <p style={{ fontSize: '0.9rem', color: '#64748B' }}>Loading customer activity metrics...</p>
         </div>
       ) : (
         <>
           {/* Key Metric KPI Cards Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '16px' }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', 
+            gap: '12px',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}>
             {/* Card 1: Today Visits */}
-            <div style={{ background: '#FFFFFF', padding: '20px', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+            <div style={{ background: '#FFFFFF', padding: 'clamp(14px, 2.5vw, 20px)', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>Today Visits</span>
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#EFF6FF', color: '#1E4AFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#EFF6FF', color: '#1E4AFF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <QrCode size={18} />
                 </div>
               </div>
@@ -154,10 +161,10 @@ export default function CustomerActivityView({ password, data, setData, loading,
             </div>
 
             {/* Card 2: Registered Members */}
-            <div style={{ background: '#FFFFFF', padding: '20px', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+            <div style={{ background: '#FFFFFF', padding: 'clamp(14px, 2.5vw, 20px)', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>Shore Club Members</span>
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FDF4FF', color: '#A855F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FDF4FF', color: '#A855F7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Users size={18} />
                 </div>
               </div>
@@ -168,10 +175,10 @@ export default function CustomerActivityView({ password, data, setData, loading,
             </div>
 
             {/* Card 3: Retention Rate */}
-            <div style={{ background: '#FFFFFF', padding: '20px', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+            <div style={{ background: '#FFFFFF', padding: 'clamp(14px, 2.5vw, 20px)', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>Retention Rate</span>
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#ECFDF5', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#ECFDF5', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <TrendingUp size={18} />
                 </div>
               </div>
@@ -182,10 +189,10 @@ export default function CustomerActivityView({ password, data, setData, loading,
             </div>
 
             {/* Card 4: Rewards & Milestones */}
-            <div style={{ background: '#FFFFFF', padding: '20px', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+            <div style={{ background: '#FFFFFF', padding: 'clamp(14px, 2.5vw, 20px)', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', color: '#64748B', letterSpacing: '0.04em' }}>Rewards Earned</span>
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FFFBEB', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FFFBEB', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Gift size={18} />
                 </div>
               </div>
@@ -201,27 +208,33 @@ export default function CustomerActivityView({ password, data, setData, loading,
           </div>
 
           {/* Middle Section: Peak Rush Windows & Loyalty Depth */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', 
+            gap: '16px',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}>
             {/* Box 1: Store Rush Windows */}
-            <div style={{ background: '#FFFFFF', padding: '24px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Clock size={18} style={{ color: '#1E4AFF' }} />
+            <div style={{ background: '#FFFFFF', padding: 'clamp(16px, 3vw, 24px)', borderRadius: '16px', border: '1px solid #E2E8F0', boxSizing: 'border-box', width: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                  <Clock size={18} style={{ color: '#1E4AFF', flexShrink: 0 }} />
                   <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>Peak Store Rush Windows</h3>
                 </div>
-                <span style={{ fontSize: '0.75rem', background: '#EFF6FF', color: '#1E4AFF', padding: '4px 10px', borderRadius: '9999px', fontWeight: 700 }}>
+                <span style={{ fontSize: '0.75rem', background: '#EFF6FF', color: '#1E4AFF', padding: '4px 10px', borderRadius: '9999px', fontWeight: 700, whiteSpace: 'nowrap', flexShrink: 0 }}>
                   Peak: {traffic.peakHourWindow}
                 </span>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
                 {Object.entries(traffic.rushWindows).map(([key, item]) => {
                   const pct = Math.round((item.count / totalRushCount) * 100);
                   return (
-                    <div key={key}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
+                    <div key={key} style={{ width: '100%' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '4px', flexWrap: 'wrap', gap: '4px' }}>
                         <span>{item.label}</span>
-                        <span>{item.count} scans ({pct}%)</span>
+                        <span style={{ whiteSpace: 'nowrap' }}>{item.count} scans ({pct}%)</span>
                       </div>
                       <div style={{ width: '100%', height: '8px', background: '#F1F5F9', borderRadius: '9999px', overflow: 'hidden' }}>
                         <div 
@@ -241,20 +254,20 @@ export default function CustomerActivityView({ password, data, setData, loading,
             </div>
 
             {/* Box 2: Loyalty Retention Funnel */}
-            <div style={{ background: '#FFFFFF', padding: '24px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Award size={18} style={{ color: '#D97706' }} />
+            <div style={{ background: '#FFFFFF', padding: 'clamp(16px, 3vw, 24px)', borderRadius: '16px', border: '1px solid #E2E8F0', boxSizing: 'border-box', width: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                  <Award size={18} style={{ color: '#D97706', flexShrink: 0 }} />
                   <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>Customer Loyalty Depth</h3>
                 </div>
                 {retention.nearingRewardCount > 0 && (
-                  <span style={{ fontSize: '0.75rem', background: '#FEF3C7', color: '#B45309', padding: '4px 10px', borderRadius: '9999px', fontWeight: 700 }}>
+                  <span style={{ fontSize: '0.75rem', background: '#FEF3C7', color: '#B45309', padding: '4px 10px', borderRadius: '9999px', fontWeight: 700, whiteSpace: 'nowrap', flexShrink: 0 }}>
                     {retention.nearingRewardCount} Nearing Reward
                   </span>
                 )}
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
                 {[
                   { label: 'First-Time Walk-ins (1 Stamp)', count: retention.tiers.firstTimer, color: '#94A3B8' },
                   { label: 'Occasional Guests (2–4 Stamps)', count: retention.tiers.occasional, color: '#38BDF8' },
@@ -263,10 +276,10 @@ export default function CustomerActivityView({ password, data, setData, loading,
                 ].map((tier, idx) => {
                   const pct = Math.round((tier.count / totalTiersCount) * 100);
                   return (
-                    <div key={idx}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
+                    <div key={idx} style={{ width: '100%' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '4px', flexWrap: 'wrap', gap: '4px' }}>
                         <span>{tier.label}</span>
-                        <span>{tier.count} guests ({pct}%)</span>
+                        <span style={{ whiteSpace: 'nowrap' }}>{tier.count} guests ({pct}%)</span>
                       </div>
                       <div style={{ width: '100%', height: '8px', background: '#F1F5F9', borderRadius: '9999px', overflow: 'hidden' }}>
                         <div 
@@ -287,15 +300,15 @@ export default function CustomerActivityView({ password, data, setData, loading,
           </div>
 
           {/* Bottom Section: Real-time Customer Activity Stream */}
-          <div style={{ background: '#FFFFFF', padding: '24px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
+          <div style={{ background: '#FFFFFF', padding: 'clamp(16px, 3vw, 24px)', borderRadius: '16px', border: '1px solid #E2E8F0', width: '100%', boxSizing: 'border-box' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Activity size={18} style={{ color: '#16255C' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                <Activity size={18} style={{ color: '#16255C', flexShrink: 0 }} />
                 <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>Recent Customer Activity Stream</h3>
               </div>
 
               {/* Filters and Search */}
-              <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', maxWidth: '100%' }}>
                 <div style={{ display: 'flex', gap: '4px', background: '#F1F5F9', padding: '3px', borderRadius: '9999px' }}>
                   {[
                     { id: 'all', label: 'All' },
@@ -322,7 +335,7 @@ export default function CustomerActivityView({ password, data, setData, loading,
                   ))}
                 </div>
 
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', flex: '1 1 130px', minWidth: 0 }}>
                   <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
                   <input
                     type="text"
@@ -335,7 +348,9 @@ export default function CustomerActivityView({ password, data, setData, loading,
                       border: '1px solid #CBD5E1',
                       fontSize: '0.78rem',
                       outline: 'none',
-                      width: '150px'
+                      width: '100%',
+                      maxWidth: '180px',
+                      boxSizing: 'border-box'
                     }}
                   />
                 </div>
@@ -343,7 +358,7 @@ export default function CustomerActivityView({ password, data, setData, loading,
             </div>
 
             {/* Activities List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
               {filteredActivities.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '32px 16px', color: '#94A3B8', fontSize: '0.85rem' }}>
                   No customer activity matching this filter.
@@ -366,10 +381,12 @@ export default function CustomerActivityView({ password, data, setData, loading,
                         background: '#F8FAFC',
                         border: '1px solid #F1F5F9',
                         gap: '12px',
-                        flexWrap: 'wrap'
+                        flexWrap: 'wrap',
+                        width: '100%',
+                        boxSizing: 'border-box'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: '1 1 200px' }}>
                         <div style={{
                           width: '36px',
                           height: '36px',
@@ -384,9 +401,9 @@ export default function CustomerActivityView({ password, data, setData, loading,
                           {isStamp ? <QrCode size={18} /> : isSignup ? <UserCheck size={18} /> : <Award size={18} />}
                         </div>
 
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', minWidth: 0 }}>
+                            <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A', overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                               {act.customerName}
                             </span>
                             <span style={{
@@ -396,13 +413,15 @@ export default function CustomerActivityView({ password, data, setData, loading,
                               borderRadius: '9999px',
                               textTransform: 'uppercase',
                               background: isStamp ? '#DBEAFE' : isSignup ? '#F3E8FF' : '#D1FAE5',
-                              color: isStamp ? '#1E40AF' : isSignup ? '#6B21A8' : '#065F46'
+                              color: isStamp ? '#1E40AF' : isSignup ? '#6B21A8' : '#065F46',
+                              whiteSpace: 'nowrap',
+                              flexShrink: 0
                             }}>
                               {isStamp ? 'QR Stamp Scan' : isSignup ? 'New Registration' : 'Reward Redemption'}
                             </span>
                           </div>
 
-                          <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '2px' }}>
+                          <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '2px', overflowWrap: 'break-word' }}>
                             {isStamp && (
                               <span>{act.staffNote ? act.staffNote : 'In-store stamp collected at beach counter'}</span>
                             )}
@@ -412,7 +431,7 @@ export default function CustomerActivityView({ password, data, setData, loading,
                         </div>
                       </div>
 
-                      <div style={{ fontSize: '0.78rem', color: '#94A3B8', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                      <div style={{ fontSize: '0.78rem', color: '#94A3B8', fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0 }}>
                         {formatRelativeTime(act.timestamp)}
                       </div>
                     </div>

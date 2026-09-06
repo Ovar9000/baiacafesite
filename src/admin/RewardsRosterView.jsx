@@ -35,12 +35,14 @@ export default function RewardsRosterView({ password, members, setMembers, summa
   });
 
   return (
-    <div className="admin-tab-pane" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="admin-tab-pane" style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', boxSizing: 'border-box' }}>
       {/* Top Header & Refresh */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>Shore Club Rewards Roster</h2>
-          <p style={{ fontSize: '0.82rem', color: '#64748B', margin: '4px 0 0 0' }}>
+        <div style={{ minWidth: 0, flex: '1 1 260px' }}>
+          <h2 style={{ fontSize: 'clamp(1.15rem, 3.5vw, 1.35rem)', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+            Shore Club Rewards Roster
+          </h2>
+          <p style={{ fontSize: '0.82rem', color: '#64748B', margin: '4px 0 0 0', lineHeight: 1.4 }}>
             Live customer milestone progression and reward redemption eligibility.
           </p>
         </div>
@@ -58,7 +60,8 @@ export default function RewardsRosterView({ password, members, setMembers, summa
             color: '#1E293B',
             fontSize: '0.8rem',
             fontWeight: 700,
-            cursor: 'pointer'
+            cursor: 'pointer',
+            flexShrink: 0
           }}
         >
           <RotateCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -69,18 +72,21 @@ export default function RewardsRosterView({ password, members, setMembers, summa
       {/* Metric Summary Cards */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '14px'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
+        gap: '12px',
+        width: '100%',
+        boxSizing: 'border-box'
       }}>
         {/* Ready for Reward Card */}
         <div style={{
           background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
           border: '1.5px solid #F59E0B',
-          borderRadius: '18px',
-          padding: '18px 20px',
+          borderRadius: '16px',
+          padding: 'clamp(14px, 2.5vw, 18px) clamp(14px, 2.5vw, 20px)',
           display: 'flex',
           alignItems: 'center',
-          gap: '14px'
+          gap: '14px',
+          boxSizing: 'border-box'
         }}>
           <div style={{
             width: '46px',
@@ -95,7 +101,7 @@ export default function RewardsRosterView({ password, members, setMembers, summa
           }}>
             <Gift size={24} />
           </div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#78350F', fontFamily: 'Space Grotesk, sans-serif', lineHeight: '1.1' }}>
               {summary.readyCount}
             </div>
@@ -109,11 +115,12 @@ export default function RewardsRosterView({ password, members, setMembers, summa
         <div style={{
           background: '#FFFFFF',
           border: '1.5px solid #E2E8F0',
-          borderRadius: '18px',
-          padding: '18px 20px',
+          borderRadius: '16px',
+          padding: 'clamp(14px, 2.5vw, 18px) clamp(14px, 2.5vw, 20px)',
           display: 'flex',
           alignItems: 'center',
-          gap: '14px'
+          gap: '14px',
+          boxSizing: 'border-box'
         }}>
           <div style={{
             width: '46px',
@@ -128,7 +135,7 @@ export default function RewardsRosterView({ password, members, setMembers, summa
           }}>
             <TrendingUp size={24} />
           </div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--loyalty-navy)', fontFamily: 'Space Grotesk, sans-serif', lineHeight: '1.1' }}>
               {summary.nearingCount}
             </div>
@@ -142,11 +149,12 @@ export default function RewardsRosterView({ password, members, setMembers, summa
         <div style={{
           background: '#FFFFFF',
           border: '1.5px solid #E2E8F0',
-          borderRadius: '18px',
-          padding: '18px 20px',
+          borderRadius: '16px',
+          padding: 'clamp(14px, 2.5vw, 18px) clamp(14px, 2.5vw, 20px)',
           display: 'flex',
           alignItems: 'center',
-          gap: '14px'
+          gap: '14px',
+          boxSizing: 'border-box'
         }}>
           <div style={{
             width: '46px',
@@ -161,7 +169,7 @@ export default function RewardsRosterView({ password, members, setMembers, summa
           }}>
             <Users size={24} />
           </div>
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--loyalty-navy)', fontFamily: 'Space Grotesk, sans-serif', lineHeight: '1.1' }}>
               {summary.totalMembers}
             </div>
@@ -176,18 +184,22 @@ export default function RewardsRosterView({ password, members, setMembers, summa
       <div style={{
         background: '#FFFFFF',
         border: '1.5px solid #E2E8F0',
-        borderRadius: '20px',
-        padding: '16px 20px',
+        borderRadius: '16px',
+        padding: 'clamp(12px, 2.5vw, 16px)',
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '14px'
+        gap: '12px',
+        width: '100%',
+        boxSizing: 'border-box'
       }}>
         {/* Search Box */}
         <div style={{
           position: 'relative',
-          flex: '1 1 240px'
+          flex: '1 1 200px',
+          minWidth: 0,
+          width: '100%'
         }}>
           <Search size={16} color="#94A3B8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
@@ -201,13 +213,14 @@ export default function RewardsRosterView({ password, members, setMembers, summa
               borderRadius: '12px',
               border: '1px solid #CBD5E1',
               fontSize: '0.85rem',
-              outline: 'none'
+              outline: 'none',
+              boxSizing: 'border-box'
             }}
           />
         </div>
 
         {/* Category Filter Pills */}
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', maxWidth: '100%' }}>
           {[
             { key: 'all', label: `All (${members.length})` },
             { key: 'ready', label: `Reward Ready (${summary.readyCount})` },
@@ -222,11 +235,12 @@ export default function RewardsRosterView({ password, members, setMembers, summa
                 background: filterCategory === tab.key ? '#16255C' : '#F1F5F9',
                 color: filterCategory === tab.key ? '#FFFFFF' : '#475569',
                 border: 'none',
-                padding: '8px 14px',
+                padding: '6px 12px',
                 borderRadius: '9999px',
                 fontSize: '0.78rem',
                 fontWeight: 700,
                 cursor: 'pointer',
+                whiteSpace: 'nowrap',
                 transition: 'all 0.2s ease'
               }}
             >
@@ -237,9 +251,9 @@ export default function RewardsRosterView({ password, members, setMembers, summa
       </div>
 
       {/* Member Roster Cards */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
         {loading && members.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 20px', background: '#FFFFFF', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
+          <div style={{ textAlign: 'center', padding: '40px 20px', background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
             <Loader2 className="animate-spin" size={28} color="#16255C" style={{ margin: '0 auto 12px' }} />
             <p style={{ fontSize: '0.85rem', color: '#64748B' }}>Loading rewards roster...</p>
           </div>
@@ -254,87 +268,140 @@ export default function RewardsRosterView({ password, members, setMembers, summa
                 style={{
                   background: isReady ? '#FFFBEB' : '#FFFFFF',
                   border: isReady ? '1.5px solid #F59E0B' : '1px solid #E2E8F0',
-                  borderRadius: '18px',
-                  padding: '18px 20px',
+                  borderRadius: '16px',
+                  padding: 'clamp(14px, 2.5vw, 18px) clamp(14px, 2.5vw, 20px)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '12px',
-                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)'
+                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  overflow: 'hidden'
                 }}
               >
                 {/* Top Row: User Info & Urgency Badge */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <h4 style={{ margin: 0, fontSize: '0.98rem', color: 'var(--loyalty-navy)', fontWeight: 700 }}>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'flex-start', 
+                  flexWrap: 'wrap', 
+                  gap: '10px',
+                  width: '100%'
+                }}>
+                  <div style={{ minWidth: 0, flex: '1 1 200px' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'baseline', 
+                      flexWrap: 'wrap', 
+                      gap: '6px',
+                      minWidth: 0
+                    }}>
+                      <h4 style={{ 
+                        margin: 0, 
+                        fontSize: '0.98rem', 
+                        color: 'var(--loyalty-navy)', 
+                        fontWeight: 700,
+                        overflowWrap: 'break-word',
+                        wordBreak: 'break-word'
+                      }}>
                         {m.name}
                       </h4>
-                      <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                      <span style={{ 
+                        fontSize: '0.75rem', 
+                        color: '#64748B',
+                        overflowWrap: 'break-word',
+                        wordBreak: 'break-all'
+                      }}>
                         ({m.email})
                       </span>
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#94A3B8', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Calendar size={12} />
+                    <div style={{ fontSize: '0.75rem', color: '#94A3B8', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Calendar size={12} style={{ flexShrink: 0 }} />
                       <span>Last visit: {formatManilaDateTime(m.lastActive)}</span>
                     </div>
                   </div>
 
                   {/* Status Pill */}
-                  {isReady ? (
-                    <span style={{
-                      background: '#FEF3C7',
-                      border: '1px solid #F59E0B',
-                      color: '#92400E',
-                      padding: '4px 10px',
-                      borderRadius: '9999px',
-                      fontSize: '0.75rem',
-                      fontWeight: 800,
-                      whiteSpace: 'nowrap'
-                    }}>
-                      Reward Ready to Claim
-                    </span>
-                  ) : isNearing ? (
-                    <span style={{
-                      background: '#EFF6FF',
-                      border: '1px solid #BFDBFE',
-                      color: '#1E40AF',
-                      padding: '4px 10px',
-                      borderRadius: '9999px',
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {m.stampsRemaining} {m.stampsRemaining === 1 ? 'drink' : 'drinks'} away
-                    </span>
-                  ) : (
-                    <span style={{
-                      background: '#F1F5F9',
-                      color: '#64748B',
-                      padding: '4px 10px',
-                      borderRadius: '9999px',
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {m.currentCycleProgress} / 10 Stamps
-                    </span>
-                  )}
+                  <div style={{ flexShrink: 0 }}>
+                    {isReady ? (
+                      <span style={{
+                        background: '#FEF3C7',
+                        border: '1px solid #F59E0B',
+                        color: '#92400E',
+                        padding: '4px 10px',
+                        borderRadius: '9999px',
+                        fontSize: '0.75rem',
+                        fontWeight: 800,
+                        whiteSpace: 'nowrap',
+                        display: 'inline-block'
+                      }}>
+                        Reward Ready to Claim
+                      </span>
+                    ) : isNearing ? (
+                      <span style={{
+                        background: '#EFF6FF',
+                        border: '1px solid #BFDBFE',
+                        color: '#1E40AF',
+                        padding: '4px 10px',
+                        borderRadius: '9999px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        whiteSpace: 'nowrap',
+                        display: 'inline-block'
+                      }}>
+                        {m.stampsRemaining} {m.stampsRemaining === 1 ? 'drink' : 'drinks'} away
+                      </span>
+                    ) : (
+                      <span style={{
+                        background: '#F1F5F9',
+                        color: '#64748B',
+                        padding: '4px 10px',
+                        borderRadius: '9999px',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                        display: 'inline-block'
+                      }}>
+                        {m.currentCycleProgress} / 10 Stamps
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Progress Bar & Milestone Target */}
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '6px' }}>
-                    <span style={{ color: '#475569', fontWeight: 600 }}>
+                <div style={{ width: '100%', minWidth: 0 }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'baseline',
+                    flexWrap: 'wrap', 
+                    gap: '6px', 
+                    fontSize: '0.78rem', 
+                    marginBottom: '6px',
+                    width: '100%'
+                  }}>
+                    <span style={{ 
+                      color: '#475569', 
+                      fontWeight: 600,
+                      minWidth: 0,
+                      flex: '1 1 auto',
+                      overflowWrap: 'break-word'
+                    }}>
                       {isReady 
                         ? `Ready: ${m.nextRewardTitle}` 
                         : `Target: ${m.nextRewardTitle} (${m.stampsRemaining} more to unlock)`}
                     </span>
-                    <span style={{ fontWeight: 700, color: 'var(--loyalty-navy)' }}>
+                    <span style={{ 
+                      fontWeight: 700, 
+                      color: 'var(--loyalty-navy)',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0
+                    }}>
                       {m.currentCycleProgress}/10 Stamps &bull; Lifetime {m.totalStamps}
                     </span>
                   </div>
 
-                  <div style={{ height: '7px', background: '#F1F5F9', borderRadius: '9999px', overflow: 'hidden' }}>
+                  <div style={{ height: '7px', background: '#F1F5F9', borderRadius: '9999px', overflow: 'hidden', width: '100%' }}>
                     <div
                       style={{
                         height: '100%',
@@ -352,12 +419,12 @@ export default function RewardsRosterView({ password, members, setMembers, summa
 
                 {/* Barista Tip / Callout */}
                 {isReady && (
-                  <div style={{ fontSize: '0.75rem', color: '#92400E', background: 'rgba(245, 158, 11, 0.1)', padding: '6px 10px', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#92400E', background: 'rgba(245, 158, 11, 0.1)', padding: '6px 10px', borderRadius: '8px', overflowWrap: 'break-word' }}>
                     Barista Note: Customer is eligible for complimentary reward upon ordering.
                   </div>
                 )}
                 {isNearing && (
-                  <div style={{ fontSize: '0.75rem', color: '#1E40AF', background: '#EFF6FF', padding: '6px 10px', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#1E40AF', background: '#EFF6FF', padding: '6px 10px', borderRadius: '8px', overflowWrap: 'break-word' }}>
                     Engagement Opportunity: Customer is only {m.stampsRemaining} {m.stampsRemaining === 1 ? 'stamp' : 'stamps'} away from their next free reward!
                   </div>
                 )}

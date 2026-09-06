@@ -39,6 +39,13 @@ export default function AdminPortal({ initialTab }) {
 
   // Sync browser back/forward history
   useEffect(() => {
+    document.body.classList.add('admin-body');
+    return () => {
+      document.body.classList.remove('admin-body');
+    };
+  }, []);
+
+  useEffect(() => {
     const handlePopState = () => {
       setActiveTab(getTabFromPath());
     };
@@ -188,12 +195,15 @@ export default function AdminPortal({ initialTab }) {
 
   return (
     <div 
-      className="loyalty-app-wrapper" 
+      className="admin-portal-wrapper" 
       style={{ 
-        maxWidth: '860px', 
+        width: '100%',
+        maxWidth: '920px', 
         margin: '0 auto', 
         minHeight: '100vh', 
-        background: '#F8FAFC'
+        background: '#F8FAFC',
+        boxSizing: 'border-box',
+        overflowX: 'hidden'
       }}
     >
       {/* Top Header */}
@@ -203,22 +213,30 @@ export default function AdminPortal({ initialTab }) {
         justifyContent: 'space-between', 
         flexWrap: 'wrap', 
         gap: '12px',
-        padding: '16px 20px',
+        padding: 'clamp(12px, 2.5vw, 16px) clamp(12px, 3vw, 20px)',
         background: '#FFFFFF',
-        borderBottom: '1px solid #E2E8F0'
+        borderBottom: '1px solid #E2E8F0',
+        width: '100%',
+        boxSizing: 'border-box'
       }}>
-        <a href="/" className="loyalty-logo-lockup">
+        <a href="/" className="loyalty-logo-lockup" style={{ minWidth: 0, flexShrink: 1 }}>
           <img src="/images/Logo.webp" alt="BAIA Cafe Logo" className="loyalty-logo-img" />
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div className="loyalty-logo-title">BAIA CAFÉ</div>
-            <div className="loyalty-logo-sub">
+            <div className="loyalty-logo-sub" style={{ fontSize: '0.64rem' }}>
               {activeTab === 'qr' ? 'BARISTA & ADMIN PORTAL' : activeTab === 'rewards' ? 'BARISTA INSIGHTS & REWARDS' : 'CUSTOMER ACTIVITY DASHBOARD'}
             </div>
           </div>
         </a>
 
         {/* Top Navigation Tabs */}
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          flexWrap: 'wrap', 
+          gap: '6px',
+          maxWidth: '100%'
+        }}>
           {/* Tab 1: Daily Standee QR */}
           <button
             type="button"
@@ -226,19 +244,20 @@ export default function AdminPortal({ initialTab }) {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
+              gap: '5px',
+              padding: '6px 12px',
               borderRadius: '9999px',
-              fontSize: '0.8rem',
+              fontSize: '0.78rem',
               fontWeight: activeTab === 'qr' ? 700 : 600,
               color: activeTab === 'qr' ? '#FFFFFF' : '#64748B',
               background: activeTab === 'qr' ? '#16255C' : '#F1F5F9',
               border: 'none',
               cursor: 'pointer',
+              whiteSpace: 'nowrap',
               transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
           >
-            <QrCode size={14} />
+            <QrCode size={14} style={{ flexShrink: 0 }} />
             <span>Daily Standee QR</span>
           </button>
 
@@ -249,19 +268,20 @@ export default function AdminPortal({ initialTab }) {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
+              gap: '5px',
+              padding: '6px 12px',
               borderRadius: '9999px',
-              fontSize: '0.8rem',
+              fontSize: '0.78rem',
               fontWeight: activeTab === 'rewards' ? 700 : 600,
               color: activeTab === 'rewards' ? '#FFFFFF' : '#64748B',
               background: activeTab === 'rewards' ? '#16255C' : '#F1F5F9',
               border: 'none',
               cursor: 'pointer',
+              whiteSpace: 'nowrap',
               transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
           >
-            <Users size={14} />
+            <Users size={14} style={{ flexShrink: 0 }} />
             <span>Rewards Roster</span>
           </button>
 
@@ -272,19 +292,20 @@ export default function AdminPortal({ initialTab }) {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
+              gap: '5px',
+              padding: '6px 12px',
               borderRadius: '9999px',
-              fontSize: '0.8rem',
+              fontSize: '0.78rem',
               fontWeight: activeTab === 'activity' ? 700 : 600,
               color: activeTab === 'activity' ? '#FFFFFF' : '#64748B',
               background: activeTab === 'activity' ? '#16255C' : '#F1F5F9',
               border: 'none',
               cursor: 'pointer',
+              whiteSpace: 'nowrap',
               transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
           >
-            <Activity size={14} />
+            <Activity size={14} style={{ flexShrink: 0 }} />
             <span>Customer Activity</span>
           </button>
 
@@ -294,12 +315,14 @@ export default function AdminPortal({ initialTab }) {
               style={{
                 background: '#F1F5F9',
                 border: 'none',
-                padding: '6px 12px',
+                padding: '6px 10px',
                 borderRadius: '9999px',
-                fontSize: '0.78rem',
+                fontSize: '0.76rem',
                 fontWeight: 600,
                 color: '#475569',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                flexShrink: 0
               }}
             >
               Lock
@@ -309,7 +332,13 @@ export default function AdminPortal({ initialTab }) {
       </header>
 
       {/* Main Content Area */}
-      <main style={{ padding: '24px 20px', flex: 1 }}>
+      <main style={{ 
+        padding: 'clamp(16px, 3vw, 24px) clamp(12px, 3vw, 20px)', 
+        flex: 1,
+        width: '100%',
+        boxSizing: 'border-box',
+        overflowX: 'hidden'
+      }}>
         {!isAuthenticated ? (
           <div className="auth-card" style={{ maxWidth: '400px', margin: '40px auto 0 auto', background: '#FFFFFF', padding: '32px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
             <div className="auth-header-icon" style={{ background: '#FEF3C7', color: '#D97706', width: '48px', height: '48px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto' }}>
