@@ -21,9 +21,29 @@ function getEnvVar(key, defaultValue = '') {
   return defaultValue;
 }
 
+function setCorsHeaders(req, res) {
+  const origin = req.headers.origin;
+  const allowedOrigins = ['https://www.baia.cafe', 'https://baia.cafe'];
+  const isAllowed = origin && (
+    allowedOrigins.includes(origin) ||
+    /^https:\/\/.*\.vercel\.app$/.test(origin) ||
+    /^http:\/\/localhost(:\d+)?$/.test(origin) ||
+    /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
+  );
+
+  if (isAllowed) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.baia.cafe');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+}
+
 function safeVerifyAdminPassword(providedPassword) {
   if (!providedPassword || typeof providedPassword !== 'string') return false;
-  const expectedPassword = getEnvVar('ADMIN_PASSWORD', 'baia-admin-2026');
+  const expectedPassword = getEnvVar('ADMIN_PASSWORD');
+  if (!expectedPassword || typeof expectedPassword !== 'string') return false;
   const providedBuf = Buffer.from(providedPassword, 'utf8');
   const expectedBuf = Buffer.from(expectedPassword, 'utf8');
   if (providedBuf.length !== expectedBuf.length) return false;
@@ -40,10 +60,7 @@ function getSupabaseAdmin() {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  setCorsHeaders(req, res);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -51,6 +68,11 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!getEnvVar('ADMIN_PASSWORD')) {
+    console.error('Server configuration error: ADMIN_PASSWORD environment variable is missing.');
+    return res.status(500).json({ error: 'Server authentication configuration error. ADMIN_PASSWORD is not set.' });
   }
 
   try {
