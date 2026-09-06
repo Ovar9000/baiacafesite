@@ -5,7 +5,7 @@ import LegalModal from './LegalModal';
 
 export default function AuthModal({ 
   onSuccess, 
-  title = "Join BAIA Shore Club", 
+  title = "Join BAIA Café Loyalty", 
   subtitle = "Collect stamps & enjoy free handcrafted coffee on every visit." 
 }) {
   const [email, setEmail] = useState('');
@@ -130,7 +130,7 @@ export default function AuthModal({
       <h3>{title}</h3>
       <p>{subtitle}</p>
 
-      {/* Shore Club Member Perks Strip */}
+      {/* BAIA Café Member Perks Strip */}
       <div className="auth-perks-strip">
         <div className="auth-perk-badge">
           <Coffee size={13} className="auth-perk-icon" />
@@ -305,7 +305,7 @@ export default function AuthModal({
 
       <div className="auth-trust-badge">
         <ShieldCheck size={13} />
-        <span>Official BAIA Shore Club Authentication</span>
+        <span>Official BAIA Café Authentication</span>
       </div>
 
       {/* In-App Legal Notice Popup (Keeps user in sign-up flow without interrupting) */}

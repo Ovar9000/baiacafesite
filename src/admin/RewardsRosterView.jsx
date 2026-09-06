@@ -40,7 +40,7 @@ export default function RewardsRosterView({ password, members, setMembers, summa
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ minWidth: 0, flex: '1 1 260px' }}>
           <h2 style={{ fontSize: 'clamp(1.15rem, 3.5vw, 1.35rem)', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-            Shore Club Rewards Roster
+            BAIA Café Rewards Roster
           </h2>
           <p style={{ fontSize: '0.82rem', color: '#64748B', margin: '4px 0 0 0', lineHeight: 1.4 }}>
             Live customer milestone progression and reward redemption eligibility.

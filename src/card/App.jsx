@@ -374,7 +374,7 @@ export default function CardApp() {
             onClick={() => setShowTutorialModal(true)} 
             className="btn-loyalty-signout" 
             style={{ background: 'transparent', border: '1px solid #E2E8F0', color: 'var(--loyalty-navy)' }}
-            title="How Shore Club Works"
+            title="How It Works"
           >
             <HelpCircle size={14} />
             <span>How It Works</span>
@@ -395,7 +395,7 @@ export default function CardApp() {
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
             <div className="spinner-border" />
             <p style={{ color: 'var(--loyalty-text-muted)', marginTop: '16px', fontSize: '0.9rem' }}>
-              Loading your Shore Club card...
+              Loading your loyalty card...
             </p>
           </div>
         ) : !user ? (
@@ -863,7 +863,7 @@ export default function CardApp() {
                   Signature Spanish Latte & Sea Salt Cold Brew
                 </h4>
                 <p style={{ fontSize: '0.8rem', color: '#64748B', lineHeight: '1.4', marginBottom: '12px' }}>
-                  Handcrafted with premium artisan beans on the Masbate shoreline. Every specialty handcrafted beverage earns 1 stamp.
+                  Handcrafted with premium artisan beans in San Pascual, Burias Island. Every specialty handcrafted beverage earns 1 stamp.
                 </p>
                 <a 
                   href="/#menu"
@@ -887,7 +887,7 @@ export default function CardApp() {
             <div style={{ textAlign: 'center', padding: '12px 0 6px', fontSize: '0.75rem', color: '#94A3B8' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
                 <ShieldCheck size={14} />
-                <span>Verified in-store at Baia Café, Masbate</span>
+                <span>Verified in-store at BAIA Café • San Pascual, Burias Island</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
                 <button 
@@ -939,7 +939,7 @@ export default function CardApp() {
                 </div>
                 <div>
                   <h3 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--loyalty-navy)', fontWeight: 800, fontFamily: 'Space Grotesk, sans-serif' }}>
-                    Shore Club Collection
+                    BAIA Café Collection
                   </h3>
                   <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>
                     Your completed coffee journeys with BAIA
@@ -1135,7 +1135,7 @@ export default function CardApp() {
           }}
         />
       )}
-      {/* Shore Club Tutorial Modal (Accessible via 'How It Works' in header) */}
+      {/* BAIA Café Loyalty Tutorial Modal (Accessible via 'How It Works' in header) */}
       {showTutorialModal && (
         <div className="archive-modal-overlay">
           <div className="archive-modal-card" style={{ maxWidth: '440px' }}>
@@ -1146,7 +1146,7 @@ export default function CardApp() {
                 </div>
                 <div>
                   <h3 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--loyalty-navy)', fontWeight: 800, fontFamily: 'Space Grotesk, sans-serif' }}>
-                    Shore Club Loyalty Guide
+                    BAIA Café Loyalty Guide
                   </h3>
                   <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>
                     How your stamps, Wi-Fi, and rewards work

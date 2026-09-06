@@ -7,7 +7,7 @@ import { setLiveRainState } from './weatherEasterEgg.js';
 const BAIA_COORDINATES = {
   lat: 13.1344,
   lon: 122.9772,
-  name: "Laurente, San Pascual, Masbate"
+  name: "Laurente, San Pascual, Burias Island"
 };
 
 export function initShoreConditions() {
