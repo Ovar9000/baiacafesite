@@ -34,7 +34,19 @@ function devApiPlugin() {
       server.middlewares.use((req, res, next) => {
         const parsedUrl = url.parse(req.url, true);
         const pathname = parsedUrl.pathname;
-        const multiPages = ['/claim', '/card', '/admin', '/admin/rewards', '/admin/activity', '/privacy', '/terms', '/menu', '/location', '/floating-cottage'];
+        if (pathname === '/menu' || pathname === '/menu/') {
+          res.writeHead(302, { Location: '/#menu' });
+          return res.end();
+        }
+        if (pathname === '/location' || pathname === '/location/') {
+          res.writeHead(302, { Location: '/#location' });
+          return res.end();
+        }
+        if (pathname === '/floating-cottage' || pathname === '/floating-cottage/') {
+          res.writeHead(302, { Location: '/#boards' });
+          return res.end();
+        }
+        const multiPages = ['/claim', '/card', '/admin', '/admin/rewards', '/admin/activity', '/privacy', '/terms'];
         if (multiPages.includes(pathname)) {
           req.url = `${pathname}/` + (parsedUrl.search || '') + (parsedUrl.hash || '');
         }
@@ -161,9 +173,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        menu: resolve(__dirname, 'menu/index.html'),
-        floatingCottage: resolve(__dirname, 'floating-cottage/index.html'),
-        location: resolve(__dirname, 'location/index.html'),
         card: resolve(__dirname, 'card/index.html'),
         claim: resolve(__dirname, 'claim/index.html'),
         admin: resolve(__dirname, 'admin/index.html'),

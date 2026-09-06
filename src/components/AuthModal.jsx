@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { AlertCircle, CheckCircle, ShieldCheck, Loader2 } from 'lucide-react';
+import { AlertCircle, CheckCircle, ShieldCheck, Loader2, Coffee, Wifi } from 'lucide-react';
+import LegalModal from './LegalModal';
 
-export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty Card", subtitle = "Earn free handcrafted coffee with every order at Baia Café." }) {
+export default function AuthModal({ 
+  onSuccess, 
+  title = "Join BAIA Shore Club", 
+  subtitle = "Collect stamps & enjoy free handcrafted coffee on every visit." 
+}) {
   const [email, setEmail] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [step, setStep] = useState('input-email'); // 'input-email' | 'check-email'
   const [oauthLoading, setOauthLoading] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
   const [otpVerifying, setOtpVerifying] = useState(false);
+  const [legalModalType, setLegalModalType] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [infoMsg, setInfoMsg] = useState('');
 
@@ -117,32 +123,22 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
         <img 
           src="/images/baia-cup-icon.webp" 
           alt="BAIA Café" 
-          style={{ width: '32px', height: '32px', objectFit: 'contain' }} 
+          style={{ width: '28px', height: '28px', objectFit: 'contain' }} 
         />
       </div>
 
       <h3>{title}</h3>
       <p>{subtitle}</p>
 
-      {/* 3-Step Loyalty Perks Tutorial Strip */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '8px',
-        margin: '16px 0 20px',
-        textAlign: 'center'
-      }}>
-        <div style={{ background: '#FAF4EB', padding: '10px 6px', borderRadius: '14px', border: '1px solid #FDE68A' }}>
-          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#16255C' }}>1 Tap Join</div>
-          <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>Instant &amp; free</div>
+      {/* Shore Club Member Perks Strip */}
+      <div className="auth-perks-strip">
+        <div className="auth-perk-badge">
+          <Coffee size={13} className="auth-perk-icon" />
+          <span>Free Coffee at 10 Stamps</span>
         </div>
-        <div style={{ background: '#EFF6FF', padding: '10px 6px', borderRadius: '14px', border: '1px solid #BFDBFE' }}>
-          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#1E4AFF' }}>Free Wi-Fi</div>
-          <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>With daily scan</div>
-        </div>
-        <div style={{ background: '#ECFDF5', padding: '10px 6px', borderRadius: '14px', border: '1px solid #A7F3D0' }}>
-          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#15803D' }}>Free Coffee</div>
-          <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>Every 10 stamps</div>
+        <div className="auth-perk-badge">
+          <Wifi size={13} className="auth-perk-icon" />
+          <span>Daily Wi-Fi Pass</span>
         </div>
       </div>
 
@@ -186,8 +182,8 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
 
       {step === 'input-email' && (
         <>
-          {/* Primary 1-Tap Google Sign-In Pill Button */}
-          <div style={{ width: '100%', marginBottom: '14px' }}>
+          {/* Primary 1-Tap Google Sign-In Button */}
+          <div style={{ width: '100%', marginBottom: '12px' }}>
             <button 
               type="button" 
               className="btn-oauth google" 
@@ -225,16 +221,26 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
             </button>
           </form>
 
-          {/* Explicit Legal Notice During Signup */}
-          <p style={{ fontSize: '0.74rem', color: '#64748B', margin: '14px 0 0', textAlign: 'center', lineHeight: '1.4' }}>
-            By signing in, you agree to the{' '}
-            <a href="/terms/" target="_blank" rel="noreferrer" style={{ color: '#16255C', fontWeight: 600, textDecoration: 'underline' }}>
-              Terms of Service
-            </a>{' '}
-            and{' '}
-            <a href="/privacy/" target="_blank" rel="noreferrer" style={{ color: '#16255C', fontWeight: 600, textDecoration: 'underline' }}>
-              Privacy Policy
-            </a>.
+          {/* Legal Notice */}
+          <p className="auth-legal-notice">
+            <span className="auth-legal-prefix">By signing in, you agree to the</span>{' '}
+            <span className="auth-legal-links">
+              <button 
+                type="button" 
+                onClick={() => setLegalModalType('terms')} 
+                className="auth-legal-btn"
+              >
+                Terms of Service
+              </button>{' '}
+              and{' '}
+              <button 
+                type="button" 
+                onClick={() => setLegalModalType('privacy')} 
+                className="auth-legal-btn"
+              >
+                Privacy Policy
+              </button>.
+            </span>
           </p>
         </>
       )}
@@ -259,35 +265,35 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
           </div>
 
           <form onSubmit={handleVerifyOtp} className="email-otp-form">
-            <input
-              type="text"
-              placeholder="Enter 6-digit code"
-              className="input-email"
-              style={{ textAlign: 'center', letterSpacing: '4px', fontSize: '1.1rem', fontWeight: 'bold' }}
-              value={otpCode}
-              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              maxLength={6}
+            <input 
+              type="text" 
+              inputMode="numeric" 
+              pattern="[0-9]*" 
+              maxLength={6} 
+              placeholder="123456" 
+              value={otpCode} 
+              onChange={(e) => setOtpCode(e.target.value.trim())}
               disabled={otpVerifying}
+              className="input-otp-code"
+              autoFocus
             />
             <button type="submit" className="btn-submit-otp" disabled={otpVerifying || otpCode.length < 6}>
-              {otpVerifying ? 'Verifying...' : 'Verify Code & Sign In →'}
+              {otpVerifying ? 'Verifying...' : 'Verify Code & Open Card →'}
             </button>
           </form>
 
-          <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
             <button 
               type="button" 
-              onClick={() => {
-                setStep('input-email');
-                setErrorMsg('');
-              }}
+              onClick={() => { setStep('input-email'); setErrorMsg(''); setInfoMsg(''); }} 
               style={{ background: 'none', border: 'none', color: '#64748B', fontSize: '0.78rem', cursor: 'pointer' }}
             >
-              ← Use different email
+              ← Back
             </button>
+            <span style={{ color: '#CBD5E1' }}>•</span>
             <button 
               type="button" 
-              onClick={handleSendEmailLink}
+              onClick={handleSendEmailLink} 
               disabled={emailSending}
               style={{ background: 'none', border: 'none', color: '#1E4AFF', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}
             >
@@ -297,10 +303,13 @@ export default function AuthModal({ onSuccess, title = "Sign In to Your Loyalty 
         </div>
       )}
 
-      <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.72rem', color: '#94A3B8' }}>
-        <ShieldCheck size={14} />
+      <div className="auth-trust-badge">
+        <ShieldCheck size={13} />
         <span>Official BAIA Shore Club Authentication</span>
       </div>
+
+      {/* In-App Legal Notice Popup (Keeps user in sign-up flow without interrupting) */}
+      <LegalModal type={legalModalType} onClose={() => setLegalModalType(null)} />
     </div>
   );
 }

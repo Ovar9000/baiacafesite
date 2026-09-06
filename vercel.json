@@ -2,6 +2,23 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "trailingSlash": true,
   "cleanUrls": false,
+  "redirects": [
+    {
+      "source": "/menu/:path*",
+      "destination": "/#menu",
+      "permanent": false
+    },
+    {
+      "source": "/location/:path*",
+      "destination": "/#location",
+      "permanent": false
+    },
+    {
+      "source": "/floating-cottage/:path*",
+      "destination": "/#boards",
+      "permanent": false
+    }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",

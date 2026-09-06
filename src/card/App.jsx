@@ -6,6 +6,7 @@ import { calculateLoyaltyStatus, formatManilaDateTime } from '../lib/loyaltyHelp
 import AuthModal from '../components/AuthModal';
 import QrScanner from '../components/QrScanner';
 import RedemptionCountdown from '../components/RedemptionCountdown';
+import LegalModal from '../components/LegalModal';
 import { 
   Coffee, 
   Gift, 
@@ -58,6 +59,7 @@ export default function CardApp() {
   const [showTutorialModal, setShowTutorialModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
+  const [cardLegalType, setCardLegalType] = useState(null);
 
   // Fetch Supabase session on load
   useEffect(() => {
@@ -402,68 +404,6 @@ export default function CardApp() {
               setSession(s);
               setUser(s.user);
             }} />
-
-            {/* Shore Club Loyalty Card Web Tutorial & Perks Guide */}
-            <div className="loyalty-section-card" style={{ marginTop: '20px', padding: '24px 20px' }}>
-              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#1E4AFF', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  Member Benefits Guide
-                </span>
-                <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--loyalty-navy)', fontSize: '1.25rem', fontWeight: 800, margin: '4px 0 6px' }}>
-                  How Your Loyalty Card Works
-                </h3>
-                <p style={{ fontSize: '0.8rem', color: '#64748B', margin: 0 }}>
-                  Enjoy handcrafted perks every time you visit the shores of Laurente.
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {/* Step 1 */}
-                <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', background: '#F8FAFC', padding: '14px 16px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#16255C', color: '#FFE699', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', flexShrink: 0 }}>
-                    1
-                  </div>
-                  <div>
-                    <h5 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--loyalty-navy)', margin: '0 0 3px' }}>
-                      1-Tap Sign Up (Free &amp; Instant)
-                    </h5>
-                    <p style={{ fontSize: '0.78rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
-                      Sign in above with Google or your email. No app store download or password required—your loyalty card loads directly in your mobile browser.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 2 */}
-                <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', background: '#F8FAFC', padding: '14px 16px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#1E4AFF', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', flexShrink: 0 }}>
-                    2
-                  </div>
-                  <div>
-                    <h5 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--loyalty-navy)', margin: '0 0 3px' }}>
-                      Collect Daily Stamps &amp; Free Wi-Fi
-                    </h5>
-                    <p style={{ fontSize: '0.78rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
-                      Order any handcrafted beverage at Baia Café, then tap <strong>Scan Counter Standee</strong> at the pickup bar. Each scan earns 1 stamp and instantly dispenses a <strong>1-hour voucher for "BAIA Free Wifi"</strong> for up to 2 devices.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 3 */}
-                <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', background: '#F8FAFC', padding: '14px 16px', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#15803D', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', flexShrink: 0 }}>
-                    3
-                  </div>
-                  <div>
-                    <h5 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--loyalty-navy)', margin: '0 0 3px' }}>
-                      Unlock Free Specialty Coffee
-                    </h5>
-                    <p style={{ fontSize: '0.78rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
-                      Every 10 stamps completes a card cycle and unlocks a <strong>complimentary handcrafted coffee</strong> of your choice. Activate your reward on screen and present it to your barista at the counter.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
@@ -926,7 +866,7 @@ export default function CardApp() {
                   Handcrafted with premium artisan beans on the Masbate shoreline. Every specialty handcrafted beverage earns 1 stamp.
                 </p>
                 <a 
-                  href="/menu/"
+                  href="/#menu"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -950,9 +890,21 @@ export default function CardApp() {
                 <span>Verified in-store at Baia Café, Masbate</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                <a href="/terms/" style={{ color: '#94A3B8', textDecoration: 'none', fontWeight: 600 }}>Terms of Service</a>
+                <button 
+                  type="button" 
+                  onClick={() => setCardLegalType('terms')} 
+                  className="legal-footer-btn"
+                >
+                  Terms of Service
+                </button>
                 <span>•</span>
-                <a href="/privacy/" style={{ color: '#94A3B8', textDecoration: 'none', fontWeight: 600 }}>Privacy Policy</a>
+                <button 
+                  type="button" 
+                  onClick={() => setCardLegalType('privacy')} 
+                  className="legal-footer-btn"
+                >
+                  Privacy Policy
+                </button>
               </div>
               <div style={{ marginTop: '12px' }}>
                 <button
@@ -1324,6 +1276,8 @@ export default function CardApp() {
           </div>
         </div>
       )}
+      {/* In-App Legal Notice Popup */}
+      <LegalModal type={cardLegalType} onClose={() => setCardLegalType(null)} />
     </>
   );
 }

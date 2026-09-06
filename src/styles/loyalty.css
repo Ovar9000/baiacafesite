@@ -455,45 +455,77 @@ body {
 /* Auth Modal / Box */
 .auth-card {
   background: #FFFFFF;
-  border-radius: var(--loyalty-radius-lg);
-  padding: 28px 22px;
-  border: 1px solid var(--loyalty-border);
-  box-shadow: var(--loyalty-shadow-lg);
+  border-radius: 24px;
+  padding: 28px 24px 22px;
+  border: 1px solid rgba(22, 37, 92, 0.08);
+  box-shadow: 0 10px 30px -5px rgba(22, 37, 92, 0.08);
   text-align: center;
+  max-width: 440px;
+  margin: 0 auto;
 }
 
 .auth-header-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #EFF6FF;
-  color: var(--loyalty-blue);
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: #FAF4EB;
+  border: 1px solid rgba(22, 37, 92, 0.08);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(22, 37, 92, 0.05);
 }
 
 .auth-card h3 {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 1.35rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--loyalty-navy);
-  margin-bottom: 8px;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
 }
 
 .auth-card p {
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   color: var(--loyalty-text-muted);
-  margin-bottom: 24px;
-  line-height: 1.4;
+  margin: 0 0 16px;
+  line-height: 1.45;
+}
+
+/* Shore Club Member Perks Strip */
+.auth-perks-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 18px;
+}
+
+.auth-perk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FAF4EB;
+  border: 1px solid rgba(22, 37, 92, 0.1);
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--loyalty-navy);
+}
+
+.auth-perk-icon {
+  color: #D97706;
+  flex-shrink: 0;
 }
 
 .oauth-buttons {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .btn-oauth {
@@ -504,8 +536,8 @@ body {
   justify-content: center;
   gap: 12px;
   padding: 0 20px;
-  border-radius: 9999px;
-  font-size: 0.9rem;
+  border-radius: 14px;
+  font-size: 0.92rem;
   font-weight: 600;
   cursor: pointer;
   border: 1px solid var(--loyalty-border);
@@ -531,6 +563,7 @@ body {
 .btn-oauth.google:hover {
   background: #F8FAFC;
   border-color: #CBD5E1;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.08);
 }
 
 .btn-oauth.facebook {
@@ -549,11 +582,12 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 18px 0;
+  margin: 14px 0;
   color: #94A3B8;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
 }
 
 .auth-divider::before,
@@ -573,18 +607,19 @@ body {
 .input-email {
   width: 100%;
   height: 48px;
-  padding: 0 20px;
-  border-radius: 9999px;
+  padding: 0 16px;
+  border-radius: 14px;
   border: 1.5px solid #E2E8F0;
   font-size: 0.92rem;
   outline: none;
   font-family: inherit;
   box-sizing: border-box;
-  background: #FFFFFF;
+  background: #F8FAFC;
   transition: all 0.2s ease;
 }
 
 .input-email:focus {
+  background: #FFFFFF;
   border-color: #16255C;
   box-shadow: 0 0 0 3px rgba(22, 37, 92, 0.1);
 }
@@ -595,7 +630,7 @@ body {
   border: none;
   height: 48px;
   padding: 0 20px;
-  border-radius: 9999px;
+  border-radius: 14px;
   font-weight: 700;
   font-size: 0.92rem;
   cursor: pointer;
@@ -610,6 +645,107 @@ body {
 .btn-submit-otp:hover {
   background: #1B3582;
   transform: translateY(-1px);
+}
+
+.auth-legal-notice {
+  font-size: 0.74rem;
+  color: #64748B;
+  margin: 14px auto 0;
+  text-align: center;
+  line-height: 1.5;
+  width: 100%;
+}
+
+.auth-legal-prefix {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.auth-legal-links {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.auth-legal-notice a,
+.auth-legal-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: #16255C;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  display: inline;
+}
+
+.auth-legal-notice a:hover,
+.auth-legal-btn:hover {
+  color: #1E4AFF;
+}
+
+.legal-footer-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: #94A3B8;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.legal-footer-btn:hover {
+  color: #16255C;
+  text-decoration: underline;
+}
+
+@keyframes legalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes legalSlideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.auth-trust-badge {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: #94A3B8;
+  font-weight: 500;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .loyalty-main-content {
+    padding: 12px 14px 20px !important;
+  }
+  .auth-card {
+    padding: 22px 18px 22px;
+    border-radius: 20px;
+  }
+  .auth-card h3 {
+    font-size: 1.22rem;
+  }
+  .auth-card p {
+    font-size: 0.82rem;
+    margin-bottom: 12px;
+  }
+  .auth-legal-notice {
+    font-size: 0.72rem;
+  }
 }
 
 /* 2-Minute Redemption Animated Screen */

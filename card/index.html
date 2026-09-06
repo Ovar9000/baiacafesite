@@ -12,10 +12,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/src/styles/loyalty.css" />
 
-  <!-- Speculation Rules API for Instant Prerender of Home Page (No Flash Reload) -->
+  <!-- Speculation Rules API for Instant Prefetch of Home Page (Preserves Cross-Document View Transitions) -->
   <script type="speculationrules">
   {
-    "prerender": [
+    "prefetch": [
       {
         "source": "list",
         "urls": ["/"],
