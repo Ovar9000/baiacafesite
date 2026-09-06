@@ -202,6 +202,7 @@ function initPolaroidWall() {
   if (!modal || !cards.length) return;
 
   const openModal = (card) => {
+    card.blur();
     const photo = card.dataset.photo || card.querySelector('img')?.src;
     const quote = card.dataset.quote || card.querySelector('.polaroid-quote')?.textContent?.trim();
     const author = card.dataset.author || card.querySelector('.polaroid-author-name')?.textContent?.trim();
@@ -220,6 +221,7 @@ function initPolaroidWall() {
     modal.classList.add('is-active');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    setTimeout(() => closeBtn?.focus(), 40);
   };
 
   const closeModal = () => {

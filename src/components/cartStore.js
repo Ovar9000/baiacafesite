@@ -104,22 +104,49 @@ class CartStore {
   }
 
   addDoubleTroubleBundle() {
-    const bundleKey = 'pairing-shore-favorites';
-    const existing = this.items.find(i => i.key === bundleKey);
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      this.items.push({
-        id: 'pairing-shore-favorites',
-        key: bundleKey,
-        name: 'Popular Shore Pairing',
-        description: 'BAIA Smash Burger + Sea Salt Latte (Iced) + Chili BBQ Fries',
-        quantity: 1,
-        unitPrice: 565,
-        isBundle: true
-      });
-    }
-    this.showToast('Shore Pairing Added', 'BAIA Smash + Sea Salt Latte + Fries (₱565) added to your order list', '✓');
+    const pairingItems = [
+      {
+        id: 'burger-smash',
+        name: 'BAIA Smash Burger',
+        price: 230,
+        description: 'Crispy double smash patty, cheddar, pickles & fries'
+      },
+      {
+        id: 'special-seasalt',
+        name: 'Sea Salt Latte',
+        price: 180,
+        temp: 'Iced',
+        isDrink: true,
+        description: 'Smooth iced latte crowned with savory sea salt foam'
+      },
+      {
+        id: 'fries-chilibbq',
+        name: 'Chili BBQ Fries',
+        price: 155,
+        description: 'Spicy kick BBQ seasoned fries'
+      }
+    ];
+
+    pairingItems.forEach(item => {
+      const key = this.getItemKey(item);
+      const existingIndex = this.items.findIndex(i => i.key === key);
+      const basePrice = item.price;
+      if (existingIndex > -1) {
+        this.items[existingIndex].quantity += 1;
+      } else {
+        this.items.push({
+          ...item,
+          basePrice,
+          addOns: [],
+          key,
+          quantity: 1,
+          unitPrice: basePrice
+        });
+      }
+    });
+
+    this.notify();
+    this.showToast('Shore Pairing Added', 'Smash Burger, Sea Salt Latte & Fries added (₱565)', '✓');
     this.openDrawer();
   }
 

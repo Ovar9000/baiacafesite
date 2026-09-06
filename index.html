@@ -106,7 +106,15 @@ svg { display: block; max-width: 100%; }
 .site-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height); z-index: 100; background: rgba(30, 74, 255, 0.94); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
 .nav-container { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .brand-logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--white); }
-.brand-logo-img { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; border: 1.5px solid rgba(255,255,255,0.35); }
+.brand-logo-img { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; border: 1.5px solid rgba(255,255,255,0.35); view-transition-name: baia-brand-logo; contain: paint; transform: translateZ(0); will-change: transform; }
+@view-transition { navigation: auto; }
+::view-transition { background-color: #1E4AFF; }
+::view-transition-old(root) { animation: pageOldFadeOut var(--motion-duration-fade, 0.65s) cubic-bezier(0.4, 0, 1, 1) both !important; z-index: 1; }
+::view-transition-new(root) { animation: pageNewSlideIn var(--motion-duration-page, 1.05s) cubic-bezier(0.16, 1, 0.3, 1) both !important; z-index: 2; mix-blend-mode: normal; }
+@keyframes pageOldFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes pageNewSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+::view-transition-group(baia-brand-logo) { z-index: 999; animation-duration: var(--motion-duration-logo, 1.5s); animation-timing-function: var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1)); }
+::view-transition-old(baia-brand-logo), ::view-transition-new(baia-brand-logo) { animation-duration: var(--motion-duration-logo, 1.5s); animation-timing-function: var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1)); }
 .brand-text-block { display: flex; flex-direction: column; }
 .brand-title { font-size: 1.4rem; line-height: 1; color: var(--white); }
 .brand-subtitle { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; color: var(--amber-contrast); text-transform: uppercase; }
@@ -235,7 +243,7 @@ svg { display: block; max-width: 100%; }
         "closes": "22:00"
       }
     ],
-    "hasMenu": "https://www.baia.cafe/menu/",
+    "hasMenu": "https://www.baia.cafe/#menu",
     "sameAs": [
       "https://www.facebook.com/thebaiacafe",
       "https://m.me/thebaiacafe",
@@ -1999,7 +2007,7 @@ svg { display: block; max-width: 100%; }
     <!-- Drawer Header -->
     <div class="drawer-header">
       <div class="drawer-title-group">
-        <h3 id="drawer-heading">Message to Order Ahead</h3>
+        <h3 id="drawer-heading">Order Ahead</h3>
         <span class="drawer-count-tag">0</span>
       </div>
       <button class="btn-close-drawer" id="drawer-close-btn" aria-label="Close order drawer">✕</button>
