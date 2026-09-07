@@ -135,6 +135,10 @@ export default defineConfig({
       injectRegister: 'script-defer',
       includeAssets: ['favicon.ico', 'images/Logo.webp', 'images/crew.webp'],
       workbox: {
+        navigateFallbackDenylist: [/^\/admin/, /^\/api/],
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
         globIgnores: [
           'admin/**',
           '**/admin/**',

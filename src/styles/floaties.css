@@ -174,6 +174,40 @@
 
 @media (max-width: 768px) {
   .section-floaties-layer {
-    display: none;
+    display: block;
+    opacity: 0.65;
+  }
+
+  /* Retain a curated, performance-friendly 2-floatie constellation per section on mobile */
+  .section-floaties-layer .glass-floatie:nth-child(n+3) {
+    display: none !important;
+  }
+
+  /* Compact dimensions for mobile viewport elegance */
+  .glass-floatie.size-lg,
+  .glass-floatie.size-xl {
+    width: 48px;
+    height: 48px;
+  }
+  .glass-floatie.size-lg svg,
+  .glass-floatie.size-xl svg {
+    width: 22px;
+    height: 22px;
+  }
+  .glass-floatie.size-md {
+    width: 40px;
+    height: 40px;
+  }
+  .glass-floatie.size-md svg {
+    width: 18px;
+    height: 18px;
+  }
+  .glass-floatie.size-sm {
+    width: 32px;
+    height: 32px;
+  }
+  .glass-floatie.size-sm svg {
+    width: 15px;
+    height: 15px;
   }
 }
