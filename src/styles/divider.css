@@ -6,15 +6,13 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-  background: var(--electric-blue);
+  background: var(--deep-navy);
   z-index: 10;
   user-select: none;
 }
 
-.checker-wave-band {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+.wave-divider-strip {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* 1. Seamless Checkerboard Pattern Row */

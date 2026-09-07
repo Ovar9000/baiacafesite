@@ -475,13 +475,13 @@
    ========================================================================== */
 @media (max-width: 1024px) {
   .hero-section {
-    min-height: 100vh;
-    min-height: 100svh;
+    min-height: calc(100vh - 28px);
+    min-height: calc(100svh - 28px);
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding-top: calc(var(--header-height) + clamp(16px, 3vh, 32px));
-    padding-bottom: clamp(32px, 5vh, 48px);
+    justify-content: flex-start;
+    padding-top: calc(var(--header-height) + clamp(10px, 2vh, 20px));
+    padding-bottom: clamp(16px, 2.5vh, 28px);
     box-sizing: border-box;
   }
 
@@ -489,10 +489,10 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: center;
-    gap: clamp(20px, 3.5vh, 36px);
+    justify-content: space-between;
+    flex: 1;
     width: 100%;
-    margin: auto 0;
+    gap: clamp(24px, 4vh, 48px);
   }
 
   .hero-content {
@@ -502,7 +502,7 @@
   /* Pacing: First Viewport = Headline (order: 1) -> Photo Card (order: 2) */
   .hero-headline.hero-vertical-focus {
     order: 1;
-    margin-top: 0;
+    margin-top: clamp(6px, 1.5vh, 16px);
     margin-bottom: 0;
     width: 100%;
     text-align: left;
@@ -511,83 +511,99 @@
   .tagline-stack {
     display: flex;
     flex-direction: column;
-    gap: clamp(6px, 1.5vh, 12px);
+    gap: clamp(6px, 1.4vh, 12px);
     width: 100%;
   }
 
   .tagline-row {
     justify-content: flex-start;
-    gap: clamp(8px, 2vw, 14px);
-    line-height: 1.05;
+    gap: clamp(10px, 2.2vw, 16px);
+    line-height: 1.02;
+  }
+
+  .tagline-row .letter-chunky {
+    font-size: clamp(2.6rem, 8.5vw, 4.0rem);
+  }
+
+  .ampersand-chunky {
+    font-size: clamp(2.4rem, 8.0vw, 3.7rem);
+  }
+
+  .script-crafted-fatseed {
+    font-size: clamp(2.7rem, 9.0vw, 4.2rem);
+  }
+
+  .bay-chunky {
+    font-size: clamp(2.0rem, 6.8vw, 3.2rem);
   }
 
   .row-crafted-bay {
     justify-content: flex-start;
-    gap: 10px;
-    margin-top: 2px;
+    gap: 12px;
+    margin-top: 4px;
   }
 
   .hero-visual-container {
     order: 2;
     min-height: auto;
     width: 100%;
-    max-width: clamp(280px, 80vw, 350px);
-    margin: 0 auto;
+    max-width: clamp(280px, 80vw, 360px);
+    margin: auto auto clamp(8px, 1.5vh, 16px) auto;
     display: flex;
     justify-content: center;
     align-items: center;
   }
 
   .hero-3d-card {
-    height: clamp(210px, 27vh, 260px);
-    min-height: 200px;
+    height: clamp(220px, 28vh, 280px);
+    min-height: 210px;
     max-width: 100%;
   }
 }
 
 @media (max-width: 640px) {
   .hero-section {
-    min-height: 100vh;
-    min-height: 100svh;
-    padding-top: calc(var(--header-height) + clamp(12px, 2.5vh, 24px));
-    padding-bottom: clamp(28px, 4vh, 40px);
+    min-height: calc(100vh - 28px);
+    min-height: calc(100svh - 28px);
+    padding-top: calc(var(--header-height) + clamp(8px, 1.8vh, 16px));
+    padding-bottom: clamp(14px, 2.2vh, 24px);
   }
 
   .hero-grid {
-    gap: clamp(16px, 3vh, 28px);
-    margin: auto 0;
+    gap: clamp(20px, 3.5vh, 36px);
+    flex: 1;
   }
 
   .hero-headline.hero-vertical-focus {
-    margin-top: 0;
+    margin-top: clamp(4px, 1vh, 10px);
     margin-bottom: 0;
     text-align: left;
   }
 
   .tagline-stack {
-    gap: clamp(5px, 1.3vh, 9px);
+    gap: clamp(5px, 1.2vh, 10px);
   }
 
   .tagline-row {
     justify-content: flex-start;
-    gap: 8px;
-    line-height: 1.05;
+    gap: 10px;
+    line-height: 1.02;
   }
 
   .tagline-row .letter-chunky {
-    font-size: clamp(1.85rem, 8.2vw, 2.6rem);
+    font-size: clamp(2.2rem, 9.4vw, 3.1rem);
   }
 
   .ampersand-chunky {
-    font-size: clamp(1.75rem, 7.6vw, 2.45rem);
+    font-size: clamp(2.05rem, 8.8vw, 2.9rem);
   }
 
   .script-crafted-fatseed {
-    font-size: clamp(1.9rem, 8.4vw, 2.7rem);
+    font-size: clamp(2.35rem, 9.6vw, 3.2rem);
   }
 
   .bay-chunky {
-    font-size: clamp(1.5rem, 6.6vw, 2.15rem);
+    font-size: clamp(1.75rem, 7.2vw, 2.45rem);
   }
 
   .row-crafted-bay {
@@ -595,33 +611,33 @@
     gap: 8px;
     flex-wrap: nowrap;
     white-space: nowrap;
-    margin-top: 2px;
+    margin-top: 3px;
   }
 
   .hero-doodle.doodle-mug {
-    width: 26px;
-    height: 26px;
+    width: clamp(28px, 7.5vw, 34px);
+    height: clamp(28px, 7.5vw, 34px);
   }
 
   .hero-doodle.doodle-food {
-    width: 26px;
-    height: 26px;
+    width: clamp(28px, 7.5vw, 34px);
+    height: clamp(28px, 7.5vw, 34px);
   }
 
   .hero-doodle.doodle-sparkle {
-    width: 20px;
-    height: 20px;
+    width: clamp(20px, 5.5vw, 24px);
+    height: clamp(20px, 5.5vw, 24px);
     position: relative !important;
   }
 
   .hero-visual-container {
-    max-width: clamp(260px, 78vw, 320px);
-    margin: 0 auto;
+    max-width: clamp(260px, 78vw, 330px);
+    margin: auto auto clamp(4px, 1vh, 12px) auto;
     min-height: auto;
   }
 
   .hero-3d-card {
-    height: clamp(200px, 26vh, 250px);
+    height: clamp(205px, 27vh, 255px);
     min-height: 195px;
     width: 100%;
   }
@@ -642,18 +658,37 @@
 
 @media (max-height: 700px) and (max-width: 640px) {
   .hero-section {
-    padding-top: calc(var(--header-height) + 8px);
-    padding-bottom: 20px;
+    padding-top: calc(var(--header-height) + 6px);
+    padding-bottom: 16px;
   }
 
   .hero-grid {
-    gap: 14px;
-    margin: auto 0;
+    gap: 12px;
+  }
+
+  .hero-headline.hero-vertical-focus {
+    margin-top: 2px;
+  }
+
+  .tagline-row .letter-chunky {
+    font-size: clamp(1.9rem, 8.2vw, 2.5rem);
+  }
+
+  .ampersand-chunky {
+    font-size: clamp(1.8rem, 7.6vw, 2.35rem);
+  }
+
+  .script-crafted-fatseed {
+    font-size: clamp(2.0rem, 8.4vw, 2.6rem);
+  }
+
+  .bay-chunky {
+    font-size: clamp(1.5rem, 6.4vw, 2.05rem);
   }
 
   .hero-3d-card {
-    height: 180px;
-    min-height: 170px;
+    height: 185px;
+    min-height: 175px;
   }
 
   .tagline-stack {
