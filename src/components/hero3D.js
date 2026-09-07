@@ -91,22 +91,34 @@ export function initHero3D() {
     activeIndex = idx;
 
     if (animate) {
-      showcaseImg.classList.add('showcase-fading');
-      if (flavorPill) flavorPill.classList.add('pill-fading');
+      // Preload image off-screen before swapping to guarantee zero loading lag
+      const imgLoader = new Image();
+      imgLoader.src = item.img;
+      const doSwap = () => {
+        showcaseImg.classList.add('showcase-fading');
+        if (flavorPill) flavorPill.classList.add('pill-fading');
 
-      setTimeout(() => {
-        showcaseImg.src = item.img;
-        showcaseImg.alt = item.alt;
-        if (flavorBadge) {
-          flavorBadge.textContent = item.badge;
-          if (item.tagColor) flavorBadge.style.background = item.tagColor;
-        }
-        if (flavorTitle) {
-          flavorTitle.textContent = item.title;
-        }
-        showcaseImg.classList.remove('showcase-fading');
-        if (flavorPill) flavorPill.classList.remove('pill-fading');
-      }, 250);
+        setTimeout(() => {
+          showcaseImg.src = item.img;
+          showcaseImg.alt = item.alt;
+          if (flavorBadge) {
+            flavorBadge.textContent = item.badge;
+            if (item.tagColor) flavorBadge.style.background = item.tagColor;
+          }
+          if (flavorTitle) {
+            flavorTitle.textContent = item.title;
+          }
+          showcaseImg.classList.remove('showcase-fading');
+          if (flavorPill) flavorPill.classList.remove('pill-fading');
+        }, 150);
+      };
+
+      if (imgLoader.complete) {
+        doSwap();
+      } else {
+        imgLoader.onload = doSwap;
+        imgLoader.onerror = doSwap;
+      }
     } else {
       showcaseImg.src = item.img;
       showcaseImg.alt = item.alt;
@@ -120,13 +132,8 @@ export function initHero3D() {
     }
   }
 
-  // 1. Let preloaded signature hero image render immediately for instant LCP.
-  // If the current Manila time slot is different, smoothly crossfade to it after initial paint.
-  if (activeIndex !== 0) {
-    setTimeout(() => {
-      applySlot(activeIndex, true);
-    }, 2000);
-  }
+  // Keep signature hero image stable on initial page load for instant, zero-lag LCP
+  // (No delayed 2-second swap that causes image flickering/lag)
 
   // 2. Hydrate showcase slots with time-appropriate food/drink items from Supabase
   // The Hero card is strictly a food & drink showcase by time-of-day:
@@ -207,8 +214,7 @@ export function initHero3D() {
           };
         }
 
-        // Smoothly re-apply current time-of-day slot
-        applySlot(getManila6HourSlotIndex(), true);
+        // Slots are updated for background schedule without jarring initial swaps
       }
     } catch (e) {
       // Graceful fallback to curated beach defaults

@@ -72,10 +72,18 @@
   color: var(--electric-blue);
 }
 
-.frost-blue svg {
+.frost-blue svg,
+.frost-blue img,
+.frost-blue .floatie-icon-img {
   fill: var(--electric-blue);
   opacity: 0.85;
   filter: drop-shadow(0 2px 6px rgba(31, 58, 224, 0.16));
+}
+
+.floatie-icon-img {
+  pointer-events: none;
+  user-select: none;
+  object-fit: contain;
 }
 
 /* Size Variants */
@@ -83,25 +91,25 @@
   width: 42px;
   height: 42px;
 }
-.size-sm svg { width: 20px; height: 20px; }
+.size-sm svg, .size-sm img, .size-sm .floatie-icon-img { width: 20px; height: 20px; }
 
 .size-md {
   width: 58px;
   height: 58px;
 }
-.size-md svg { width: 26px; height: 26px; }
+.size-md svg, .size-md img, .size-md .floatie-icon-img { width: 26px; height: 26px; }
 
 .size-lg {
   width: 72px;
   height: 72px;
 }
-.size-lg svg { width: 32px; height: 32px; }
+.size-lg svg, .size-lg img, .size-lg .floatie-icon-img { width: 34px; height: 34px; }
 
 .size-xl {
   width: 86px;
   height: 86px;
 }
-.size-xl svg { width: 38px; height: 38px; }
+.size-xl svg, .size-xl img, .size-xl .floatie-icon-img { width: 42px; height: 42px; }
 
 .size-pill {
   height: 38px;
@@ -190,7 +198,9 @@
     height: 48px;
   }
   .glass-floatie.size-lg svg,
-  .glass-floatie.size-xl svg {
+  .glass-floatie.size-xl svg,
+  .glass-floatie.size-lg img,
+  .glass-floatie.size-xl img {
     width: 22px;
     height: 22px;
   }
@@ -198,7 +208,8 @@
     width: 40px;
     height: 40px;
   }
-  .glass-floatie.size-md svg {
+  .glass-floatie.size-md svg,
+  .glass-floatie.size-md img {
     width: 18px;
     height: 18px;
   }
@@ -206,7 +217,8 @@
     width: 32px;
     height: 32px;
   }
-  .glass-floatie.size-sm svg {
+  .glass-floatie.size-sm svg,
+  .glass-floatie.size-sm img {
     width: 15px;
     height: 15px;
   }
