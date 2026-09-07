@@ -33,6 +33,14 @@
   will-change: transform;
 }
 
+.floating-glyph svg,
+.floating-glyph img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 /* Individual Glyphs Positioning & Floating Keyframes */
 .glyph-1 {
   top: 14%;
@@ -334,6 +342,10 @@
   animation-delay: -1s;
 }
 
+.doodle-food {
+  animation-delay: -1.8s;
+}
+
 .doodle-sparkle {
   animation-delay: -2.5s;
 }
@@ -554,6 +566,11 @@
   }
 
   .hero-doodle.doodle-mug {
+    width: 28px;
+    height: 28px;
+  }
+
+  .hero-doodle.doodle-food {
     width: 28px;
     height: 28px;
   }

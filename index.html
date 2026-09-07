@@ -328,32 +328,19 @@ svg { display: block; max-width: 100%; }
   <!-- MAIN CONTENT CONTAINER -->
   <!-- 1. HERO SECTION (Commanding Vertical Focus — Fat Seed Energy with Coastal Restraint) -->
   <section class="hero-section" id="hero" data-theme="surface-blue" aria-label="Welcome to BAIA Cafe">
-    <!-- Ambient Floating Glyphs (BAIA Brand Only: 6-Petal Flower & Palm Tree) -->
+    <!-- Ambient Floating Glyphs (BAIA Brand Logo Icons: Flower, Palm, Waves, Cup) -->
     <div class="floating-glyphs-layer" aria-hidden="true">
       <div class="floating-glyph glyph-1">
-        <svg viewBox="0 0 24 24" fill="#ffffff">
-          <circle cx="12" cy="12" r="3" />
-          <circle cx="12" cy="5" r="2.5" />
-          <circle cx="12" cy="19" r="2.5" />
-          <circle cx="5.94" cy="8.5" r="2.5" />
-          <circle cx="18.06" cy="15.5" r="2.5" />
-          <circle cx="5.94" cy="15.5" r="2.5" />
-          <circle cx="18.06" cy="8.5" r="2.5" />
-        </svg>
+        <img src="./images/baia-flower-white.webp" alt="" width="48" height="48" />
       </div>
       <div class="floating-glyph glyph-6">
-        <svg viewBox="0 0 24 24" fill="#FFE699"><path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" /></svg>
+        <img src="./images/baia-palm-white.webp" alt="" width="52" height="52" />
       </div>
       <div class="floating-glyph glyph-8">
-        <svg viewBox="0 0 24 24" fill="#ff6b9d">
-          <circle cx="12" cy="12" r="3" />
-          <circle cx="12" cy="5" r="2.5" />
-          <circle cx="12" cy="19" r="2.5" />
-          <circle cx="5.94" cy="8.5" r="2.5" />
-          <circle cx="18.06" cy="15.5" r="2.5" />
-          <circle cx="5.94" cy="15.5" r="2.5" />
-          <circle cx="18.06" cy="8.5" r="2.5" />
-        </svg>
+        <img src="./images/baia-wave-white.webp" alt="" width="46" height="46" />
+      </div>
+      <div class="floating-glyph glyph-3">
+        <img src="./images/baia-cup-white.webp" alt="" width="44" height="44" />
       </div>
     </div>
 
@@ -374,6 +361,23 @@ svg { display: block; max-width: 100%; }
             <span class="tagline-row row-food">
               <span class="letter-chunky">FOOD</span>
               <span class="ampersand-chunky">&amp;</span>
+              <svg class="hero-doodle doodle-food doodle-inasal" viewBox="0 0 40 40" width="38" height="38" aria-label="Authentic Bacolod Chicken Inasal Grilled Skewer" role="img">
+                <!-- Sizzle & Charcoal Smoke lines -->
+                <path d="M26 6 Q29 2 27 0 M32 9 Q35 5 33 2" fill="none" stroke="#FFE699" stroke-width="2" stroke-linecap="round" />
+                <!-- Bamboo Skewer -->
+                <line x1="6" y1="36" x2="35" y2="7" stroke="#E5BE8A" stroke-width="3" stroke-linecap="round" />
+                <line x1="31" y1="11" x2="35" y2="7" stroke="#16255C" stroke-width="2.5" stroke-linecap="round" />
+                <!-- Inasal Piece 1 (Bottom cut) -->
+                <ellipse cx="14" cy="28" rx="5.5" ry="4.5" transform="rotate(-45 14 28)" fill="#E8611A" stroke="#16255C" stroke-width="2.3" />
+                <line x1="11" y1="27" x2="14" y2="24" stroke="#16255C" stroke-width="1.8" stroke-linecap="round" />
+                <!-- Inasal Piece 2 (Middle cut - thick juicy inasal) -->
+                <ellipse cx="21" cy="21" rx="6.5" ry="5" transform="rotate(-45 21 21)" fill="#F57C00" stroke="#16255C" stroke-width="2.3" />
+                <line x1="18" y1="20" x2="22" y2="16" stroke="#16255C" stroke-width="1.8" stroke-linecap="round" />
+                <line x1="21" y1="24" x2="25" y2="20" stroke="#16255C" stroke-width="1.8" stroke-linecap="round" />
+                <!-- Inasal Piece 3 (Top cut) -->
+                <ellipse cx="28" cy="14" rx="5.5" ry="4.2" transform="rotate(-45 28 14)" fill="#E8611A" stroke="#16255C" stroke-width="2.3" />
+                <line x1="26" y1="14" x2="29" y2="11" stroke="#16255C" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
             </span>
             <span class="tagline-row row-vibes">
               <span class="letter-chunky">GOOD VIBES</span>
@@ -387,10 +391,6 @@ svg { display: block; max-width: 100%; }
             </span>
           </span>
         </h1>
-
-        <p class="hero-subtitle">
-          Artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers, and shore recreation right on the beach sand in Barangay Laurente.
-        </p>
       </div>
 
       <!-- Hero Right Column: 3D Visual Centerpiece -->
@@ -404,6 +404,7 @@ svg { display: block; max-width: 100%; }
               width="440" 
               height="480" 
               fetchpriority="high" 
+              decoding="sync" 
             />
           </div>
 
@@ -428,22 +429,17 @@ svg { display: block; max-width: 100%; }
   <!-- 4. STORY & "TEAM BAIA" POLAROID SECTION -->
   <section class="story-section" id="about" data-theme="sand" aria-label="About BAIA Cafe">
     <div class="section-floaties-layer" aria-hidden="true">
-      <div class="glass-floatie frost-blue anim-1 size-lg" style="top: 6%; left: 3%;">
-        <svg viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="3" />
-          <circle cx="12" cy="5" r="2.5" />
-          <circle cx="12" cy="19" r="2.5" />
-          <circle cx="5.94" cy="8.5" r="2.5" />
-          <circle cx="18.06" cy="15.5" r="2.5" />
-          <circle cx="5.94" cy="15.5" r="2.5" />
-          <circle cx="18.06" cy="8.5" r="2.5" />
-        </svg>
+      <div class="glass-floatie frost-blue anim-1 size-lg shape-flower" style="top: 6%; left: 3%;">
+        <img src="./images/baia-flower-icon.webp" alt="BAIA Flower Icon" class="floatie-icon-img" width="34" height="34" />
       </div>
       <div class="glass-floatie frost-blue anim-2 size-md shape-wave" style="top: 86%; left: 3%;">
-        <svg viewBox="0 0 24 24"><path d="M2 9c2 0 3-2 5-2s3 2 5 2 3-2 5-2 3 2 5 2v2c-2 0-3-2-5-2s-3 2-5 2-3-2-5-2-3 2-5 2V9z" /></svg>
+        <img src="./images/baia-wave-icon.webp" alt="BAIA Waves Icon" class="floatie-icon-img" width="28" height="28" />
       </div>
       <div class="glass-floatie frost-blue anim-3 size-xl" style="top: 8%; right: 4%;">
-        <svg viewBox="0 0 24 24"><path d="M12 2c1.5 2 3.5 3 6 3-1 2-3 3-5 3.5v11.5a1 1 0 0 1-2 0V8.5C9 8 7 7 6 5c2.5 0 4.5-1 6-3z" /></svg>
+        <img src="./images/baia-palm-icon.webp" alt="BAIA Palm Tree Icon" class="floatie-icon-img" width="40" height="40" />
+      </div>
+      <div class="glass-floatie frost-blue anim-4 size-md" style="top: 76%; right: 3%;">
+        <img src="./images/baia-cup-icon.webp" alt="BAIA Coffee Cup Icon" class="floatie-icon-img" width="28" height="28" />
       </div>
     </div>
 
