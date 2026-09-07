@@ -154,6 +154,7 @@ main + .site-footer {
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--header-height, 80px);
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

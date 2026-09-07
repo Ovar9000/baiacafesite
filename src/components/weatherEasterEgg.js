@@ -1,5 +1,3 @@
-import { showShowcaseToast } from './hero3D.js';
-
 let canvas = null;
 let ctx = null;
 let animationFrameId = null;
@@ -121,7 +119,7 @@ export function initWeatherEasterEgg() {
   }
 }
 
-export function setLiveRainState(isRaining, weatherDescription = '') {
+export function setLiveRainState(isRaining) {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (prefersReducedMotion) return;
 
@@ -133,9 +131,6 @@ export function setLiveRainState(isRaining, weatherDescription = '') {
       isRainingActive = true;
       canvas.classList.add('active');
       if (!animationFrameId) loop();
-      if (weatherDescription) {
-        showShowcaseToast('Tropical Rain in Laurente, Masbate', weatherDescription);
-      }
     }
   } else {
     isRainingActive = false;

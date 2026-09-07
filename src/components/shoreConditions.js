@@ -2,8 +2,6 @@
    BAIA CAFE — Shore Atmosphere & Sunset Timing for Laurente, Masbate
    ========================================================================== */
 
-import { setLiveRainState } from './weatherEasterEgg.js';
-
 const BAIA_COORDINATES = {
   lat: 13.1344,
   lon: 122.9772,
@@ -54,9 +52,7 @@ export function initShoreConditions() {
       if (data && data.current) {
         const temp = Math.round(data.current.temperature_2m);
         const weatherCode = data.current.weather_code;
-        const isRainy = data.current.precipitation > 0 || [51, 53, 55, 61, 63, 65, 80, 81, 82, 95].includes(weatherCode);
-
-        setLiveRainState(isRainy, isRainy ? `Live precipitation at the shoreline (${temp}°C).` : '');
+        // Live rain toast removed per user feedback (open-meteo grid precipitation is inaccurate for Burias Island)
 
         if (data.daily && data.daily.sunset && data.daily.sunset[0]) {
           liveSunsetTime = new Date(data.daily.sunset[0]);
