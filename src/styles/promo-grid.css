@@ -68,7 +68,7 @@
   animation: doodleBob 4s ease-in-out infinite alternate -0.8s;
 }
 
-.doodle-sparkle {
+.promo-doodle-container .doodle-sparkle {
   position: absolute;
   pointer-events: none;
   animation: sparkleTwinkle 3s ease-in-out infinite alternate;
