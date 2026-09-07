@@ -287,9 +287,9 @@ export function initMenuExplorer() {
     const toggleAccordion = (card, catId, willOpen, btn, indicatorText) => {
       if (!card) return;
 
-      const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-      if (isMobile || !document.startViewTransition) {
-        // Fallback / Mobile Viewports: standard instant toggle with clean CSS transitions
+      const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion || !document.startViewTransition) {
+        // Fallback: standard clean toggle when View Transitions are unavailable or reduced motion is requested
         card.querySelectorAll('.menu-card').forEach(c => c.classList.remove('morph-settled'));
         if (willOpen) {
           openCategories.add(catId);
