@@ -9,7 +9,7 @@ function setCorsHeaders(req, res) {
   const allowedOrigins = ['https://www.baia.cafe', 'https://baia.cafe'];
   const isAllowed = origin && (
     allowedOrigins.includes(origin) ||
-    /^https:\/\/.*\.vercel\.app$/.test(origin) ||
+    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin) ||
     /^http:\/\/localhost(:\d+)?$/.test(origin) ||
     /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
   );
@@ -84,19 +84,35 @@ export default async function handler(req, res) {
       userId = profiles[0].id;
       displayName = profiles[0].display_name || cleanEmail;
     } else {
-      // Try finding user via auth admin API
+      // Try finding user via auth admin API with pagination
       try {
-        const { data: userList } = await supabaseAdmin.auth.admin.listUsers();
-        const found = userList?.users?.find(u => u.email?.toLowerCase() === cleanEmail);
-        if (found) {
-          userId = found.id;
-          displayName = found.user_metadata?.full_name || found.email;
-          // create profile row
-          await supabaseAdmin.from('profiles').upsert({
-            id: found.id,
-            email: found.email,
-            display_name: displayName
+        let page = 1;
+        let hasMore = true;
+        while (hasMore && !userId && page <= 5) {
+          const { data: userList, error: listErr } = await supabaseAdmin.auth.admin.listUsers({
+            page,
+            perPage: 100
           });
+          if (listErr || !userList?.users?.length) {
+            hasMore = false;
+            break;
+          }
+          const found = userList.users.find(u => u.email?.toLowerCase() === cleanEmail);
+          if (found) {
+            userId = found.id;
+            displayName = found.user_metadata?.full_name || found.email;
+            await supabaseAdmin.from('profiles').upsert({
+              id: found.id,
+              email: found.email,
+              display_name: displayName
+            });
+            break;
+          }
+          if (userList.users.length < 100) {
+            hasMore = false;
+          } else {
+            page++;
+          }
         }
       } catch (e) {
         console.warn('Could not list auth users:', e.message);

@@ -235,7 +235,6 @@ class CartStore {
       icon
     };
     this.toasts.push(toast);
-    this.notify();
 
     const toastContainer = document.getElementById('toast-container');
     if (toastContainer) {
@@ -260,7 +259,6 @@ class CartStore {
 
     setTimeout(() => {
       this.toasts = this.toasts.filter(t => t.id !== toast.id);
-      this.notify();
     }, 3500);
   }
 }

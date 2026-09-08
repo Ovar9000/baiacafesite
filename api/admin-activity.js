@@ -26,7 +26,7 @@ function setCorsHeaders(req, res) {
   const allowedOrigins = ['https://www.baia.cafe', 'https://baia.cafe'];
   const isAllowed = origin && (
     allowedOrigins.includes(origin) ||
-    /^https:\/\/.*\.vercel\.app$/.test(origin) ||
+    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin) ||
     /^http:\/\/localhost(:\d+)?$/.test(origin) ||
     /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
   );
@@ -113,10 +113,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Server database configuration error.' });
     }
 
-    const [profilesRes, stampsRes, redemptionsRes] = await Promise.all([
-      supabaseAdmin.from('profiles').select('id, email, display_name, avatar_url, created_at').order('created_at', { ascending: false }),
-      supabaseAdmin.from('stamps').select('id, user_id, awarded_at, distance_meters, staff_note').order('awarded_at', { ascending: false }),
-      supabaseAdmin.from('redemptions').select('id, user_id, redeemed_at, reward_type, milestone_number').order('redeemed_at', { ascending: false })
+    const [profilesRes, stampsRes, redemptionsRes, totalStampsCountRes] = await Promise.all([
+      supabaseAdmin.from('profiles').select('id, email, display_name, avatar_url, created_at').order('created_at', { ascending: false }).limit(1000),
+      supabaseAdmin.from('stamps').select('id, user_id, awarded_at, distance_meters, staff_note').order('awarded_at', { ascending: false }).limit(5000),
+      supabaseAdmin.from('redemptions').select('id, user_id, redeemed_at, reward_type, milestone_number').order('redeemed_at', { ascending: false }).limit(2000),
+      supabaseAdmin.from('stamps').select('*', { count: 'exact', head: true })
     ]);
 
     if (profilesRes.error) throw profilesRes.error;
@@ -126,6 +127,7 @@ export default async function handler(req, res) {
     const profiles = profilesRes.data || [];
     const stamps = stampsRes.data || [];
     const redemptions = redemptionsRes.data || [];
+    const totalVisitsCount = totalStampsCountRes.count ?? stamps.length;
 
     const profileMap = new Map();
     profiles.forEach(p => profileMap.set(p.id, p));
@@ -285,7 +287,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       traffic: {
-        totalVisits: stamps.length,
+        totalVisits: totalVisitsCount,
         todayVisits,
         weekVisits,
         monthVisits,

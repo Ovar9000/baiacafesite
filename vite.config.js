@@ -77,6 +77,8 @@ function devApiPlugin() {
             handlerModule = await import('./api/admin-rewards.js');
           } else if (endpoint === 'admin-activity') {
             handlerModule = await import('./api/admin-activity.js');
+          } else if (endpoint === 'delete-account') {
+            handlerModule = await import('./api/delete-account.js');
           } else {
             return next();
           }

@@ -38,13 +38,12 @@ function generateExpectedToken(dateStr) {
 
 function safeCompareTokens(provided, expected) {
   if (!provided || typeof provided !== 'string') return false;
-  // Match full hash or 16-char prefix
-  const expectedPrefix = expected.substring(0, provided.length);
-  if (provided.length !== expected.length && provided.length !== expectedPrefix.length) {
+  // Strictly enforce 64-character SHA-256 hex string to prevent prefix bypass
+  if (provided.length !== 64 || expected.length !== 64) {
     return false;
   }
   const bufA = Buffer.from(provided, 'utf8');
-  const bufB = Buffer.from(provided.length === expected.length ? expected : expectedPrefix, 'utf8');
+  const bufB = Buffer.from(expected, 'utf8');
   if (bufA.length !== bufB.length) return false;
   return crypto.timingSafeEqual(bufA, bufB);
 }
@@ -63,12 +62,12 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
 }
 
 export default async function handler(req, res) {
-  // Restrict CORS
+  // Restrict CORS with strict origin validation
   const origin = req.headers.origin;
   const allowedOrigins = ['https://www.baia.cafe', 'https://baia.cafe'];
   const isAllowed = origin && (
     allowedOrigins.includes(origin) ||
-    /^https:\/\/.*\.vercel\.app$/.test(origin) ||
+    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin) ||
     /^http:\/\/localhost(:\d+)?$/.test(origin) ||
     /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
   );
@@ -116,6 +115,11 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'QR verification token is required.' });
     }
 
+    if (!process.env.DAILY_QR_SECRET && process.env.NODE_ENV === 'production') {
+      console.error('Server configuration error: DAILY_QR_SECRET is not set.');
+      return res.status(500).json({ error: 'Server QR configuration error. Please contact administrator.' });
+    }
+
     // 1. Operating Hours Enforcement (Closed 11:00 PM - 9:00 AM Manila time)
     if (!isCafeOperatingHours()) {
       return res.status(403).json({
@@ -142,13 +146,21 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3. Ensure user profile exists
-    await supabaseAdmin.from('profiles').upsert({
-      id: user.id,
-      email: user.email,
-      display_name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Baia Guest',
-      avatar_url: user.user_metadata?.avatar_url || null
-    });
+    // 3. Ensure user profile exists (without overwriting customized display_name)
+    const { data: existingProfile } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!existingProfile) {
+      await supabaseAdmin.from('profiles').insert({
+        id: user.id,
+        email: user.email,
+        display_name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Baia Guest',
+        avatar_url: user.user_metadata?.avatar_url || null
+      });
+    }
 
     // 4. Check for existing stamp today (Asia/Manila midnight boundary)
     const startOfDayISO = new Date(`${todayManila}T00:00:00+08:00`).toISOString();

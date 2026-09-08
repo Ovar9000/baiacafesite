@@ -49,6 +49,17 @@ create table if not exists public.redemptions (
 -- Optimized index for redemptions per user
 create index if not exists redemptions_user_idx on public.redemptions (user_id, redeemed_at desc);
 
+-- Pre-clean any accidental duplicate redemptions before creating unique index
+delete from public.redemptions a
+using public.redemptions b
+where a.id > b.id
+  and a.user_id = b.user_id
+  and a.milestone_number = b.milestone_number;
+
+-- Enforce strict unique redemptions per user per milestone number
+create unique index if not exists redemptions_user_milestone_idx
+  on public.redemptions (user_id, milestone_number);
+
 -- 4. Dynamic Releases & Events Table (Facebook & Special Drops)
 create table if not exists public.drops (
   id text primary key,
@@ -228,7 +239,7 @@ create table if not exists public.wifi_vouchers (
   valid_from date default '2026-09-03',
   valid_until date default '2027-09-03',
   is_claimed boolean default false,
-  claimed_by uuid references public.profiles(id),
+  claimed_by uuid references public.profiles(id) on delete set null,
   claimed_at timestamptz,
   created_at timestamptz default timezone('Asia/Manila'::text, now()) not null
 );

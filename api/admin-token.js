@@ -34,7 +34,7 @@ function setCorsHeaders(req, res) {
   const allowedOrigins = ['https://www.baia.cafe', 'https://baia.cafe'];
   const isAllowed = origin && (
     allowedOrigins.includes(origin) ||
-    /^https:\/\/.*\.vercel\.app$/.test(origin) ||
+    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin) ||
     /^http:\/\/localhost(:\d+)?$/.test(origin) ||
     /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
   );
@@ -72,6 +72,11 @@ export default async function handler(req, res) {
   if (!process.env.ADMIN_PASSWORD) {
     console.error('Server configuration error: ADMIN_PASSWORD environment variable is missing.');
     return res.status(500).json({ error: 'Server authentication configuration error. ADMIN_PASSWORD is not set.' });
+  }
+
+  if (!process.env.DAILY_QR_SECRET && process.env.NODE_ENV === 'production') {
+    console.error('Server configuration error: DAILY_QR_SECRET is missing.');
+    return res.status(500).json({ error: 'Server configuration error. DAILY_QR_SECRET is not set.' });
   }
 
   try {

@@ -162,9 +162,9 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
         <div className="standee-subtitle">SHORE LOYALTY CARD</div>
 
         <div className="standee-qr-frame" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
-          {tokenData?.claimUrl ? (
+          {tokenData ? (
             <QRCodeSVG 
-              value={tokenData.claimUrl}
+              value={tokenData.productionUrl || tokenData.claimUrl}
               size={220}
               level="H"
               includeMargin={false}

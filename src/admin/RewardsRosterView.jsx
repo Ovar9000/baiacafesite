@@ -13,12 +13,14 @@ import { formatManilaDateTime } from '../lib/loyaltyHelpers';
 export default function RewardsRosterView({ password, members, setMembers, summary, setSummary, loading, setLoading, fetchInsights }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('all'); // 'all' | 'ready' | 'nearing' | 'active'
+  const hasFetchedRef = React.useRef(false);
 
   useEffect(() => {
-    if (password && members.length === 0 && !loading) {
+    if (password && !hasFetchedRef.current && !loading) {
+      hasFetchedRef.current = true;
       fetchInsights(password);
     }
-  }, [password, members.length, loading]);
+  }, [password, loading]);
 
   const filteredMembers = members.filter((m) => {
     const matchesSearch = 
