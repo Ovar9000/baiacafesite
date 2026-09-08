@@ -287,9 +287,14 @@ export function initMenuExplorer() {
     const toggleAccordion = (card, catId, willOpen, btn, indicatorText) => {
       if (!card) return;
 
+      const isMobile = typeof window !== 'undefined' && (window.innerWidth <= 768 || window.matchMedia('(max-width: 768px)').matches);
       const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (prefersReducedMotion || !document.startViewTransition) {
-        // Fallback: standard clean toggle when View Transitions are unavailable or reduced motion is requested
+      if (isMobile || prefersReducedMotion || !document.startViewTransition) {
+        // Fallback / Mobile Viewports: clean native CSS accordion animations without pill-to-card ghost text distortion
+        card.querySelectorAll('.sneak-peek-pill, .menu-card').forEach(el => {
+          el.style.viewTransitionName = '';
+          el.removeAttribute('data-vt-morph');
+        });
         card.querySelectorAll('.menu-card').forEach(c => c.classList.remove('morph-settled'));
         if (willOpen) {
           openCategories.add(catId);

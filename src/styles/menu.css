@@ -685,8 +685,20 @@ html.vt-morph-active::view-transition-new(baia-brand-logo) {
   ::view-transition-group(morph-2),
   ::view-transition-group(morph-3),
   ::view-transition-group(morph-4),
-  ::view-transition-group(morph-item-*) {
-    animation-duration: 0.32s;
+  ::view-transition-group(morph-item-*),
+  ::view-transition-old(morph-0),
+  ::view-transition-old(morph-1),
+  ::view-transition-old(morph-2),
+  ::view-transition-old(morph-3),
+  ::view-transition-old(morph-4),
+  ::view-transition-old(morph-item-*),
+  ::view-transition-new(morph-0),
+  ::view-transition-new(morph-1),
+  ::view-transition-new(morph-2),
+  ::view-transition-new(morph-3),
+  ::view-transition-new(morph-4),
+  ::view-transition-new(morph-item-*) {
+    animation: none !important;
   }
 }
 
@@ -1304,10 +1316,17 @@ html.vt-morph-active::view-transition-new(baia-brand-logo) {
     font-size: 0.74rem;
   }
   .category-accordion-body {
-    padding: 16px;
+    padding: 16px 12px;
+    transition: grid-template-rows 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.32s ease,
+                padding 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .menu-accordion-card.is-open .category-accordion-body,
+  .menu-accordion-card.is-open .category-accordion-body[hidden] {
+    padding: 16px 12px;
   }
   .menu-section {
-    padding-bottom: 64px !important;
+    padding-bottom: clamp(90px, 14vh, 120px) !important;
   }
 }
 
@@ -1321,7 +1340,7 @@ html.vt-morph-active::view-transition-new(baia-brand-logo) {
 
 @media (max-width: 640px) {
   .menu-section {
-    padding: 40px 0 64px 0;
+    padding: 40px 0 clamp(90px, 14vh, 120px) 0 !important;
   }
   .board-switcher {
     flex-direction: column;
