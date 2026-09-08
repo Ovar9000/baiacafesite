@@ -313,21 +313,17 @@ export default function CardApp() {
   const loyaltyStatus = calculateLoyaltyStatus(stamps, redemptions);
 
   // Check if today's stamp or Wi-Fi voucher has already been claimed for current Manila date
-  const todayManila = new Intl.DateTimeFormat('en-CA', {
+  const manilaDateFormatter = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Manila',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
-  }).format(new Date());
+  });
+  const todayManila = manilaDateFormatter.format(new Date());
 
   const hasScannedToday = Boolean(todayVoucher) || stamps.some(s => {
     try {
-      const stampDate = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Asia/Manila',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      }).format(new Date(s.awarded_at));
+      const stampDate = manilaDateFormatter.format(new Date(s.awarded_at));
       return stampDate === todayManila;
     } catch (e) {
       return false;

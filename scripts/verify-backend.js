@@ -92,14 +92,19 @@ async function runHealthCheck() {
   const token = crypto.createHmac('sha256', DAILY_QR_SECRET).update(manilaDateStr).digest('hex');
   assert(token.length === 64, `Generated 64-character SHA-256 hex token (${token.slice(0, 8)}...)`);
 
-  const bufA = Buffer.from(token, 'utf8');
-  const bufB = Buffer.from(token, 'utf8');
-  const match = crypto.timingSafeEqual(bufA, bufB);
-  assert(match === true, 'Constant-time safe comparison passes for identical tokens');
+  function testSafeCompare(provided, expected) {
+    if (!provided || typeof provided !== 'string') return false;
+    if (provided.length !== 64 || expected.length !== 64) return false;
+    const bufA = Buffer.from(provided, 'utf8');
+    const bufB = Buffer.from(expected, 'utf8');
+    if (bufA.length !== bufB.length) return false;
+    return crypto.timingSafeEqual(bufA, bufB);
+  }
 
-  const bufWrong = Buffer.from('a'.repeat(64), 'utf8');
-  const noMatch = crypto.timingSafeEqual(bufA, bufWrong);
-  assert(noMatch === false, 'Constant-time safe comparison rejects tampered tokens');
+  assert(testSafeCompare(token, token) === true, 'Constant-time safe comparison passes for identical 64-char token');
+  assert(testSafeCompare(token.slice(0, 1), token) === false, 'Rejects 1-char prefix attack vector');
+  assert(testSafeCompare(token.slice(0, 16), token) === false, 'Rejects 16-char prefix attack vector');
+  assert(testSafeCompare('a'.repeat(64), token) === false, 'Constant-time safe comparison rejects tampered tokens');
 
   // Test 3: Static Data Integrity
   console.log('\n3. Static Files & Updates Data Integrity:');
@@ -118,6 +123,8 @@ async function runHealthCheck() {
   assert(fs.existsSync(schemaFile), 'supabase/schema.sql exists');
   const schemaSql = fs.readFileSync(schemaFile, 'utf-8');
   assert(schemaSql.includes('stamps_user_single_daily_stamp_idx'), 'Schema includes daily stamp unique index');
+  assert(schemaSql.includes('redemptions_user_milestone_idx'), 'Schema includes redemptions milestone unique index');
+  assert(schemaSql.includes('on delete set null'), 'Schema includes on delete set null for wifi vouchers');
   assert(schemaSql.includes('public.drops'), 'Schema includes dynamic drops table');
   assert(schemaSql.includes('redeem_loyalty_reward'), 'Schema includes atomic redeem stored procedure');
 
@@ -195,7 +202,15 @@ async function runHealthCheck() {
 
   // Test 6: API Endpoints & Serverless Function Contracts
   console.log('\n6. Serverless API Endpoint Contracts:');
-  const apis = ['claim-stamp.js', 'redeem-reward.js', 'admin-token.js', 'delete-account.js'];
+  const apis = [
+    'claim-stamp.js',
+    'redeem-reward.js',
+    'admin-token.js',
+    'delete-account.js',
+    'admin-manual-stamp.js',
+    'admin-rewards.js',
+    'admin-activity.js'
+  ];
   apis.forEach(api => {
     const apiFile = path.join(ROOT_DIR, 'api', api);
     assert(fs.existsSync(apiFile), `api/${api} exists`);

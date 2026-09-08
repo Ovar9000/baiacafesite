@@ -26,7 +26,7 @@ function setCorsHeaders(req, res) {
   const allowedOrigins = ['https://www.baia.cafe', 'https://baia.cafe'];
   const isAllowed = origin && (
     allowedOrigins.includes(origin) ||
-    /^https:\/\/.*\.vercel\.app$/.test(origin) ||
+    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin) ||
     /^http:\/\/localhost(:\d+)?$/.test(origin) ||
     /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
   );
@@ -87,26 +87,30 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Server database configuration error. Please contact administrator.' });
     }
 
-    // 1. Fetch real registered customer profiles from Supabase
+    // 1. Fetch real registered customer profiles from Supabase (bounded)
     const { data: profiles, error: pErr } = await supabaseAdmin
       .from('profiles')
       .select('id, email, display_name, avatar_url, created_at')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(1000);
 
     if (pErr) {
       console.error('Error fetching Supabase profiles:', pErr);
       return res.status(500).json({ error: 'Failed to fetch profiles from Supabase.' });
     }
 
-    // 2. Fetch all stamps and redemptions
+    // 2. Fetch stamps and redemptions (bounded to prevent memory exhaustion)
     const { data: stamps, error: sErr } = await supabaseAdmin
       .from('stamps')
       .select('user_id, awarded_at, staff_note')
-      .order('awarded_at', { ascending: false });
+      .order('awarded_at', { ascending: false })
+      .limit(5000);
 
     const { data: redemptions, error: rErr } = await supabaseAdmin
       .from('redemptions')
-      .select('user_id, redeemed_at, reward_type, milestone_number');
+      .select('user_id, redeemed_at, reward_type, milestone_number')
+      .order('redeemed_at', { ascending: false })
+      .limit(2000);
 
     // Group stamps and redemptions by user_id
     const userStampsMap = {};

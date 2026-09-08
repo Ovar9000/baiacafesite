@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   const allowedOrigins = ['https://www.baia.cafe', 'https://baia.cafe'];
   const isAllowed = origin && (
     allowedOrigins.includes(origin) ||
-    /^https:\/\/.*\.vercel\.app$/.test(origin) ||
+    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin) ||
     /^http:\/\/localhost(:\d+)?$/.test(origin) ||
     /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
   );
@@ -50,11 +50,15 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Invalid user session. Please sign in again.' });
     }
 
-    // Unclaim any vouchers claimed by this user
-    await supabaseAdmin
-      .from('wifi_vouchers')
-      .update({ is_claimed: false, claimed_by: null, claimed_at: null })
-      .eq('claimed_by', user.id);
+    // Unclaim any vouchers claimed by this user before deletion
+    try {
+      await supabaseAdmin
+        .from('wifi_vouchers')
+        .update({ is_claimed: false, claimed_by: null, claimed_at: null })
+        .eq('claimed_by', user.id);
+    } catch (vErr) {
+      console.warn('Non-fatal voucher unclaim notice during account deletion:', vErr.message);
+    }
 
     // Delete user from auth.users (automatically cascades to profiles, stamps, redemptions)
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id);

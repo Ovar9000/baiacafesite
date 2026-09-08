@@ -159,12 +159,16 @@ export function initCartDrawer() {
           </div>
           <h4>Your Order List is Empty</h4>
           <p>Explore our menu and build your order list to message directly via Facebook Messenger!</p>
-          <button class="btn-story-pill" style="margin-top: 14px;" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'}); cartStore.closeDrawer();">
+          <button type="button" class="btn-story-pill" id="empty-cart-explore-btn" style="margin-top: 14px;">
             <span>Explore BAIA Menu</span>
             <span aria-hidden="true">→</span>
           </button>
         </div>
       `;
+      itemsContainer.querySelector('#empty-cart-explore-btn')?.addEventListener('click', () => {
+        document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' });
+        cartStore.closeDrawer();
+      });
       return;
     }
 

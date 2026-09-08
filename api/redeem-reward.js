@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   const allowedOrigins = ['https://www.baia.cafe', 'https://baia.cafe'];
   const isAllowed = origin && (
     allowedOrigins.includes(origin) ||
-    /^https:\/\/.*\.vercel\.app$/.test(origin) ||
+    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin) ||
     /^http:\/\/localhost(:\d+)?$/.test(origin) ||
     /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
   );
@@ -113,6 +113,9 @@ export default async function handler(req, res) {
 
     if (insertError) {
       console.error('Failed to insert redemption:', insertError);
+      if (insertError.code === '23505' || insertError.message?.toLowerCase().includes('unique') || insertError.message?.toLowerCase().includes('duplicate')) {
+        return res.status(400).json({ error: 'This reward milestone has already been claimed.' });
+      }
       return res.status(500).json({ error: `Failed to record reward redemption: ${insertError.message}` });
     }
 
