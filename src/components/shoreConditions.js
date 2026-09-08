@@ -2,79 +2,31 @@
    BAIA CAFE — Shore Atmosphere & Sunset Timing for Laurente, Masbate
    ========================================================================== */
 
-const BAIA_COORDINATES = {
-  lat: 13.1344,
-  lon: 122.9772,
-  name: "Laurente, San Pascual, Burias Island"
-};
-
 export function initShoreConditions() {
   const sunsetDisplay = document.getElementById('sunset-countdown-display');
-  const liveWeatherEl = document.getElementById('shore-live-weather');
-
-  let liveSunsetTime = new Date();
-  liveSunsetTime.setHours(17, 58, 0, 0); // Default Masbate sunset around 5:58 PM
+  if (!sunsetDisplay) return;
 
   function updateSunset() {
     const now = new Date();
-    let diff = liveSunsetTime.getTime() - now.getTime();
+    // Burias Island golden hour sunset target (5:58 PM Manila time)
+    const sunsetTarget = new Date(now);
+    sunsetTarget.setHours(17, 58, 0, 0);
 
+    let diff = sunsetTarget.getTime() - now.getTime();
     if (diff < 0) {
-      // If passed today, count towards tomorrow
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      tomorrow.setHours(17, 58, 0, 0);
-      diff = tomorrow.getTime() - now.getTime();
+      // If passed today, count towards tomorrow's sunset
+      sunsetTarget.setDate(sunsetTarget.getDate() + 1);
+      diff = sunsetTarget.getTime() - now.getTime();
     }
 
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
-    if (sunsetDisplay) {
-      sunsetDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-    }
+    sunsetDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }
 
-  // Immediate synchronous calculation
+  // Immediate calculation & 1-second interval
   updateSunset();
   setInterval(updateSunset, 1000);
-
-  // External live weather update
-  async function fetchMasbateLiveWeather() {
-    try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${BAIA_COORDINATES.lat}&longitude=${BAIA_COORDINATES.lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation&daily=sunset,sunrise&timezone=Asia%2FManila`;
-      
-      const response = await fetch(url);
-      if (!response.ok) return;
-      const data = await response.json();
-
-      if (data && data.current) {
-        const temp = Math.round(data.current.temperature_2m);
-        const weatherCode = data.current.weather_code;
-        // Live rain toast removed per user feedback (open-meteo grid precipitation is inaccurate for Burias Island)
-
-        if (data.daily && data.daily.sunset && data.daily.sunset[0]) {
-          liveSunsetTime = new Date(data.daily.sunset[0]);
-          updateSunset();
-        }
-
-        const weatherLabel = isRainy ? 'Tropical Rain' : (weatherCode > 2 ? 'Coastal Clouds' : 'Sunny Bay');
-
-        if (liveWeatherEl) {
-          liveWeatherEl.textContent = `${weatherLabel} ${temp}°C`;
-        }
-      }
-    } catch (err) {
-      // Baseline fallback values remain in place
-    }
-  }
-
-  if (typeof requestIdleCallback !== 'undefined') {
-    requestIdleCallback(() => fetchMasbateLiveWeather(), { timeout: 3000 });
-  } else {
-    setTimeout(fetchMasbateLiveWeather, 2500);
-  }
-
-  setInterval(fetchMasbateLiveWeather, 1200000);
 }
