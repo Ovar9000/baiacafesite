@@ -19,6 +19,80 @@ injectSpeedInsights();
 inject();
 
 /**
+ * Smart 24-Hour Scroll Position Manager
+ * - Fresh visitors or visits > 24 hours start cleanly at the top (0, 0) with a snug hero.
+ * - Accidental micro-scrolls in the hero (<= 150px) reset to 0 so the wave divider stays flush.
+ * - Active browsing down in the content (> 150px) within 24h is smoothly remembered across reloads/repeat visits.
+ */
+const SCROLL_CACHE_KEY = 'baia_scroll_pos';
+const MAX_SCROLL_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+const HERO_SNUG_THRESHOLD = 150;
+
+function initSmartScrollRestoration() {
+  if (typeof window === 'undefined') return;
+
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+
+  // Preserve explicit hash navigation (e.g. #menu, #drops)
+  if (window.location.hash) {
+    setupScrollSaver();
+    return;
+  }
+
+  try {
+    const raw = localStorage.getItem(SCROLL_CACHE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      const isFresh = Date.now() - (data.time || 0) < MAX_SCROLL_AGE_MS;
+      if (isFresh && typeof data.y === 'number' && data.y > HERO_SNUG_THRESHOLD) {
+        window.scrollTo(0, data.y);
+        window.addEventListener('load', () => {
+          if (!window.location.hash) {
+            window.scrollTo(0, data.y);
+          }
+        }, { once: true });
+        setupScrollSaver();
+        return;
+      }
+    }
+  } catch (_) {}
+
+  // First-time visit, expired (>24h), or was within hero: start snug at top
+  window.scrollTo(0, 0);
+  window.addEventListener('load', () => {
+    if (!window.location.hash && window.scrollY < HERO_SNUG_THRESHOLD) {
+      window.scrollTo(0, 0);
+    }
+  }, { once: true });
+
+  setupScrollSaver();
+}
+
+function setupScrollSaver() {
+  let saveTimer = null;
+  const persist = () => {
+    try {
+      localStorage.setItem(SCROLL_CACHE_KEY, JSON.stringify({
+        y: Math.round(window.scrollY),
+        time: Date.now()
+      }));
+    } catch (_) {}
+  };
+
+  window.addEventListener('scroll', () => {
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(persist, 400);
+  }, { passive: true });
+
+  window.addEventListener('pagehide', persist, { passive: true });
+  window.addEventListener('beforeunload', persist, { passive: true });
+}
+
+initSmartScrollRestoration();
+
+/**
  * ============================================================================
  * PROMOS & SEASONAL EVENTS TOGGLE
  * ============================================================================

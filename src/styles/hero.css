@@ -4,9 +4,11 @@
 
 .hero-section {
   position: relative;
-  min-height: 90vh;
-  padding-top: calc(var(--header-height) + 32px);
-  padding-bottom: 72px;
+  min-height: calc(100vh - 28px);
+  min-height: calc(100dvh - 28px);
+  height: auto;
+  padding-top: calc(var(--header-height) + clamp(16px, 2.5vh, 32px));
+  padding-bottom: clamp(16px, 2.5vh, 32px);
   background: radial-gradient(120% 80% at 75% 40%, #2949ff 0%, var(--electric-blue) 60%, #152bb5 100%);
   overflow: hidden;
   display: flex;
@@ -274,7 +276,7 @@
 .tagline-row .letter-chunky {
   font-family: var(--font-headline);
   font-weight: 900;
-  font-size: clamp(3.8rem, 8.5vw, 5.4rem);
+  font-size: clamp(3.0rem, min(8.5vw, 9.5vh), 5.4rem);
   text-transform: uppercase;
   color: var(--white);
   text-shadow: 0 4px 24px rgba(10, 20, 60, 0.45);
@@ -291,7 +293,7 @@
 .ampersand-chunky {
   font-family: var(--font-headline);
   font-weight: 900;
-  font-size: clamp(3.6rem, 8.0vw, 5.0rem);
+  font-size: clamp(2.8rem, min(8.0vw, 9.0vh), 5.0rem);
   color: var(--golden-amber);
   margin-left: 2px;
   text-shadow: 0 4px 18px rgba(245, 166, 35, 0.4);
@@ -315,7 +317,7 @@
 .script-crafted-fatseed {
   font-family: var(--font-script);
   font-weight: 700;
-  font-size: clamp(4.0rem, 9.0vw, 5.8rem);
+  font-size: clamp(3.2rem, min(9.0vw, 10.2vh), 5.8rem);
   color: #ff6b9d;
   transform: rotate(-4deg);
   display: inline-block;
@@ -326,7 +328,7 @@
 .bay-chunky {
   font-family: var(--font-headline);
   font-weight: 900;
-  font-size: clamp(3.0rem, 6.8vw, 4.4rem);
+  font-size: clamp(2.4rem, min(6.8vw, 7.8vh), 4.4rem);
   text-transform: uppercase;
   color: var(--white);
   letter-spacing: -0.03em;
@@ -382,16 +384,18 @@
   perspective: 1200px;
   position: relative;
   width: 100%;
-  min-height: 460px;
+  min-height: 0;
   box-sizing: border-box;
 }
 
 .hero-3d-card {
   position: relative;
   width: 100%;
-  max-width: 440px;
-  height: 480px;
-  min-height: 480px;
+  max-width: min(440px, calc((100dvh - var(--header-height) - 80px) * 0.92));
+  height: auto;
+  aspect-ratio: 11 / 12;
+  max-height: min(480px, calc(100dvh - var(--header-height) - 80px));
+  min-height: 280px;
   transform-style: preserve-3d;
   cursor: default;
 }
