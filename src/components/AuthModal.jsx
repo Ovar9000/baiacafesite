@@ -121,7 +121,7 @@ export default function AuthModal({
     <div className="auth-card">
       <div className="auth-header-icon">
         <img 
-          src="/images/baia-cup-icon.webp" 
+          src="/images/baia-cup-black.webp" 
           alt="BAIA Café" 
           style={{ width: '28px', height: '28px', objectFit: 'contain' }} 
         />
@@ -254,7 +254,7 @@ export default function AuthModal({
             padding: '18px 14px',
             marginBottom: '18px',
             fontSize: '0.88rem',
-            color: '#16255C',
+            color: '#131314',
             lineHeight: '1.5'
           }}>
             Open the email from <strong>Supabase / BAIA Café</strong> and tap <strong>"Sign in"</strong> to open your loyalty card automatically.
@@ -295,7 +295,7 @@ export default function AuthModal({
               type="button" 
               onClick={handleSendEmailLink} 
               disabled={emailSending}
-              style={{ background: 'none', border: 'none', color: '#1E4AFF', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: '#131314', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}
             >
               Resend link
             </button>

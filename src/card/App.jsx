@@ -11,7 +11,6 @@ import {
   Coffee, 
   Gift, 
   Award, 
-  Sparkles, 
   LogOut, 
   ChevronRight, 
   QrCode, 
@@ -369,7 +368,6 @@ export default function CardApp() {
             type="button" 
             onClick={() => setShowTutorialModal(true)} 
             className="btn-loyalty-signout" 
-            style={{ background: 'transparent', border: '1px solid #E2E8F0', color: 'var(--loyalty-navy)' }}
             title="How It Works"
           >
             <HelpCircle size={14} />
@@ -540,7 +538,7 @@ export default function CardApp() {
                         disabled={redeeming}
                         style={{
                           flex: 1.5,
-                          background: '#16255C',
+                          background: '#131314',
                           color: '#FFFFFF',
                           border: 'none',
                           padding: '10px',
@@ -659,10 +657,10 @@ export default function CardApp() {
             {todayVoucher ? (
               <div style={{
                 background: '#FFFFFF',
-                border: '1.5px solid #BFDBFE',
+                border: '1.5px solid #E2E8F0',
                 borderRadius: '20px',
                 padding: '16px 18px',
-                boxShadow: '0 4px 16px rgba(37, 99, 235, 0.08)',
+                boxShadow: '0 4px 16px rgba(19, 19, 20, 0.06)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '12px'
@@ -673,8 +671,8 @@ export default function CardApp() {
                       width: '36px',
                       height: '36px',
                       borderRadius: '10px',
-                      background: '#EFF6FF',
-                      color: '#2563EB',
+                      background: '#F1F5F9',
+                      color: '#131314',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
@@ -682,10 +680,10 @@ export default function CardApp() {
                       <Wifi size={18} />
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.68rem', fontWeight: 800, color: '#2563EB', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                      <div style={{ fontSize: '0.68rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                         Active Today
                       </div>
-                      <h4 style={{ fontSize: '0.96rem', color: 'var(--loyalty-navy)', fontWeight: 700, margin: 0 }}>
+                      <h4 style={{ fontSize: '0.96rem', color: '#131314', fontWeight: 700, margin: 0 }}>
                         Beach Wi-Fi Voucher
                       </h4>
                     </div>
@@ -703,8 +701,8 @@ export default function CardApp() {
                 </div>
 
                 <div style={{
-                  background: '#F8FAFC',
-                  border: '1px dashed #93C5FD',
+                  background: '#FAF4EB',
+                  border: '1px dashed rgba(19, 19, 20, 0.16)',
                   borderRadius: '12px',
                   padding: '10px 14px',
                   display: 'flex',
@@ -713,7 +711,7 @@ export default function CardApp() {
                 }}>
                   <div>
                     <div style={{ fontSize: '0.66rem', color: '#64748B', fontWeight: 700, letterSpacing: '0.5px' }}>HOTSPOT CODE</div>
-                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#1E3A8A', letterSpacing: '2.5px', fontFamily: 'monospace' }}>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#131314', letterSpacing: '2.5px', fontFamily: 'monospace' }}>
                       {todayVoucher.code}
                     </div>
                   </div>
@@ -727,7 +725,7 @@ export default function CardApp() {
                       }
                     }}
                     style={{
-                      background: copiedVoucher ? '#16A34A' : 'var(--loyalty-navy)',
+                      background: copiedVoucher ? '#16A34A' : '#131314',
                       color: '#FFFFFF',
                       border: 'none',
                       padding: '8px 14px',
@@ -738,6 +736,7 @@ export default function CardApp() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '5px',
+                      boxShadow: '0 2px 6px rgba(19, 19, 20, 0.15)',
                       transition: 'all 0.2s ease'
                     }}
                   >
@@ -767,12 +766,12 @@ export default function CardApp() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  background: 'linear-gradient(135deg, #16255C 0%, #1E3A8A 100%)',
-                  border: 'none',
+                  background: 'linear-gradient(135deg, #1E1E22 0%, #131314 60%, #0C0C0D 100%)',
+                  border: '1.5px solid rgba(255, 255, 255, 0.12)',
                   padding: '16px 20px',
                   borderRadius: '20px',
                   color: '#FFFFFF',
-                  boxShadow: '0 8px 24px rgba(22, 37, 92, 0.22)',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
                   cursor: 'pointer',
                   textAlign: 'left',
                   transition: 'transform 0.15s ease, box-shadow 0.15s ease'
@@ -838,7 +837,7 @@ export default function CardApp() {
                   position: 'absolute',
                   top: '12px',
                   left: '12px',
-                  background: 'rgba(22, 37, 92, 0.85)',
+                  background: 'rgba(19, 19, 20, 0.85)',
                   backdropFilter: 'blur(6px)',
                   color: '#FFE699',
                   padding: '4px 10px',
@@ -849,13 +848,12 @@ export default function CardApp() {
                   alignItems: 'center',
                   gap: '4px'
                 }}>
-                  <Sparkles size={12} />
                   <span>What's Brewing</span>
                 </div>
               </div>
 
               <div style={{ padding: '16px' }}>
-                <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--loyalty-navy)', fontSize: '1rem', fontWeight: 700, marginBottom: '4px' }}>
+                <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#131314', fontSize: '1rem', fontWeight: 700, marginBottom: '4px' }}>
                   Signature Spanish Latte & Sea Salt Cold Brew
                 </h4>
                 <p style={{ fontSize: '0.8rem', color: '#64748B', lineHeight: '1.4', marginBottom: '12px' }}>
@@ -867,7 +865,7 @@ export default function CardApp() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    color: '#1E4AFF',
+                    color: '#131314',
                     fontSize: '0.82rem',
                     fontWeight: 700,
                     textDecoration: 'none'
@@ -934,7 +932,7 @@ export default function CardApp() {
                   <Trophy size={20} />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--loyalty-navy)', fontWeight: 800, fontFamily: 'Space Grotesk, sans-serif' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#131314', fontWeight: 800, fontFamily: 'Space Grotesk, sans-serif' }}>
                     BAIA Café Collection
                   </h3>
                   <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>
@@ -965,7 +963,7 @@ export default function CardApp() {
                 textAlign: 'center'
               }}>
                 <div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--loyalty-navy)', fontFamily: 'Space Grotesk, sans-serif' }}>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#131314', fontFamily: 'Space Grotesk, sans-serif' }}>
                     Cycle {activeCycleNumber}
                   </div>
                   <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Active Journey</div>
@@ -1039,7 +1037,7 @@ export default function CardApp() {
               ) : (
                 <div style={{ textAlign: 'center', padding: '24px 16px', background: '#FFFFFF', borderRadius: '18px', border: '1px dashed #CBD5E1' }}>
                   <Coffee size={32} color="#94A3B8" style={{ margin: '0 auto 10px' }} />
-                  <h4 style={{ color: 'var(--loyalty-navy)', fontSize: '0.95rem', marginBottom: '4px' }}>
+                  <h4 style={{ color: '#131314', fontSize: '0.95rem', marginBottom: '4px' }}>
                     First Card In Progress
                   </h4>
                   <p style={{ fontSize: '0.78rem', color: '#64748B', maxWidth: '260px', margin: '0 auto' }}>
@@ -1137,11 +1135,11 @@ export default function CardApp() {
           <div className="archive-modal-card" style={{ maxWidth: '440px' }}>
             <div className="archive-modal-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ padding: '8px', background: '#EFF6FF', color: '#1E4AFF', borderRadius: '12px' }}>
+                <div style={{ padding: '8px', background: '#FAF4EB', color: '#131314', borderRadius: '12px', border: '1px solid rgba(19, 19, 20, 0.08)' }}>
                   <HelpCircle size={20} />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--loyalty-navy)', fontWeight: 800, fontFamily: 'Space Grotesk, sans-serif' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#131314', fontWeight: 800, fontFamily: 'Space Grotesk, sans-serif' }}>
                     BAIA Café Loyalty Guide
                   </h3>
                   <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>
@@ -1161,12 +1159,12 @@ export default function CardApp() {
             </div>
 
             <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', gap: '12px', background: '#F8FAFC', padding: '12px 14px', borderRadius: '14px', border: '1px solid #E2E8F0' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#16255C', color: '#FFE699', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
+              <div style={{ display: 'flex', gap: '12px', background: '#FAF4EB', padding: '12px 14px', borderRadius: '14px', border: '1px solid rgba(19, 19, 20, 0.08)' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#131314', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
                   1
                 </div>
                 <div>
-                  <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--loyalty-navy)', margin: '0 0 2px' }}>
+                  <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: '#131314', margin: '0 0 2px' }}>
                     1 Drink = 1 Daily Stamp
                   </h5>
                   <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
@@ -1175,12 +1173,12 @@ export default function CardApp() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', background: '#F8FAFC', padding: '12px 14px', borderRadius: '14px', border: '1px solid #E2E8F0' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#1E4AFF', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
+              <div style={{ display: 'flex', gap: '12px', background: '#FAF4EB', padding: '12px 14px', borderRadius: '14px', border: '1px solid rgba(19, 19, 20, 0.08)' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#131314', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
                   2
                 </div>
                 <div>
-                  <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--loyalty-navy)', margin: '0 0 2px' }}>
+                  <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: '#131314', margin: '0 0 2px' }}>
                     Free Beach Wi-Fi with Every Scan
                   </h5>
                   <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
@@ -1189,12 +1187,12 @@ export default function CardApp() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', background: '#F8FAFC', padding: '12px 14px', borderRadius: '14px', border: '1px solid #E2E8F0' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#15803D', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
+              <div style={{ display: 'flex', gap: '12px', background: '#FAF4EB', padding: '12px 14px', borderRadius: '14px', border: '1px solid rgba(19, 19, 20, 0.08)' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#131314', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
                   3
                 </div>
                 <div>
-                  <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--loyalty-navy)', margin: '0 0 2px' }}>
+                  <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: '#131314', margin: '0 0 2px' }}>
                     Free Coffee Every 10 Stamps
                   </h5>
                   <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
@@ -1225,7 +1223,7 @@ export default function CardApp() {
             }}>
               <Trash2 size={22} />
             </div>
-            <h3 style={{ color: '#16255C', margin: '0 0 8px', fontSize: '1.1rem', fontWeight: 800 }}>
+            <h3 style={{ color: '#131314', margin: '0 0 8px', fontSize: '1.1rem', fontWeight: 800 }}>
               Delete Loyalty Account?
             </h3>
             <p style={{ fontSize: '0.82rem', color: '#64748B', lineHeight: '1.5', margin: '0 0 20px' }}>

@@ -234,7 +234,7 @@ export default function RewardsRosterView({ password, members, setMembers, summa
               type="button"
               onClick={() => setFilterCategory(tab.key)}
               style={{
-                background: filterCategory === tab.key ? '#16255C' : '#F1F5F9',
+                background: filterCategory === tab.key ? '#131314' : '#F1F5F9',
                 color: filterCategory === tab.key ? '#FFFFFF' : '#475569',
                 border: 'none',
                 padding: '6px 12px',
@@ -256,7 +256,7 @@ export default function RewardsRosterView({ password, members, setMembers, summa
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
         {loading && members.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 20px', background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
-            <Loader2 className="animate-spin" size={28} color="#16255C" style={{ margin: '0 auto 12px' }} />
+            <Loader2 className="animate-spin" size={28} color="#131314" style={{ margin: '0 auto 12px' }} />
             <p style={{ fontSize: '0.85rem', color: '#64748B' }}>Loading rewards roster...</p>
           </div>
         ) : filteredMembers.length > 0 ? (

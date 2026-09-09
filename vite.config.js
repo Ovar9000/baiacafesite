@@ -135,7 +135,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'script-defer',
-      includeAssets: ['favicon.ico', 'images/Logo.webp', 'images/crew.webp'],
+      includeAssets: ['favicon.ico', 'images/Logo.webp', 'images/Logo-black.webp', 'images/crew.webp'],
       workbox: {
         navigateFallbackDenylist: [/^\/admin/, /^\/api/],
         cleanupOutdatedCaches: true,

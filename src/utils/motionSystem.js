@@ -83,11 +83,11 @@ class MotionSystem {
     this.currentMetrics.viewportWidth = width;
 
     if (width <= 768) {
-      // Mobile viewport: User confirmed mobile transition is fine (snappy 0.52s spring)
-      this.currentMetrics.logoDuration = '0.52s';
-      this.currentMetrics.pageDuration = '0.42s';
-      this.currentMetrics.fadeDuration = '0.22s';
-      this.currentMetrics.logoEase = 'cubic-bezier(0.34, 1.38, 0.64, 1)';
+      // Mobile viewport: Stutter-free, hardware-accelerated 60fps cross-dissolve & slide
+      this.currentMetrics.logoDuration = '0.75s';
+      this.currentMetrics.pageDuration = '0.70s';
+      this.currentMetrics.fadeDuration = '0.55s';
+      this.currentMetrics.logoEase = 'cubic-bezier(0.4, 0, 0.2, 1)';
     } else if (width <= 1024) {
       // Tablet / Medium viewport
       this.currentMetrics.logoDuration = '1.25s';

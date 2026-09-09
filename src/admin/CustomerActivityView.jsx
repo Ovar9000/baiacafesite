@@ -133,7 +133,7 @@ export default function CustomerActivityView({ password, data, setData, loading,
 
       {loading && !data ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
-          <Loader2 className="animate-spin" size={32} color="#16255C" style={{ margin: '0 auto 12px' }} />
+          <Loader2 className="animate-spin" size={32} color="#131314" style={{ margin: '0 auto 12px' }} />
           <p style={{ fontSize: '0.9rem', color: '#64748B' }}>Loading customer activity metrics...</p>
         </div>
       ) : (
@@ -303,7 +303,7 @@ export default function CustomerActivityView({ password, data, setData, loading,
           <div style={{ background: '#FFFFFF', padding: 'clamp(16px, 3vw, 24px)', borderRadius: '16px', border: '1px solid #E2E8F0', width: '100%', boxSizing: 'border-box' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-                <Activity size={18} style={{ color: '#16255C', flexShrink: 0 }} />
+                <Activity size={18} style={{ color: '#131314', flexShrink: 0 }} />
                 <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>Recent Customer Activity Stream</h3>
               </div>
 
@@ -320,7 +320,7 @@ export default function CustomerActivityView({ password, data, setData, loading,
                       key={f.id}
                       onClick={() => setActivityFilter(f.id)}
                       style={{
-                        background: activityFilter === f.id ? '#16255C' : 'transparent',
+                        background: activityFilter === f.id ? '#131314' : 'transparent',
                         color: activityFilter === f.id ? '#FFFFFF' : '#64748B',
                         border: 'none',
                         padding: '4px 12px',

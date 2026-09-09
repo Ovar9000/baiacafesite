@@ -8,7 +8,7 @@ export default function PrivacyPolicyApp() {
         
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid #F1F5F9', paddingBottom: '16px' }}>
-          <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#16255C', textDecoration: 'none', fontWeight: 700, fontSize: '0.88rem' }}>
+          <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#131314', textDecoration: 'none', fontWeight: 700, fontSize: '0.88rem' }}>
             <ArrowLeft size={16} />
             <span>Back to Baia Café</span>
           </a>
@@ -23,7 +23,7 @@ export default function PrivacyPolicyApp() {
           <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#D97706', textTransform: 'uppercase', letterSpacing: '1px' }}>
             Legal &amp; Transparency
           </span>
-          <h1 style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#16255C', fontSize: '1.8rem', fontWeight: 800, margin: '6px 0 10px' }}>
+          <h1 style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#131314', fontSize: '1.8rem', fontWeight: 800, margin: '6px 0 10px' }}>
             Privacy Policy
           </h1>
           <p style={{ color: '#64748B', fontSize: '0.88rem', margin: 0 }}>
@@ -35,7 +35,7 @@ export default function PrivacyPolicyApp() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontSize: '0.92rem', lineHeight: '1.7', color: '#334155' }}>
           
           <section>
-            <h2 style={{ fontSize: '1.15rem', color: '#16255C', fontWeight: 700, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.15rem', color: '#131314', fontWeight: 700, marginBottom: '8px' }}>
               1. Overview &amp; Who We Are
             </h2>
             <p>
@@ -47,7 +47,7 @@ export default function PrivacyPolicyApp() {
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.15rem', color: '#16255C', fontWeight: 700, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.15rem', color: '#131314', fontWeight: 700, marginBottom: '8px' }}>
               2. Information We Collect
             </h2>
             <p>
@@ -70,7 +70,7 @@ export default function PrivacyPolicyApp() {
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.15rem', color: '#16255C', fontWeight: 700, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.15rem', color: '#131314', fontWeight: 700, marginBottom: '8px' }}>
               3. How We Use Your Information
             </h2>
             <p>We process your information strictly for the following purposes:</p>
@@ -80,13 +80,13 @@ export default function PrivacyPolicyApp() {
               <li>To notify you and our baristas when you are eligible for complimentary beverage rewards.</li>
               <li>To prevent unauthorized, automated, or fraudulent stamp claims.</li>
             </ul>
-            <p style={{ marginTop: '8px', fontWeight: 600, color: '#16255C' }}>
+            <p style={{ marginTop: '8px', fontWeight: 600, color: '#131314' }}>
               We will never sell, rent, or monetize your personal data to third parties or advertisers.
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.15rem', color: '#16255C', fontWeight: 700, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.15rem', color: '#131314', fontWeight: 700, marginBottom: '8px' }}>
               4. Third-Party Infrastructure &amp; Security
             </h2>
             <p>We use industry-standard enterprise cloud infrastructure to secure your data:</p>
@@ -98,7 +98,7 @@ export default function PrivacyPolicyApp() {
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.15rem', color: '#16255C', fontWeight: 700, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.15rem', color: '#131314', fontWeight: 700, marginBottom: '8px' }}>
               5. Your Rights &amp; Data Deletion
             </h2>
             <p>
@@ -110,15 +110,15 @@ export default function PrivacyPolicyApp() {
               <li>Request the permanent deletion of your account, email, and stamp history.</li>
             </ul>
             <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '14px', padding: '14px 16px', marginTop: '12px' }}>
-              <strong style={{ color: '#16255C' }}>How to Request Data Deletion:</strong>
+              <strong style={{ color: '#131314' }}>How to Request Data Deletion:</strong>
               <p style={{ margin: '4px 0 0', fontSize: '0.88rem' }}>
-                To permanently delete your loyalty account, email us at <a href="mailto:quibotmark@gmail.com" style={{ color: '#1E4AFF', fontWeight: 600 }}>quibotmark@gmail.com</a> with the subject line <em>"Data Deletion Request"</em>. All associated database records will be erased within 48 business hours.
+                To permanently delete your loyalty account, email us at <a href="mailto:quibotmark@gmail.com" style={{ color: '#131314', fontWeight: 600 }}>quibotmark@gmail.com</a> with the subject line <em>"Data Deletion Request"</em>. All associated database records will be erased within 48 business hours.
               </p>
             </div>
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.15rem', color: '#16255C', fontWeight: 700, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.15rem', color: '#131314', fontWeight: 700, marginBottom: '8px' }}>
               6. Contact Us
             </h2>
             <p>
@@ -127,8 +127,8 @@ export default function PrivacyPolicyApp() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.88rem', color: '#475569' }}>
               <div><strong>Entity:</strong> BAIA Café</div>
               <div><strong>Location:</strong> Barangay Laurente, San Pascual, Burias Island, Masbate, Philippines</div>
-              <div><strong>Primary Contact Email:</strong> <a href="mailto:quibotmark@gmail.com" style={{ color: '#1E4AFF', fontWeight: 600 }}>quibotmark@gmail.com</a></div>
-              <div><strong>Official Website:</strong> <a href="https://www.baia.cafe" target="_blank" rel="noreferrer" style={{ color: '#1E4AFF', fontWeight: 600 }}>https://www.baia.cafe</a></div>
+              <div><strong>Primary Contact Email:</strong> <a href="mailto:quibotmark@gmail.com" style={{ color: '#131314', fontWeight: 600 }}>quibotmark@gmail.com</a></div>
+              <div><strong>Official Website:</strong> <a href="https://www.baia.cafe" target="_blank" rel="noreferrer" style={{ color: '#131314', fontWeight: 600 }}>https://www.baia.cafe</a></div>
             </div>
           </section>
 

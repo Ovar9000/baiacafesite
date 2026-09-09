@@ -105,13 +105,13 @@ export default function RedemptionCountdown({ redemptionData, user, onClose }) {
           background: '#FAF4EB',
           borderRadius: '16px',
           padding: '16px',
-          border: '2px dashed #16255C',
+          border: '2px dashed #131314',
           marginBottom: '16px'
         }}>
-          <div style={{ display: 'inline-flex', padding: '10px', background: '#16255C', color: '#FFF', borderRadius: '12px', marginBottom: '8px' }}>
+          <div style={{ display: 'inline-flex', padding: '10px', background: '#131314', color: '#FFF', borderRadius: '12px', marginBottom: '8px' }}>
             <Coffee size={28} />
           </div>
-          <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#16255C', fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase' }}>
+          <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#131314', fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase' }}>
             FREE SPECIALTY COFFEE
           </h3>
           <p style={{ fontSize: '0.82rem', color: '#475569', marginTop: '4px' }}>
@@ -144,7 +144,7 @@ export default function RedemptionCountdown({ redemptionData, user, onClose }) {
           onClick={onClose}
           style={{
             width: '100%',
-            background: '#16255C',
+            background: '#131314',
             color: '#FFFFFF',
             border: 'none',
             padding: '12px',
