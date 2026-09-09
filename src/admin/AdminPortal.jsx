@@ -250,7 +250,7 @@ export default function AdminPortal({ initialTab }) {
               fontSize: '0.78rem',
               fontWeight: activeTab === 'qr' ? 700 : 600,
               color: activeTab === 'qr' ? '#FFFFFF' : '#64748B',
-              background: activeTab === 'qr' ? '#16255C' : '#F1F5F9',
+              background: activeTab === 'qr' ? '#131314' : '#F1F5F9',
               border: 'none',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
@@ -274,7 +274,7 @@ export default function AdminPortal({ initialTab }) {
               fontSize: '0.78rem',
               fontWeight: activeTab === 'rewards' ? 700 : 600,
               color: activeTab === 'rewards' ? '#FFFFFF' : '#64748B',
-              background: activeTab === 'rewards' ? '#16255C' : '#F1F5F9',
+              background: activeTab === 'rewards' ? '#131314' : '#F1F5F9',
               border: 'none',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
@@ -298,7 +298,7 @@ export default function AdminPortal({ initialTab }) {
               fontSize: '0.78rem',
               fontWeight: activeTab === 'activity' ? 700 : 600,
               color: activeTab === 'activity' ? '#FFFFFF' : '#64748B',
-              background: activeTab === 'activity' ? '#16255C' : '#F1F5F9',
+              background: activeTab === 'activity' ? '#131314' : '#F1F5F9',
               border: 'none',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
@@ -388,7 +388,7 @@ export default function AdminPortal({ initialTab }) {
                 type="submit"
                 disabled={authLoading}
                 style={{
-                  background: '#16255C',
+                  background: '#131314',
                   color: '#FFFFFF',
                   padding: '12px 16px',
                   borderRadius: '10px',

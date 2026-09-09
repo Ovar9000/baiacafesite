@@ -124,7 +124,7 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
           }}>
             <code style={{ 
               fontSize: '0.75rem', 
-              color: '#16255C', 
+              color: '#131314', 
               overflow: 'hidden', 
               textOverflow: 'ellipsis', 
               whiteSpace: 'nowrap',
@@ -138,7 +138,7 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
               target="_blank"
               rel="noreferrer"
               style={{
-                background: '#16255C',
+                background: '#131314',
                 color: '#FFF',
                 textDecoration: 'none',
                 padding: '6px 12px',

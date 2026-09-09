@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Digital Loyalty Card — BAIA Café</title>
   <meta name="description" content="Collect coffee stamps and unlock free handcrafted specialty drinks at BAIA Café in San Pascual, Burias Island." />
-  <meta name="theme-color" content="#16255C" />
+  <meta name="theme-color" content="#131314" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -44,17 +44,17 @@
       -webkit-tap-highlight-color: transparent;
     }
     :root {
-      --motion-duration-logo: 1.5s;
-      --motion-duration-page: 1.05s;
-      --motion-duration-fade: 0.65s;
+      --motion-duration-logo: 1.1s;
+      --motion-duration-page: 0.9s;
+      --motion-duration-fade: 0.6s;
       --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1);
     }
     @media (max-width: 768px) {
       :root {
-        --motion-duration-logo: 0.52s;
-        --motion-duration-page: 0.42s;
-        --motion-duration-fade: 0.22s;
-        --motion-ease-logo: cubic-bezier(0.34, 1.38, 0.64, 1);
+        --motion-duration-logo: 0.75s;
+        --motion-duration-page: 0.70s;
+        --motion-duration-fade: 0.55s;
+        --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
     @view-transition {
@@ -64,11 +64,11 @@
       background-color: #FAF4EB;
     }
     ::view-transition-old(root) {
-      animation: pageOldFadeOut var(--motion-duration-fade, 0.65s) cubic-bezier(0.4, 0, 1, 1) both !important;
+      animation: pageOldFadeOut var(--motion-duration-fade, 0.55s) cubic-bezier(0.4, 0, 0.2, 1) both !important;
       z-index: 1;
     }
     ::view-transition-new(root) {
-      animation: pageNewSlideIn var(--motion-duration-page, 1.05s) cubic-bezier(0.16, 1, 0.3, 1) both !important;
+      animation: pageNewSlideIn var(--motion-duration-page, 0.70s) cubic-bezier(0.4, 0, 0.2, 1) both !important;
       z-index: 2;
       mix-blend-mode: normal;
     }
@@ -94,13 +94,24 @@
     }
     ::view-transition-group(baia-brand-logo) {
       z-index: 999;
-      animation-duration: var(--motion-duration-logo, 1.5s);
+      animation-duration: var(--motion-duration-logo, 0.75s);
       animation-timing-function: var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1));
     }
-    ::view-transition-old(baia-brand-logo),
+    ::view-transition-old(baia-brand-logo) {
+      animation: logoFadeOut var(--motion-duration-logo, 0.75s) var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1)) both;
+      mix-blend-mode: normal !important;
+    }
     ::view-transition-new(baia-brand-logo) {
-      animation-duration: var(--motion-duration-logo, 1.5s);
-      animation-timing-function: var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1));
+      animation: logoFadeIn var(--motion-duration-logo, 0.75s) var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1)) both;
+      mix-blend-mode: normal !important;
+    }
+    @keyframes logoFadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    @keyframes logoFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     /* Initial Shell styling for seamless view transition & zero white flash */
@@ -117,7 +128,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(22, 37, 92, 0.08);
+      border-bottom: 1px solid rgba(19, 19, 20, 0.08);
       background: #FAF4EB;
     }
     .loyalty-logo-lockup {
@@ -133,8 +144,8 @@
       min-height: 44px;
       border-radius: 12px;
       object-fit: cover;
-      box-shadow: 0 4px 12px rgba(22, 37, 92, 0.12);
-      border: 1.5px solid rgba(22, 37, 92, 0.08);
+      box-shadow: 0 4px 14px rgba(19, 19, 20, 0.16);
+      border: 1.5px solid rgba(19, 19, 20, 0.12);
       transform: translateZ(0);
       will-change: transform;
     }
@@ -147,7 +158,7 @@
       font-weight: 800;
       font-size: 1.1rem;
       letter-spacing: -0.02em;
-      color: #16255C;
+      color: #131314;
       line-height: 1.1;
     }
     .loyalty-logo-sub {
@@ -159,9 +170,9 @@
       text-transform: uppercase;
     }
     .btn-loyalty-signout {
-      background: #F8FAFC;
+      background: #FFFFFF;
       border: 1px solid #E2E8F0;
-      color: #475569;
+      color: #131314;
       border-radius: 9999px;
       padding: 6px 14px;
       font-size: 0.78rem;
@@ -171,6 +182,14 @@
       align-items: center;
       gap: 6px;
       cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+    }
+    .btn-loyalty-signout:hover {
+      background: #131314;
+      color: #FFFFFF;
+      border-color: #131314;
+      box-shadow: 0 4px 12px rgba(19, 19, 20, 0.15);
     }
     @keyframes spinShell {
       to { transform: rotate(360deg); }
@@ -182,7 +201,7 @@
     <!-- Persistent header — outside React root for uninterrupted view transitions -->
     <header class="loyalty-header" id="loyalty-header-static">
       <a href="/" class="loyalty-logo-lockup" title="Return to BAIA Café">
-        <img src="/images/Logo.webp" alt="BAIA Cafe Logo" class="loyalty-logo-img" />
+        <img src="/images/Logo-black.webp" alt="BAIA Cafe Logo" class="loyalty-logo-img" />
         <div class="loyalty-logo-title-group">
           <div class="loyalty-logo-title">BAIA CAFÉ</div>
           <div class="loyalty-logo-sub">DIGITAL LOYALTY CARD</div>
@@ -194,7 +213,7 @@
       <!-- React renders below the static header -->
       <main class="loyalty-main-content" style="flex: 1; padding: 20px 16px;">
         <div style="text-align: center; padding: 60px 20px;">
-          <div style="width: 38px; height: 38px; border: 3px solid rgba(22, 37, 92, 0.12); border-top-color: #16255C; border-radius: 50%; display: inline-block; animation: spinShell 0.8s linear infinite;"></div>
+          <div style="width: 38px; height: 38px; border: 3px solid rgba(19, 19, 20, 0.12); border-top-color: #131314; border-radius: 50%; display: inline-block; animation: spinShell 0.8s linear infinite;"></div>
           <p style="color: #64748B; margin-top: 16px; font-size: 0.9rem; font-family: 'Outfit', sans-serif;">Loading your loyalty card...</p>
         </div>
       </main>

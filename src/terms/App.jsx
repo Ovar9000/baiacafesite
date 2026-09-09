@@ -8,7 +8,7 @@ export default function TermsApp() {
         
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid #F1F5F9', paddingBottom: '16px' }}>
-          <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#16255C', textDecoration: 'none', fontWeight: 700, fontSize: '0.88rem' }}>
+          <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#131314', textDecoration: 'none', fontWeight: 700, fontSize: '0.88rem' }}>
             <ArrowLeft size={16} />
             <span>Back to Baia Café</span>
           </a>
@@ -20,10 +20,10 @@ export default function TermsApp() {
 
         {/* Title */}
         <div style={{ marginBottom: '28px' }}>
-          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1E4AFF', textTransform: 'uppercase', letterSpacing: '1px' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#131314', textTransform: 'uppercase', letterSpacing: '1px' }}>
             User Agreement
           </span>
-          <h1 style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#16255C', fontSize: '1.8rem', fontWeight: 800, margin: '6px 0 10px' }}>
+          <h1 style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#131314', fontSize: '1.8rem', fontWeight: 800, margin: '6px 0 10px' }}>
             Terms of Service
           </h1>
           <p style={{ color: '#64748B', fontSize: '0.88rem', margin: 0 }}>
@@ -35,7 +35,7 @@ export default function TermsApp() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontSize: '0.92rem', lineHeight: '1.7', color: '#334155' }}>
           
           <section>
-            <h2 style={{ fontSize: '1.15rem', color: '#16255C', fontWeight: 700, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.15rem', color: '#131314', fontWeight: 700, marginBottom: '8px' }}>
               1. Acceptance of Terms
             </h2>
             <p>
@@ -44,7 +44,7 @@ export default function TermsApp() {
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.15rem', color: '#16255C', fontWeight: 700, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.15rem', color: '#131314', fontWeight: 700, marginBottom: '8px' }}>
               2. BAIA Café Loyalty Program Rules
             </h2>
             <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -57,7 +57,7 @@ export default function TermsApp() {
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.15rem', color: '#16255C', fontWeight: 700, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.15rem', color: '#131314', fontWeight: 700, marginBottom: '8px' }}>
               3. User Accounts &amp; Security
             </h2>
             <p>
@@ -66,7 +66,7 @@ export default function TermsApp() {
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.15rem', color: '#16255C', fontWeight: 700, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.15rem', color: '#131314', fontWeight: 700, marginBottom: '8px' }}>
               4. Changes &amp; Termination
             </h2>
             <p>
@@ -75,7 +75,7 @@ export default function TermsApp() {
           </section>
 
           <section>
-            <h2 style={{ fontSize: '1.15rem', color: '#16255C', fontWeight: 700, marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.15rem', color: '#131314', fontWeight: 700, marginBottom: '8px' }}>
               5. Governing Law &amp; Contact
             </h2>
             <p>
@@ -84,7 +84,7 @@ export default function TermsApp() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.88rem', color: '#475569' }}>
               <div><strong>BAIA Café</strong></div>
               <div>Barangay Laurente, San Pascual, Burias Island, Masbate, Philippines</div>
-              <div><strong>Email:</strong> <a href="mailto:quibotmark@gmail.com" style={{ color: '#1E4AFF', fontWeight: 600 }}>quibotmark@gmail.com</a></div>
+              <div><strong>Email:</strong> <a href="mailto:quibotmark@gmail.com" style={{ color: '#131314', fontWeight: 600 }}>quibotmark@gmail.com</a></div>
             </div>
           </section>
 

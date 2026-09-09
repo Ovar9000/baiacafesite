@@ -139,11 +139,11 @@ export default function QrScanner({ onScan, onClose }) {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ padding: '8px', background: '#EFF6FF', color: '#1E4AFF', borderRadius: '10px' }}>
+          <div style={{ padding: '8px', background: '#F1F5F9', color: '#131314', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
             <Camera size={20} />
           </div>
           <div style={{ textAlign: 'left' }}>
-            <h4 style={{ margin: 0, fontSize: '0.95rem', color: 'var(--loyalty-navy)', fontWeight: 700 }}>
+            <h4 style={{ margin: 0, fontSize: '0.95rem', color: '#131314', fontWeight: 700 }}>
               Scan Counter Standee
             </h4>
             <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>
@@ -234,7 +234,7 @@ export default function QrScanner({ onScan, onClose }) {
             alignItems: 'center',
             justifyContent: 'center',
             textAlign: 'center',
-            color: '#16255C',
+            color: '#131314',
             gap: '8px'
           }}>
             <Camera size={32} color="#FB923C" />
@@ -261,7 +261,7 @@ export default function QrScanner({ onScan, onClose }) {
           onClick={() => fileInputRef.current?.click()}
           disabled={isScanningFile}
           style={{
-            background: '#16255C',
+            background: '#131314',
             color: '#FFFFFF',
             border: 'none',
             padding: '12px 16px',
@@ -273,7 +273,7 @@ export default function QrScanner({ onScan, onClose }) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: '8px',
-            boxShadow: '0 4px 12px rgba(22, 37, 92, 0.2)'
+            boxShadow: '0 4px 12px rgba(19, 19, 20, 0.2)'
           }}
         >
           <Camera size={18} />
