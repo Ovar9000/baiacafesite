@@ -25,26 +25,26 @@ export const deliveryConfig = {
       feeSchedule: { baseFee: 20, includedItems: 4, incrementFee: 20, incrementBlock: 4, maxFee: 40 }
     },
     {
-      id: 'nazareno_bolod',
-      name: 'Nazareno – Bolod',
-      fullName: 'Nazareno to Bolod Proper',
+      id: 'bolod',
+      name: 'Bolod',
+      fullName: 'Bolod',
       landmarks: [
         'Barangay Nazareno–Bolod Boundary Marker',
         'NJJL General Merchandise',
-        'Bolod Barangay Hall / Community Center'
+        'Bolod Barangay Hall / Community Center',
+        'San Pascual National High School (Main)',
+        'San Pascual Central School',
+        'San Pascual Municipal Hall & Town Plaza',
+        'St. Paschal Baylon Parish Church'
       ],
       coveragePolygon: [],
       feeSchedule: { baseFee: 120, includedItems: 8, incrementFee: 60, incrementBlock: 8 }
     },
     {
-      id: 'bolod',
-      name: 'Bolod',
-      fullName: 'Bolod',
+      id: 'pantalan',
+      name: 'Pantalan',
+      fullName: 'Pantalan',
       landmarks: [
-        'San Pascual National High School (Main)',
-        'San Pascual Central School',
-        'San Pascual Municipal Hall & Town Plaza',
-        'St. Paschal Baylon Parish Church',
         'San Pascual Public Market (Pamilihan)',
         'LGU Tourism Office',
         'Sunset View Tourist Hotel / Port Lodges',
@@ -54,7 +54,14 @@ export const deliveryConfig = {
       feeSchedule: { baseFee: 120, includedItems: 8, incrementFee: 60, incrementBlock: 8 }
     }
   ],
-  batching: { windowMinutes: 30, mode: 'manual-staff-dispatch' }
+  batching: {
+    windowMinutes: 30,
+    mode: 'customer-choice-batch-or-standard',
+    // Batch delivery costs this fraction of the standard tier fee.
+    batchDiscount: 0.5,
+    // Zones where customers may choose batch delivery (half price, shared trip).
+    batchZones: ['bolod', 'pantalan']
+  }
 };
 
 export function getDeliveryZone(zoneId) {
@@ -68,9 +75,10 @@ export function getZoneLandmarks(zoneId) {
 
 /**
  * Fee from Zone + item count (customer's own cart only — never cross-customer).
+ * Pass { batched: true } for batch delivery (half price, batch-eligible zones only).
  * Returns 0 when zone is unknown/unselected (fee hidden until zone is picked).
  */
-export function calculateDeliveryFee(zoneId, itemCount) {
+export function calculateDeliveryFee(zoneId, itemCount, options = {}) {
   const zone = getDeliveryZone(zoneId);
   if (!zone) return 0;
   const count = Math.max(0, Math.floor(Number(itemCount) || 0));
@@ -79,14 +87,23 @@ export function calculateDeliveryFee(zoneId, itemCount) {
   const extra = Math.max(0, count - includedItems);
   let fee = baseFee + incrementFee * Math.ceil(extra / incrementBlock);
   if (typeof maxFee === 'number') fee = Math.min(fee, maxFee);
+  if (options.batched && isBatchEligible(zoneId)) {
+    fee = Math.round(fee * deliveryConfig.batching.batchDiscount);
+  }
   return fee;
 }
 
+/** Batch delivery (half price, shared trip) is offered in these zones only. */
+export function isBatchEligible(zoneId) {
+  return deliveryConfig.batching.batchZones.includes(zoneId);
+}
+
 /**
- * Delivery Details validation: Zone → Landmark (when the zone lists any) → Directions length.
+ * Delivery Details validation: Zone → Landmark (when the zone lists any) →
+ * Directions length → Speed choice (Standard/Batch, required in batch zones).
  * Returns { valid, error } — error is a human-readable message for toasts.
  */
-export function validateDeliveryDetails({ zoneId, landmark, directions }) {
+export function validateDeliveryDetails({ zoneId, landmark, directions, speed }) {
   const zone = getDeliveryZone(zoneId);
   if (!zone) {
     return { valid: false, error: 'Please select a delivery zone.' };
@@ -103,12 +120,31 @@ export function validateDeliveryDetails({ zoneId, landmark, directions }) {
       error: `Please add delivery directions (at least ${DELIVERY_MIN_DIRECTIONS_LENGTH} characters) so the rider can find you.`
     };
   }
+  if (isBatchEligible(zoneId) && speed !== 'standard' && speed !== 'batch') {
+    return { valid: false, error: 'Please choose Standard or Batch delivery.' };
+  }
   return { valid: true, error: '' };
 }
 
-export function getBatchingNote(zoneName) {
+export function getSpeedLabel(speed) {
+  return speed === 'batch' ? 'Batch (half price)' : 'Standard';
+}
+
+/**
+ * What the customer sees after sending: sets dispatch expectations per speed.
+ * - Standard: rider on the road ~30 minutes after the order is sent.
+ * - Batch: order waits and goes out with the next order to the same area.
+ */
+export function getDeliverySpeedNote(zoneName, speed) {
+  if (speed === 'batch') {
+    return `You've chosen batch delivery — half the fee. Your order goes on the road with the next order to ${zoneName}, whether that's another batch or a standard delivery.`;
+  }
   const mins = deliveryConfig.batching.windowMinutes;
-  return `Deliveries to ${zoneName} are grouped roughly every ${mins} minutes to keep trips efficient — your order goes out with the next batch.`;
+  return `Standard delivery — the rider will be on the road about ${mins} minutes after your order is sent.`;
+}
+
+export function getBatchingNote(zoneName, speed = 'standard') {
+  return getDeliverySpeedNote(zoneName, speed);
 }
 
 /**
