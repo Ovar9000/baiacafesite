@@ -15,37 +15,51 @@ export const deliveryConfig = {
     {
       id: 'laurente',
       name: 'Laurente',
-      fullName: 'Laurente (BAIA Café / Atlaza Resort)',
+      fullName: 'Laurente (Starting Corridor / Northeast)',
       landmarks: [
         'Atlaza Resort',
-        'PLWM Burias Church',
-        'Barangay Nazareno-Bolod Hall',
-        'NJJL General Merchandise',
-        'Pinamasingan Covered Court',
-        'Kilometer Zero (Burias Island)'
+        'BAIA Café',
+        'PLWM Burias Church (Sitio Bocal)'
       ],
       coveragePolygon: [],
       feeSchedule: { baseFee: 20, includedItems: 4, incrementFee: 20, incrementBlock: 4, maxFee: 40 }
     },
     {
-      id: 'bolod',
-      name: 'Bolod',
-      fullName: 'Bolod',
+      id: 'nazareno_bolod',
+      name: 'Nazareno – Bolod',
+      fullName: 'Nazareno to Bolod Transition',
       landmarks: [
-        'Parish of Saint Pascual Baylon',
-        'Stern Inn',
-        'Orchidia Guesthouse',
-        'San Pascual Central School',
-        'Iglesia Ni Cristo - San Pascual'
+        'Nazareno–Bolod Boundary Arch',
+        'Pinamasingan Junction / Covered Court',
+        'NJJL General Merchandise',
+        'Bolod Barangay Hall & Basketball Court'
       ],
       coveragePolygon: [],
       feeSchedule: { baseFee: 120, includedItems: 8, incrementFee: 60, incrementBlock: 8 }
     },
     {
-      id: 'pantalan_port',
+      id: 'bolod_poblacion',
+      name: 'Bolod – Poblacion',
+      fullName: 'Bolod to Poblacion / Terraplin Approach',
+      landmarks: [
+        'San Pascual National High School (Main)',
+        'San Pascual Central School',
+        'San Pascual Municipal Hall & Rizal Plaza',
+        'St. Paschal Baylon Parish Church'
+      ],
+      coveragePolygon: [],
+      feeSchedule: { baseFee: 120, includedItems: 8, incrementFee: 60, incrementBlock: 8 }
+    },
+    {
+      id: 'pantalan',
       name: 'Pantalan / Port Area',
-      fullName: 'Pantalan / Port Area',
-      landmarks: [],
+      fullName: 'Commercial Core to Pantalan (Terminal Area)',
+      landmarks: [
+        'San Pascual Public Market (Pamilihan)',
+        'Kilometer Zero Marker',
+        'Sunset View Tourist Hotel / Port Homestays',
+        'San Pascual Port / Pantalan'
+      ],
       coveragePolygon: [],
       feeSchedule: { baseFee: 120, includedItems: 8, incrementFee: 60, incrementBlock: 8 }
     }
