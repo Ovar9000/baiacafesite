@@ -15,7 +15,7 @@ export const deliveryConfig = {
     {
       id: 'laurente',
       name: 'Laurente',
-      fullName: 'Laurente (Starting Corridor / Northeast)',
+      fullName: 'Laurente (Starting Point / Northeast Coast)',
       landmarks: [
         'Atlaza Resort',
         'BAIA Café',
@@ -27,12 +27,11 @@ export const deliveryConfig = {
     {
       id: 'nazareno_bolod',
       name: 'Nazareno – Bolod',
-      fullName: 'Nazareno to Bolod Transition',
+      fullName: 'Nazareno to Bolod Proper',
       landmarks: [
-        'Nazareno–Bolod Boundary Arch',
-        'Pinamasingan Junction / Covered Court',
+        'Barangay Nazareno–Bolod Boundary Marker',
         'NJJL General Merchandise',
-        'Bolod Barangay Hall & Basketball Court'
+        'Bolod Barangay Hall / Community Center'
       ],
       coveragePolygon: [],
       feeSchedule: { baseFee: 120, includedItems: 8, incrementFee: 60, incrementBlock: 8 }
@@ -40,11 +39,11 @@ export const deliveryConfig = {
     {
       id: 'bolod_poblacion',
       name: 'Bolod – Poblacion',
-      fullName: 'Bolod to Poblacion / Terraplin Approach',
+      fullName: 'Poblacion / Terraplin Approach',
       landmarks: [
         'San Pascual National High School (Main)',
         'San Pascual Central School',
-        'San Pascual Municipal Hall & Rizal Plaza',
+        'San Pascual Municipal Hall & Town Plaza',
         'St. Paschal Baylon Parish Church'
       ],
       coveragePolygon: [],
@@ -53,11 +52,11 @@ export const deliveryConfig = {
     {
       id: 'pantalan',
       name: 'Pantalan / Port Area',
-      fullName: 'Commercial Core to Pantalan (Terminal Area)',
+      fullName: 'Port Area / Pantalan (Terminal End)',
       landmarks: [
         'San Pascual Public Market (Pamilihan)',
-        'Kilometer Zero Marker',
-        'Sunset View Tourist Hotel / Port Homestays',
+        'LGU Tourism Office',
+        'Sunset View Tourist Hotel / Port Lodges',
         'San Pascual Port / Pantalan'
       ],
       coveragePolygon: [],
