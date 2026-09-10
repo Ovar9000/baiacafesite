@@ -12,6 +12,7 @@
 
 import updatesData from '../data/updates.json';
 import { cartStore } from './cartStore.js';
+import { escapeHtml, sanitizeUrl, sanitizeImageUrl } from '../utils/sanitize.js';
 
 export function initNewDrops() {
   const container = document.getElementById('new-drops-root');
@@ -161,43 +162,43 @@ export function initNewDrops() {
           }
 
           return `
-            <article class="drop-card drop-card-${item.category}" style="--stagger-index: ${index};" data-drop-id="${item.id}">
+            <article class="drop-card drop-card-${item.category}" style="--stagger-index: ${index};" data-drop-id="${escapeHtml(item.id)}">
               <!-- Visual Media Area -->
               <div class="drop-media-frame">
                 <img 
-                  src="${item.image_url || './images/Baia%20skimboard%20and%20coffee.webp'}" 
-                  alt="${item.title}" 
+                  src="${sanitizeImageUrl(item.image_url)}" 
+                  alt="${escapeHtml(item.title)}" 
                   loading="lazy" 
                   decoding="async" 
                   class="drop-image"
-                  onerror="this.src='./images/Baia%20skimboard%20and%20coffee.webp';"
+                  data-fallback-src="./images/Baia%20skimboard%20and%20coffee.webp"
                 />
                 
                 <!-- Floating Category & Live Drop Badge -->
                 <div class="drop-badge-row">
                   <span class="drop-pill-badge ${badgeClass}">
-                    ${badgeLabel}
+                    ${escapeHtml(badgeLabel)}
                   </span>
-                  <span class="drop-time-pill" title="${item.published_at}">
-                    ${timeAgo}
+                  <span class="drop-time-pill" title="${escapeHtml(item.published_at)}">
+                    ${escapeHtml(timeAgo)}
                   </span>
                 </div>
 
                 ${(isGiveaway && isGiveawayConcluded) ? `
                   <div class="drop-date-tag tag-winner">
-                    Winner: ${item.winner || 'Cassandra Espinosa'}
+                    Winner: ${escapeHtml(item.winner || 'Cassandra Espinosa')}
                   </div>
                 ` : (item.winner ? `
                   <div class="drop-date-tag tag-winner">
-                    Winner: ${item.winner}
+                    Winner: ${escapeHtml(item.winner)}
                   </div>
                 ` : (!isEvent && item.price ? `
                   <div class="drop-price-tag">
-                    ${item.price}
+                    ${escapeHtml(item.price)}
                   </div>
                 ` : (item.event_date ? `
                   <div class="drop-date-tag">
-                    ${formatEventDate(item.event_date)}
+                    ${escapeHtml(formatEventDate(item.event_date))}
                   </div>
                 ` : (isAdvisory ? `
                   <div class="drop-date-tag tag-advisory">
@@ -209,27 +210,27 @@ export function initNewDrops() {
               <!-- Content Area -->
               <div class="drop-content-body">
                 <div class="drop-meta-line">
-                  <span class="drop-category-label">${categoryLabel}</span>
-                  ${(isGiveaway && isGiveawayConcluded) ? `<span class="drop-date-label status-winner">Winner: ${item.winner || 'Cassandra Espinosa'}</span>` : (item.winner ? `<span class="drop-date-label status-winner">Winner: ${item.winner}</span>` : (item.event_date ? `<span class="drop-date-label">${formatEventDate(item.event_date)}</span>` : (isAdvisory ? `<span class="drop-date-label status-open">Open Regular Hours</span>` : '')))}
+                  <span class="drop-category-label">${escapeHtml(categoryLabel)}</span>
+                  ${(isGiveaway && isGiveawayConcluded) ? `<span class="drop-date-label status-winner">Winner: ${escapeHtml(item.winner || 'Cassandra Espinosa')}</span>` : (item.winner ? `<span class="drop-date-label status-winner">Winner: ${escapeHtml(item.winner)}</span>` : (item.event_date ? `<span class="drop-date-label">${escapeHtml(formatEventDate(item.event_date))}</span>` : (isAdvisory ? `<span class="drop-date-label status-open">Open Regular Hours</span>` : '')))}
                 </div>
 
-                <h3 class="drop-card-title">${item.title}</h3>
-                <p class="drop-card-desc">${item.description}</p>
+                <h3 class="drop-card-title">${escapeHtml(item.title)}</h3>
+                <p class="drop-card-desc">${escapeHtml(item.description)}</p>
 
                 <!-- Actions Footer -->
                 <div class="drop-card-actions">
                   ${!isEvent && priceNum > 0 ? `
-                    <button class="btn-drop-order" data-order-drop="${item.id}" data-title="${encodeURIComponent(item.title)}" data-price="${priceNum}">
-                      <span>Order (${item.price})</span>
+                    <button class="btn-drop-order" data-order-drop="${escapeHtml(item.id)}" data-title="${encodeURIComponent(item.title)}" data-price="${priceNum}">
+                      <span>Order (${escapeHtml(item.price)})</span>
                     </button>
                   ` : (isGiveaway ? `
                     ${isGiveawayConcluded ? `
-                      <a href="${item.permalink || 'https://facebook.com/thebaiacafe'}" target="_blank" rel="noopener" class="btn-drop-order btn-drop-winner">
+                      <a href="${sanitizeUrl(item.permalink || 'https://facebook.com/thebaiacafe', 'https://facebook.com/thebaiacafe')}" target="_blank" rel="noopener" class="btn-drop-order btn-drop-winner">
                         <span>View Winner</span>
                         <span aria-hidden="true">↗</span>
                       </a>
                     ` : `
-                      <a href="${item.permalink || 'https://facebook.com/thebaiacafe'}" target="_blank" rel="noopener" class="btn-drop-order btn-drop-giveaway">
+                      <a href="${sanitizeUrl(item.permalink || 'https://facebook.com/thebaiacafe', 'https://facebook.com/thebaiacafe')}" target="_blank" rel="noopener" class="btn-drop-order btn-drop-giveaway">
                         <span>Enter Giveaway</span>
                         <span aria-hidden="true">→</span>
                       </a>
@@ -250,7 +251,7 @@ export function initNewDrops() {
                   `)))}
 
                   ${item.permalink ? `
-                    <a href="${item.permalink}" target="_blank" rel="noopener" class="btn-drop-fb" title="View original post on Facebook" aria-label="View original Facebook post">
+                    <a href="${sanitizeUrl(item.permalink, 'https://facebook.com/thebaiacafe')}" target="_blank" rel="noopener" class="btn-drop-fb" title="View original post on Facebook" aria-label="View original Facebook post">
                       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                       </svg>
@@ -325,6 +326,17 @@ export function initNewDrops() {
       track.addEventListener('scroll', updateNavButtons, { passive: true });
       updateNavButtons();
     }
+
+    // CSP-safe image fallback (no inline onerror)
+    container.querySelectorAll('img[data-fallback-src]').forEach((img) => {
+      img.addEventListener('error', () => {
+        const fb = img.getAttribute('data-fallback-src');
+        if (fb && img.src !== fb && !img.dataset.fbk) {
+          img.dataset.fbk = '1';
+          img.src = fb;
+        }
+      });
+    });
 
     // Attach Order Buttons to CartStore
     container.querySelectorAll('[data-order-drop]').forEach(btn => {

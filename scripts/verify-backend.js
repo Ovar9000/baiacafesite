@@ -30,7 +30,10 @@ if (fs.existsSync(ENV_FILE)) {
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://cqtcmrqlafgtcrcfaojz.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-const DAILY_QR_SECRET = process.env.DAILY_QR_SECRET || '***REMOVED_DAILY_QR_SECRET***';
+const DAILY_QR_SECRET = process.env.DAILY_QR_SECRET || '';
+if (!DAILY_QR_SECRET) {
+  console.error('  ⚠️ WARN: DAILY_QR_SECRET is not set — QR checks will fail closed (no hardcoded fallback).');
+}
 const CAFE_TIMEZONE = process.env.CAFE_TIMEZONE || 'Asia/Manila';
 
 let totalTests = 0;

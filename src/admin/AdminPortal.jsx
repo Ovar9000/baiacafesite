@@ -22,6 +22,7 @@ function getTabFromPath() {
 export default function AdminPortal({ initialTab }) {
   const [activeTab, setActiveTab] = useState(initialTab || getTabFromPath());
   const [password, setPassword] = useState('');
+  const [adminSession, setAdminSession] = useState(() => sessionStorage.getItem('baia_admin_session') || '');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -53,34 +54,44 @@ export default function AdminPortal({ initialTab }) {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Check saved session password on mount
+  // Check saved admin SESSION (signed, 8h) on mount — never store raw password
   useEffect(() => {
-    const savedPass = sessionStorage.getItem('baia_admin_pass');
-    if (savedPass) {
-      setPassword(savedPass);
-      validateSavedPass(savedPass);
+    const savedSession = sessionStorage.getItem('baia_admin_session');
+    if (savedSession) {
+      validateSavedSession(savedSession);
     }
   }, []);
 
-  const validateSavedPass = async (pass) => {
+  const validateSavedSession = async (sess) => {
     try {
       setAuthLoading(true);
       setAuthError('');
-      // Test credentials against token endpoint
-      const res = await fetch('/api/admin-token', {
+      // Validate session token against token endpoint (password empty)
+      const res = await fetch('/api/admin-rewards', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pass })
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Session': sess },
+        body: JSON.stringify({ adminSession: sess })
       });
-      const data = await res.json();
       if (!res.ok) {
-        sessionStorage.removeItem('baia_admin_pass');
+        sessionStorage.removeItem('baia_admin_session');
         setIsAuthenticated(false);
-        setAuthError(data.error || 'Session expired. Please log in again.');
+        setAuthError('Session expired. Please log in again.');
         return;
       }
-      setTokenData(data);
+      // Session valid — fetch daily token with same session
+      const tRes = await fetch('/api/admin-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Session': sess },
+        body: JSON.stringify({ adminSession: sess, password: '' })
+      });
+      // admin-token requires password for issuance; fall back to asking login for QR
+      // Mark authenticated for roster/activity, QR tab will prompt re-login if needed
       setIsAuthenticated(true);
+      setAdminSession(sess);
+      if (tRes.ok) {
+        const tData = await tRes.json();
+        if (tData?.token) setTokenData(tData);
+      }
     } catch (err) {
       setIsAuthenticated(false);
       setAuthError('Connection error validating admin session.');
@@ -110,7 +121,13 @@ export default function AdminPortal({ initialTab }) {
 
       setTokenData(data);
       setIsAuthenticated(true);
-      sessionStorage.setItem('baia_admin_pass', password);
+      // Store only the short-lived signed session — clear raw password from memory/storage
+      if (data.adminSession) {
+        sessionStorage.setItem('baia_admin_session', data.adminSession);
+        setAdminSession(data.adminSession);
+      }
+      sessionStorage.removeItem('baia_admin_pass');
+      setPassword('');
     } catch (err) {
       setAuthError(err.message || 'Authentication failed.');
       setIsAuthenticated(false);
@@ -120,8 +137,10 @@ export default function AdminPortal({ initialTab }) {
   };
 
   const handleLock = () => {
+    sessionStorage.removeItem('baia_admin_session');
     sessionStorage.removeItem('baia_admin_pass');
     setIsAuthenticated(false);
+    setAdminSession('');
     setPassword('');
     setTokenData(null);
     setRewardsMembers([]);
@@ -135,17 +154,29 @@ export default function AdminPortal({ initialTab }) {
     window.history.pushState(null, '', targetUrl);
   };
 
+  const authHeaders = (sess) => ({
+    'Content-Type': 'application/json',
+    ...(sess ? { 'X-Admin-Session': sess } : {})
+  });
+
   const fetchDailyToken = async (pass) => {
     try {
       setLoadingToken(true);
+      const sess = adminSession || sessionStorage.getItem('baia_admin_session') || '';
       const res = await fetch('/api/admin-token', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pass || password })
+        headers: authHeaders(sess),
+        body: JSON.stringify(sess ? { adminSession: sess } : { password: pass || password })
       });
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.token) {
         setTokenData(data);
+        if (data.adminSession) {
+          sessionStorage.setItem('baia_admin_session', data.adminSession);
+          setAdminSession(data.adminSession);
+        }
+      } else if (res.status === 401) {
+        handleLock();
       }
     } catch (err) {
       console.error('Error fetching token:', err);
@@ -157,15 +188,18 @@ export default function AdminPortal({ initialTab }) {
   const fetchRewards = async (pass) => {
     try {
       setLoadingRewards(true);
+      const sess = adminSession || sessionStorage.getItem('baia_admin_session') || '';
       const res = await fetch('/api/admin-rewards', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pass || password })
+        headers: authHeaders(sess),
+        body: JSON.stringify(sess ? { adminSession: sess } : { password: pass || password })
       });
       const data = await res.json();
       if (res.ok) {
         setRewardsMembers(data.members || []);
         setRewardsSummary(data.summary || { totalMembers: 0, readyCount: 0, nearingCount: 0 });
+      } else if (res.status === 401) {
+        handleLock();
       }
     } catch (err) {
       console.error('Error fetching rewards:', err);
@@ -177,14 +211,17 @@ export default function AdminPortal({ initialTab }) {
   const fetchActivity = async (pass) => {
     try {
       setLoadingActivity(true);
+      const sess = adminSession || sessionStorage.getItem('baia_admin_session') || '';
       const res = await fetch('/api/admin-activity', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pass || password })
+        headers: authHeaders(sess),
+        body: JSON.stringify(sess ? { adminSession: sess } : { password: pass || password })
       });
       const data = await res.json();
       if (res.ok) {
         setActivityData(data);
+      } else if (res.status === 401) {
+        handleLock();
       }
     } catch (err) {
       console.error('Error fetching activity:', err);
@@ -406,7 +443,7 @@ export default function AdminPortal({ initialTab }) {
           <div key={activeTab} className="admin-tab-pane">
             {activeTab === 'qr' && (
               <DailyStandeeView 
-                password={password}
+                password={adminSession || password}
                 tokenData={tokenData}
                 setTokenData={setTokenData}
                 loadingToken={loadingToken}
@@ -416,7 +453,7 @@ export default function AdminPortal({ initialTab }) {
 
             {activeTab === 'rewards' && (
               <RewardsRosterView 
-                password={password}
+                password={adminSession || password}
                 members={rewardsMembers}
                 setMembers={setRewardsMembers}
                 summary={rewardsSummary}
@@ -429,7 +466,7 @@ export default function AdminPortal({ initialTab }) {
 
             {activeTab === 'activity' && (
               <CustomerActivityView 
-                password={password}
+                password={adminSession || password}
                 data={activityData}
                 setData={setActivityData}
                 loading={loadingActivity}

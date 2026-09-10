@@ -1,6 +1,10 @@
 import crypto from 'crypto';
 
-const DAILY_QR_SECRET = process.env.DAILY_QR_SECRET || '***REMOVED_DAILY_QR_SECRET***';
+const DAILY_QR_SECRET = process.env.DAILY_QR_SECRET;
+if (!DAILY_QR_SECRET) {
+  console.error('Missing DAILY_QR_SECRET env var. Refusing to use hardcoded fallback.');
+  process.exit(1);
+}
 const CAFE_LAT = 13.6218;
 const CAFE_LNG = 123.1948;
 const CAFE_TIMEZONE = 'Asia/Manila';
@@ -29,5 +33,5 @@ console.log(`   http://localhost:5173/claim?t=${token}`);
 console.log(`   https://baia.cafe/claim?t=${token}`);
 console.log('4. ADMIN PORTAL:');
 console.log('   URL: http://localhost:5173/admin/');
-console.log('   Password: baia-admin-2026');
+console.log('   Password: <use ADMIN_PASSWORD from .env — never hardcode>');
 console.log('--------------------------------------------------');

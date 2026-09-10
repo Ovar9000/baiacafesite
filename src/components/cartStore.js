@@ -228,11 +228,13 @@ class CartStore {
   }
 
   showToast(title, message, icon = '✓') {
+    const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    const safeIcon = ['✓', '!', '×'].includes(icon) ? icon : '✓';
     const toast = {
       id: Date.now() + Math.random(),
       title,
       message,
-      icon
+      icon: safeIcon
     };
     this.toasts.push(toast);
 
@@ -242,10 +244,10 @@ class CartStore {
       toastEl.className = 'toast-item';
       toastEl.setAttribute('role', 'alert');
       toastEl.innerHTML = `
-        <div class="toast-icon" aria-hidden="true">${icon}</div>
+        <div class="toast-icon" aria-hidden="true">${esc(safeIcon)}</div>
         <div class="toast-content">
-          <h4>${title}</h4>
-          <p>${message}</p>
+          <h4>${esc(title)}</h4>
+          <p>${esc(message)}</p>
         </div>
       `;
       toastContainer.appendChild(toastEl);

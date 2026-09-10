@@ -264,15 +264,17 @@ export function initHero3D() {
 export function showShowcaseToast(title, message, icon = '✓') {
   const container = document.getElementById('toast-container');
   if (!container) return;
+  const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  const safeIcon = ['✓', '!', '×'].includes(icon) ? icon : '✓';
 
   const toast = document.createElement('div');
   toast.className = 'toast-item';
   toast.setAttribute('role', 'alert');
   toast.innerHTML = `
-    <div class="toast-icon" aria-hidden="true">${icon}</div>
+    <div class="toast-icon" aria-hidden="true">${esc(safeIcon)}</div>
     <div class="toast-content">
-      <h4>${title}</h4>
-      <p>${message}</p>
+      <h4>${esc(title)}</h4>
+      <p>${esc(message)}</p>
     </div>
   `;
   container.appendChild(toast);

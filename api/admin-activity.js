@@ -1,62 +1,15 @@
-import crypto from 'crypto';
-import fs from 'fs';
-import path from 'path';
 import { createClient } from '@supabase/supabase-js';
-
-function getEnvVar(key, defaultValue = '') {
-  if (process.env[key]) return process.env[key];
-  try {
-    const envPath = path.resolve(process.cwd(), '.env');
-    if (fs.existsSync(envPath)) {
-      const content = fs.readFileSync(envPath, 'utf-8');
-      const regex = new RegExp(`^${key}\\s*=\\s*(.+)$`, 'm');
-      const match = content.match(regex);
-      if (match) {
-        const val = match[1].trim().replace(/^["']|["']$/g, '');
-        process.env[key] = val;
-        return val;
-      }
-    }
-  } catch (e) {}
-  return defaultValue;
-}
-
-function setCorsHeaders(req, res) {
-  const origin = req.headers.origin;
-  const allowedOrigins = ['https://www.baia.cafe', 'https://baia.cafe'];
-  const isAllowed = origin && (
-    allowedOrigins.includes(origin) ||
-    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin) ||
-    /^http:\/\/localhost(:\d+)?$/.test(origin) ||
-    /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
-  );
-
-  if (isAllowed) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', 'https://www.baia.cafe');
-  }
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-}
-
-function safeVerifyAdminPassword(providedPassword) {
-  if (!providedPassword || typeof providedPassword !== 'string') return false;
-  const expectedPassword = getEnvVar('ADMIN_PASSWORD');
-  if (!expectedPassword || typeof expectedPassword !== 'string') return false;
-  const providedBuf = Buffer.from(providedPassword, 'utf8');
-  const expectedBuf = Buffer.from(expectedPassword, 'utf8');
-  if (providedBuf.length !== expectedBuf.length) return false;
-  return crypto.timingSafeEqual(providedBuf, expectedBuf);
-}
+import { setCorsHeaders, isRateLimited, isAdminAuthenticated, getSupabaseConfig, getRequiredEnv } from './_security.js';
 
 function getSupabaseAdmin() {
-  const supabaseUrl = getEnvVar('SUPABASE_URL') || getEnvVar('NEXT_PUBLIC_SUPABASE_URL') || getEnvVar('VITE_SUPABASE_URL') || 'https://cqtcmrqlafgtcrcfaojz.supabase.co';
-  const serviceKey = getEnvVar('SUPABASE_SERVICE_ROLE_KEY');
-  if (!supabaseUrl || !serviceKey) return null;
-  return createClient(supabaseUrl, serviceKey, {
-    auth: { persistSession: false, autoRefreshToken: false }
-  });
+  try {
+    const { url, serviceKey } = getSupabaseConfig();
+    return createClient(url, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
+  } catch {
+    return null;
+  }
 }
 
 function getManilaHour(dateString) {
@@ -97,14 +50,22 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  if (!getEnvVar('ADMIN_PASSWORD')) {
+  const rl = isRateLimited(req, 'admin-activity', 30, 60_000);
+  if (rl.limited) {
+    res.setHeader('Retry-After', String(rl.retryAfter));
+    return res.status(429).json({ error: 'Too many requests. Please try again shortly.' });
+  }
+
+  try {
+    getRequiredEnv('ADMIN_PASSWORD');
+  } catch {
     console.error('Server configuration error: ADMIN_PASSWORD environment variable is missing.');
     return res.status(500).json({ error: 'Server authentication configuration error. ADMIN_PASSWORD is not set.' });
   }
 
   try {
-    const { password } = req.body || {};
-    if (!safeVerifyAdminPassword(password)) {
+    if (!isAdminAuthenticated(req).ok) {
+      await new Promise((r) => setTimeout(r, 300));
       return res.status(401).json({ error: 'Invalid admin credentials.' });
     }
 
