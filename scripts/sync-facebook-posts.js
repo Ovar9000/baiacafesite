@@ -1,10 +1,13 @@
 /**
  * BAIA Cafe — Facebook → Website Sync Agent
- * 
+ *
  * Pipeline:
- * 1. Scheduled GitHub Action or local trigger calls Facebook Graph API for recent Page posts.
- * 2. Deterministic code filter: if attachments.data[0].type === "share", skip immediately.
- * 3. Non-share posts sent to LLM with strict classification prompt & few-shot examples.
+ * 1. Scheduled GitHub Action or local trigger calls Facebook Graph API for
+ *    recent Page posts AND tagged posts (`/posts` + `/tagged` edges).
+ * 2. Deterministic code filter: pure reshares with no BAIA commentary are
+ *    skipped; shares WITH BAIA commentary + image are kept for classification
+ *    (see scripts/fb-post-utils.js `shouldSkipShareForDrops`).
+ * 3. Non-skipped posts sent to LLM with strict classification prompt & few-shot examples.
  * 4. Merges classified new releases/events into src/data/updates.json & sync-state.json.
  * 5. Changes committed to repo, triggering automatic Vercel/Netlify deployment.
  */
@@ -13,6 +16,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
+import {
+  buildPostsUrl,
+  buildTaggedUrl,
+  extractImageUrls as extractSharedImageUrls,
+  shouldSkipShareForDrops,
+  isTrivialPost as isTrivialSharedPost,
+  markSource,
+  mergePostEdges,
+} from './fb-post-utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -243,10 +255,15 @@ async function fetchFacebookPosts(pageId, token, sinceId = null) {
   }
 
   let effectiveToken = token;
-  const endpoint = (t) => `https://graph.facebook.com/v19.0/${encodeURIComponent(pageId)}/posts?fields=id,message,created_time,permalink_url,attachments{media_type,type,media,subattachments,unshimmed_url},comments.limit(25){message,from,created_time}&limit=60&access_token=${encodeURIComponent(t)}`;
+  // `full_picture` + expanded `subattachments{media{image{src}}}` are required:
+  // share-wrappers carry no `media.image.src` — the photo lives in subattachments
+  // or `full_picture`. Tagged posts live on the `/tagged` edge, not `/posts`.
+  const postsEndpoint = (t) => buildPostsUrl(pageId, t, 60);
+  const taggedEndpoint = (t) => buildTaggedUrl(pageId, t, 60);
+  const endpoint = postsEndpoint;
   
-  console.log(`📡 [Fetch] Querying Facebook Graph API for page: ${pageId}...`);
-  let response = await fetch(endpoint(effectiveToken));
+  console.log(`📡 [Fetch] Querying Facebook Graph API for page: ${pageId} (/posts + /tagged)...`);
+  let response = await fetch(postsEndpoint(effectiveToken));
   let responseText = await response.text();
   
   if (!response.ok) {
@@ -268,7 +285,7 @@ async function fetchFacebookPosts(pageId, token, sinceId = null) {
         if (directData && directData.access_token) {
           console.log(`🔑 [Auth Success] Retrieved Page Access Token for "${directData.name}" (ID: ${directData.id})!`);
           effectiveToken = directData.access_token;
-          response = await fetch(endpoint(effectiveToken));
+          response = await fetch(postsEndpoint(effectiveToken));
           responseText = await response.text();
         } else {
           // Fallback to /me/accounts
@@ -279,7 +296,7 @@ async function fetchFacebookPosts(pageId, token, sinceId = null) {
             if (pageObj && pageObj.access_token) {
               console.log(`🔑 [Auth Success] Found Page Access Token for "${pageObj.name}" via accounts list!`);
               effectiveToken = pageObj.access_token;
-              response = await fetch(endpoint(effectiveToken));
+              response = await fetch(postsEndpoint(effectiveToken));
               responseText = await response.text();
             }
           }
@@ -303,27 +320,39 @@ async function fetchFacebookPosts(pageId, token, sinceId = null) {
   }
 
   const data = JSON.parse(responseText);
-  return data.data || [];
+  const pagePosts = markSource(data.data || [], 'posts');
+
+  // Second edge: posts where BAIA is tagged (invisible on /posts).
+  // Failure here must not fail the whole sync — drops still update from /posts.
+  let taggedPosts = [];
+  try {
+    const taggedRes = await fetch(taggedEndpoint(effectiveToken));
+    if (taggedRes.ok) {
+      const taggedData = await taggedRes.json().catch(() => null);
+      taggedPosts = markSource(taggedData?.data || [], 'tagged');
+      if (taggedPosts.length > 0) {
+        console.log(`📥 [Fetch] Also retrieved ${taggedPosts.length} tagged post(s) via /tagged edge.`);
+      }
+    } else {
+      console.warn(`⚠️ [/tagged] Skipped (HTTP ${taggedRes.status}); continuing with /posts only.`);
+    }
+  } catch (taggedErr) {
+    console.warn('⚠️ [/tagged] Fetch failed, continuing with /posts only:', taggedErr.message);
+  }
+
+  return mergePostEdges(pagePosts, taggedPosts);
 }
 
 /**
- * Step 2: Deterministic code filters
+ * Step 2: Deterministic code filters (delegated to scripts/fb-post-utils.js
+ * so drops + photowall + tests share one policy).
  */
 function isSharePost(post) {
-  const firstAttachment = post.attachments?.data?.[0];
-  if (!firstAttachment) return false;
-  if (firstAttachment.type === 'share') return true;
-  if (firstAttachment.media_type === 'link' && !post.message) return true;
-  return false;
+  return shouldSkipShareForDrops(post);
 }
 
 function isTrivialPost(post) {
-  const msg = (post.message || '').trim();
-  if (!msg) return true;
-  // If caption is mostly emojis or fewer than 6 alphanumeric characters without keywords
-  const stripped = msg.replace(/[\p{Emoji}\s\p{P}]/gu, '');
-  if (stripped.length < 6) return true;
-  return false;
+  return isTrivialSharedPost(post);
 }
 
 function isExpiredClosurePost(post) {
@@ -337,30 +366,11 @@ function isExpiredClosurePost(post) {
 }
 
 /**
- * Extract best image URLs from post attachments
+ * Extract best image URLs from post attachments.
+ * Delegates to shared utils: wrapper media → ALL subattachments → full_picture.
  */
 function extractImageUrls(post) {
-  const images = [];
-  const attachments = post.attachments?.data || [];
-  
-  for (const att of attachments) {
-    if (att.media?.image?.src) {
-      images.push(att.media.image.src);
-    }
-    if (att.subattachments?.data) {
-      for (const sub of att.subattachments.data) {
-        if (sub.media?.image?.src) {
-          images.push(sub.media.image.src);
-        }
-      }
-    }
-  }
-  
-  if (images.length === 0 && post.full_picture) {
-    images.push(post.full_picture);
-  }
-  
-  return images;
+  return extractSharedImageUrls(post);
 }
 
 /**
@@ -622,7 +632,7 @@ async function runSync() {
 
     // Step 2: Deterministic checks in code
     if (isSharePost(post)) {
-      console.log(`⏭️ [Deterministic Skip] Post is a shared story/link. Skipping.`);
+      console.log(`⏭️ [Deterministic Skip] Pure reshare with no BAIA commentary/image. Skipping.`);
       continue;
     }
 

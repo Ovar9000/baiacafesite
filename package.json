@@ -11,7 +11,8 @@
     "audit": "node run-preview-audit.js",
     "sync:fb": "node scripts/sync-facebook-posts.js",
     "sync:fb:mock": "node scripts/sync-facebook-posts.js --test-mock",
-    "sync:community": "node scripts/sync-guest-photos.js"
+    "sync:community": "node scripts/sync-guest-photos.js",
+    "test:fb": "node --test \"tests/*.test.js\""
   },
   "devDependencies": {
     "lighthouse": "^12.8.2",

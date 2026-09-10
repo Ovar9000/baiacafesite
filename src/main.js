@@ -9,6 +9,7 @@ import { initLiquidFloaties } from './components/liquidFloaties.js';
 import { initWeatherEasterEgg } from './components/weatherEasterEgg.js';
 import { initCartDrawer } from './components/cartDrawer.js';
 import { initNewDrops } from './components/newDrops.js';
+import { initCommunityWall } from './components/communityWall.js';
 import { injectSpeedInsights } from '@vercel/speed-insights';
 import { inject } from '@vercel/analytics';
 
@@ -182,6 +183,9 @@ function initApp() {
   safeInit('boardsRental', initBoardsRental);
   safeInit('cartDrawer', initCartDrawer);
   safeInit('seasonalPromos', initSeasonalPromosToggle);
+  // Hydrate fresh shared/tagged community photos BEFORE binding the lightbox
+  // so dynamically prepended cards also open in the modal.
+  safeInit('communityWall', initCommunityWall);
   safeInit('polaroidWall', initPolaroidWall);
 
   // Defer non-critical ambient features to idle time
@@ -271,9 +275,9 @@ function initPolaroidWall() {
   const modalAuthor = document.getElementById('polaroid-modal-author');
   const modalMeta = document.getElementById('polaroid-modal-meta');
   const modalFbBtn = document.getElementById('polaroid-modal-fb-btn');
-  const cards = document.querySelectorAll('.mosaic-photo-card');
 
-  if (!modal || !cards.length) return;
+  if (!modal) return;
+  if (!document.querySelector('.mosaic-photo-card')) return;
 
   const openModal = (card) => {
     card.blur();
@@ -304,17 +308,20 @@ function initPolaroidWall() {
     document.body.style.overflow = '';
   };
 
-  cards.forEach((card) => {
-    card.addEventListener('click', (e) => {
-      e.preventDefault();
-      openModal(card);
-    });
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        openModal(card);
-      }
-    });
+  // Delegated binding so runtime-hydrated community cards
+  // (prepended by initCommunityWall after fetch) also open the modal.
+  document.addEventListener('click', (e) => {
+    const card = e.target?.closest?.('.mosaic-photo-card');
+    if (!card || !document.contains(card)) return;
+    e.preventDefault();
+    openModal(card);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const card = e.target?.closest?.('.mosaic-photo-card');
+    if (!card) return;
+    e.preventDefault();
+    openModal(card);
   });
 
   closeBtn?.addEventListener('click', closeModal);
