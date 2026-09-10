@@ -130,7 +130,7 @@
 
 .spot-options-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
 
@@ -332,6 +332,11 @@
   font-weight: 700;
 }
 
+.drawer-total-row.delivery-row {
+  color: var(--deep-navy);
+  font-weight: 700;
+}
+
 .drawer-total-row.grand-total-row {
   font-size: 1.15rem;
   font-weight: 900;
@@ -522,4 +527,97 @@
   font-family: var(--font-mono);
   font-weight: 800;
   color: #D97706;
+}
+
+/* Delivery Details Section (visible only when Order Type = Delivery) */
+#delivery-details-root {
+  flex-shrink: 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.delivery-details-card {
+  background: #FFFBEB;
+  border-top: 2px solid var(--golden-amber);
+  padding: 14px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.delivery-details-title {
+  font-family: var(--font-mono);
+  font-size: 0.725rem;
+  font-weight: 800;
+  color: #92400E;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.delivery-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.delivery-field > label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--deep-navy);
+}
+
+.delivery-field select,
+.delivery-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #cbd5e1;
+  background: #FFFFFF;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--deep-navy);
+}
+
+.delivery-field select:focus,
+.delivery-field textarea:focus {
+  outline: none;
+  border-color: var(--golden-amber);
+  box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.2);
+}
+
+.delivery-field textarea {
+  min-height: 64px;
+  resize: vertical;
+}
+
+.delivery-field.field-error select,
+.delivery-field.field-error textarea {
+  border-color: #DC2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.delivery-hint {
+  font-size: 0.75rem;
+  color: #64748B;
+  line-height: 1.45;
+}
+
+.delivery-fee-preview {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--deep-navy);
+  background: #FFFFFF;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.delivery-batching-note {
+  font-size: 0.78rem;
+  color: #15803D;
+  background: #F0FDF4;
+  border: 1px solid #86EFAC;
+  border-radius: 10px;
+  padding: 10px 12px;
+  line-height: 1.5;
 }
