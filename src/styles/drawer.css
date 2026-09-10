@@ -556,7 +556,7 @@
   width: 100%;
   background: none;
   border: none;
-  padding: 0;
+  padding: 4px 0;
   cursor: pointer;
   text-align: left;
 }
@@ -578,11 +578,28 @@
 
 .delivery-toggle-action {
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 0.72rem;
   font-weight: 800;
-  color: #B45309;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  color: #FFFFFF;
+  background: var(--deep-navy);
+  padding: 6px 12px;
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+}
+
+.dd-toggle-chevron {
+  font-size: 0.65rem;
+  line-height: 1;
+  transition: transform 0.18s ease;
+}
+
+.delivery-details-toggle[aria-expanded="true"] .dd-toggle-chevron {
+  transform: rotate(180deg);
 }
 
 .delivery-details-title {

@@ -302,7 +302,7 @@ export function initCartDrawer() {
       <div class="delivery-details-card${deliveryCollapsed ? ' is-collapsed' : ''}">
         <button type="button" class="delivery-details-toggle" id="delivery-toggle" aria-expanded="${deliveryCollapsed ? 'false' : 'true'}">
           <span class="delivery-details-title">Delivery Details${nowValid ? ' · ✓' : ''}</span>
-          ${deliveryCollapsed ? `<span class="delivery-summary">${esc(zone.name)} · ${esc(d.landmark)}${speedLabel ? ` · ${esc(speedLabel)}` : ''} · ${esc(store.formatCurrency(totals.deliveryFee))}</span><span class="delivery-toggle-action">Edit</span>` : `<span class="delivery-toggle-action">Hide</span>`}
+          ${deliveryCollapsed ? `<span class="delivery-summary">${esc(zone.name)} · ${esc(d.landmark)}${speedLabel ? ` · ${esc(speedLabel)}` : ''} · ${esc(store.formatCurrency(totals.deliveryFee))}</span><span class="delivery-toggle-action">Edit <span class="dd-toggle-chevron" aria-hidden="true">▾</span></span>` : `<span class="delivery-toggle-action">Hide <span class="dd-toggle-chevron" aria-hidden="true">▾</span></span>`}
         </button>
         ${deliveryCollapsed ? '' : `
         <div class="delivery-field${deliveryErrors.zone ? ' field-error' : ''}">
