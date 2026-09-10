@@ -104,6 +104,8 @@ export function initCartDrawer() {
       btn.setAttribute('aria-pressed', 'true');
       cartStore.orderType = btn.dataset.spot || 'Dine-In at Cafe';
       cartStore.showToast('Order Type Set', `${cartStore.orderType}`);
+      // Notify so the Delivery Details section + fee rows render immediately
+      cartStore.notify();
     });
   });
 
