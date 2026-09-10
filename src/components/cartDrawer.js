@@ -288,6 +288,11 @@ export function initCartDrawer() {
     const batchEligible = isBatchEligible(d.zoneId);
     const speedLabel = d.speed === 'batch' ? 'Batch' : d.speed === 'standard' ? 'Standard' : '';
 
+    // Collapsed summary must never crash on an empty/unfinished form
+    const summaryText = !zone
+      ? 'Tap to set zone, landmark & directions'
+      : `${zone.name} · ${d.landmark || '—'}${speedLabel ? ` · ${speedLabel}` : ''} · ${totals.deliveryFee > 0 ? store.formatCurrency(totals.deliveryFee) : '—'}`;
+
     const feePreview = (() => {
       if (!zone || totals.deliveryFee <= 0) return '';
       return `<div class="delivery-fee-preview">Delivery Fee (${esc(zone.name)}): ${esc(store.formatCurrency(totals.deliveryFee))}</div>`;
@@ -313,7 +318,7 @@ export function initCartDrawer() {
         ${deliveryCollapsed ? `
         <button type="button" class="delivery-details-toggle" id="delivery-toggle" aria-expanded="false" aria-label="Expand delivery details">
           <span class="delivery-details-title">Delivery Details${nowValid ? ' · ✓' : ''}</span>
-          <span class="delivery-summary">${esc(zone.name)} · ${esc(d.landmark)}${speedLabel ? ` · ${esc(speedLabel)}` : ''} · ${esc(store.formatCurrency(totals.deliveryFee))}</span>
+          <span class="delivery-summary">${esc(summaryText)}</span>
           <span class="dd-toggle-chevron" aria-hidden="true">▾</span>
         </button>` : `
         <div class="delivery-details-title">Delivery Details${nowValid ? ' · ✓' : ''}</div>`}
