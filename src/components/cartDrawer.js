@@ -30,6 +30,9 @@ export function initCartDrawer() {
 
   // Field-level validation flags for the Delivery Details section (cleared on fix)
   let deliveryErrors = {};
+  // Collapsed once the section first becomes valid, so the items list stays visible
+  let deliveryCollapsed = false;
+  let wasDeliveryValid = false;
 
   // Ensure initial inert state
   if (panel && !cartStore.isDrawerOpen) {
@@ -211,6 +214,17 @@ export function initCartDrawer() {
     const landmarks = zone ? zone.landmarks : [];
     const totals = store.getTotals();
 
+    // Auto-collapse the moment the section becomes valid (never auto-expand).
+    // Invalid sections always stay expanded so the problem field is visible.
+    const nowValid = validateDeliveryDetails(d).valid;
+    if (!nowValid) {
+      wasDeliveryValid = false;
+      deliveryCollapsed = false;
+    } else if (!wasDeliveryValid) {
+      deliveryCollapsed = true;
+      wasDeliveryValid = true;
+    }
+
     const zoneOptions = deliveryConfig.zones.map((z) =>
       `<option value="${esc(z.id)}"${d.zoneId === z.id ? ' selected' : ''}>${esc(z.fullName)}</option>`
     ).join('');
@@ -228,8 +242,12 @@ export function initCartDrawer() {
       : '';
 
     deliveryRoot.innerHTML = `
-      <div class="delivery-details-card">
-        <div class="delivery-details-title">Delivery Details</div>
+      <div class="delivery-details-card${deliveryCollapsed ? ' is-collapsed' : ''}">
+        <button type="button" class="delivery-details-toggle" id="delivery-toggle" aria-expanded="${deliveryCollapsed ? 'false' : 'true'}">
+          <span class="delivery-details-title">Delivery Details${nowValid ? ' · ✓' : ''}</span>
+          ${deliveryCollapsed ? `<span class="delivery-summary">${esc(zone.name)} · ${esc(d.landmark)} · ${esc(store.formatCurrency(totals.deliveryFee))}</span><span class="delivery-toggle-action">Edit</span>` : `<span class="delivery-toggle-action">Hide</span>`}
+        </button>
+        ${deliveryCollapsed ? '' : `
         <div class="delivery-field${deliveryErrors.zone ? ' field-error' : ''}">
           <label for="delivery-zone-select">Delivery Zone *</label>
           <select id="delivery-zone-select" aria-label="Delivery zone">
@@ -248,9 +266,15 @@ export function initCartDrawer() {
           <textarea id="delivery-directions-input" placeholder="e.g. Blue gate, 2nd house past the sari-sari store" aria-label="Additional delivery directions">${esc(d.directions || '')}</textarea>
         </div>
         ${feePreview}
-        <div class="delivery-hint">Contact is handled through Messenger — no phone number needed. Landmark + directions are enough for the rider to find you.</div>
+        <div class="delivery-hint">Further updates and rider coordination will be handled through Messenger.</div>
+        `}
       </div>
     `;
+
+    deliveryRoot.querySelector('#delivery-toggle')?.addEventListener('click', () => {
+      deliveryCollapsed = !deliveryCollapsed;
+      renderDeliverySection(cartStore);
+    });
 
     deliveryRoot.querySelector('#delivery-zone-select')?.addEventListener('change', (e) => {
       delete deliveryErrors.zone;
