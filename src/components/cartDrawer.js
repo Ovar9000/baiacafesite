@@ -37,6 +37,14 @@ export function initCartDrawer() {
   let wasDeliveryValid = false;
   // Which custom dropdown menu is open ('zone' | 'landmark' | null)
   let openMenu = null;
+  // Set when the expand toggle wants the next render to animate open
+  let animateOpenOnRender = false;
+
+  function prefersReducedMotion() {
+    return typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
 
   // Close an open delivery dropdown on outside tap or Escape (registered once)
   document.addEventListener('click', (e) => {
@@ -310,6 +318,8 @@ export function initCartDrawer() {
         </button>` : `
         <div class="delivery-details-title">Delivery Details${nowValid ? ' · ✓' : ''}</div>`}
         ${deliveryCollapsed ? '' : `
+        <div class="delivery-collapse-body">
+        <div class="delivery-collapse-inner">
         <div class="delivery-field${deliveryErrors.zone ? ' field-error' : ''}">
           <span class="delivery-label" id="delivery-zone-label">Delivery Zone *</span>
           <div class="dd-wrap${openMenu === 'zone' ? ' open' : ''}">
@@ -341,13 +351,44 @@ export function initCartDrawer() {
           <span>Show less</span>
           <span class="dd-toggle-chevron" aria-hidden="true">▴</span>
         </button>
+        </div>
+        </div>
         `}
       </div>
     `;
 
+    // Play the open animation when the expand toggle requested it
+    if (animateOpenOnRender && !deliveryCollapsed) {
+      animateOpenOnRender = false;
+      const body = deliveryRoot.querySelector('.delivery-collapse-body');
+      if (body && !prefersReducedMotion()) {
+        body.classList.add('pre-open');
+        requestAnimationFrame(() => requestAnimationFrame(() => body.classList.remove('pre-open')));
+      }
+    }
+
     deliveryRoot.querySelector('#delivery-toggle')?.addEventListener('click', () => {
-      deliveryCollapsed = !deliveryCollapsed;
-      renderDeliverySection(cartStore);
+      if (deliveryCollapsed) {
+        // Expand: render open, then animate the body from closed → open
+        deliveryCollapsed = false;
+        animateOpenOnRender = true;
+        renderDeliverySection(cartStore);
+      } else {
+        // Collapse: animate the body closed first, then swap to the summary row
+        const card = deliveryRoot.querySelector('.delivery-details-card');
+        const body = deliveryRoot.querySelector('.delivery-collapse-body');
+        if (!card || !body || prefersReducedMotion()) {
+          deliveryCollapsed = true;
+          renderDeliverySection(cartStore);
+          return;
+        }
+        card.classList.add('is-closing');
+        openMenu = null;
+        setTimeout(() => {
+          deliveryCollapsed = true;
+          renderDeliverySection(cartStore);
+        }, 260);
+      }
     });
 
     deliveryRoot.querySelector('#delivery-zone-btn')?.addEventListener('click', (e) => {
