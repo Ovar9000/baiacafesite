@@ -33,6 +33,22 @@ export function initCartDrawer() {
   // Collapsed once the section first becomes valid, so the items list stays visible
   let deliveryCollapsed = false;
   let wasDeliveryValid = false;
+  // Which custom dropdown menu is open ('zone' | 'landmark' | null)
+  let openMenu = null;
+
+  // Close an open delivery dropdown on outside tap or Escape (registered once)
+  document.addEventListener('click', (e) => {
+    if (openMenu && deliveryRoot && !deliveryRoot.contains(e.target)) {
+      openMenu = null;
+      renderDeliverySection(cartStore);
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && openMenu && deliveryRoot?.contains(document.activeElement)) {
+      openMenu = null;
+      renderDeliverySection(cartStore);
+    }
+  });
 
   // Ensure initial inert state
   if (panel && !cartStore.isDrawerOpen) {
@@ -132,7 +148,7 @@ export function initCartDrawer() {
         deliveryErrors = flagDeliveryErrors(cartStore.delivery);
         renderDeliverySection(cartStore);
         cartStore.showToast('Delivery Details Incomplete', v.error, '!');
-        document.getElementById('delivery-zone-select')?.focus();
+        document.getElementById('delivery-zone-btn')?.focus();
         return;
       }
       deliveryErrors = {};
@@ -225,17 +241,34 @@ export function initCartDrawer() {
       wasDeliveryValid = true;
     }
 
-    const zoneOptions = deliveryConfig.zones.map((z) =>
-      `<option value="${esc(z.id)}"${d.zoneId === z.id ? ' selected' : ''}>${esc(z.fullName)}</option>`
-    ).join('');
+    const zoneOptions = deliveryConfig.zones.map((z) => {
+      const feeHint = `from ₱${z.feeSchedule.baseFee}` + (typeof z.feeSchedule.maxFee === 'number' ? ` · max ₱${z.feeSchedule.maxFee}` : '');
+      const selected = d.zoneId === z.id;
+      return `
+        <button type="button" class="dd-option${selected ? ' is-selected' : ''}" data-zone-id="${esc(z.id)}" role="option" aria-selected="${selected}">
+          <span class="dd-check" aria-hidden="true">${selected ? '✓' : ''}</span>
+          <span class="dd-label">${esc(z.fullName)}</span>
+          <span class="dd-sub">${esc(feeHint)}</span>
+        </button>`;
+    }).join('');
 
     const landmarkOptions = !zone
-      ? '<option value="">Select a zone first</option>'
+      ? ''
+      : landmarks.map((lm) => {
+        const selected = d.landmark === lm;
+        return `
+          <button type="button" class="dd-option${selected ? ' is-selected' : ''}" data-landmark="${esc(lm)}" role="option" aria-selected="${selected}">
+            <span class="dd-check" aria-hidden="true">${selected ? '✓' : ''}</span>
+            <span class="dd-label">${esc(lm)}</span>
+          </button>`;
+      }).join('');
+
+    const landmarkBtnLabel = !zone
+      ? 'Select a zone first'
       : landmarks.length === 0
-        ? '<option value="">No landmarks listed yet — describe the location below</option>'
-        : `<option value="">Choose nearest landmark</option>` + landmarks.map((lm) =>
-          `<option value="${esc(lm)}"${d.landmark === lm ? ' selected' : ''}>${esc(lm)}</option>`
-        ).join('');
+        ? 'No landmarks listed yet — describe the location below'
+        : (d.landmark || 'Choose nearest landmark');
+    const landmarkDisabled = !zone || landmarks.length === 0;
 
     const feePreview = zone && totals.deliveryFee > 0
       ? `<div class="delivery-fee-preview">Delivery Fee (${esc(zone.name)}): ${esc(store.formatCurrency(totals.deliveryFee))} · based on ${totals.itemCount} item${totals.itemCount === 1 ? '' : 's'}</div>`
@@ -249,17 +282,24 @@ export function initCartDrawer() {
         </button>
         ${deliveryCollapsed ? '' : `
         <div class="delivery-field${deliveryErrors.zone ? ' field-error' : ''}">
-          <label for="delivery-zone-select">Delivery Zone *</label>
-          <select id="delivery-zone-select" aria-label="Delivery zone">
-            <option value="">Choose delivery zone</option>
-            ${zoneOptions}
-          </select>
+          <span class="delivery-label" id="delivery-zone-label">Delivery Zone *</span>
+          <div class="dd-wrap${openMenu === 'zone' ? ' open' : ''}">
+            <button type="button" class="dd-btn" id="delivery-zone-btn" aria-labelledby="delivery-zone-label delivery-zone-btn" aria-haspopup="listbox" aria-expanded="${openMenu === 'zone'}">
+              <span class="dd-value${d.zoneId ? '' : ' is-placeholder'}">${esc(zone ? zone.fullName : 'Choose delivery zone')}</span>
+              <span class="dd-chevron" aria-hidden="true">▾</span>
+            </button>
+            ${openMenu === 'zone' ? `<div class="dd-menu" role="listbox" aria-label="Delivery zone">${zoneOptions}</div>` : ''}
+          </div>
         </div>
         <div class="delivery-field${deliveryErrors.landmark ? ' field-error' : ''}">
-          <label for="delivery-landmark-select">Nearest Landmark${landmarks.length > 0 ? ' *' : ''}</label>
-          <select id="delivery-landmark-select" aria-label="Nearest landmark"${!zone || landmarks.length === 0 ? ' disabled' : ''}>
-            ${landmarkOptions}
-          </select>
+          <span class="delivery-label" id="delivery-landmark-label">Nearest Landmark${landmarks.length > 0 ? ' *' : ''}</span>
+          <div class="dd-wrap${openMenu === 'landmark' ? ' open' : ''}">
+            <button type="button" class="dd-btn" id="delivery-landmark-btn" aria-labelledby="delivery-landmark-label delivery-landmark-btn" aria-haspopup="listbox" aria-expanded="${openMenu === 'landmark'}"${landmarkDisabled ? ' disabled' : ''}>
+              <span class="dd-value${d.landmark ? '' : ' is-placeholder'}">${esc(landmarkBtnLabel)}</span>
+              <span class="dd-chevron" aria-hidden="true">▾</span>
+            </button>
+            ${openMenu === 'landmark' && !landmarkDisabled ? `<div class="dd-menu" role="listbox" aria-label="Nearest landmark">${landmarkOptions}</div>` : ''}
+          </div>
         </div>
         <div class="delivery-field${deliveryErrors.directions ? ' field-error' : ''}">
           <label for="delivery-directions-input">Additional Directions *</label>
@@ -276,15 +316,37 @@ export function initCartDrawer() {
       renderDeliverySection(cartStore);
     });
 
-    deliveryRoot.querySelector('#delivery-zone-select')?.addEventListener('change', (e) => {
-      delete deliveryErrors.zone;
-      delete deliveryErrors.landmark;
-      cartStore.setDelivery({ zoneId: e.target.value, landmark: '' });
+    deliveryRoot.querySelector('#delivery-zone-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openMenu = openMenu === 'zone' ? null : 'zone';
+      renderDeliverySection(cartStore);
+      if (openMenu === 'zone') deliveryRoot.querySelector('#delivery-zone-btn')?.focus();
     });
 
-    deliveryRoot.querySelector('#delivery-landmark-select')?.addEventListener('change', (e) => {
-      delete deliveryErrors.landmark;
-      cartStore.setDelivery({ landmark: e.target.value });
+    deliveryRoot.querySelector('#delivery-landmark-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openMenu = openMenu === 'landmark' ? null : 'landmark';
+      renderDeliverySection(cartStore);
+      if (openMenu === 'landmark') deliveryRoot.querySelector('#delivery-landmark-btn')?.focus();
+    });
+
+    deliveryRoot.querySelectorAll('[data-zone-id]').forEach((opt) => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openMenu = null;
+        delete deliveryErrors.zone;
+        delete deliveryErrors.landmark;
+        cartStore.setDelivery({ zoneId: opt.dataset.zoneId, landmark: '' });
+      });
+    });
+
+    deliveryRoot.querySelectorAll('[data-landmark]').forEach((opt) => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openMenu = null;
+        delete deliveryErrors.landmark;
+        cartStore.setDelivery({ landmark: opt.dataset.landmark });
+      });
     });
 
     // Direct assignment without notify: avoids re-render (and focus loss) while typing.
