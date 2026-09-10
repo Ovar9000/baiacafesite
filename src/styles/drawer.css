@@ -538,10 +538,51 @@
 .delivery-details-card {
   background: #FFFBEB;
   border-top: 2px solid var(--golden-amber);
-  padding: 14px 20px 16px;
+  padding: 12px 20px 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+}
+
+.delivery-details-card.is-collapsed {
+  padding: 10px 20px;
+  gap: 0;
+}
+
+.delivery-details-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.delivery-details-toggle .delivery-details-title {
+  flex-shrink: 0;
+}
+
+.delivery-summary {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--deep-navy);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.delivery-toggle-action {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #B45309;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .delivery-details-title {
@@ -586,7 +627,7 @@
 }
 
 .delivery-field textarea {
-  min-height: 64px;
+  min-height: 54px;
   resize: vertical;
 }
 
