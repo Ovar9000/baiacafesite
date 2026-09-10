@@ -600,7 +600,8 @@
   gap: 4px;
 }
 
-.delivery-field > label {
+.delivery-field > label,
+.delivery-field > .delivery-label {
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--deep-navy);
@@ -626,13 +627,151 @@
   box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.2);
 }
 
+/* Custom dropdown (replaces native select popup) */
+.dd-wrap {
+  position: relative;
+}
+
+.dd-btn {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid #cbd5e1;
+  background: #FFFFFF;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--deep-navy);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dd-btn:hover {
+  border-color: #94a3b8;
+}
+
+.dd-wrap.open .dd-btn,
+.dd-btn:focus-visible {
+  outline: none;
+  border-color: var(--golden-amber);
+  box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.25);
+}
+
+.dd-btn:disabled {
+  background: #F1F5F9;
+  color: #94A3B8;
+  cursor: not-allowed;
+}
+
+.dd-value {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.dd-value.is-placeholder {
+  font-weight: 500;
+  color: #64748B;
+}
+
+.dd-chevron {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: #B45309;
+  transition: transform 0.18s ease;
+  line-height: 1;
+}
+
+.dd-wrap.open .dd-chevron {
+  transform: rotate(180deg);
+}
+
+.dd-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  background: #FFFFFF;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+  padding: 6px;
+  max-height: 228px;
+  overflow-y: auto;
+  animation: dd-pop 0.16s ease;
+}
+
+@keyframes dd-pop {
+  from { opacity: 0; transform: translateY(-5px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dd-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--deep-navy);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease;
+}
+
+.dd-option:hover {
+  background: #FFFBEB;
+}
+
+.dd-option.is-selected {
+  background: #FFFBEB;
+  font-weight: 800;
+}
+
+.dd-check {
+  flex-shrink: 0;
+  width: 16px;
+  font-weight: 900;
+  color: #D97706;
+}
+
+.dd-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.dd-sub {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #B45309;
+  background: #FEF3C7;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
 .delivery-field textarea {
   min-height: 54px;
   resize: vertical;
 }
 
 .delivery-field.field-error select,
-.delivery-field.field-error textarea {
+.delivery-field.field-error textarea,
+.delivery-field.field-error .dd-btn {
   border-color: #DC2626;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
 }
