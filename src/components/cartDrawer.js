@@ -3,10 +3,7 @@ import { menuData, getAvailableDrinkAddOns } from '../data/menuData.js';
 import {
   deliveryConfig,
   getDeliveryZone,
-  isBatchEligible,
   validateDeliveryDetails,
-  getDeliverySpeedNote,
-  getSpeedLabel,
   DELIVERY_MIN_DIRECTIONS_LENGTH
 } from '../data/deliveryZones.js';
 
@@ -223,9 +220,6 @@ export function initCartDrawer() {
     if ((delivery.directions || '').trim().length < DELIVERY_MIN_DIRECTIONS_LENGTH) {
       flags.directions = true;
     }
-    if (isBatchEligible(delivery.zoneId) && delivery.speed !== 'standard' && delivery.speed !== 'batch') {
-      flags.speed = true;
-    }
     return flags;
   }
 
@@ -257,13 +251,12 @@ export function initCartDrawer() {
     }
 
     const zoneOptions = deliveryConfig.zones.map((z) => {
-      const feeHint = `from ₱${z.feeSchedule.baseFee}` + (typeof z.feeSchedule.maxFee === 'number' ? ` · max ₱${z.feeSchedule.maxFee}` : '');
       const selected = d.zoneId === z.id;
       return `
         <button type="button" class="dd-option${selected ? ' is-selected' : ''}" data-zone-id="${esc(z.id)}" role="option" aria-selected="${selected}">
           <span class="dd-check" aria-hidden="true">${selected ? '✓' : ''}</span>
           <span class="dd-label">${esc(z.fullName)}</span>
-          <span class="dd-sub">${esc(feeHint)}</span>
+          <span class="dd-sub">₱${z.flatFee}</span>
         </button>`;
     }).join('');
 
@@ -285,33 +278,15 @@ export function initCartDrawer() {
         : (d.landmark || 'Choose nearest landmark');
     const landmarkDisabled = !zone || landmarks.length === 0;
 
-    const batchEligible = isBatchEligible(d.zoneId);
-    const speedLabel = d.speed === 'batch' ? 'Batch' : d.speed === 'standard' ? 'Standard' : '';
-
     // Collapsed summary must never crash on an empty/unfinished form
     const summaryText = !zone
       ? 'Tap to set zone, landmark & directions'
-      : `${zone.name} · ${d.landmark || '—'}${speedLabel ? ` · ${speedLabel}` : ''} · ${totals.deliveryFee > 0 ? store.formatCurrency(totals.deliveryFee) : '—'}`;
+      : `${zone.name} · ${d.landmark || '—'} · ${totals.deliveryFee > 0 ? store.formatCurrency(totals.deliveryFee) : '—'}`;
 
     const feePreview = (() => {
       if (!zone || totals.deliveryFee <= 0) return '';
       return `<div class="delivery-fee-preview">Delivery Fee (${esc(zone.name)}): ${esc(store.formatCurrency(totals.deliveryFee))}</div>`;
     })();
-
-    const speedPicker = !batchEligible ? '' : `
-        <div class="delivery-field${deliveryErrors.speed ? ' field-error' : ''}">
-          <span class="delivery-label" id="delivery-speed-label">Delivery speed *</span>
-          <div class="speed-options" role="radiogroup" aria-labelledby="delivery-speed-label">
-            <button type="button" class="speed-btn${d.speed === 'standard' ? ' active' : ''}" data-speed="standard" role="radio" aria-checked="${d.speed === 'standard'}">
-              <span class="speed-name">Standard</span>
-              <span class="speed-sub">On the road ~30 min after order</span>
-            </button>
-            <button type="button" class="speed-btn${d.speed === 'batch' ? ' active' : ''}" data-speed="batch" role="radio" aria-checked="${d.speed === 'batch'}">
-              <span class="speed-name">Batch · ½ price</span>
-              <span class="speed-sub">Goes out with the next order</span>
-            </button>
-          </div>
-        </div>`;
 
     deliveryRoot.innerHTML = `
       <div class="delivery-details-card${deliveryCollapsed ? ' is-collapsed' : ''}">
@@ -349,7 +324,6 @@ export function initCartDrawer() {
           <label for="delivery-directions-input">Additional Directions *</label>
           <textarea id="delivery-directions-input" placeholder="e.g. Blue gate, 2nd house past the sari-sari store" aria-label="Additional delivery directions">${esc(d.directions || '')}</textarea>
         </div>
-        ${speedPicker}
         ${feePreview}
         <div class="delivery-hint">Further updates and rider coordination will be handled through Messenger.</div>
         <button type="button" class="delivery-collapse-btn" id="delivery-toggle" aria-expanded="true">
@@ -416,10 +390,7 @@ export function initCartDrawer() {
         openMenu = null;
         delete deliveryErrors.zone;
         delete deliveryErrors.landmark;
-        delete deliveryErrors.speed;
-        const nextZone = opt.dataset.zoneId;
-        // Batch zones require an explicit speed pick; Laurente is standard-only.
-        cartStore.setDelivery({ zoneId: nextZone, landmark: '', speed: isBatchEligible(nextZone) ? '' : 'standard' });
+        cartStore.setDelivery({ zoneId: opt.dataset.zoneId, landmark: '' });
       });
     });
 
@@ -432,16 +403,6 @@ export function initCartDrawer() {
       });
     });
 
-    deliveryRoot.querySelectorAll('[data-speed]').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        delete deliveryErrors.speed;
-        cartStore.setDelivery({ speed: btn.dataset.speed });
-      });
-    });
-
-    // Direct assignment without notify: avoids re-render (and focus loss) while typing.
-    // Fee preview doesn't depend on directions, so nothing else needs updating.
     deliveryRoot.querySelector('#delivery-directions-input')?.addEventListener('input', (e) => {
       cartStore.delivery.directions = e.target.value;
       if ((e.target.value || '').trim().length >= DELIVERY_MIN_DIRECTIONS_LENGTH) {
@@ -635,8 +596,6 @@ export function initCartDrawer() {
     const delLandmark = (cartStore.delivery.landmark || '').trim();
     const delDirections = (cartStore.delivery.directions || '').trim();
     const delLocation = delLandmark ? `Near ${delLandmark} — ${delDirections}` : delDirections;
-    const delSpeed = cartStore.delivery.speed === 'batch' ? 'batch' : 'standard';
-    const batchingNote = isDelOrder && delZoneName ? getDeliverySpeedNote(delZoneName, delSpeed) : '';
 
     modal.innerHTML = `
       <div class="modal-dialog-card checkout-modal-card">
@@ -694,22 +653,12 @@ export function initCartDrawer() {
                 <span>Delivery Location:</span>
                 <span>${esc(delLocation)}</span>
               </div>
-              <div class="summary-delivery-row">
-                <span>Delivery Speed:</span>
-                <span>${esc(getSpeedLabel(delSpeed))}</span>
-              </div>
             ` : ''}
             <div class="summary-total-row">
               <span>Estimated Total:</span>
               <strong>${cartStore.formatCurrency(totals.grandTotal)}</strong>
             </div>
           </div>
-
-          ${isDelOrder && batchingNote ? `
-            <div class="delivery-batching-note" id="modal-batching-note" style="display: none; margin-bottom: 10px;">
-              ${esc(batchingNote)}
-            </div>
-          ` : ''}
 
           <div class="order-copy-notice">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -786,12 +735,7 @@ export function initCartDrawer() {
           fbBtnLabel.textContent = 'Open Messenger to Order';
         }, 4000);
       }
-      if (isDelOrder && batchingNote) {
-        modal.querySelector('#modal-batching-note')?.style.setProperty('display', 'block');
-        cartStore.showToast('Order Copied to Clipboard!', batchingNote, '✓');
-      } else {
-        cartStore.showToast('Order Copied to Clipboard!', 'Opening Messenger — paste and send.', '✓');
-      }
+      cartStore.showToast('Order Copied to Clipboard!', 'Opening Messenger — paste and send.', '✓');
       window.open(messengerUrl, '_blank', 'noopener,noreferrer');
     });
 

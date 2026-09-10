@@ -823,52 +823,6 @@
   white-space: nowrap;
 }
 
-/* Delivery speed picker (Standard vs Batch) */
-.speed-options {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
-.speed-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1.5px solid #cbd5e1;
-  background: #FFFFFF;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.15s ease;
-}
-
-.speed-btn:hover {
-  border-color: #94a3b8;
-}
-
-.speed-btn.active {
-  background: var(--deep-navy);
-  border-color: var(--deep-navy);
-  color: #FFFFFF;
-}
-
-.speed-btn.active .speed-sub {
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.speed-name {
-  font-size: 0.82rem;
-  font-weight: 800;
-}
-
-.speed-sub {
-  font-size: 0.7rem;
-  line-height: 1.35;
-  color: #64748B;
-}
-
 .delivery-field textarea {
   min-height: 54px;
   resize: vertical;
@@ -895,14 +849,4 @@
   border: 1px dashed #cbd5e1;
   border-radius: 8px;
   padding: 8px 12px;
-}
-
-.delivery-batching-note {
-  font-size: 0.78rem;
-  color: #15803D;
-  background: #F0FDF4;
-  border: 1px solid #86EFAC;
-  border-radius: 10px;
-  padding: 10px 12px;
-  line-height: 1.5;
 }
