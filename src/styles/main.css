@@ -913,6 +913,13 @@ main,
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
   }
 
+  /* Runtime-hydrated cards carry their own mobile slot (--mgc/--mgr) so they
+     don't inherit desktop coordinates in the 7-column mobile cup. */
+  .baia-coffee-cup-mobile .mosaic-photo-card[data-community-hydrated="1"] {
+    grid-column: var(--mgc, var(--gc));
+    grid-row: var(--mgr, var(--gr));
+  }
+
   .baia-coffee-cup-mobile .mosaic-photo-card.is-steam {
     width: clamp(28px, 8.5vw, 34px);
     aspect-ratio: 1 / 1;

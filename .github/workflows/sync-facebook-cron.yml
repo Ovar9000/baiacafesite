@@ -38,14 +38,25 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || secrets.SUPABASE_ANON_KEY }}
         run: npm run sync:fb
 
+      - name: 📸 Run Community Wall Sync (shared/tagged guest photos)
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID || 'thebaiacafe' }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://cqtcmrqlafgtcrcfaojz.supabase.co' }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || secrets.SUPABASE_ANON_KEY }}
+        run: npm run sync:community
+
       # Only commit to git when manually triggered via workflow_dispatch.
       # Scheduled cron runs update Supabase directly with zero git churn, zero redeployments, and zero downtime!
+      # NOTE: the photowall JSON (public/data) has no Supabase table behind it,
+      # so it MUST be committed to reach the live site — manual runs include it.
       - name: 💾 Commit & Push Static Fallback Changes (Manual Run Only)
         if: github.event_name == 'workflow_dispatch'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add src/data/updates.json src/data/sync-state.json
+          git add src/data/updates.json src/data/sync-state.json src/data/community-reviews.json public/data/community-reviews.json
           if git diff --staged --quiet; then
             echo "No new changes to commit."
           else
