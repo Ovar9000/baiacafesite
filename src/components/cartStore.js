@@ -1,4 +1,4 @@
-import { calculateDeliveryFee, getDeliveryZone } from '../data/deliveryZones.js';
+import { calculateDeliveryFee, getDeliveryZone, getSpeedLabel } from '../data/deliveryZones.js';
 
 class CartStore {
   constructor() {
@@ -7,7 +7,7 @@ class CartStore {
     this.orderType = 'Dine-In at Cafe';
     this.customerName = '';
     this.customerNotes = '';
-    this.delivery = { zoneId: '', landmark: '', directions: '' };
+    this.delivery = { zoneId: '', landmark: '', directions: '', speed: '' };
     this.listeners = new Set();
     this.toasts = [];
   }
@@ -188,13 +188,15 @@ class CartStore {
   }
 
   clearDelivery() {
-    this.delivery = { zoneId: '', landmark: '', directions: '' };
+    this.delivery = { zoneId: '', landmark: '', directions: '', speed: '' };
     this.notify();
   }
 
   getDeliveryFee() {
     if (!this.isDelivery()) return 0;
-    return calculateDeliveryFee(this.delivery.zoneId, this.getItemCount());
+    return calculateDeliveryFee(this.delivery.zoneId, this.getItemCount(), {
+      batched: this.delivery.speed === 'batch'
+    });
   }
 
   getTotals() {
@@ -251,6 +253,7 @@ class CartStore {
         'Order Type: Delivery',
         `Delivery Zone: ${zoneName}`,
         `Delivery Location: ${location}`,
+        `Delivery Speed: ${getSpeedLabel(this.delivery.speed)}`,
         '',
         'Thank you!'
       ].filter(Boolean);

@@ -3,8 +3,10 @@ import { menuData, getAvailableDrinkAddOns } from '../data/menuData.js';
 import {
   deliveryConfig,
   getDeliveryZone,
+  isBatchEligible,
   validateDeliveryDetails,
-  getBatchingNote,
+  getDeliverySpeedNote,
+  getSpeedLabel,
   DELIVERY_MIN_DIRECTIONS_LENGTH
 } from '../data/deliveryZones.js';
 
@@ -213,6 +215,9 @@ export function initCartDrawer() {
     if ((delivery.directions || '').trim().length < DELIVERY_MIN_DIRECTIONS_LENGTH) {
       flags.directions = true;
     }
+    if (isBatchEligible(delivery.zoneId) && delivery.speed !== 'standard' && delivery.speed !== 'batch') {
+      flags.speed = true;
+    }
     return flags;
   }
 
@@ -270,15 +275,39 @@ export function initCartDrawer() {
         : (d.landmark || 'Choose nearest landmark');
     const landmarkDisabled = !zone || landmarks.length === 0;
 
-    const feePreview = zone && totals.deliveryFee > 0
-      ? `<div class="delivery-fee-preview">Delivery Fee (${esc(zone.name)}): ${esc(store.formatCurrency(totals.deliveryFee))} · based on ${totals.itemCount} item${totals.itemCount === 1 ? '' : 's'}</div>`
-      : '';
+    const batchEligible = isBatchEligible(d.zoneId);
+    const speedLabel = d.speed === 'batch' ? 'Batch' : d.speed === 'standard' ? 'Standard' : '';
+
+    const feePreview = (() => {
+      if (!zone || totals.deliveryFee <= 0) return '';
+      const base = `Delivery Fee (${esc(zone.name)}): ${esc(store.formatCurrency(totals.deliveryFee))} · ${totals.itemCount} item${totals.itemCount === 1 ? '' : 's'}`;
+      if (!batchEligible) return `<div class="delivery-fee-preview">${base}</div>`;
+      const altFee = store.formatCurrency(d.speed === 'batch' ? totals.deliveryFee * 2 : Math.round(totals.deliveryFee * 0.5));
+      const altText = d.speed === 'batch' ? `Standard would be ${altFee}` : `Batch & save: ${altFee}`;
+      const tag = d.speed === 'batch' ? ' · ½ price' : '';
+      return `<div class="delivery-fee-preview">${base}${tag} · ${esc(altText)}</div>`;
+    })();
+
+    const speedPicker = !batchEligible ? '' : `
+        <div class="delivery-field${deliveryErrors.speed ? ' field-error' : ''}">
+          <span class="delivery-label" id="delivery-speed-label">Delivery speed *</span>
+          <div class="speed-options" role="radiogroup" aria-labelledby="delivery-speed-label">
+            <button type="button" class="speed-btn${d.speed === 'standard' ? ' active' : ''}" data-speed="standard" role="radio" aria-checked="${d.speed === 'standard'}">
+              <span class="speed-name">Standard</span>
+              <span class="speed-sub">Rider on the road ~30 min after order</span>
+            </button>
+            <button type="button" class="speed-btn${d.speed === 'batch' ? ' active' : ''}" data-speed="batch" role="radio" aria-checked="${d.speed === 'batch'}">
+              <span class="speed-name">Batch · ½ price</span>
+              <span class="speed-sub">Goes out with the next order to ${esc(zone.name)}</span>
+            </button>
+          </div>
+        </div>`;
 
     deliveryRoot.innerHTML = `
       <div class="delivery-details-card${deliveryCollapsed ? ' is-collapsed' : ''}">
         <button type="button" class="delivery-details-toggle" id="delivery-toggle" aria-expanded="${deliveryCollapsed ? 'false' : 'true'}">
           <span class="delivery-details-title">Delivery Details${nowValid ? ' · ✓' : ''}</span>
-          ${deliveryCollapsed ? `<span class="delivery-summary">${esc(zone.name)} · ${esc(d.landmark)} · ${esc(store.formatCurrency(totals.deliveryFee))}</span><span class="delivery-toggle-action">Edit</span>` : `<span class="delivery-toggle-action">Hide</span>`}
+          ${deliveryCollapsed ? `<span class="delivery-summary">${esc(zone.name)} · ${esc(d.landmark)}${speedLabel ? ` · ${esc(speedLabel)}` : ''} · ${esc(store.formatCurrency(totals.deliveryFee))}</span><span class="delivery-toggle-action">Edit</span>` : `<span class="delivery-toggle-action">Hide</span>`}
         </button>
         ${deliveryCollapsed ? '' : `
         <div class="delivery-field${deliveryErrors.zone ? ' field-error' : ''}">
@@ -305,6 +334,7 @@ export function initCartDrawer() {
           <label for="delivery-directions-input">Additional Directions *</label>
           <textarea id="delivery-directions-input" placeholder="e.g. Blue gate, 2nd house past the sari-sari store" aria-label="Additional delivery directions">${esc(d.directions || '')}</textarea>
         </div>
+        ${speedPicker}
         ${feePreview}
         <div class="delivery-hint">Further updates and rider coordination will be handled through Messenger.</div>
         `}
@@ -336,7 +366,10 @@ export function initCartDrawer() {
         openMenu = null;
         delete deliveryErrors.zone;
         delete deliveryErrors.landmark;
-        cartStore.setDelivery({ zoneId: opt.dataset.zoneId, landmark: '' });
+        delete deliveryErrors.speed;
+        const nextZone = opt.dataset.zoneId;
+        // Batch zones require an explicit speed pick; Laurente is standard-only.
+        cartStore.setDelivery({ zoneId: nextZone, landmark: '', speed: isBatchEligible(nextZone) ? '' : 'standard' });
       });
     });
 
@@ -346,6 +379,14 @@ export function initCartDrawer() {
         openMenu = null;
         delete deliveryErrors.landmark;
         cartStore.setDelivery({ landmark: opt.dataset.landmark });
+      });
+    });
+
+    deliveryRoot.querySelectorAll('[data-speed]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        delete deliveryErrors.speed;
+        cartStore.setDelivery({ speed: btn.dataset.speed });
       });
     });
 
@@ -544,7 +585,8 @@ export function initCartDrawer() {
     const delLandmark = (cartStore.delivery.landmark || '').trim();
     const delDirections = (cartStore.delivery.directions || '').trim();
     const delLocation = delLandmark ? `Near ${delLandmark} — ${delDirections}` : delDirections;
-    const batchingNote = isDelOrder && delZoneName ? getBatchingNote(delZoneName) : '';
+    const delSpeed = cartStore.delivery.speed === 'batch' ? 'batch' : 'standard';
+    const batchingNote = isDelOrder && delZoneName ? getDeliverySpeedNote(delZoneName, delSpeed) : '';
 
     modal.innerHTML = `
       <div class="modal-dialog-card checkout-modal-card">
@@ -601,6 +643,10 @@ export function initCartDrawer() {
               <div class="summary-delivery-row">
                 <span>Delivery Location:</span>
                 <span>${esc(delLocation)}</span>
+              </div>
+              <div class="summary-delivery-row">
+                <span>Delivery Speed:</span>
+                <span>${esc(getSpeedLabel(delSpeed))}</span>
               </div>
             ` : ''}
             <div class="summary-total-row">
