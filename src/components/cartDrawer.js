@@ -1,5 +1,12 @@
 import { cartStore } from './cartStore.js';
 import { menuData, getAvailableDrinkAddOns } from '../data/menuData.js';
+import {
+  deliveryConfig,
+  getDeliveryZone,
+  validateDeliveryDetails,
+  getBatchingNote,
+  DELIVERY_MIN_DIRECTIONS_LENGTH
+} from '../data/deliveryZones.js';
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
@@ -16,6 +23,13 @@ export function initCartDrawer() {
   const closeBtn = document.getElementById('drawer-close-btn');
   const spotButtons = document.querySelectorAll('.spot-btn');
   const clearBtn = document.getElementById('drawer-clear-btn');
+  const deliveryRoot = document.getElementById('delivery-details-root');
+  const deliveryFeeRow = document.getElementById('drawer-delivery-row');
+  const deliveryFeeLabel = document.getElementById('drawer-delivery-label');
+  const deliveryFeeEl = document.getElementById('drawer-delivery-fee');
+
+  // Field-level validation flags for the Delivery Details section (cleared on fix)
+  let deliveryErrors = {};
 
   // Ensure initial inert state
   if (panel && !cartStore.isDrawerOpen) {
@@ -107,6 +121,17 @@ export function initCartDrawer() {
       cartStore.showToast('Order List is Empty', 'Add your favorite coffee or smash burger first.');
       return;
     }
+    if (cartStore.isDelivery()) {
+      const v = validateDeliveryDetails(cartStore.delivery);
+      if (!v.valid) {
+        deliveryErrors = flagDeliveryErrors(cartStore.delivery);
+        renderDeliverySection(cartStore);
+        cartStore.showToast('Delivery Details Incomplete', v.error, '!');
+        document.getElementById('delivery-zone-select')?.focus();
+        return;
+      }
+      deliveryErrors = {};
+    }
     showCheckoutModal(totals);
   });
 
@@ -132,6 +157,17 @@ export function initCartDrawer() {
     if (subtotalEl) subtotalEl.textContent = store.formatCurrency(totals.subtotal);
     if (grandTotalEl) grandTotalEl.textContent = store.formatCurrency(totals.grandTotal);
 
+    if (deliveryFeeRow && deliveryFeeEl) {
+      if (store.isDelivery() && totals.deliveryFee > 0) {
+        const zone = getDeliveryZone(store.delivery.zoneId);
+        deliveryFeeRow.style.display = 'flex';
+        if (deliveryFeeLabel) deliveryFeeLabel.textContent = zone ? `Delivery Fee (${zone.name})` : 'Delivery Fee';
+        deliveryFeeEl.textContent = store.formatCurrency(totals.deliveryFee);
+      } else {
+        deliveryFeeRow.style.display = 'none';
+      }
+    }
+
     if (savingsRow && savingsEl) {
       if (totals.savings > 0) {
         savingsRow.style.display = 'flex';
@@ -142,7 +178,99 @@ export function initCartDrawer() {
     }
 
     renderItems(store);
+    renderDeliverySection(store);
   });
+
+  function flagDeliveryErrors(delivery) {
+    const flags = {};
+    const zone = getDeliveryZone(delivery.zoneId);
+    if (!zone) {
+      flags.zone = true;
+    } else if (zone.landmarks.length > 0 && !zone.landmarks.includes(delivery.landmark)) {
+      flags.landmark = true;
+    }
+    if ((delivery.directions || '').trim().length < DELIVERY_MIN_DIRECTIONS_LENGTH) {
+      flags.directions = true;
+    }
+    return flags;
+  }
+
+  function renderDeliverySection(store) {
+    if (!deliveryRoot) return;
+    if (!store.isDelivery()) {
+      deliveryRoot.style.display = 'none';
+      deliveryRoot.innerHTML = '';
+      return;
+    }
+    deliveryRoot.style.display = 'block';
+
+    const d = store.delivery;
+    const zone = getDeliveryZone(d.zoneId);
+    const landmarks = zone ? zone.landmarks : [];
+    const totals = store.getTotals();
+
+    const zoneOptions = deliveryConfig.zones.map((z) =>
+      `<option value="${esc(z.id)}"${d.zoneId === z.id ? ' selected' : ''}>${esc(z.fullName)}</option>`
+    ).join('');
+
+    const landmarkOptions = !zone
+      ? '<option value="">Select a zone first</option>'
+      : landmarks.length === 0
+        ? '<option value="">No landmarks listed yet — describe the location below</option>'
+        : `<option value="">Choose nearest landmark</option>` + landmarks.map((lm) =>
+          `<option value="${esc(lm)}"${d.landmark === lm ? ' selected' : ''}>${esc(lm)}</option>`
+        ).join('');
+
+    const feePreview = zone && totals.deliveryFee > 0
+      ? `<div class="delivery-fee-preview">Delivery Fee (${esc(zone.name)}): ${esc(store.formatCurrency(totals.deliveryFee))} · based on ${totals.itemCount} item${totals.itemCount === 1 ? '' : 's'}</div>`
+      : '';
+
+    deliveryRoot.innerHTML = `
+      <div class="delivery-details-card">
+        <div class="delivery-details-title">Delivery Details</div>
+        <div class="delivery-field${deliveryErrors.zone ? ' field-error' : ''}">
+          <label for="delivery-zone-select">Delivery Zone *</label>
+          <select id="delivery-zone-select" aria-label="Delivery zone">
+            <option value="">Choose delivery zone</option>
+            ${zoneOptions}
+          </select>
+        </div>
+        <div class="delivery-field${deliveryErrors.landmark ? ' field-error' : ''}">
+          <label for="delivery-landmark-select">Nearest Landmark${landmarks.length > 0 ? ' *' : ''}</label>
+          <select id="delivery-landmark-select" aria-label="Nearest landmark"${!zone || landmarks.length === 0 ? ' disabled' : ''}>
+            ${landmarkOptions}
+          </select>
+        </div>
+        <div class="delivery-field${deliveryErrors.directions ? ' field-error' : ''}">
+          <label for="delivery-directions-input">Additional Directions *</label>
+          <textarea id="delivery-directions-input" placeholder="e.g. Blue gate, 2nd house past the sari-sari store" aria-label="Additional delivery directions">${esc(d.directions || '')}</textarea>
+        </div>
+        ${feePreview}
+        <div class="delivery-hint">Contact is handled through Messenger — no phone number needed. Landmark + directions are enough for the rider to find you.</div>
+      </div>
+    `;
+
+    deliveryRoot.querySelector('#delivery-zone-select')?.addEventListener('change', (e) => {
+      delete deliveryErrors.zone;
+      delete deliveryErrors.landmark;
+      cartStore.setDelivery({ zoneId: e.target.value, landmark: '' });
+    });
+
+    deliveryRoot.querySelector('#delivery-landmark-select')?.addEventListener('change', (e) => {
+      delete deliveryErrors.landmark;
+      cartStore.setDelivery({ landmark: e.target.value });
+    });
+
+    // Direct assignment without notify: avoids re-render (and focus loss) while typing.
+    // Fee preview doesn't depend on directions, so nothing else needs updating.
+    deliveryRoot.querySelector('#delivery-directions-input')?.addEventListener('input', (e) => {
+      cartStore.delivery.directions = e.target.value;
+      if ((e.target.value || '').trim().length >= DELIVERY_MIN_DIRECTIONS_LENGTH) {
+        delete deliveryErrors.directions;
+        e.target.closest('.delivery-field')?.classList.remove('field-error');
+      }
+    });
+  }
 
   function renderItems(store) {
     if (!itemsContainer) return;
@@ -322,6 +450,14 @@ export function initCartDrawer() {
       ? `https://m.me/thebaiacafe?text=${encodedOrder}` 
       : `https://www.facebook.com/messages/t/thebaiacafe?text=${encodedOrder}`;
 
+    const isDelOrder = cartStore.isDelivery();
+    const delZone = isDelOrder ? getDeliveryZone(cartStore.delivery.zoneId) : null;
+    const delZoneName = delZone ? delZone.name : '';
+    const delLandmark = (cartStore.delivery.landmark || '').trim();
+    const delDirections = (cartStore.delivery.directions || '').trim();
+    const delLocation = delLandmark ? `Near ${delLandmark} — ${delDirections}` : delDirections;
+    const batchingNote = isDelOrder && delZoneName ? getBatchingNote(delZoneName) : '';
+
     modal.innerHTML = `
       <div class="modal-dialog-card checkout-modal-card">
         <div class="modal-header">
@@ -365,11 +501,31 @@ export function initCartDrawer() {
                 <span>-${cartStore.formatCurrency(totals.savings)}</span>
               </div>
             ` : ''}
+            ${isDelOrder ? `
+              <div class="summary-delivery-row">
+                <span>Delivery Fee (${esc(delZoneName)}):</span>
+                <span>${esc(cartStore.formatCurrency(totals.deliveryFee))}</span>
+              </div>
+              <div class="summary-delivery-row">
+                <span>Delivery Zone:</span>
+                <span>${esc(delZoneName)}</span>
+              </div>
+              <div class="summary-delivery-row">
+                <span>Delivery Location:</span>
+                <span>${esc(delLocation)}</span>
+              </div>
+            ` : ''}
             <div class="summary-total-row">
               <span>Estimated Total:</span>
               <strong>${cartStore.formatCurrency(totals.grandTotal)}</strong>
             </div>
           </div>
+
+          ${isDelOrder && batchingNote ? `
+            <div class="delivery-batching-note" id="modal-batching-note" style="display: none; margin-bottom: 10px;">
+              ${esc(batchingNote)}
+            </div>
+          ` : ''}
 
           <div class="order-copy-notice">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -446,7 +602,12 @@ export function initCartDrawer() {
           fbBtnLabel.textContent = 'Open Messenger to Order';
         }, 4000);
       }
-      cartStore.showToast('Order Copied to Clipboard!', 'Opening Messenger — paste and send.', '✓');
+      if (isDelOrder && batchingNote) {
+        modal.querySelector('#modal-batching-note')?.style.setProperty('display', 'block');
+        cartStore.showToast('Order Copied to Clipboard!', batchingNote, '✓');
+      } else {
+        cartStore.showToast('Order Copied to Clipboard!', 'Opening Messenger — paste and send.', '✓');
+      }
       window.open(messengerUrl, '_blank', 'noopener,noreferrer');
     });
 

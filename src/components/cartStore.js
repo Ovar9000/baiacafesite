@@ -1,3 +1,5 @@
+import { calculateDeliveryFee, getDeliveryZone } from '../data/deliveryZones.js';
+
 class CartStore {
   constructor() {
     this.items = [];
@@ -5,6 +7,7 @@ class CartStore {
     this.orderType = 'Dine-In at Cafe';
     this.customerName = '';
     this.customerNotes = '';
+    this.delivery = { zoneId: '', landmark: '', directions: '' };
     this.listeners = new Set();
     this.toasts = [];
   }
@@ -175,6 +178,25 @@ class CartStore {
     return this.items.reduce((sum, item) => sum + item.quantity, 0);
   }
 
+  isDelivery() {
+    return this.orderType === 'Delivery';
+  }
+
+  setDelivery(patch) {
+    this.delivery = { ...this.delivery, ...(patch || {}) };
+    this.notify();
+  }
+
+  clearDelivery() {
+    this.delivery = { zoneId: '', landmark: '', directions: '' };
+    this.notify();
+  }
+
+  getDeliveryFee() {
+    if (!this.isDelivery()) return 0;
+    return calculateDeliveryFee(this.delivery.zoneId, this.getItemCount());
+  }
+
   getTotals() {
     let subtotal = 0;
     let savings = 0;
@@ -186,11 +208,13 @@ class CartStore {
       }
     });
 
-    const grandTotal = subtotal;
+    const deliveryFee = this.getDeliveryFee();
+    const grandTotal = subtotal + deliveryFee;
 
     return {
       subtotal,
       savings,
+      deliveryFee,
       grandTotal,
       itemCount: this.getItemCount()
     };
@@ -199,19 +223,44 @@ class CartStore {
   generateOrderMessage() {
     if (this.items.length === 0) return '';
     const totals = this.getTotals();
+    const itemLines = this.items.map(i => {
+      const meta = [];
+      if (i.temp) meta.push(i.temp);
+      if (i.size) meta.push(`Size ${i.size}`);
+      if (i.addOns && i.addOns.length > 0) {
+        i.addOns.forEach(a => meta.push(`+ ${a.name}`));
+      }
+      const metaStr = meta.length > 0 ? ` (${meta.join(', ')})` : '';
+      return `• ${i.quantity}x ${i.name}${metaStr} — ${this.formatCurrency(i.unitPrice * i.quantity)}`;
+    });
+
+    if (this.isDelivery()) {
+      const zone = getDeliveryZone(this.delivery.zoneId);
+      const zoneName = zone ? zone.name : 'Delivery Area';
+      const landmark = (this.delivery.landmark || '').trim();
+      const directions = (this.delivery.directions || '').trim();
+      const location = landmark ? `Near ${landmark} — ${directions}` : directions;
+      const lines = [
+        'Hi BAIA Cafe, I would like to place an order for delivery via Messenger:',
+        '',
+        ...itemLines,
+        '',
+        `Subtotal: ${this.formatCurrency(totals.subtotal)}`,
+        `Delivery Fee (${zoneName}): ${this.formatCurrency(totals.deliveryFee)}`,
+        `Estimated Total: ${this.formatCurrency(totals.grandTotal)}`,
+        'Order Type: Delivery',
+        `Delivery Zone: ${zoneName}`,
+        `Delivery Location: ${location}`,
+        '',
+        'Thank you!'
+      ].filter(Boolean);
+      return lines.join('\n');
+    }
+
     const lines = [
       'Hi BAIA Cafe, I would like to place an order ahead via Messenger:',
       '',
-      ...this.items.map(i => {
-        const meta = [];
-        if (i.temp) meta.push(i.temp);
-        if (i.size) meta.push(`Size ${i.size}`);
-        if (i.addOns && i.addOns.length > 0) {
-          i.addOns.forEach(a => meta.push(`+ ${a.name}`));
-        }
-        const metaStr = meta.length > 0 ? ` (${meta.join(', ')})` : '';
-        return `• ${i.quantity}x ${i.name}${metaStr} — ${this.formatCurrency(i.unitPrice * i.quantity)}`;
-      }),
+      ...itemLines,
       '',
       totals.savings > 0 ? `Bundle Savings: -${this.formatCurrency(totals.savings)}` : null,
       `Estimated Total: ${this.formatCurrency(totals.grandTotal)}`,

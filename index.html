@@ -2057,8 +2057,14 @@ svg { display: block; max-width: 100%; }
         <button class="spot-btn" data-spot="Beach Takeout" aria-pressed="false">
           Takeout
         </button>
+        <button class="spot-btn" data-spot="Delivery" aria-pressed="false">
+          Delivery
+        </button>
       </div>
     </div>
+
+    <!-- Delivery Details (rendered by cartDrawer.js, visible only for Delivery) -->
+    <div id="delivery-details-root" style="display: none;"></div>
 
     <!-- Items List Container -->
     <div class="drawer-items-list" id="drawer-items-list" role="region" aria-label="Order items list">
@@ -2075,6 +2081,10 @@ svg { display: block; max-width: 100%; }
         <div class="drawer-total-row discount-row" id="drawer-savings-row" style="display: none;">
           <span>Bundle Savings</span>
           <span id="drawer-savings">-₱0</span>
+        </div>
+        <div class="drawer-total-row delivery-row" id="drawer-delivery-row" style="display: none;">
+          <span id="drawer-delivery-label">Delivery Fee</span>
+          <span id="drawer-delivery-fee">₱0</span>
         </div>
         <div class="drawer-total-row grand-total-row">
           <span>Estimated Total</span>

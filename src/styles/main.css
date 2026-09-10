@@ -1371,6 +1371,23 @@ main,
   border-top: 1px dashed #CBD5E1;
 }
 
+.summary-delivery-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--deep-navy);
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #CBD5E1;
+}
+
+.summary-delivery-row span:last-child {
+  text-align: right;
+  max-width: 60%;
+}
+
 .summary-total-row {
   display: flex;
   justify-content: space-between;
