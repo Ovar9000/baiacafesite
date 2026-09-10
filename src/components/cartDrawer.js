@@ -300,10 +300,13 @@ export function initCartDrawer() {
 
     deliveryRoot.innerHTML = `
       <div class="delivery-details-card${deliveryCollapsed ? ' is-collapsed' : ''}">
-        <button type="button" class="delivery-details-toggle" id="delivery-toggle" aria-expanded="${deliveryCollapsed ? 'false' : 'true'}">
+        ${deliveryCollapsed ? `
+        <button type="button" class="delivery-details-toggle" id="delivery-toggle" aria-expanded="false" aria-label="Expand delivery details">
           <span class="delivery-details-title">Delivery Details${nowValid ? ' · ✓' : ''}</span>
-          ${deliveryCollapsed ? `<span class="delivery-summary">${esc(zone.name)} · ${esc(d.landmark)}${speedLabel ? ` · ${esc(speedLabel)}` : ''} · ${esc(store.formatCurrency(totals.deliveryFee))}</span><span class="delivery-toggle-action">Edit <span class="dd-toggle-chevron" aria-hidden="true">▾</span></span>` : `<span class="delivery-toggle-action">Hide <span class="dd-toggle-chevron" aria-hidden="true">▾</span></span>`}
-        </button>
+          <span class="delivery-summary">${esc(zone.name)} · ${esc(d.landmark)}${speedLabel ? ` · ${esc(speedLabel)}` : ''} · ${esc(store.formatCurrency(totals.deliveryFee))}</span>
+          <span class="dd-toggle-chevron" aria-hidden="true">▾</span>
+        </button>` : `
+        <div class="delivery-details-title">Delivery Details${nowValid ? ' · ✓' : ''}</div>`}
         ${deliveryCollapsed ? '' : `
         <div class="delivery-field${deliveryErrors.zone ? ' field-error' : ''}">
           <span class="delivery-label" id="delivery-zone-label">Delivery Zone *</span>
@@ -332,6 +335,10 @@ export function initCartDrawer() {
         ${speedPicker}
         ${feePreview}
         <div class="delivery-hint">Further updates and rider coordination will be handled through Messenger.</div>
+        <button type="button" class="delivery-collapse-btn" id="delivery-toggle" aria-expanded="true">
+          <span>Show less</span>
+          <span class="dd-toggle-chevron" aria-hidden="true">▴</span>
+        </button>
         `}
       </div>
     `;
