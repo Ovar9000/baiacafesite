@@ -37,23 +37,14 @@ export const deliveryConfig = {
       feeSchedule: { baseFee: 120, includedItems: 8, incrementFee: 60, incrementBlock: 8 }
     },
     {
-      id: 'bolod_poblacion',
-      name: 'Bolod – Poblacion',
-      fullName: 'Poblacion / Terraplin Approach',
+      id: 'bolod',
+      name: 'Bolod',
+      fullName: 'Bolod',
       landmarks: [
         'San Pascual National High School (Main)',
         'San Pascual Central School',
         'San Pascual Municipal Hall & Town Plaza',
-        'St. Paschal Baylon Parish Church'
-      ],
-      coveragePolygon: [],
-      feeSchedule: { baseFee: 120, includedItems: 8, incrementFee: 60, incrementBlock: 8 }
-    },
-    {
-      id: 'pantalan',
-      name: 'Pantalan / Port Area',
-      fullName: 'Port Area / Pantalan (Terminal End)',
-      landmarks: [
+        'St. Paschal Baylon Parish Church',
         'San Pascual Public Market (Pamilihan)',
         'LGU Tourism Office',
         'Sunset View Tourist Hotel / Port Lodges',
