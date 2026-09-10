@@ -236,11 +236,13 @@ export function initCartDrawer() {
     const totals = store.getTotals();
 
     // Auto-collapse the moment the section becomes valid (never auto-expand).
-    // Invalid sections always stay expanded so the problem field is visible.
+    // Only force-expand when there are checkout validation errors to show —
+    // otherwise a manual collapse always wins, even on an incomplete form.
     const nowValid = validateDeliveryDetails(d).valid;
+    const hasFieldErrors = Object.keys(deliveryErrors).length > 0;
     if (!nowValid) {
       wasDeliveryValid = false;
-      deliveryCollapsed = false;
+      if (hasFieldErrors) deliveryCollapsed = false;
     } else if (!wasDeliveryValid) {
       deliveryCollapsed = true;
       wasDeliveryValid = true;
