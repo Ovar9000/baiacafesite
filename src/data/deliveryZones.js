@@ -15,7 +15,7 @@ export const deliveryConfig = {
     {
       id: 'laurente',
       name: 'Laurente',
-      fullName: 'Laurente (Starting Point / Northeast Coast)',
+      fullName: 'Laurente',
       landmarks: [
         'Atlaza Resort',
         'BAIA Café',
