@@ -280,12 +280,7 @@ export function initCartDrawer() {
 
     const feePreview = (() => {
       if (!zone || totals.deliveryFee <= 0) return '';
-      const base = `Delivery Fee (${esc(zone.name)}): ${esc(store.formatCurrency(totals.deliveryFee))} · ${totals.itemCount} item${totals.itemCount === 1 ? '' : 's'}`;
-      if (!batchEligible) return `<div class="delivery-fee-preview">${base}</div>`;
-      const altFee = store.formatCurrency(d.speed === 'batch' ? totals.deliveryFee * 2 : Math.round(totals.deliveryFee * 0.5));
-      const altText = d.speed === 'batch' ? `Standard would be ${altFee}` : `Batch & save: ${altFee}`;
-      const tag = d.speed === 'batch' ? ' · ½ price' : '';
-      return `<div class="delivery-fee-preview">${base}${tag} · ${esc(altText)}</div>`;
+      return `<div class="delivery-fee-preview">Delivery Fee (${esc(zone.name)}): ${esc(store.formatCurrency(totals.deliveryFee))}</div>`;
     })();
 
     const speedPicker = !batchEligible ? '' : `
@@ -294,11 +289,11 @@ export function initCartDrawer() {
           <div class="speed-options" role="radiogroup" aria-labelledby="delivery-speed-label">
             <button type="button" class="speed-btn${d.speed === 'standard' ? ' active' : ''}" data-speed="standard" role="radio" aria-checked="${d.speed === 'standard'}">
               <span class="speed-name">Standard</span>
-              <span class="speed-sub">Rider on the road ~30 min after order</span>
+              <span class="speed-sub">On the road ~30 min after order</span>
             </button>
             <button type="button" class="speed-btn${d.speed === 'batch' ? ' active' : ''}" data-speed="batch" role="radio" aria-checked="${d.speed === 'batch'}">
               <span class="speed-name">Batch · ½ price</span>
-              <span class="speed-sub">Goes out with the next order to ${esc(zone.name)}</span>
+              <span class="speed-sub">Goes out with the next order</span>
             </button>
           </div>
         </div>`;
