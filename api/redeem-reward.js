@@ -1,25 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
-
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://cqtcmrqlafgtcrcfaojz.supabase.co';
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+import { setCorsHeaders, isRateLimited, getSupabaseConfig } from './_security.js';
 
 export default async function handler(req, res) {
-  const origin = req.headers.origin;
-  const allowedOrigins = ['https://www.baia.cafe', 'https://baia.cafe'];
-  const isAllowed = origin && (
-    allowedOrigins.includes(origin) ||
-    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin) ||
-    /^http:\/\/localhost(:\d+)?$/.test(origin) ||
-    /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
-  );
-
-  if (isAllowed) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', 'https://www.baia.cafe');
-  }
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  setCorsHeaders(req, res);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -29,21 +12,29 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const rl = isRateLimited(req, 'redeem-reward', 20, 60_000);
+  if (rl.limited) {
+    res.setHeader('Retry-After', String(rl.retryAfter));
+    return res.status(429).json({ error: 'Too many requests. Please try again shortly.' });
+  }
+
   try {
     const authHeader = req.headers.authorization || req.headers.Authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Missing or invalid Authorization header' });
     }
 
-    if (!SUPABASE_SERVICE_ROLE_KEY) {
+    const accessToken = authHeader.replace('Bearer ', '').trim();
+    let supabaseAdmin;
+    try {
+      const { url, serviceKey } = getSupabaseConfig();
+      supabaseAdmin = createClient(url, serviceKey, {
+        auth: { persistSession: false }
+      });
+    } catch {
       console.error('Server configuration error: SUPABASE_SERVICE_ROLE_KEY is missing.');
       return res.status(500).json({ error: 'Server database configuration error. Please contact administrator.' });
     }
-
-    const accessToken = authHeader.replace('Bearer ', '').trim();
-    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-      auth: { persistSession: false }
-    });
 
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(accessToken);
     if (authError || !user) {

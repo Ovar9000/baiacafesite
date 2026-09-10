@@ -1,6 +1,8 @@
 import { cartStore } from './cartStore.js';
 import { menuData, getAvailableDrinkAddOns } from '../data/menuData.js';
 
+const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
 export function initCartDrawer() {
   const backdrop = document.getElementById('cart-drawer-backdrop');
   const panel = document.getElementById('cart-drawer-panel');
@@ -185,51 +187,51 @@ export function initCartDrawer() {
       const cleanKey = item.key.replace(/[^a-zA-Z0-9_-]/g, '_');
 
       return `
-        <div class="cart-item-card" data-key="${item.key}">
+        <div class="cart-item-card" data-key="${esc(item.key)}">
           <div class="cart-item-top">
             <div>
-              <p class="cart-item-name"><strong>${item.name}</strong></p>
-              ${metaParts.length > 0 ? `<div class="cart-item-meta">${metaParts.join(' • ')}</div>` : ''}
+              <p class="cart-item-name"><strong>${esc(item.name)}</strong></p>
+              ${metaParts.length > 0 ? `<div class="cart-item-meta">${esc(metaParts.join(' • '))}</div>` : ''}
               ${addOnsList.length > 0 ? `
                 <div class="cart-item-addons-list">
                   ${addOnsList.map(a => `
                     <span class="cart-addon-badge">
-                      <span>+ ${a.name} (+₱${a.price})</span>
-                      <button type="button" class="btn-remove-addon" data-key="${item.key}" data-addon-id="${a.id}" aria-label="Remove ${a.name}">×</button>
+                      <span>+ ${esc(a.name)} (+₱${Number(a.price) || 0})</span>
+                      <button type="button" class="btn-remove-addon" data-key="${esc(item.key)}" data-addon-id="${esc(a.id)}" aria-label="Remove ${esc(a.name)}">×</button>
                     </span>
                   `).join('')}
                 </div>
               ` : ''}
             </div>
-            <div class="cart-item-price">${store.formatCurrency(item.unitPrice * item.quantity)}</div>
+            <div class="cart-item-price">${esc(store.formatCurrency(item.unitPrice * item.quantity))}</div>
           </div>
 
           <div class="cart-item-bottom">
             <div class="cart-item-controls-left">
               <div class="quantity-stepper" role="group" aria-label="Item quantity controls">
-                <button class="btn-step" data-action="decrease" data-key="${item.key}" aria-label="Decrease quantity of ${item.name}">−</button>
-                <span class="step-count" aria-live="polite">${item.quantity}</span>
-                <button class="btn-step" data-action="increase" data-key="${item.key}" aria-label="Increase quantity of ${item.name}">+</button>
+                <button class="btn-step" data-action="decrease" data-key="${esc(item.key)}" aria-label="Decrease quantity of ${esc(item.name)}">−</button>
+                <span class="step-count" aria-live="polite">${Number(item.quantity) || 0}</span>
+                <button class="btn-step" data-action="increase" data-key="${esc(item.key)}" aria-label="Increase quantity of ${esc(item.name)}">+</button>
               </div>
               ${hasCustomizations ? `
-                <button type="button" class="btn-cart-quick-addon" data-action="toggle-custom-popover" data-target="popover-${cleanKey}" aria-label="Customize add-ons for ${item.name}">
+                <button type="button" class="btn-cart-quick-addon" data-action="toggle-custom-popover" data-target="popover-${esc(cleanKey)}" aria-label="Customize add-ons for ${esc(item.name)}">
                   <span>+ Customize</span>
                 </button>
               ` : ''}
             </div>
-            <button class="btn-item-remove" data-key="${item.key}" aria-label="Remove ${item.name} from order list">Remove</button>
+            <button class="btn-item-remove" data-key="${esc(item.key)}" aria-label="Remove ${esc(item.name)} from order list">Remove</button>
           </div>
 
           ${hasCustomizations ? `
-            <div class="cart-addon-popover" id="popover-${cleanKey}" style="display: none;">
+            <div class="cart-addon-popover" id="popover-${esc(cleanKey)}" style="display: none;">
               <div class="cart-addon-popover-header">Drink Customizations &amp; Add-ons</div>
               <div class="cart-addon-popover-items">
                 ${availableAddOns.map(addon => {
                   const hasIt = addOnsList.some(a => a.id === addon.id);
                   return `
-                    <div class="cart-addon-popover-item ${hasIt ? 'is-active' : ''}" data-key="${item.key}" data-addon-id="${addon.id}" role="button" tabindex="0">
-                      <span class="popover-item-name">${hasIt ? '✓ ' : '+ '}${addon.name}</span>
-                      <strong class="popover-item-price">+₱${addon.price}</strong>
+                    <div class="cart-addon-popover-item ${hasIt ? 'is-active' : ''}" data-key="${esc(item.key)}" data-addon-id="${esc(addon.id)}" role="button" tabindex="0">
+                      <span class="popover-item-name">${hasIt ? '✓ ' : '+ '}${esc(addon.name)}</span>
+                      <strong class="popover-item-price">+₱${Number(addon.price) || 0}</strong>
                     </div>
                   `;
                 }).join('')}
@@ -335,7 +337,7 @@ export function initCartDrawer() {
           <div class="order-summary-box">
             <div class="summary-spot-line">
               <span>Order Type:</span>
-              <strong>${cartStore.orderType}</strong>
+              <strong>${esc(cartStore.orderType)}</strong>
             </div>
             <div class="summary-items-list">
               ${cartStore.items.map(i => {
@@ -349,10 +351,10 @@ export function initCartDrawer() {
                 return `
                   <div class="summary-item-row">
                     <div>
-                      <span>${i.quantity}x ${i.name}</span>
-                      ${metaStr ? `<div class="summary-item-meta">${metaStr}</div>` : ''}
+                      <span>${Number(i.quantity) || 0}x ${esc(i.name)}</span>
+                      ${metaStr ? `<div class="summary-item-meta">${esc(metaStr)}</div>` : ''}
                     </div>
-                    <span>${cartStore.formatCurrency(i.unitPrice * i.quantity)}</span>
+                    <span>${esc(cartStore.formatCurrency(i.unitPrice * i.quantity))}</span>
                   </div>
                 `;
               }).join('')}

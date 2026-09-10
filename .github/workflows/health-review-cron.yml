@@ -38,9 +38,9 @@ jobs:
 
       - name: 🔍 Run Backend Health & Schema Verification
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://cqtcmrqlafgtcrcfaojz.supabase.co' }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || secrets.SUPABASE_ANON_KEY }}
-          DAILY_QR_SECRET: ${{ secrets.DAILY_QR_SECRET || '***REMOVED_DAILY_QR_SECRET***' }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DAILY_QR_SECRET: ${{ secrets.DAILY_QR_SECRET }}
           CAFE_TIMEZONE: 'Asia/Manila'
         run: npm run verify
 

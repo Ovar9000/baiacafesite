@@ -181,7 +181,8 @@ export default function CardApp() {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`
-        }
+        },
+        body: JSON.stringify({ confirm: 'DELETE' })
       });
       const data = await res.json();
       if (!res.ok || !data.success) {

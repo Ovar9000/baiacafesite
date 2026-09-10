@@ -1,37 +1,5 @@
-import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
-
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://cqtcmrqlafgtcrcfaojz.supabase.co';
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-function setCorsHeaders(req, res) {
-  const origin = req.headers.origin;
-  const allowedOrigins = ['https://www.baia.cafe', 'https://baia.cafe'];
-  const isAllowed = origin && (
-    allowedOrigins.includes(origin) ||
-    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin) ||
-    /^http:\/\/localhost(:\d+)?$/.test(origin) ||
-    /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
-  );
-
-  if (isAllowed) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', 'https://www.baia.cafe');
-  }
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-}
-
-function safeVerifyAdminPassword(providedPassword) {
-  if (!providedPassword || typeof providedPassword !== 'string') return false;
-  const expectedPassword = process.env.ADMIN_PASSWORD;
-  if (!expectedPassword || typeof expectedPassword !== 'string') return false;
-  const providedBuf = Buffer.from(providedPassword, 'utf8');
-  const expectedBuf = Buffer.from(expectedPassword, 'utf8');
-  if (providedBuf.length !== expectedBuf.length) return false;
-  return crypto.timingSafeEqual(providedBuf, expectedBuf);
-}
+import { setCorsHeaders, isRateLimited, isAdminAuthenticated, getSupabaseConfig, getRequiredEnv } from './_security.js';
 
 export default async function handler(req, res) {
   setCorsHeaders(req, res);
@@ -44,19 +12,32 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  if (!process.env.ADMIN_PASSWORD) {
+  const rl = isRateLimited(req, 'admin-manual-stamp', 30, 60_000);
+  if (rl.limited) {
+    res.setHeader('Retry-After', String(rl.retryAfter));
+    return res.status(429).json({ error: 'Too many requests. Please try again shortly.' });
+  }
+
+  try {
+    getRequiredEnv('ADMIN_PASSWORD');
+  } catch {
     console.error('Server configuration error: ADMIN_PASSWORD environment variable is missing.');
     return res.status(500).json({ error: 'Server authentication configuration error. ADMIN_PASSWORD is not set.' });
   }
 
   try {
-    const { password, email, staffNote } = req.body || {};
+    const { email, staffNote } = req.body || {};
 
-    if (!safeVerifyAdminPassword(password)) {
+    if (!isAdminAuthenticated(req).ok) {
+      await new Promise((r) => setTimeout(r, 300));
       return res.status(401).json({ error: 'Invalid admin credentials.' });
     }
 
-    if (!SUPABASE_SERVICE_ROLE_KEY) {
+    let supabaseAdmin;
+    try {
+      const { url, serviceKey } = getSupabaseConfig();
+      supabaseAdmin = createClient(url, serviceKey, { auth: { persistSession: false } });
+    } catch {
       console.error('Server configuration error: SUPABASE_SERVICE_ROLE_KEY is missing.');
       return res.status(500).json({ error: 'Server database configuration error. Please contact administrator.' });
     }
@@ -66,9 +47,9 @@ export default async function handler(req, res) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-      auth: { persistSession: false }
-    });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail) || cleanEmail.length > 254) {
+      return res.status(400).json({ error: 'Invalid customer email.' });
+    }
 
     // 1. Find profile by email
     let userId = null;
@@ -125,8 +106,10 @@ export default async function handler(req, res) {
       });
     }
 
-    // 2. Insert manual stamp
-    const note = staffNote?.trim() ? `Manual Grant: ${staffNote.trim()}` : 'Manual Barista Override (Edge Case / GPS)';
+    // 2. Insert manual stamp (cap note length, strip control chars)
+    const rawNote = typeof staffNote === 'string' ? staffNote.trim().slice(0, 200) : '';
+    const safeNote = rawNote.replace(/[\u0000-\u001F\u007F]/g, '');
+    const note = safeNote ? `Manual Grant: ${safeNote}` : 'Manual Barista Override (Edge Case / GPS)';
     const { error: insertErr } = await supabaseAdmin
       .from('stamps')
       .insert({

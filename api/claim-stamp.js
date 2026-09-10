@@ -1,9 +1,7 @@
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
+import { getDailyQrSecret, getSupabaseConfig, setCorsHeaders, isRateLimited } from './_security.js';
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://cqtcmrqlafgtcrcfaojz.supabase.co';
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const DAILY_QR_SECRET = process.env.DAILY_QR_SECRET || '***REMOVED_DAILY_QR_SECRET***';
 const CAFE_LAT = parseFloat(process.env.CAFE_LAT || '13.6218');
 const CAFE_LNG = parseFloat(process.env.CAFE_LNG || '123.1948');
 const CAFE_TIMEZONE = process.env.CAFE_TIMEZONE || 'Asia/Manila';
@@ -33,7 +31,7 @@ function getManilaDateString(date = new Date()) {
 }
 
 function generateExpectedToken(dateStr) {
-  return crypto.createHmac('sha256', DAILY_QR_SECRET).update(dateStr).digest('hex');
+  return crypto.createHmac('sha256', getDailyQrSecret()).update(dateStr).digest('hex');
 }
 
 function safeCompareTokens(provided, expected) {
@@ -62,23 +60,7 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
 }
 
 export default async function handler(req, res) {
-  // Restrict CORS with strict origin validation
-  const origin = req.headers.origin;
-  const allowedOrigins = ['https://www.baia.cafe', 'https://baia.cafe'];
-  const isAllowed = origin && (
-    allowedOrigins.includes(origin) ||
-    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin) ||
-    /^http:\/\/localhost(:\d+)?$/.test(origin) ||
-    /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
-  );
-
-  if (isAllowed) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', 'https://www.baia.cafe');
-  }
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  setCorsHeaders(req, res, 'GET,OPTIONS,POST');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -88,21 +70,29 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const rl = isRateLimited(req, 'claim-stamp', 20, 60_000);
+  if (rl.limited) {
+    res.setHeader('Retry-After', String(rl.retryAfter));
+    return res.status(429).json({ error: 'Too many requests. Please try again shortly.' });
+  }
+
   try {
     const authHeader = req.headers.authorization || req.headers.Authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Missing or invalid Authorization header' });
     }
 
-    if (!SUPABASE_SERVICE_ROLE_KEY) {
-      console.error('Server configuration error: SUPABASE_SERVICE_ROLE_KEY is missing.');
+    const accessToken = authHeader.replace('Bearer ', '').trim();
+    let supabaseAdmin;
+    try {
+      const { url, serviceKey } = getSupabaseConfig();
+      supabaseAdmin = createClient(url, serviceKey, {
+        auth: { persistSession: false }
+      });
+    } catch (e) {
+      console.error('Server configuration error: Supabase env is missing.');
       return res.status(500).json({ error: 'Server database configuration error. Please contact administrator.' });
     }
-
-    const accessToken = authHeader.replace('Bearer ', '').trim();
-    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-      auth: { persistSession: false }
-    });
 
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(accessToken);
     if (authError || !user) {
@@ -115,7 +105,16 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'QR verification token is required.' });
     }
 
-    if (!process.env.DAILY_QR_SECRET && process.env.NODE_ENV === 'production') {
+    if (typeof token !== 'string' || token.length !== 64 || !/^[a-f0-9]{64}$/i.test(token)) {
+      return res.status(403).json({
+        error: 'Invalid or expired QR code. Please scan today’s QR standee at the drink pickup bar.'
+      });
+    }
+
+    // Fail closed when secrets are not configured (no hardcoded fallback)
+    try {
+      getDailyQrSecret();
+    } catch (e) {
       console.error('Server configuration error: DAILY_QR_SECRET is not set.');
       return res.status(500).json({ error: 'Server QR configuration error. Please contact administrator.' });
     }

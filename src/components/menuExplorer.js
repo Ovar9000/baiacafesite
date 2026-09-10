@@ -138,12 +138,12 @@ export function initMenuExplorer() {
               return `
                 <span 
                   class="sneak-peek-pill ${isFeatured ? 'is-featured' : ''}" 
-                  data-target-item-id="${item.id}"
-                  data-parent-category-id="${group.id}"
-                  title="Explore ${item.name}"
+                  data-target-item-id="${escapeHtml(item.id)}"
+                  data-parent-category-id="${escapeHtml(group.id)}"
+                  title="Explore ${escapeHtml(item.name)}"
                 >
                   ${isFeatured ? '<span class="note-star" aria-hidden="true">★</span>' : ''}
-                  <span class="pill-name">${item.name}</span>
+                  <span class="pill-name">${escapeHtml(item.name)}</span>
                 </span>
                 ${!isLast ? '<span class="tasting-dot" aria-hidden="true">·</span>' : ''}
               `;
@@ -151,8 +151,8 @@ export function initMenuExplorer() {
             ${remainingCount > 0 ? `
               <span 
                 class="tasting-more" 
-                data-parent-category-id="${group.id}"
-                title="View all ${group.items.length} items in ${group.name}"
+                data-parent-category-id="${escapeHtml(group.id)}"
+                title="View all ${group.items.length} items in ${escapeHtml(group.name)}"
               >
                 +${remainingCount} more
               </span>
@@ -160,23 +160,23 @@ export function initMenuExplorer() {
           `;
 
           return `
-            <div class="menu-accordion-card ${isOpen ? 'is-open' : ''}" id="cat-card-${group.id}">
+            <div class="menu-accordion-card ${isOpen ? 'is-open' : ''}" id="cat-card-${escapeHtml(group.id)}">
               <div 
                 class="category-accordion-btn" 
-                data-category-id="${group.id}" 
+                data-category-id="${escapeHtml(group.id)}" 
                 role="button" 
                 tabindex="0" 
                 aria-expanded="${isOpen}"
-                aria-controls="cat-body-${group.id}"
+                aria-controls="cat-body-${escapeHtml(group.id)}"
               >
                 <div class="category-header-main">
                   <div class="category-title-left">
-                    <h3 class="category-title-text">${group.name}</h3>
+                    <h3 class="category-title-text">${escapeHtml(group.name)}</h3>
                     <span class="category-count-pill">${group.items.length} ${group.items.length === 1 ? 'item' : 'items'}</span>
                     ${priceTeaserMarkup}
                   </div>
 
-                  <div class="category-sneak-peek-track" aria-label="Sneak peek of ${group.name}">
+                  <div class="category-sneak-peek-track" aria-label="Sneak peek of ${escapeHtml(group.name)}">
                     ${previewCapsulesMarkup}
                   </div>
 
@@ -203,39 +203,39 @@ export function initMenuExplorer() {
                     else if (item.subcategory) modifierTag = item.subcategory;
 
                     return `
-                      <article class="menu-card" data-item-id="${item.id}">
+                      <article class="menu-card" data-item-id="${escapeHtml(item.id)}">
                         <div class="menu-card-main">
                           <div class="card-header-row">
                             <div class="item-name-group">
-                              <h4 class="item-name">${item.name}</h4>
+                              <h4 class="item-name">${escapeHtml(item.name)}</h4>
                               <div class="item-badges">
                                 ${item.isSpecialty ? '<span class="badge-special">Specialty</span>' : ''}
                                 ${item.isPopular ? '<span class="badge-pop">Popular</span>' : ''}
                               </div>
                             </div>
-                            <div class="item-price-tag">${priceDisplay}</div>
+                            <div class="item-price-tag">${escapeHtml(priceDisplay)}</div>
                           </div>
-                          <p class="item-desc">${item.description || 'Crafted fresh daily on the shore with premium ingredients.'}</p>
+                          <p class="item-desc">${escapeHtml(item.description || 'Crafted fresh daily on the shore with premium ingredients.')}</p>
                         </div>
 
                         <div class="card-footer-action-row">
                           <div class="card-footer-tags">
-                            <span class="item-cat-tag">${group.name}</span>
-                            ${modifierTag ? `<span class="item-mod-tag">${modifierTag}</span>` : ''}
+                            <span class="item-cat-tag">${escapeHtml(group.name)}</span>
+                            ${modifierTag ? `<span class="item-mod-tag">${escapeHtml(modifierTag)}</span>` : ''}
                           </div>
                           <button 
                             class="btn-add-item" 
-                            data-add-id="${item.id}"
-                            data-add-name="${item.name}"
-                            data-add-price="${itemPrice}"
-                            data-add-desc="${item.description || ''}"
-                            data-add-board="${activeBoard}"
-                            data-category-id="${group.id}"
+                            data-add-id="${escapeHtml(item.id)}"
+                            data-add-name="${escapeHtml(item.name)}"
+                            data-add-price="${escapeHtml(String(itemPrice))}"
+                            data-add-desc="${escapeHtml(item.description || '')}"
+                            data-add-board="${escapeHtml(activeBoard)}"
+                            data-category-id="${escapeHtml(group.id)}"
                             data-has-hot-cold="${group.hasHotCold ? 'true' : 'false'}"
                             data-has-sizes="${group.hasSizes ? 'true' : 'false'}"
-                            data-price-m="${item.priceM || ''}"
-                            data-price-l="${item.priceL || ''}"
-                            aria-label="Add ${item.name} to order"
+                            data-price-m="${escapeHtml(String(item.priceM || ''))}"
+                            data-price-l="${escapeHtml(String(item.priceL || ''))}"
+                            aria-label="Add ${escapeHtml(item.name)} to order"
                           >
                             <span>${itemPrice > 0 ? '+ Order' : 'Inquire'}</span>
                           </button>
@@ -254,7 +254,7 @@ export function initMenuExplorer() {
       <div class="menu-disclaimer-card">
         <div class="disclaimer-text">
           <p><strong>BAIA CAFE SHORE NOTICE</strong></p>
-          <p>${menuData.boardDisclaimer}</p>
+          <p>${escapeHtml(menuData.boardDisclaimer)}</p>
         </div>
       </div>
     `;
@@ -614,8 +614,8 @@ export function initMenuExplorer() {
           <div class="customizer-header-row">
             <div>
               <div class="modal-badge">Drink Customization</div>
-              <h3 id="drink-customizer-title" class="customizer-drink-title">${itemData.name}</h3>
-              <p class="customizer-drink-desc">${itemData.description || 'Crafted fresh on the shore with artisanal ingredients.'}</p>
+              <h3 id="drink-customizer-title" class="customizer-drink-title">${escapeHtml(itemData.name)}</h3>
+              <p class="customizer-drink-desc">${escapeHtml(itemData.description || 'Crafted fresh on the shore with artisanal ingredients.')}</p>
             </div>
             <button type="button" class="modal-dialog-close-btn" id="customizer-close-btn" aria-label="Close customizer">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -664,12 +664,12 @@ export function initMenuExplorer() {
                 ${addOnsList.map(addon => {
                   const isChecked = selectedAddOns.has(addon.id);
                   return `
-                    <div class="customizer-addon-row ${isChecked ? 'is-checked' : ''}" data-addon-id="${addon.id}" role="checkbox" aria-checked="${isChecked}" tabindex="0">
+                    <div class="customizer-addon-row ${isChecked ? 'is-checked' : ''}" data-addon-id="${escapeHtml(addon.id)}" role="checkbox" aria-checked="${isChecked}" tabindex="0">
                       <div class="addon-left-info">
                         <div class="addon-checkbox-indicator">${isChecked ? '✓' : ''}</div>
-                        <span class="addon-row-name">${addon.name}</span>
+                        <span class="addon-row-name">${escapeHtml(addon.name)}</span>
                       </div>
-                      <span class="addon-row-price">+₱${addon.price}</span>
+                      <span class="addon-row-price">+₱${Number(addon.price) || 0}</span>
                     </div>
                   `;
                 }).join('')}

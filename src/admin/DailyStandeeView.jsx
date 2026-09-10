@@ -39,11 +39,13 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
       setManualError('');
       setManualResult(null);
 
+      const sess = sessionStorage.getItem('baia_admin_session') || '';
+      const isSession = sess && password === sess;
       const res = await fetch('/api/admin-manual-stamp', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(isSession ? { 'X-Admin-Session': sess } : {}) },
         body: JSON.stringify({
-          password,
+          ...(isSession ? { adminSession: sess } : { password }),
           email: manualEmail.trim(),
           staffNote: manualNote.trim()
         })

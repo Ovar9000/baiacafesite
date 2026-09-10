@@ -28,6 +28,11 @@ dist-ssr
 .env.*
 !.env.example
 
+# Secrets / voucher pools — never commit live codes
+supabase/wifi_vouchers.csv
+supabase/*vouchers*.csv
+supabase/*voucher*.csv
+
 # Audit, diagnostic, and testing scripts
 diagnose.js
 optimize-critical.js
