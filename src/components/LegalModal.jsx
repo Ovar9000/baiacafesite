@@ -117,11 +117,12 @@ export default function LegalModal({ type, onClose }) {
               <section>
                 <h4 style={{ color: '#131314', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>2. BAIA Café Loyalty Rules</h4>
                 <ul style={{ margin: '0', paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', textAlign: 'left' }}>
-                  <li><strong>Earning Stamps:</strong> Receive 1 digital stamp per qualifying handcrafted beverage purchased at BAIA Café by scanning the official daily standee QR code.</li>
-                  <li><strong>Daily Limit:</strong> Maximum of 1 stamp per account per calendar day (Asia/Manila timezone).</li>
-                  <li><strong>Physical Standee QR:</strong> Stamp claims require scanning the physical daily counter standee at BAIA Café. Codes rotate daily at midnight.</li>
+                  <li><strong>Qualifying Items (Handcrafted Beverages Only):</strong> Stamps are awarded exclusively on full-priced handcrafted beverages (Classic Coffee, Signature Coffee, House Specials, Blended Frappes, Non-Coffee, Fruit Sodas, and Shaken Teas).</li>
+                  <li><strong>Exclusions (Meals &amp; Add-ons Do Not Count):</strong> Food orders, rice meals, mirindal, waffles, burgers, pasta, bakery items, side dishes (e.g., plain rice, extra sauces), and beverage customizations/add-ons (e.g., extra syrup pump, extra espresso shot, alternative milk) do <strong>NOT</strong> qualify for stamp collection or reward redemption.</li>
+                  <li><strong>Daily Limit:</strong> Maximum of 1 stamp per member per calendar day (Asia/Manila timezone).</li>
+                  <li><strong>Physical Tap Card &amp; Standee QR:</strong> Collect stamps by tapping your registered physical BAIA Tap Card at the barista cashier or scanning the daily counter standee QR code. Physical cards are requested on the website for ₱120 and include one (1) complimentary Classic Coffee upon activation.</li>
                   <li><strong>Beach Wi-Fi Voucher:</strong> Each daily stamp scan dispenses a 1-hour access voucher for the <em>"BAIA Free Wifi"</em> hotspot, valid for up to 2 devices.</li>
-                  <li><strong>Reward Redemption:</strong> Every 10 stamps earns 1 complimentary specialty coffee. Rewards must be redeemed in-person with our counter barista.</li>
+                  <li><strong>Reward Redemption Scope:</strong> Every 10 stamps earns one (1) complimentary <strong>Classic Coffee</strong> (Long Black, Flat White, Cafe Latte, Cappuccino). Specialty upgrades are available by paying the menu price difference at the counter.</li>
                 </ul>
               </section>
 

@@ -3,20 +3,25 @@ import {
   QrCode, 
   Users, 
   Activity, 
+  CreditCard,
   Lock, 
   AlertCircle
 } from 'lucide-react';
 import DailyStandeeView from './DailyStandeeView.jsx';
 import RewardsRosterView from './RewardsRosterView.jsx';
 import CustomerActivityView from './CustomerActivityView.jsx';
+import CounterKioskView from './CounterKioskView.jsx';
 import '../styles/loyalty.css';
 
 function getTabFromPath() {
-  if (typeof window === 'undefined') return 'qr';
+  if (typeof window === 'undefined') return 'counter';
   const path = window.location.pathname.toLowerCase();
-  if (path.includes('/activity')) return 'activity';
-  if (path.includes('/rewards')) return 'rewards';
-  return 'qr';
+  const search = window.location.search.toLowerCase();
+  if (path.includes('/counter') || search.includes('tab=counter')) return 'counter';
+  if (path.includes('/activity') || search.includes('tab=activity')) return 'activity';
+  if (path.includes('/rewards') || search.includes('tab=rewards')) return 'rewards';
+  if (path.includes('/qr') || search.includes('tab=qr')) return 'qr';
+  return 'counter';
 }
 
 export default function AdminPortal({ initialTab }) {
@@ -261,7 +266,7 @@ export default function AdminPortal({ initialTab }) {
           <div style={{ minWidth: 0 }}>
             <div className="loyalty-logo-title">BAIA CAFÉ</div>
             <div className="loyalty-logo-sub" style={{ fontSize: '0.64rem' }}>
-              {activeTab === 'qr' ? 'BARISTA & ADMIN PORTAL' : activeTab === 'rewards' ? 'BARISTA INSIGHTS & REWARDS' : 'CUSTOMER ACTIVITY DASHBOARD'}
+              {activeTab === 'counter' ? 'BARISTA CASHIER & NFC TAP' : activeTab === 'qr' ? 'BARISTA & ADMIN PORTAL' : activeTab === 'rewards' ? 'BARISTA INSIGHTS & REWARDS' : 'CUSTOMER ACTIVITY DASHBOARD'}
             </div>
           </div>
         </a>
@@ -274,6 +279,29 @@ export default function AdminPortal({ initialTab }) {
           gap: '6px',
           maxWidth: '100%'
         }}>
+          {/* Tab: Counter Cashier (NFC Tap & Card Requests) */}
+          <button
+            type="button"
+            onClick={() => switchTab('counter')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '6px 12px',
+              borderRadius: '9999px',
+              fontSize: '0.78rem',
+              fontWeight: activeTab === 'counter' ? 700 : 600,
+              color: activeTab === 'counter' ? '#FFFFFF' : '#64748B',
+              background: activeTab === 'counter' ? '#131314' : '#F1F5F9',
+              border: 'none',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+            }}
+          >
+            <CreditCard size={14} style={{ flexShrink: 0 }} />
+            <span>Counter Cashier</span>
+          </button>
           {/* Tab 1: Daily Standee QR */}
           <button
             type="button"
@@ -441,6 +469,13 @@ export default function AdminPortal({ initialTab }) {
           </div>
         ) : (
           <div key={activeTab} className="admin-tab-pane">
+            {activeTab === 'counter' && (
+              <CounterKioskView 
+                password={password}
+                adminSession={adminSession}
+              />
+            )}
+
             {activeTab === 'qr' && (
               <DailyStandeeView 
                 password={adminSession || password}
