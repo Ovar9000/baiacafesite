@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { setCorsHeaders, isRateLimited, isAdminAuthenticated, getSupabaseConfig, getRequiredEnv } from './_security.js';
+import { setCorsHeaders, isRateLimited, rejectUnlessAdmin, getSupabaseConfig, getRequiredEnv } from './_security.js';
 
 export default async function handler(req, res) {
   setCorsHeaders(req, res);
@@ -28,10 +28,7 @@ export default async function handler(req, res) {
   try {
     const { email, staffNote } = req.body || {};
 
-    if (!isAdminAuthenticated(req).ok) {
-      await new Promise((r) => setTimeout(r, 300));
-      return res.status(401).json({ error: 'Invalid admin credentials.' });
-    }
+    if (await rejectUnlessAdmin(req, res)) return;
 
     let supabaseAdmin;
     try {
@@ -55,16 +52,27 @@ export default async function handler(req, res) {
     let userId = null;
     let displayName = cleanEmail;
 
-    const { data: profiles, error: profileErr } = await supabaseAdmin
+    // Resolve by the verified auth email, not profiles.email: profiles is the
+    // lookup of record only when its email matches auth.users exactly.
+    // Escape LIKE wildcards so "a_b@x.com" can't match other customers.
+    const likeSafeEmail = cleanEmail.replace(/[\\%_]/g, (c) => `\\${c}`);
+    const { data: profiles } = await supabaseAdmin
       .from('profiles')
       .select('id, email, display_name')
-      .ilike('email', cleanEmail)
-      .limit(1);
+      .ilike('email', likeSafeEmail)
+      .order('created_at', { ascending: true })
+      .limit(5);
 
-    if (profiles && profiles.length > 0) {
-      userId = profiles[0].id;
-      displayName = profiles[0].display_name || cleanEmail;
-    } else {
+    for (const candidate of profiles || []) {
+      const { data: authData } = await supabaseAdmin.auth.admin.getUserById(candidate.id);
+      if (authData?.user?.email?.toLowerCase() === cleanEmail) {
+        userId = candidate.id;
+        displayName = candidate.display_name || cleanEmail;
+        break;
+      }
+    }
+
+    if (!userId) {
       // Try finding user via auth admin API with pagination
       try {
         let page = 1;
@@ -125,7 +133,7 @@ export default async function handler(req, res) {
           error: `Customer (${displayName}) has already received a stamp for today. Only 1 stamp per day is permitted.`
         });
       }
-      return res.status(500).json({ error: `Failed to award stamp in database: ${insertErr.message}` });
+      return res.status(500).json({ error: 'Failed to award stamp in database.' });
     }
 
     // 3. Get updated count
@@ -147,6 +155,6 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('Unhandled admin manual stamp error:', err);
-    return res.status(500).json({ error: err.message || 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }

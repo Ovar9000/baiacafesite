@@ -42,7 +42,7 @@ export default async function handler(req, res) {
 
     // Require explicit typed confirmation to prevent CSRF / stolen-token abuse
     const { confirm } = req.body || {};
-    if (req.method === 'POST' && confirm !== 'DELETE') {
+    if (confirm !== 'DELETE') {
       return res.status(400).json({ error: 'Please type DELETE to confirm account deletion.' });
     }
 
@@ -73,6 +73,6 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     console.error('Delete account error:', err);
-    return res.status(500).json({ error: err.message || 'Failed to delete account.' });
+    return res.status(500).json({ error: 'Failed to delete account. Please try again.' });
   }
 }

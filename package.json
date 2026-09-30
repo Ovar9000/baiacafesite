@@ -15,23 +15,23 @@
     "test:fb": "node --test \"tests/*.test.js\""
   },
   "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "^1.2.0",
+    "@vitejs/plugin-react": "^4.7.0",
     "lighthouse": "^12.8.2",
-    "vite": "^5.4.2"
+    "vite": "^5.4.2",
+    "vite-plugin-pwa": "^0.20.5"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.4",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "@vitejs/plugin-basic-ssl": "^1.2.0",
-    "@vitejs/plugin-react": "^4.7.0",
     "canvas-confetti": "^1.9.4",
     "html5-qrcode": "^2.3.8",
     "lucide-react": "^1.38.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "vanilla-tilt": "^1.8.1",
-    "vite-plugin-pwa": "^0.20.5"
+    "vanilla-tilt": "^1.8.1"
   }
 }

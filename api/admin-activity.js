@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { setCorsHeaders, isRateLimited, isAdminAuthenticated, getSupabaseConfig, getRequiredEnv } from './_security.js';
+import { setCorsHeaders, isRateLimited, rejectUnlessAdmin, getSupabaseConfig, getRequiredEnv } from './_security.js';
 
 function getSupabaseAdmin() {
   try {
@@ -64,10 +64,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    if (!isAdminAuthenticated(req).ok) {
-      await new Promise((r) => setTimeout(r, 300));
-      return res.status(401).json({ error: 'Invalid admin credentials.' });
-    }
+    if (await rejectUnlessAdmin(req, res)) return;
 
     const supabaseAdmin = getSupabaseAdmin();
     if (!supabaseAdmin) {
@@ -282,6 +279,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Error in admin-activity API:', error);
-    return res.status(500).json({ error: error.message || 'Failed to process activity metrics.' });
+    return res.status(500).json({ error: 'Failed to process activity metrics.' });
   }
 }

@@ -93,10 +93,9 @@ drop policy if exists "Users can view own profile" on public.profiles;
 create policy "Users can view own profile" on public.profiles
   for select using (auth.uid() = id);
 
--- Users can update their own profile details
+-- Profiles are server-managed (trigger + service_role). No client UPDATE: letting
+-- users rewrite profiles.email/display_name enables impersonation at the counter.
 drop policy if exists "Users can update own profile" on public.profiles;
-create policy "Users can update own profile" on public.profiles
-  for update using (auth.uid() = id);
 
 -- Stamps Policies:
 -- Users can view their own stamp history
@@ -241,7 +240,7 @@ create table if not exists public.wifi_vouchers (
   is_claimed boolean default false,
   claimed_by uuid references public.profiles(id) on delete set null,
   claimed_at timestamptz,
-  created_at timestamptz default timezone('Asia/Manila'::text, now()) not null
+  created_at timestamptz default now() not null
 );
 
 create index if not exists idx_wifi_vouchers_unclaimed 
@@ -278,7 +277,7 @@ begin
   into v_code, v_dur, v_dev
   from public.wifi_vouchers
   where claimed_by = p_user_id
-    and (timezone('Asia/Manila', claimed_at)::date) = (timezone('Asia/Manila', now())::date)
+    and claimed_at >= date_trunc('day', now() at time zone 'Asia/Manila') at time zone 'Asia/Manila'
   limit 1;
 
   if found then
@@ -298,7 +297,7 @@ begin
     update public.wifi_vouchers
     set is_claimed = true,
         claimed_by = p_user_id,
-        claimed_at = timezone('Asia/Manila'::text, now())
+        claimed_at = now()
     where id = v_id;
 
     return query select v_code, v_dur, v_dev;
