@@ -1,12 +1,14 @@
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
-import { getDailyQrSecret, getSupabaseConfig, setCorsHeaders, isRateLimited } from './_security.js';
+import { getDailyQrSecret, getSupabaseConfig, setCorsHeaders, isRateLimited, getClientIp, hashIp } from './_security.js';
 
 const CAFE_LAT = parseFloat(process.env.CAFE_LAT || '13.6218');
 const CAFE_LNG = parseFloat(process.env.CAFE_LNG || '123.1948');
 const CAFE_TIMEZONE = process.env.CAFE_TIMEZONE || 'Asia/Manila';
 const CAFE_OPEN_HOUR = parseInt(process.env.CAFE_OPEN_HOUR || '9', 10);
 const CAFE_CLOSE_HOUR = parseInt(process.env.CAFE_CLOSE_HOUR || '23', 10);
+const WIFI_VOUCHER_DAILY_CAP = parseInt(process.env.WIFI_VOUCHER_DAILY_CAP || '150', 10);
+const WIFI_VOUCHER_NEW_ACCOUNT_IP_CAP = parseInt(process.env.WIFI_VOUCHER_NEW_ACCOUNT_IP_CAP || '10', 10);
 
 function isCafeOperatingHours(date = new Date()) {
   const hour = parseInt(new Intl.DateTimeFormat('en-US', {
@@ -199,7 +201,7 @@ export default async function handler(req, res) {
           error: 'You have already collected today’s stamp! Enjoy your drink and come back tomorrow for another.'
         });
       }
-      return res.status(500).json({ error: `Failed to record stamp in database: ${insertError.message}` });
+      return res.status(500).json({ error: 'Failed to record stamp. Please try again.' });
     }
 
     // 6. Recalculate totals and milestone unlock
@@ -219,10 +221,25 @@ export default async function handler(req, res) {
     const pendingRewards = Math.max(0, milestoneNumber - (redemptionsCount || 0));
 
     // 7. Dispense Omada Wi-Fi Voucher (gracefully fails safe if pool not seeded yet)
+    // The printed QR is valid all day, so a leaked photo could be used with throwaway
+    // accounts to drain the pool. v2 enforces a café-wide daily cap plus a per-network
+    // cap on vouchers for accounts created in the last 24h. Stamps are unaffected.
     let wifiVoucher = null;
     try {
-      const { data: voucherData, error: voucherErr } = await supabaseAdmin
-        .rpc('claim_next_wifi_voucher', { p_user_id: user.id });
+      const isNewAccount = Date.now() - new Date(user.created_at).getTime() < 24 * 60 * 60 * 1000;
+      let { data: voucherData, error: voucherErr } = await supabaseAdmin
+        .rpc('claim_next_wifi_voucher_v2', {
+          p_user_id: user.id,
+          p_ip_hash: hashIp(getClientIp(req)),
+          p_is_new_account: isNewAccount,
+          p_daily_cap: WIFI_VOUCHER_DAILY_CAP,
+          p_new_account_ip_cap: WIFI_VOUCHER_NEW_ACCOUNT_IP_CAP
+        });
+      if (voucherErr?.code === 'PGRST202') {
+        // Migration not applied yet — fall back to the original dispenser
+        ({ data: voucherData, error: voucherErr } = await supabaseAdmin
+          .rpc('claim_next_wifi_voucher', { p_user_id: user.id }));
+      }
 
       if (!voucherErr && voucherData && voucherData.length > 0) {
         wifiVoucher = {
@@ -250,6 +267,6 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('Unhandled claim-stamp error:', err);
-    return res.status(500).json({ error: err.message || 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }

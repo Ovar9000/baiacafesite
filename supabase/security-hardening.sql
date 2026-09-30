@@ -24,9 +24,8 @@ drop policy if exists "Users can view own profile" on public.profiles;
 create policy "Users can view own profile" on public.profiles
   for select using (auth.uid() = id);
 
+-- No client UPDATE on profiles (see 2026-09-30-audit-fixes.sql)
 drop policy if exists "Users can update own profile" on public.profiles;
-create policy "Users can update own profile" on public.profiles
-  for update using (auth.uid() = id);
 
 -- No INSERT/DELETE on profiles from client (handled by handle_new_user trigger + service_role)
 -- (Deliberately no insert/delete policies here.)

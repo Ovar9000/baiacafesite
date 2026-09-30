@@ -107,7 +107,7 @@ export default async function handler(req, res) {
       if (insertError.code === '23505' || insertError.message?.toLowerCase().includes('unique') || insertError.message?.toLowerCase().includes('duplicate')) {
         return res.status(400).json({ error: 'This reward milestone has already been claimed.' });
       }
-      return res.status(500).json({ error: `Failed to record reward redemption: ${insertError.message}` });
+      return res.status(500).json({ error: 'Failed to record reward redemption. Please try again.' });
     }
 
     return res.status(200).json({
@@ -122,6 +122,6 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('Unhandled redeem-reward error:', err);
-    return res.status(500).json({ error: err.message || 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }

@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { getDailyQrSecret, setCorsHeaders, isRateLimited, isAdminAuthenticated, issueAdminSession, buildClaimUrls, getRequiredEnv } from './_security.js';
+import { getDailyQrSecret, setCorsHeaders, isRateLimited, rejectUnlessAdmin, issueAdminSession, buildClaimUrls, getRequiredEnv } from './_security.js';
 
 const CAFE_TIMEZONE = process.env.CAFE_TIMEZONE || 'Asia/Manila';
 
@@ -49,12 +49,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const auth = isAdminAuthenticated(req);
-    if (!auth.ok) {
-      // Generic message + same timing to deter user enumeration
-      await new Promise((r) => setTimeout(r, 300));
-      return res.status(401).json({ error: 'Invalid admin credentials.' });
-    }
+    if (await rejectUnlessAdmin(req, res)) return;
 
     const todayDateStr = getManilaDateString();
     const token = crypto.createHmac('sha256', dailySecret).update(todayDateStr).digest('hex');

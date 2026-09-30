@@ -13,7 +13,7 @@ create table if not exists public.wifi_vouchers (
   is_claimed boolean default false,
   claimed_by uuid references public.profiles(id),
   claimed_at timestamptz,
-  created_at timestamptz default timezone('Asia/Manila'::text, now()) not null
+  created_at timestamptz default now() not null
 );
 
 -- Partial index for lightning-fast claiming of available vouchers
@@ -55,7 +55,7 @@ begin
   into v_code, v_dur, v_dev
   from public.wifi_vouchers
   where claimed_by = p_user_id
-    and (timezone('Asia/Manila', claimed_at)::date) = (timezone('Asia/Manila', now())::date)
+    and claimed_at >= date_trunc('day', now() at time zone 'Asia/Manila') at time zone 'Asia/Manila'
   limit 1;
 
   if found then
@@ -76,7 +76,7 @@ begin
     update public.wifi_vouchers
     set is_claimed = true,
         claimed_by = p_user_id,
-        claimed_at = timezone('Asia/Manila'::text, now())
+        claimed_at = now()
     where id = v_id;
 
     return query select v_code, v_dur, v_dev;

@@ -41,16 +41,10 @@
   <link rel="preload" as="image" href="./images/Baia%20skimboard%20and%20coffee.webp" type="image/webp" fetchpriority="high" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Plain stylesheet: the media="print" + onload swap is an inline handler the CSP blocks -->
   <link
     rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;600;800;900&family=Space+Grotesk:wght@700;900&display=swap"
-    media="print"
-    onload="this.media='all'" />
-  <noscript>
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;600;800;900&family=Space+Grotesk:wght@700;900&display=swap" />
-  </noscript>
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;600;800;900&family=Space+Grotesk:wght@700;900&display=swap" />
 
   <!-- Critical Above-The-Fold CSS -->
   <style id="critical-hero-css">
@@ -205,28 +199,8 @@ svg { display: block; max-width: 100%; }
 
   <!-- Master Stylesheet and Main Entry Module -->
   <link rel="stylesheet" href="/src/styles/main.css" />
-  <script>
-    // Smart 24-hour scroll restoration:
-    // First-time or hero-viewing users start snug at top (0, 0); repeat browsing within 24h restores position.
-    try {
-      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-      if (!window.location.hash) {
-        const raw = localStorage.getItem('baia_scroll_pos');
-        if (raw) {
-          const data = JSON.parse(raw);
-          if (Date.now() - (data.time || 0) < 86400000 && data.y > 150) {
-            window.scrollTo(0, data.y);
-          } else {
-            window.scrollTo(0, 0);
-          }
-        } else {
-          window.scrollTo(0, 0);
-        }
-      }
-    } catch (_) {
-      window.scrollTo(0, 0);
-    }
-  </script>
+  <!-- External (not inline) so the CSP allows it; runs before first paint -->
+  <script src="/scroll-restore.js"></script>
   <script type="module" src="/src/main.js"></script>
 
   <!-- Schema.org JSON-LD Structured Data -->
