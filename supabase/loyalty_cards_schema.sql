@@ -11,9 +11,9 @@ create table if not exists public.loyalty_cards (
   card_uid text unique not null,
   card_label text default 'Baia Vinyl Tap Card',
   status text default 'active' check (status in ('active', 'deactivated', 'lost')),
-  issued_at timestamptz default timezone('Asia/Manila'::text, now()) not null,
+  issued_at timestamptz default now() not null,
   last_tapped_at timestamptz,
-  created_at timestamptz default timezone('Asia/Manila'::text, now()) not null
+  created_at timestamptz default now() not null
 );
 
 -- Optimize lookups when customer taps card at counter scanner
@@ -28,7 +28,7 @@ create table if not exists public.card_requests (
   price_php numeric default 120 not null,
   includes_free_coffee boolean default true not null,
   free_coffee_redeemed boolean default false not null,
-  requested_at timestamptz default timezone('Asia/Manila'::text, now()) not null,
+  requested_at timestamptz default now() not null,
   fulfilled_at timestamptz,
   fulfilled_by text,
   notes text
@@ -55,10 +55,9 @@ drop policy if exists "Users can view own card requests" on public.card_requests
 create policy "Users can view own card requests" on public.card_requests
   for select using (auth.uid() = user_id);
 
--- Users can insert their own card request
+-- No client INSERT: requests go through /api/request-physical-card (service_role),
+-- which enforces one pending request / no active card and fixed price fields.
 drop policy if exists "Users can submit own card request" on public.card_requests;
-create policy "Users can submit own card request" on public.card_requests
-  for insert with check (auth.uid() = user_id);
 
 -- Ensure service_role has full access for backend APIs
 grant all on public.loyalty_cards to service_role;

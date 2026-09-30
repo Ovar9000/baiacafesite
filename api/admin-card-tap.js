@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { setCorsHeaders, isRateLimited, isAdminAuthenticated, getSupabaseConfig } from './_security.js';
+import { setCorsHeaders, isRateLimited, rejectUnlessAdmin, getSupabaseConfig } from './_security.js';
 
 const CAFE_TIMEZONE = process.env.CAFE_TIMEZONE || 'Asia/Manila';
 
@@ -39,10 +39,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    if (!isAdminAuthenticated(req).ok) {
-      await new Promise((r) => setTimeout(r, 200));
-      return res.status(401).json({ error: 'Invalid admin credentials.' });
-    }
+    if (await rejectUnlessAdmin(req, res)) return;
 
     const { cardUid } = req.body || {};
     const cleanUid = cleanCardUid(cardUid);
@@ -166,7 +163,7 @@ export default async function handler(req, res) {
           message: `${userProfile.display_name} already collected today’s stamp!`
         });
       }
-      return res.status(500).json({ error: `Failed to award stamp: ${insertError.message}` });
+      return res.status(500).json({ error: 'Failed to award stamp.' });
     }
 
     // Update last_tapped_at on card
@@ -196,6 +193,6 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('Unhandled admin-card-tap error:', err);
-    return res.status(500).json({ error: err.message || 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }

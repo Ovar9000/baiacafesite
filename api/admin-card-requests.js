@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { setCorsHeaders, isRateLimited, isAdminAuthenticated, getSupabaseConfig } from './_security.js';
+import { setCorsHeaders, isRateLimited, rejectUnlessAdmin, getSupabaseConfig } from './_security.js';
 
 export default async function handler(req, res) {
   setCorsHeaders(req, res, 'GET,OPTIONS,POST');
@@ -19,10 +19,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    if (!isAdminAuthenticated(req).ok) {
-      await new Promise((r) => setTimeout(r, 200));
-      return res.status(401).json({ error: 'Invalid admin credentials.' });
-    }
+    if (await rejectUnlessAdmin(req, res)) return;
 
     let supabaseAdmin;
     try {
@@ -91,6 +88,6 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('Unhandled admin-card-requests error:', err);
-    return res.status(500).json({ error: err.message || 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }

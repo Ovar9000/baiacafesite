@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { setCorsHeaders, isRateLimited, isAdminAuthenticated, getSupabaseConfig } from './_security.js';
+import { setCorsHeaders, isRateLimited, rejectUnlessAdmin, getSupabaseConfig } from './_security.js';
 
 function cleanCardUid(raw) {
   if (!raw || typeof raw !== 'string') return '';
@@ -25,10 +25,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    if (!isAdminAuthenticated(req).ok) {
-      await new Promise((r) => setTimeout(r, 200));
-      return res.status(401).json({ error: 'Invalid admin credentials.' });
-    }
+    if (await rejectUnlessAdmin(req, res)) return;
 
     const { requestId, userId, cardUid, staffNote } = req.body || {};
 
@@ -45,15 +42,20 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Server database configuration error.' });
     }
 
-    // 1. Check if card UID is already assigned to any active card
+    // 1. Look up this UID in any status (card_uid is unique across all statuses,
+    //    so a deactivated/lost card must be re-linked, not re-inserted)
     const { data: existingCard, error: checkErr } = await supabaseAdmin
       .from('loyalty_cards')
       .select('id, user_id, status')
       .eq('card_uid', cleanUid)
-      .eq('status', 'active')
       .maybeSingle();
 
-    if (existingCard) {
+    if (checkErr) {
+      console.error('Error checking card UID:', checkErr);
+      return res.status(500).json({ error: 'Database error checking card.' });
+    }
+
+    if (existingCard?.status === 'active') {
       return res.status(400).json({
         error: `This NFC card (${cleanUid}) is already registered and active for another member! Please use an unassigned blank card.`
       });
@@ -86,29 +88,47 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Target user ID or Request ID is required.' });
     }
 
-    // 3. Deactivate any previous active cards for this user
+    // 3. Link the card FIRST so a failure never leaves the member without a card
+    const cardFields = {
+      user_id: targetUserId,
+      card_label: staffNote ? `Baia Vinyl Tap Card (${staffNote})` : 'Baia Vinyl Tap Card',
+      status: 'active',
+      issued_at: new Date().toISOString(),
+      last_tapped_at: null
+    };
+
+    const { data: newCard, error: cardLinkErr } = existingCard
+      ? await supabaseAdmin
+          .from('loyalty_cards')
+          .update(cardFields)
+          .eq('id', existingCard.id)
+          .neq('status', 'active')
+          .select()
+          .single()
+      : await supabaseAdmin
+          .from('loyalty_cards')
+          .insert({ ...cardFields, card_uid: cleanUid })
+          .select()
+          .single();
+
+    if (cardLinkErr || !newCard) {
+      console.error('Error linking loyalty card:', cardLinkErr);
+      if (cardLinkErr?.code === '23505' || cardLinkErr?.code === 'PGRST116') {
+        // Unique violation or the row became active meanwhile: someone else linked it first
+        return res.status(409).json({
+          error: `This NFC card (${cleanUid}) was just registered to another member. Please use an unassigned blank card.`
+        });
+      }
+      return res.status(500).json({ error: 'Failed to link card. Please try again.' });
+    }
+
+    // 4. Retire the member's previous active cards (all except the one just linked)
     await supabaseAdmin
       .from('loyalty_cards')
       .update({ status: 'deactivated' })
       .eq('user_id', targetUserId)
-      .eq('status', 'active');
-
-    // 4. Insert new active card
-    const { data: newCard, error: cardInsertErr } = await supabaseAdmin
-      .from('loyalty_cards')
-      .insert({
-        user_id: targetUserId,
-        card_uid: cleanUid,
-        card_label: staffNote ? `Baia Vinyl Tap Card (${staffNote})` : 'Baia Vinyl Tap Card',
-        status: 'active'
-      })
-      .select()
-      .single();
-
-    if (cardInsertErr) {
-      console.error('Error creating loyalty card:', cardInsertErr);
-      return res.status(500).json({ error: `Failed to link card: ${cardInsertErr.message}` });
-    }
+      .eq('status', 'active')
+      .neq('id', newCard.id);
 
     // 5. If fulfilling a request, mark it fulfilled
     if (requestId) {
@@ -139,6 +159,6 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('Unhandled admin-fulfill-card error:', err);
-    return res.status(500).json({ error: err.message || 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }
