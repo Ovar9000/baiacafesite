@@ -1,6 +1,7 @@
 import './styles/main.css';
 import { motionSystem } from './utils/motionSystem.js';
 import { initHero3D } from './components/hero3D.js';
+import { initHeroCaustics } from './components/heroCaustics.js';
 import { initMenuExplorer } from './components/menuExplorer.js';
 import { initBoardsRental } from './components/boardsRental.js';
 import { initBayVibesAudio } from './components/bayVibesAudio.js';
@@ -190,6 +191,7 @@ function initApp() {
 
   // Defer non-critical ambient features to idle time
   const initAmbientFeatures = () => {
+    safeInit('heroCaustics', initHeroCaustics);
     safeInit('bayVibesAudio', initBayVibesAudio);
     safeInit('shoreConditions', initShoreConditions);
     safeInit('liquidFloaties', initLiquidFloaties);
