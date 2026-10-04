@@ -253,8 +253,11 @@ export function buildCommunityCardHTML(item) {
 // no winners, no dates that the post doesn't contain.
 
 const RX = {
-  // Same-day operational updates: useful on Facebook, not "drops".
-  notice: /\b(full house|fully booked|deliver(?:y|ies)\b[^.\n]*\b(?:paused?|on hold|suspended|delayed|longer)|paus(?:e|ing) deliver(?:y|ies)|may take (?:a little )?longer|now hiring|we(?:'|’)?re hiring|hiring|job opening|looking for)\b/,
+  // Same-day operational updates: shown briefly as "Cafe Update", never as drops.
+  notice: /\b(full house|fully booked|deliver(?:y|ies)\b[^.\n]*\b(?:paused?|on hold|suspended|delayed|longer)|paus(?:e|ing) deliver(?:y|ies)|may take (?:a little )?longer)\b/,
+  hiring: /\b(now hiring|we(?:'|’)?re hiring|hiring|job opening|looking for)\b/,
+  // Café news that isn't a menu item.
+  announce: /\b(loyalty (?:card|program)|stamp card)\b/,
   closure: /\b(closed (?:today|for the day|tomorrow)|we(?:'|’)?(?:re| are) closed|weather (?:break|advisory)|temporar(?:y|ily) closed|closure)\b/,
   launch: /\b(now online|new website)\b/,
   giveaway: /\b(giveaway|contest|guess (?:the|our|what|which)|to win|win a|free .* for the first)\b/,
@@ -312,8 +315,10 @@ export function classifyDropPost(post) {
   };
 
   if (RX.closure.test(lower)) return base('advisory', 'event', '1-Day Advisory');
-  if (RX.notice.test(lower)) return { action: 'skip', reason: 'operational-notice' };
+  if (RX.hiring.test(lower)) return { action: 'skip', reason: 'hiring' };
+  if (RX.notice.test(lower)) return base('update', 'event', 'Cafe Update');
   if (RX.launch.test(lower)) return base('launch', 'event', 'Website Launch');
+  if (RX.announce.test(lower)) return base('news', 'event', 'New at BAIA');
   if (RX.giveaway.test(lower)) {
     return RX.winner.test(lower)
       ? base('giveaway', 'event', 'Winner Awarded', 'concluded')
@@ -336,5 +341,5 @@ export function classifyDropPost(post) {
 /** Wall: skip notice/hiring posts (their images are text graphics, not moments). */
 export function isWallNoticePost(post) {
   const lower = normalizePostText(post?.message).toLowerCase();
-  return RX.notice.test(lower) || RX.closure.test(lower);
+  return RX.notice.test(lower) || RX.closure.test(lower) || RX.hiring.test(lower);
 }

@@ -1,5 +1,47 @@
 [
   {
+    "id": "640323492494372_122186165348834483",
+    "category": "event",
+    "title": "Full house today!",
+    "description": "Full house today!💙\n\nDelivery orders may take a little longer than usual. Thanks for your patience!",
+    "price": null,
+    "event_date": null,
+    "winner": null,
+    "status": null,
+    "image_url": "./images/Baia%20skimboard%20and%20coffee.webp",
+    "permalink": "https://www.facebook.com/122183033894834483/posts/122186165348834483",
+    "published_at": "2026-09-28T07:29:18+00:00",
+    "badge": "Cafe Update"
+  },
+  {
+    "id": "640323492494372_122184430916834483",
+    "category": "event",
+    "title": "FULL HOUSE TODAY",
+    "description": "FULL HOUSE TODAY 💙\n\nFeeling so grateful for the love! 🥹 We’ll pause deliveries for now and focus on everyone here at BAIA. Thank you, always. 🙏🏻\n\nNew menu before the month ends.",
+    "price": null,
+    "event_date": null,
+    "winner": null,
+    "status": null,
+    "image_url": "https://cqtcmrqlafgtcrcfaojz.supabase.co/storage/v1/object/public/drops-cache/drop_640323492494372_122184430916834483.jpg",
+    "permalink": "https://www.facebook.com/122183033894834483/posts/122184430916834483",
+    "published_at": "2026-09-14T09:03:20+00:00",
+    "badge": "Cafe Update"
+  },
+  {
+    "id": "640323492494372_122183525726834483",
+    "category": "event",
+    "title": "THE BAIA DIGITAL LOYALTY CARD",
+    "description": "THE BAIA DIGITAL LOYALTY CARD ☕️\n\nA more convenient way to make every visit count, with less paper along the way. 🌱\n\nWe’re taking our loyalty program digital, so your card is always within reach on your phone. No more forgetting it at home, losing a physical card, or keeping track of where you put it.\n\nJust scan when you visit and order with us, then watch your stamps add up.\n\nVisit www.baia.cafe/card/\n\nCYCLE 01\n10 stamps → FREE COFFEE\n\nCYCLE 02\n10 more stamps → FREE BAIA MERCH\n\nHOW TO JOIN?\n\nFollow the step-by-step instructions on this page to get started. Have your email account ready for registration.\n\nLess to carry. Less to lose. Less paper.\nMore reasons to come back. ☕️🌱",
+    "price": null,
+    "event_date": null,
+    "winner": null,
+    "status": null,
+    "image_url": "https://cqtcmrqlafgtcrcfaojz.supabase.co/storage/v1/object/public/drops-cache/drop_640323492494372_122183525726834483.jpg",
+    "permalink": "https://www.facebook.com/122183033894834483/posts/122183525726834483",
+    "published_at": "2026-09-05T09:18:49+00:00",
+    "badge": "New at BAIA"
+  },
+  {
     "id": "640323492494372_122183128280834483",
     "category": "event",
     "title": "BAIA, Now Online",

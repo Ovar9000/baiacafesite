@@ -535,11 +535,19 @@ describe('classifyDropPost — rules only, built from the post text', async () =
   const { classifyDropPost, isWallNoticePost, titleFromPost, normalizePostText } = await import('../scripts/fb-post-utils.js');
   const post = (message) => ({ id: 'x', message });
 
-  it('skips same-day notices ("delivery" is not "live")', () => {
-    assert.deepEqual(classifyDropPost(post('Full house today!💙\n\nDelivery orders may take a little longer than usual.')),
-      { action: 'skip', reason: 'operational-notice' });
-    assert.equal(classifyDropPost(post('FULL HOUSE TODAY 💙 We’ll pause deliveries for now.')).action, 'skip');
-    assert.equal(classifyDropPost(post('We’re hiring! ☕️💙 1 Male Barista')).reason, 'operational-notice');
+  it('same-day notices are Cafe Updates, never drops ("delivery" is not "live")', () => {
+    const c = classifyDropPost(post('Full house today!💙\n\nDelivery orders may take a little longer than usual.'));
+    assert.equal(c.badge, 'Cafe Update');
+    assert.equal(c.category, 'event');
+    assert.equal(c.title, 'Full house today!');
+    assert.equal(classifyDropPost(post('FULL HOUSE TODAY 💙 We’ll pause deliveries for now.\nNew menu before the month ends.')).badge, 'Cafe Update');
+    assert.deepEqual(classifyDropPost(post('We’re hiring! ☕️💙 1 Male Barista')), { action: 'skip', reason: 'hiring' });
+  });
+
+  it('loyalty card announcement is News, not a launch duplicate', () => {
+    const c = classifyDropPost(post('𝗧𝗛𝗘 𝗕𝗔𝗜𝗔 𝗗𝗜𝗚𝗜𝗧𝗔𝗟 𝗟𝗢𝗬𝗔𝗟𝗧𝗬 𝗖𝗔𝗥𝗗 ☕️\n\nVisit www.baia.cafe/card/'));
+    assert.equal(c.badge, 'New at BAIA');
+    assert.equal(c.title, 'THE BAIA DIGITAL LOYALTY CARD');
   });
 
   it('food vs drink by keyword weight, titled from the real text', () => {
@@ -576,6 +584,7 @@ describe('classifyDropPost — rules only, built from the post text', async () =
 
   it('wall skips notice/hiring graphics', () => {
     assert.equal(isWallNoticePost(post('We’re hiring! Check the caption.')), true);
+    assert.equal(isWallNoticePost(post('Full house today! Deliveries may take longer.')), true);
     assert.equal(isWallNoticePost(post('For the matcha people who also need a beach break.')), false);
   });
 

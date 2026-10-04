@@ -38,6 +38,11 @@ export function initNewDrops() {
       (item.badge === '1-Day Advisory' || /\b(advisory|closure|weather)\b/i.test(item.title || ''));
   }
 
+  // Same-day café news ("Full house today") from the sync: shown briefly, never as a drop.
+  function isUpdateItem(item) {
+    return item.badge === 'Cafe Update';
+  }
+
   function isGiveawayItem(item) {
     return item.category === 'event' &&
       (item.badge === 'Giveaway' || item.badge === 'Winner Awarded' || Boolean(item.winner) || /\b(giveaway|contest|guess)\b/i.test(item.title || ''));
@@ -48,7 +53,7 @@ export function initNewDrops() {
     const anchor = parseDate(item.event_date) || parseDate(item.published_at);
     if (!anchor) return false;
     const ageDays = (now - anchor.getTime()) / DAY_MS;
-    if (isAdvisoryItem(item)) return ageDays > ADVISORY_TTL_DAYS;
+    if (isAdvisoryItem(item) || isUpdateItem(item)) return ageDays > ADVISORY_TTL_DAYS;
     if (item.category === 'event' && !isGiveawayItem(item) && parseDate(item.event_date)) {
       return ageDays > PAST_EVENT_TTL_DAYS;
     }
@@ -194,6 +199,14 @@ export function initNewDrops() {
               badgeClass = 'badge-advisory';
               badgeLabel = '1-Day Advisory';
               categoryLabel = 'ADVISORY';
+            } else if (isUpdateItem(item)) {
+              badgeClass = 'badge-advisory';
+              badgeLabel = 'Cafe Update';
+              categoryLabel = 'UPDATE';
+            } else if (item.badge === 'New at BAIA') {
+              badgeClass = 'badge-event';
+              badgeLabel = 'New at BAIA';
+              categoryLabel = 'NEWS';
             } else {
               badgeClass = 'badge-event';
               badgeLabel = item.badge || 'Live Event';
@@ -259,6 +272,11 @@ export function initNewDrops() {
                         <span aria-hidden="true">→</span>
                       </a>
                     `}
+                  ` : (/baia\.cafe\/card/i.test(item.description || '') ? `
+                    <a href="/card/" class="btn-drop-order">
+                      <span>Get Your Card</span>
+                      <span aria-hidden="true">→</span>
+                    </a>
                   ` : (isUpcomingEvent && !isAdvisory ? `
                     <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-drop-order btn-drop-rsvp">
                       <span>RSVP on Messenger</span>
@@ -268,7 +286,7 @@ export function initNewDrops() {
                     <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-drop-order">
                       <span>Message Us</span>
                     </a>
-                  `))}
+                  `)))}
 
                   ${item.permalink ? `
                     <a href="${sanitizeUrl(item.permalink, 'https://facebook.com/thebaiacafe')}" target="_blank" rel="noopener" class="btn-drop-fb" title="View original post on Facebook" aria-label="View original Facebook post">
