@@ -17,6 +17,8 @@
  * import this file safely.
  */
 
+import { thumbPathFor } from '../src/utils/wallThumbs.js';
+
 export const FB_GRAPH_VERSION = 'v19.0';
 
 // Requested on BOTH /posts and /tagged. `full_picture` is the critical
@@ -221,54 +223,25 @@ function escapeHtmlAttr(s) {
 }
 
 /**
- * Spread slots so runtime cards land on DIFFERENT cells instead of stacking.
- * Desktop cup is 14 cols × 8 rows; mobile cup is 7 cols × 6 rows.
- * MUST stay in sync with `src/components/communityWall.js` `wallSlot`.
- */
-const DESKTOP_SLOTS = [[3,2],[11,2],[6,3],[10,4],[4,5],[12,5],[7,6],[2,4]];
-const MOBILE_SLOTS = [[2,2],[6,2],[4,3],[3,4],[5,4],[2,5],[6,5],[4,5]];
-const SLOT_ROTS = ['-3deg','2.5deg','-2deg','3deg','-1.5deg','2deg','-2.5deg','1.5deg'];
-
-export function wallSlot(index = 0) {
-  const i = ((index % DESKTOP_SLOTS.length) + DESKTOP_SLOTS.length) % DESKTOP_SLOTS.length;
-  return {
-    gc: DESKTOP_SLOTS[i][0],
-    gr: DESKTOP_SLOTS[i][1],
-    mgc: MOBILE_SLOTS[i][0],
-    mgr: MOBILE_SLOTS[i][1],
-    rot: SLOT_ROTS[i],
-    z: 4 + (i % 3),
-  };
-}
-
-/**
  * Card markup contract — MUST stay in sync with
  * `src/components/communityWall.js` `buildCommunityCardHTML`.
  * Tests assert this contract (data-photo / data-permalink / img src).
+ * Position comes from the card's index via src/utils/wallLayout.js
+ * (applyWallLayout), so cards carry no grid coordinates of their own.
  */
-export function buildCommunityCardHTML(item, index = 0) {
-  const slot = wallSlot(index);
-  const asGridNum = (v, fb) => {
-    const n = parseInt(v, 10);
-    return Number.isFinite(n) && n > 0 ? n : fb;
-  };
-  const gc = asGridNum(item.gc, slot.gc);
-  const gr = asGridNum(item.gr, slot.gr);
-  const mgc = asGridNum(item.mgc, slot.mgc);
-  const mgr = asGridNum(item.mgr, slot.mgr);
-  const z = asGridNum(item.z, slot.z);
+export function buildCommunityCardHTML(item) {
   const photo = escapeHtmlAttr(item.photo_url);
+  const tile = escapeHtmlAttr(thumbPathFor(item.photo_url) || item.photo_url);
   const quote = escapeHtmlAttr(item.caption);
-  const author = escapeHtmlAttr(item.guest_name || 'BAIA Cafe Guest');
-  const meta = escapeHtmlAttr(`${item.date || 'Recently'} • ${item.tagline || 'Shared Community Moment'}`);
+  const author = escapeHtmlAttr(item.guest_name || 'Shared on Facebook');
+  const meta = escapeHtmlAttr(`${item.date || 'Recently'} • ${item.tagline || 'Shared on Facebook'}`);
   const permalink = escapeHtmlAttr(item.permalink || 'https://www.facebook.com/thebaiacafe');
-  const rot = escapeHtmlAttr(item.tilt || slot.rot);
   return (
-    `<button type="button" class="mosaic-photo-card" style="--gc: ${gc}; --gr: ${gr}; --mgc: ${mgc}; --mgr: ${mgr}; --rot: ${rot}; --z: ${z};"` +
+    `<button type="button" class="mosaic-photo-card"` +
     ` data-wall-id="${escapeHtmlAttr(item.id || '')}" data-photo="${photo}" data-quote="${quote}" data-author="${author}" data-meta="${meta}"` +
     ` data-permalink="${permalink}" data-community-hydrated="1" aria-label="View photo by ${author}">` +
     `<div class="mosaic-photo-frame">` +
-    `<img src="${photo}" alt="BAIA Family guest photo" class="mosaic-photo-img" loading="lazy" />` +
+    `<img src="${tile}" alt="BAIA Family guest photo" class="mosaic-photo-img" loading="lazy" />` +
     `</div></button>`
   );
 }

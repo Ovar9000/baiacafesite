@@ -31,14 +31,18 @@ import {
   markSource,
   mergePostEdges,
   shouldSkipShareForDrops,
-  wallSlot,
 } from '../scripts/fb-post-utils.js';
 
 import {
-  collectOccupiedCells,
-  parseGridCoord,
-  rankFreeCells,
-} from '../src/components/communityWall.js';
+  DESKTOP_GRID,
+  DESKTOP_SLOTS,
+  MOBILE_GRID,
+  MOBILE_SLOTS,
+  WALL_SIZE,
+  wallSlot,
+  wallSlotAttrs,
+} from '../src/utils/wallLayout.js';
+import { thumbPathFor } from '../src/utils/wallThumbs.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -262,41 +266,15 @@ describe('buildCommunityCardHTML — page-update contract', () => {
     assert.match(html, /&quot;&gt;&lt;script&gt;/);
   });
 
-  it('spreads consecutive cards across DIFFERENT grid cells (no stacking)', () => {
-    const cells = new Set();
-    for (let i = 0; i < 8; i++) {
-      const html = buildCommunityCardHTML({ photo_url: `/images/community/guest_new_${i}.jpg` }, i);
-      const m = html.match(/--gc: (\d+); --gr: (\d+); --mgc: (\d+); --mgr: (\d+);/);
-      assert.ok(m, 'card must carry desktop + mobile grid slots');
-      const [, gc, gr, mgc, mgr] = m.map(Number);
-      assert.ok(gc >= 1 && gc <= 14, `desktop gc ${gc} within 14-col cup`);
-      assert.ok(gr >= 1 && gr <= 8, `desktop gr ${gr} within 8-row cup`);
-      assert.ok(mgc >= 1 && mgc <= 7, `mobile mgc ${mgc} within 7-col cup`);
-      assert.ok(mgr >= 1 && mgr <= 6, `mobile mgr ${mgr} within 6-row cup`);
-      const key = `${gc}x${gr}`;
-      assert.ok(!cells.has(key), `cell ${key} must not repeat (stacking bug)`);
-      cells.add(key);
-    }
-    assert.equal(cells.size, 8);
+  it('cards carry no grid coordinates; position comes from their index', () => {
+    const html = buildCommunityCardHTML({ photo_url: '/x.jpg', gc: 5, gr: 6 });
+    assert.doesNotMatch(html, /--gc|--gr|style=/);
   });
 
-  it('wallSlot() mirrors the browser builder slots (shared layout contract)', () => {
-    const a = wallSlot(0);
-    const b = wallSlot(1);
-    assert.notDeepEqual([a.gc, a.gr], [b.gc, b.gr]);
-    const html = buildCommunityCardHTML({ photo_url: '/x.jpg' }, 0);
-    assert.match(html, new RegExp(`--gc: ${a.gc}; --gr: ${a.gr};`));
-  });
-
-  it('stored per-item layout wins over slot rotation (stable Supabase rows)', () => {
-    const html = buildCommunityCardHTML({ photo_url: '/x.jpg', gc: 5, gr: 6, mgc: 3, mgr: 4 }, 0);
-    assert.match(html, /--gc: 5; --gr: 6; --mgc: 3; --mgr: 4;/);
-  });
-
-  it('main.css maps hydrated cards to mobile slots in the 7-col cup', () => {
+  it('main.css maps phone slots (--mgc/--mgr) in the cup', () => {
     const css = read('src/styles/main.css');
-    assert.match(css, /\[data-community-hydrated="1"\]/);
-    assert.match(css, /grid-column: var\(--mgc, var\(--gc\)\)/);
+    assert.match(css, /\.baia-coffee-cup \.mosaic-photo-card \{\s*grid-column: var\(--mgc\);\s*grid-row: var\(--mgr\);/);
+    assert.match(css, /\.is-mobile-hidden \{\s*display: none;/);
   });
 
   it('cards carry a stable data-wall-id for cross-source dedupe', () => {
@@ -358,57 +336,79 @@ describe('supabase migration — community wall lives in the backend', () => {
 
 // --- 7. Collision-free placement + byte dedupe --------------------------------
 
-describe('wall placement — free cells only, repeats removed', () => {
-  it('parseGridCoord accepts positive ints, rejects junk', () => {
-    assert.equal(parseGridCoord('3'), 3);
-    assert.equal(parseGridCoord(5), 5);
-    assert.equal(parseGridCoord('0'), null);
-    assert.equal(parseGridCoord('-2'), null);
-    assert.equal(parseGridCoord('abc'), null);
-    assert.equal(parseGridCoord(undefined), null);
-  });
-
-  it('collectOccupiedCells dedupes and drops invalid coords', () => {
-    const occ = collectOccupiedCells([
-      { gc: '3', gr: '2' },
-      { gc: '3', gr: '2' },
-      { gc: 'x', gr: '2' },
-      { gc: '4', gr: null },
-    ]);
-    assert.deepEqual([...occ], ['3,2']);
-  });
-
-  it('rankFreeCells never returns occupied cells (the double-stack bug)', () => {
-    const occ = new Set(['3,2', '6,3', '4,5', '12,5', '7,6', '2,4']);
-    const cells = rankFreeCells(14, 8, occ, 8);
-    assert.equal(cells.length, 8);
-    for (const [gc, gr] of cells) {
-      assert.ok(!occ.has(`${gc},${gr}`), `cell ${gc},${gr} must be free`);
-      assert.ok(gc >= 1 && gc <= 14 && gr >= 1 && gr <= 8);
+describe('wall layout — one cup template, never stacks', () => {
+  const cellsOk = (slots, grid) => {
+    const keys = slots.map(([c, r]) => `${c},${r}`);
+    assert.equal(new Set(keys).size, slots.length, 'every slot is a different cell');
+    for (const [c, r] of slots) {
+      assert.ok(c >= 1 && c <= grid.cols && r >= 1 && r <= grid.rows, `${c},${r} inside ${grid.cols}x${grid.rows}`);
     }
-    assert.equal(new Set(cells.map((c) => c.join(','))).size, 8);
+  };
+
+  it('desktop and phone templates use unique cells inside their grids', () => {
+    assert.equal(WALL_SIZE, 30);
+    cellsOk(DESKTOP_SLOTS, DESKTOP_GRID);
+    cellsOk(MOBILE_SLOTS, MOBILE_GRID);
+    assert.ok(MOBILE_SLOTS.length < DESKTOP_SLOTS.length);
   });
 
-  it('rankFreeCells grows from the existing mass (nearest first)', () => {
-    const cells = rankFreeCells(5, 5, new Set(['3,3']), 4);
-    // All four orthogonal neighbours (Manhattan distance 1) come first.
-    for (const [gc, gr] of cells) {
-      assert.equal(Math.abs(gc - 3) + Math.abs(gr - 3), 1);
-    }
+  it('wallSlot maps index to slot; extra cards are hidden on phones', () => {
+    assert.deepEqual([wallSlot(0).gc, wallSlot(0).gr], DESKTOP_SLOTS[0]);
+    assert.deepEqual([wallSlot(0).mgc, wallSlot(0).mgr], MOBILE_SLOTS[0]);
+    assert.equal(wallSlot(MOBILE_SLOTS.length).mobileHidden, true);
+    assert.equal(wallSlot(WALL_SIZE - 1).steam, true);
+    assert.equal(wallSlot(WALL_SIZE).hidden, true);
+    assert.ok(wallSlotAttrs(MOBILE_SLOTS.length).classes.includes('is-mobile-hidden'));
   });
 
-  it('rankFreeCells returns fewer (never stacks) when the grid is full', () => {
-    const occ = new Set(['1,1', '2,1', '1,2', '2,2']);
-    assert.deepEqual(rankFreeCells(2, 2, occ, 5), []);
-    assert.equal(rankFreeCells(2, 2, new Set(['1,1']), 9).length, 3);
+  it('static index.html cup matches the template card-for-card', () => {
+    const html = read('index.html');
+    const cup = html.slice(html.indexOf('<div class="baia-coffee-cup">'));
+    const cards = [...cup.matchAll(/<button type="button" class="(mosaic-photo-card[^"]*)" style="([^"]*)"/g)];
+    assert.equal(cards.length, WALL_SIZE);
+    cards.forEach((m, i) => {
+      const { style, classes } = wallSlotAttrs(i);
+      assert.equal(m[2], style, `card ${i} style`);
+      assert.equal(m[1], ['mosaic-photo-card', ...classes].join(' '), `card ${i} classes`);
+    });
   });
 
-  it('communityWall.js places per-container from live DOM cells', () => {
+  it('hydration prepends then re-lays out the whole cup (oldest drop off)', async () => {
+    const { applyWallLayout } = await import('../src/utils/wallLayout.js');
+    // Minimal fake container: 30 static cards + 5 fresh ones prepended.
+    const made = [];
+    const mkCard = (id) => {
+      const card = {
+        id, attrs: {}, cls: new Set(['mosaic-photo-card']), removed: false,
+        setAttribute(k, v) { this.attrs[k] = v; },
+        classList: null,
+        remove() { this.removed = true; },
+      };
+      card.classList = {
+        add: (...c) => c.forEach((x) => card.cls.add(x)),
+        remove: (...c) => c.forEach((x) => card.cls.delete(x)),
+      };
+      made.push(card);
+      return card;
+    };
+    const list = [
+      ...Array.from({ length: 5 }, (_, i) => mkCard(`fresh${i}`)),
+      ...Array.from({ length: WALL_SIZE }, (_, i) => mkCard(`static${i}`)),
+    ];
+    const container = { querySelectorAll: () => list };
+    assert.equal(applyWallLayout(container), WALL_SIZE);
+    assert.deepEqual(list.filter((c) => c.removed).map((c) => c.id),
+      ['static25', 'static26', 'static27', 'static28', 'static29']);
+    const cells = list.filter((c) => !c.removed).map((c) => c.attrs.style.match(/--gc: (\d+); --gr: (\d+)/).slice(1).join(','));
+    assert.equal(new Set(cells).size, WALL_SIZE, 'no two cards share a cell');
+    assert.match(list[0].attrs.style, new RegExp(`--gc: ${DESKTOP_SLOTS[0][0]}; --gr: ${DESKTOP_SLOTS[0][1]};`));
+  });
+
+  it('communityWall.js lays out with the shared template', () => {
     const src = read('src/components/communityWall.js');
-    assert.match(src, /readContainerCells\(desktop, false\)/);
-    assert.match(src, /readContainerCells\(mobile, true\)/);
-    assert.match(src, /rankFreeCells\(/);
-    assert.match(src, /grid-full/);
+    assert.match(src, /applyWallLayout\(cup\)/);
+    assert.match(src, /insertBefore/);
+    assert.doesNotMatch(src, /rankFreeCells|readContainerCells/);
   });
 
   it('dedupeByContentHash drops byte-identical repeats, keeps the rest', () => {
@@ -472,6 +472,38 @@ describe('page wiring — sync output is fetched + rendered', () => {
       const html = buildCommunityCardHTML(item);
       assert.match(html, new RegExp(item.photo_url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').slice(0, 40)));
       assert.match(html, /data-permalink="https:\/\/www\.facebook\.com/);
+    }
+  });
+});
+
+// --- Photowall thumbnails: tiles load small WebPs, lightbox keeps full photo --
+
+describe('wall thumbnails', () => {
+  it('maps local photos to /images/thumbs/<name>.webp', () => {
+    assert.equal(thumbPathFor('/images/community/guest_1.jpg'), '/images/thumbs/guest_1.webp');
+    assert.equal(thumbPathFor('./images/skimboard.webp'), '/images/thumbs/skimboard.webp');
+    assert.equal(thumbPathFor('/images/Baia%20refreshers.jpg'), '/images/thumbs/Baia%20refreshers.webp');
+  });
+
+  it('leaves remote and already-thumb URLs alone', () => {
+    assert.equal(thumbPathFor('https://scontent-mnl3-1.xx.fbcdn.net/v/t39/a.jpg'), null);
+    assert.equal(thumbPathFor('/images/thumbs/guest_1.webp'), null);
+    assert.equal(thumbPathFor(undefined), null);
+  });
+
+  it('card tile uses the thumb while data-photo stays full-size', () => {
+    const html = buildCommunityCardHTML({ photo_url: '/images/community/guest_x.jpg' }, 0);
+    assert.match(html, /data-photo="\/images\/community\/guest_x\.jpg"/);
+    assert.match(html, /<img src="\/images\/thumbs\/guest_x\.webp"/);
+  });
+
+  it('every static wall tile in index.html points at an existing thumb', () => {
+    const html = read('index.html');
+    const srcs = [...html.matchAll(/<img\s+src="([^"]+)"[^>]*class="mosaic-photo-img"/g)].map((m) => m[1]);
+    assert.ok(srcs.length > 0);
+    for (const src of srcs) {
+      assert.ok(src.startsWith('/images/thumbs/'), `${src} should be a thumb`);
+      assert.ok(fs.existsSync(path.join(ROOT, 'public', decodeURIComponent(src))), `${src} missing on disk`);
     }
   });
 });
