@@ -115,8 +115,9 @@ export function initMenuExplorer() {
             <h3>No items match "${escapeHtml(searchQuery)}"</h3>
         ` : groupedItems.map(group => {
           const isOpen = isSearching ? true : openCategories.has(group.id);
-          // Dynamically size the tasting notes to fill available space without awkward "+1 more"
-          const maxAllowed = 8;
+          // Keep the preview short enough that the "+N more" hint stays on screen
+          // instead of the row being cut off mid-name; avoid an awkward "+1 more".
+          const maxAllowed = 4;
           let maxSneak = Math.min(group.items.length, maxAllowed);
           if (group.items.length - maxSneak === 1) {
             maxSneak = group.items.length;
@@ -237,7 +238,7 @@ export function initMenuExplorer() {
                             data-price-l="${escapeHtml(String(item.priceL || ''))}"
                             aria-label="Add ${escapeHtml(item.name)} to order"
                           >
-                            <span>${itemPrice > 0 ? '+ Order' : 'Inquire'}</span>
+                            <span>${itemPrice > 0 ? '+ Add' : 'Inquire'}</span>
                           </button>
                         </div>
                       </article>
@@ -253,7 +254,7 @@ export function initMenuExplorer() {
       <!-- Official Physical Menu Board Notice -->
       <div class="menu-disclaimer-card">
         <div class="disclaimer-text">
-          <p><strong>BAIA CAFE SHORE NOTICE</strong></p>
+          <p><strong>Good to know</strong></p>
           <p>${escapeHtml(menuData.boardDisclaimer)}</p>
         </div>
       </div>

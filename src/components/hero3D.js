@@ -221,7 +221,21 @@ export function initHero3D() {
     }
   }
 
-  hydrateHeroFromSupabase();
+  // The default card is already on screen, so the ~200 KB Supabase client can
+  // wait until the page has loaded and gone idle instead of competing with
+  // first paint on slow mobile data.
+  const hydrateWhenIdle = () => {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(hydrateHeroFromSupabase, { timeout: 3000 });
+    } else {
+      setTimeout(hydrateHeroFromSupabase, 1500);
+    }
+  };
+  if (document.readyState === 'complete') {
+    hydrateWhenIdle();
+  } else {
+    window.addEventListener('load', hydrateWhenIdle, { once: true });
+  }
 
   // 3. Periodic check: if 6-hour boundary changes while page remains open, crossfade to next feature
   setInterval(() => {

@@ -1,3 +1,5 @@
+import { HOURS, HOURS_TEXT, formatTime } from './siteInfo.js';
+
 export const boardsData = [
   {
     id: "board-skimboard",
@@ -59,7 +61,7 @@ export const boardsData = [
 export const cottageData = {
   title: "Barangay Laurente Floating Cottage",
   subtitle: "Official Booking Partner: BAIA Café (Message via Messenger)",
-  hours: "11:00 AM – 6:00 PM (Cafe open until 10:00 PM)",
+  hours: `${HOURS_TEXT.cottage} (Cafe open until ${formatTime(HOURS.cafe.closes)})`,
   image: "./images/Cottage%20rental.webp",
   cottagePhoto: "./images/Cottage.webp",
   rates: [

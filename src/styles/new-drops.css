@@ -569,9 +569,10 @@
   line-height: 1.45;
   color: var(--cream);
   margin-bottom: 14px;
-  flex: 1;
+  /* No flex-grow here: stretching a line-clamped box exposes a half-cut extra line.
+     The actions row is pushed down with margin-top:auto instead. */
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

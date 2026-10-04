@@ -64,7 +64,7 @@ class CartStore {
     }
 
     const customizationNote = (item.addOns && item.addOns.length > 0) ? ` (+${item.addOns.length} add-on${item.addOns.length > 1 ? 's' : ''})` : '';
-    this.showToast('Added to Order List', `${item.name}${customizationNote} (${this.formatCurrency(price)})`, '✓');
+    this.showToast('Added to My Order', `${item.name}${customizationNote} (${this.formatCurrency(price)})`, '✓');
     this.openDrawer();
   }
 

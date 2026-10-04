@@ -5,7 +5,7 @@
  * Features:
  * - Dynamic category filtering (All, Food, Drinks, Events)
  * - Relative time stamps ("2 days ago", "Yesterday")
- * - 1-Click "Message to Order" integration with cartStore & Messenger
+ * - 1-Click "Add to Order" integration with cartStore & Messenger
  * - Direct "View on Facebook ↗" links to original post
  * - Sleek card interactions and live sync status indicators
  */
@@ -13,13 +13,51 @@
 import updatesData from '../data/updates.json';
 import { cartStore } from './cartStore.js';
 import { escapeHtml, sanitizeUrl, sanitizeImageUrl } from '../utils/sanitize.js';
+import { whenNear } from '../utils/whenNear.js';
 
 export function initNewDrops() {
   const container = document.getElementById('new-drops-root');
   if (!container) return;
 
   let activeCategory = 'all';
-  let currentItems = (updatesData || []).filter(item => !String(item.id).startsWith('fb_post_'));
+
+  // Time-sensitive cards stop showing once they're stale, so a one-day
+  // closure notice can't linger on the homepage for weeks.
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const ADVISORY_TTL_DAYS = 3;
+  const PAST_EVENT_TTL_DAYS = 7;
+
+  function parseDate(str) {
+    if (!str) return null;
+    const d = new Date(str);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function isAdvisoryItem(item) {
+    return item.category === 'event' &&
+      (item.badge === '1-Day Advisory' || /\b(advisory|closure|weather)\b/i.test(item.title || ''));
+  }
+
+  function isGiveawayItem(item) {
+    return item.category === 'event' &&
+      (item.badge === 'Giveaway' || item.badge === 'Winner Awarded' || Boolean(item.winner) || /\b(giveaway|contest|guess)\b/i.test(item.title || ''));
+  }
+
+  function isExpired(item) {
+    const now = Date.now();
+    const anchor = parseDate(item.event_date) || parseDate(item.published_at);
+    if (!anchor) return false;
+    const ageDays = (now - anchor.getTime()) / DAY_MS;
+    if (isAdvisoryItem(item)) return ageDays > ADVISORY_TTL_DAYS;
+    if (item.category === 'event' && !isGiveawayItem(item) && parseDate(item.event_date)) {
+      return ageDays > PAST_EVENT_TTL_DAYS;
+    }
+    return false;
+  }
+
+  const keepItem = (item) => !String(item.id).startsWith('fb_post_') && !isExpired(item);
+
+  let currentItems = (updatesData || []).filter(keepItem);
 
   function formatTimeAgo(isoString) {
     if (!isoString) return 'Recently';
@@ -122,10 +160,12 @@ export function initNewDrops() {
           const timeAgo = formatTimeAgo(item.published_at);
 
           // Event sub-types (strictly scoped to events)
-          const isGiveaway = isEvent && (item.badge === 'Giveaway' || item.badge === 'Winner Awarded' || Boolean(item.winner) || /\b(giveaway|contest|guess)\b/i.test(item.title));
-          const isDatePast = Boolean(item.event_date && !isNaN(new Date(item.event_date).getTime()) && new Date(item.event_date) < new Date());
+          const isGiveaway = isGiveawayItem(item);
+          const eventDate = parseDate(item.event_date);
+          const isDatePast = Boolean(eventDate && eventDate < new Date());
+          const isUpcomingEvent = Boolean(eventDate && !isDatePast);
           const isGiveawayConcluded = isGiveaway && (item.status === 'concluded' || Boolean(item.winner) || item.badge === 'Winner Awarded' || isDatePast);
-          const isAdvisory = isEvent && !isGiveaway && (item.badge === '1-Day Advisory' || /\b(advisory|closure|weather)\b/i.test(item.title));
+          const isAdvisory = !isGiveaway && isAdvisoryItem(item);
 
           let badgeClass = 'badge-drop';
           let badgeLabel = item.badge || (isFood ? 'Fresh Drop' : (isDrink ? 'Drink Drop' : 'New Drop'));
@@ -184,27 +224,11 @@ export function initNewDrops() {
                   </span>
                 </div>
 
-                ${(isGiveaway && isGiveawayConcluded) ? `
-                  <div class="drop-date-tag tag-winner">
-                    ${item.winner ? `Winner: ${escapeHtml(item.winner)}` : 'Winner announced'}
-                  </div>
-                ` : (item.winner ? `
-                  <div class="drop-date-tag tag-winner">
-                    Winner: ${escapeHtml(item.winner)}
-                  </div>
-                ` : (!isEvent && item.price ? `
+                ${!isEvent && item.price ? `
                   <div class="drop-price-tag">
                     ${escapeHtml(item.price)}
                   </div>
-                ` : (item.event_date ? `
-                  <div class="drop-date-tag">
-                    ${escapeHtml(formatEventDate(item.event_date))}
-                  </div>
-                ` : (isAdvisory ? `
-                  <div class="drop-date-tag tag-advisory">
-                    Reopened Next Day
-                  </div>
-                ` : ''))))}
+                ` : ''}
               </div>
 
               <!-- Content Area -->
@@ -221,7 +245,7 @@ export function initNewDrops() {
                 <div class="drop-card-actions">
                   ${!isEvent && priceNum > 0 ? `
                     <button class="btn-drop-order" data-order-drop="${escapeHtml(item.id)}" data-title="${encodeURIComponent(item.title)}" data-price="${priceNum}">
-                      <span>Order (${escapeHtml(item.price)})</span>
+                      <span>Add to Order (${escapeHtml(item.price)})</span>
                     </button>
                   ` : (isGiveaway ? `
                     ${isGiveawayConcluded ? `
@@ -235,20 +259,16 @@ export function initNewDrops() {
                         <span aria-hidden="true">→</span>
                       </a>
                     `}
-                  ` : (isAdvisory ? `
-                    <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-drop-order">
-                      <span>Message Cafe</span>
-                    </a>
-                  ` : (isEvent ? `
+                  ` : (isUpcomingEvent && !isAdvisory ? `
                     <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-drop-order btn-drop-rsvp">
-                      <span>RSVP Event</span>
+                      <span>RSVP on Messenger</span>
                       <span aria-hidden="true">→</span>
                     </a>
                   ` : `
                     <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-drop-order">
-                      <span>Message Cafe</span>
+                      <span>Message Us</span>
                     </a>
-                  `)))}
+                  `))}
 
                   ${item.permalink ? `
                     <a href="${sanitizeUrl(item.permalink, 'https://facebook.com/thebaiacafe')}" target="_blank" rel="noopener" class="btn-drop-fb" title="View original post on Facebook" aria-label="View original Facebook post">
@@ -371,7 +391,7 @@ export function initNewDrops() {
         .limit(30);
 
       if (!error && dbDrops && dbDrops.length > 0) {
-        const validDbDrops = dbDrops.filter(item => !String(item.id).startsWith('fb_post_'));
+        const validDbDrops = dbDrops.filter(keepItem);
         if (validDbDrops.length > 0) {
           // Check if data is different before re-rendering
           const currentIds = currentItems.map(i => i.id).join(',');
@@ -387,5 +407,6 @@ export function initNewDrops() {
     }
   }
 
-  hydrateFromSupabase();
+  // The Supabase client is ~200 KB; fetch it only as the visitor nears this section.
+  whenNear(container, hydrateFromSupabase);
 }

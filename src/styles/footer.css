@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BAIA CAFE — Location, Sunset Hub & Unified Footer
+   BAIA CAFE — Location, Visit Card & Unified Footer
    ========================================================================== */
 
 .site-footer {
@@ -19,7 +19,7 @@
   margin-bottom: 52px;
 }
 
-/* Column 1: Brand & Operating Hours */
+/* Column 1: Brand */
 .footer-col-brand {
   display: flex;
   flex-direction: column;
@@ -60,70 +60,13 @@
   max-width: 380px;
 }
 
-.footer-location-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-pill);
-  padding: 6px 14px;
-  font-size: 0.8rem;
-  color: var(--cream);
-  width: fit-content;
-}
-
-.footer-location-badge .loc-map-link {
-  color: var(--amber-contrast);
-  font-weight: 800;
-  text-decoration: none;
-  border-bottom: 1px solid var(--golden-amber);
-}
-
-.footer-location-badge .loc-map-link:hover {
-  color: var(--white);
-}
-
-.footer-hours-box {
-  background: #0f1c48;
-  border-left: 3.5px solid var(--golden-amber);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  padding: 14px 18px;
-  margin-top: 4px;
-  position: relative;
-  z-index: 2;
-}
-
-.hours-title {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--amber-contrast);
-  letter-spacing: 0.08em;
-  margin-bottom: 4px;
-}
-
-.hours-schedule {
-  font-size: 0.925rem;
-  font-weight: 700;
-  color: var(--white);
-}
-
-.footer-kitchen-note {
-  font-size: 0.775rem !important;
-  color: rgba(245, 233, 214, 0.8) !important;
-  margin-top: 4px;
-  line-height: 1.35;
-}
-
-/* Column 2: Sunset Hub & Live Shore Vibe Card */
+/* Column 2: Visit card — hours, live status, directions */
 .footer-col-vibe {
   display: flex;
   flex-direction: column;
 }
 
-.sunset-countdown-card {
+.visit-card {
   background: linear-gradient(145deg, #182e75 0%, #0d1a42 100%);
   border: 1.5px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--radius-xl);
@@ -131,76 +74,95 @@
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
-.sunset-header {
+.visit-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.sunset-label {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+.visit-card-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.15rem;
   text-transform: uppercase;
-  color: var(--amber-contrast);
-  font-weight: 800;
-  letter-spacing: 0.05em;
+  color: var(--white);
 }
 
-.sunset-target {
-  font-size: 0.75rem;
-  color: var(--cream);
-  font-family: var(--font-mono);
+.visit-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
   font-weight: 700;
+  color: var(--cream);
   background: rgba(255, 255, 255, 0.1);
-  padding: 2px 8px;
+  padding: 4px 10px;
   border-radius: var(--radius-pill);
 }
 
-.sunset-time-row {
+.visit-hours-list {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
 }
 
-.sunset-time-display {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 900;
-  color: var(--white);
-  letter-spacing: -0.02em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-  min-width: 140px;
-  display: inline-block;
-}
-
-.sunset-time-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--amber-contrast);
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-}
-
-.sunset-note {
-  font-size: 0.85rem;
-  color: var(--cream);
-  line-height: 1.45;
-  opacity: 0.9;
-}
-
-.sunset-spot-footer {
-  border-top: 1px dashed rgba(255, 255, 255, 0.15);
-  padding-top: 10px;
+.visit-hours-list > div {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  font-size: 0.775rem;
+  gap: 12px;
+  font-size: 0.9rem;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.visit-hours-list dt {
   color: var(--cream);
+  opacity: 0.85;
+}
+
+.visit-hours-list dd {
+  margin: 0;
+  font-weight: 700;
+  color: var(--white);
+  text-align: right;
+}
+
+.visit-address {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--cream);
+}
+
+.visit-pluscode {
+  display: block;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.visit-directions-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  background: var(--golden-amber);
+  color: var(--deep-navy);
+  font-weight: 800;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: transform var(--duration-fast);
+}
+
+.visit-directions-btn:hover {
+  transform: translateY(-1px);
 }
 
 /* Column 3: Community & Social Links */
@@ -301,7 +263,7 @@
     grid-template-columns: 1fr;
     gap: 32px;
   }
-  .sunset-countdown-card {
+  .visit-card {
     max-width: 480px;
   }
 }

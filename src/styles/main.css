@@ -4,7 +4,6 @@
 
 @import './hero.css';
 @import './floaties.css';
-@import './weather.css';
 @import './divider.css';
 @import './story.css';
 @import './promo-grid.css';
@@ -96,6 +95,11 @@ main > section,
   outline: none;
 }
 
+/* Skip-link target: receives focus programmatically, no page-wide focus ring */
+#main-content:focus {
+  outline: none;
+}
+
 /* Fix mobile sub-pixel gaps between adjacent stacked sections */
 main > section + section,
 main + .site-footer {
@@ -135,7 +139,6 @@ main + .site-footer {
 [data-theme="midnight"],
 .theme-midnight,
 .menu-section,
-.reviews-section,
 .boards-section,
 .atmosphere-section,
 .site-footer {
@@ -270,7 +273,6 @@ main,
 .story-section,
 .promo-grid-section,
 .menu-section,
-.reviews-section,
 .boards-section,
 .atmosphere-section {
   position: relative;
@@ -678,10 +680,12 @@ main,
 /* ==========================================================================
    REVIEWS & TESTIMONIALS SECTION
    ========================================================================== */
+/* Light section between the navy menu and navy recreation blocks */
 .reviews-section {
   padding-top: 64px;
   padding-bottom: 80px;
-  background: #0E1A45;
+  background: var(--depth-sand-cream);
+  color: var(--deep-navy);
   position: relative;
 }
 
@@ -1200,6 +1204,12 @@ main,
   box-shadow: 0 4px 14px rgba(245, 166, 35, 0.4);
 }
 
+/* Hidden until the order has at least one item (set by cartDrawer.js) */
+.cart-count-badge[data-empty],
+.drawer-count-tag[data-empty] {
+  display: none;
+}
+
 .mobile-cart-badge {
   background: var(--hot-pink);
   color: var(--white);
@@ -1563,6 +1573,21 @@ main,
    RESPONSIVE LAYOUTS & PREFERS-REDUCED-MOTION
    ========================================================================== */
 
+/* Common laptop widths (1280–1440px): collapse Messenger to an icon so the
+   My Order button never runs off the right edge */
+@media (max-width: 1440px) {
+  .nav-phone-link {
+    padding: 0;
+    width: 38px;
+    min-width: 38px;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  .nav-phone-text {
+    display: none;
+  }
+}
+
 /* Laptops & Tablets Landscape (<= 1200px) */
 @media (max-width: 1200px) {
   .main-nav-links {
@@ -1818,3 +1843,78 @@ main,
   to { opacity: 1; }
 }
 
+
+/* ==========================================================================
+   TYPE DISCIPLINE
+   The handwritten script (Caveat) is reserved for the hero "Crafted" and the
+   polaroid photo captions. Every other headline accent uses the main type
+   with a single accent colour, so sections read as one site.
+   ========================================================================== */
+.drops-script-accent {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--amber-contrast);
+  transform: none;
+  margin-bottom: 12px;
+}
+
+.title-word-script {
+  font-family: inherit;
+  font-size: 1em;
+  color: var(--electric-blue);
+  text-transform: uppercase;
+  transform: none;
+  text-shadow: none;
+}
+
+.card-script-title {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--amber-contrast);
+  line-height: 1.2;
+  transform: none;
+  text-shadow: none;
+  margin-bottom: 4px;
+}
+
+.headline-script-line .script-accent {
+  font-family: var(--font-headline);
+  font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+  font-weight: 700;
+  transform: none;
+}
+
+.reviews-title .script-accent,
+.boards-title .script-accent {
+  font-family: inherit;
+  font-size: 1em;
+  font-weight: inherit;
+  line-height: inherit;
+  color: var(--golden-amber);
+  text-transform: inherit;
+  letter-spacing: inherit;
+  transform: none;
+  margin: 0;
+}
+
+/* Photo wall on sand */
+.reviews-section .reviews-tag {
+  color: #92400E;
+  background: rgba(245, 166, 35, 0.16);
+}
+.reviews-section .reviews-title {
+  color: var(--deep-navy);
+}
+.reviews-section .reviews-title .script-accent {
+  color: var(--electric-blue);
+}
+.reviews-section .reviews-subtitle {
+  color: #38466b;
+  opacity: 1;
+}

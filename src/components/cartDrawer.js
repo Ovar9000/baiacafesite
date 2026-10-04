@@ -137,7 +137,7 @@ export function initCartDrawer() {
 
   // Clear Cart Button
   clearBtn?.addEventListener('click', () => {
-    if (confirm('Clear all items from your order list?')) {
+    if (confirm('Clear all items from your order?')) {
       cartStore.clearCart();
     }
   });
@@ -146,7 +146,7 @@ export function initCartDrawer() {
   checkoutBtn?.addEventListener('click', () => {
     const totals = cartStore.getTotals();
     if (totals.itemCount === 0) {
-      cartStore.showToast('Order List is Empty', 'Add your favorite coffee or smash burger first.');
+      cartStore.showToast('Your Order is Empty', 'Add your favorite coffee or smash burger first.');
       return;
     }
     if (cartStore.isDelivery()) {
@@ -179,6 +179,8 @@ export function initCartDrawer() {
     const totalCount = store.getItemCount();
     countTags.forEach(tag => {
       tag.textContent = totalCount;
+      // An empty "0" badge reads as noise; only show the count once something is added
+      tag.toggleAttribute('data-empty', totalCount === 0);
     });
 
     const totals = store.getTotals();
@@ -427,8 +429,8 @@ export function initCartDrawer() {
               <line x1="14" y1="2" x2="14" y2="4"></line>
             </svg>
           </div>
-          <h4>Your Order List is Empty</h4>
-          <p>Explore our menu and build your order list to message directly via Facebook Messenger!</p>
+          <h4>Your Order is Empty</h4>
+          <p>Add items from the menu, then send your order to us on Messenger.</p>
           <button type="button" class="btn-story-pill" id="empty-cart-explore-btn" style="margin-top: 14px;">
             <span>Explore BAIA Menu</span>
             <span aria-hidden="true">→</span>
@@ -487,7 +489,7 @@ export function initCartDrawer() {
                 </button>
               ` : ''}
             </div>
-            <button class="btn-item-remove" data-key="${esc(item.key)}" aria-label="Remove ${esc(item.name)} from order list">Remove</button>
+            <button class="btn-item-remove" data-key="${esc(item.key)}" aria-label="Remove ${esc(item.name)} from your order">Remove</button>
           </div>
 
           ${hasCustomizations ? `
@@ -677,7 +679,7 @@ export function initCartDrawer() {
               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" style="display:inline-block; vertical-align: -2px; flex-shrink: 0;">
                 <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
               </svg>
-              <span id="modal-fb-btn-label">Open Messenger to Order</span>
+              <span id="modal-fb-btn-label">Send Order on Messenger</span>
               <span aria-hidden="true">↗</span>
             </button>
 
@@ -732,7 +734,7 @@ export function initCartDrawer() {
       if (fbBtnLabel) {
         fbBtnLabel.textContent = '✓ Copied! Opening Messenger...';
         setTimeout(() => {
-          fbBtnLabel.textContent = 'Open Messenger to Order';
+          fbBtnLabel.textContent = 'Send Order on Messenger';
         }, 4000);
       }
       cartStore.showToast('Order Copied to Clipboard!', 'Opening Messenger — paste and send.', '✓');

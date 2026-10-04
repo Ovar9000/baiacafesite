@@ -8,7 +8,7 @@
   <!-- Primary SEO Meta Tags -->
   <title>BAIA Cafe | Beachfront Specialty Coffee in Burias Island, Masbate</title>
   <meta name="description"
-    content="Beachfront specialty coffee, Bohol Asin Tibuok lattes, smash burgers &amp; floating cottage booking in Barangay Laurente, San Pascual, Burias Island. Open daily 11AM–10PM." />
+    content="Beachfront specialty coffee, Bohol Asin Tibuok lattes, smash burgers &amp; floating cottage booking in Barangay Laurente, San Pascual, Burias Island. Open daily {{cafeHoursMeta}}." />
   <meta name="keywords"
     content="BAIA Cafe, Burias Island cafe, San Pascual Masbate cafe, specialty coffee Burias, Asin Tibuok latte, smash burger, Laurente beach, skimboarding, floating cottage, order on facebook messenger" />
   <meta name="author" content="BAIA Cafe" />
@@ -199,8 +199,6 @@ svg { display: block; max-width: 100%; }
 
   <!-- Master Stylesheet and Main Entry Module -->
   <link rel="stylesheet" href="/src/styles/main.css" />
-  <!-- External (not inline) so the CSP allows it; runs before first paint -->
-  <script src="/scroll-restore.js"></script>
   <script type="module" src="/src/main.js"></script>
 
   <!-- Schema.org JSON-LD Structured Data -->
@@ -254,8 +252,8 @@ svg { display: block; max-width: 100%; }
           "Saturday",
           "Sunday"
         ],
-        "opens": "11:00",
-        "closes": "22:00"
+        "opens": "{{cafeOpens}}",
+        "closes": "{{cafeCloses}}"
       }
     ],
     "hasMenu": "https://www.baia.cafe/#menu",
@@ -274,9 +272,6 @@ svg { display: block; max-width: 100%; }
 
   <!-- Grain Noise Overlay -->
   <div class="grain-overlay" aria-hidden="true"></div>
-
-  <!-- Dynamic Weather Simulation Canvas (Easter Egg) -->
-  <canvas id="weather-canvas" aria-hidden="true"></canvas>
 
   <!-- Live Toast Notification Container -->
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
@@ -298,11 +293,10 @@ svg { display: block; max-width: 100%; }
         <ul class="main-nav-links">
           <li><a href="#about" class="nav-link">About</a></li>
           <li><a href="#drops" class="nav-link nav-link-drops"><span class="nav-drop-badge">NEW</span> Drops</a></li>
-          <li><a href="#promos" class="nav-link">Favorites</a></li>
           <li><a href="#menu" class="nav-link">Menu</a></li>
-          <li><a href="#reviews" class="nav-link">Reviews</a></li>
+          <li><a href="#reviews" class="nav-link">Photos</a></li>
           <li><a href="#boards" class="nav-link">Recreation</a></li>
-          <li><a href="#atmosphere" class="nav-link">Atmosphere</a></li>
+          <li><a href="#location" class="nav-link">Visit</a></li>
         </ul>
       </nav>
 
@@ -327,20 +321,21 @@ svg { display: block; max-width: 100%; }
         </a>
 
         <!-- Header Cart Trigger Button -->
-        <button class="nav-cart-btn" data-open-cart aria-label="Order List — View active orders">
+        <button class="nav-cart-btn" data-open-cart aria-label="My Order — review and send your order">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <path d="M16 10a4 4 0 0 1-8 0"></path>
           </svg>
-          <span class="nav-cart-text">Order List</span>
-          <span class="cart-count-badge">0</span>
+          <span class="nav-cart-text">My Order</span>
+          <span class="cart-count-badge" data-empty>0</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- MAIN CONTENT CONTAINER -->
+  <main id="main-content" tabindex="-1">
   <!-- 1. HERO SECTION (Commanding Vertical Focus — Fat Seed Energy with Coastal Restraint) -->
   <section class="hero-section" id="hero" data-theme="surface-blue" aria-label="Welcome to BAIA Cafe">
     <!-- Ambient Floating Glyphs (BAIA Brand Logo Icons: Flower, Palm, Waves, Cup) -->
@@ -406,6 +401,27 @@ svg { display: block; max-width: 100%; }
             </span>
           </span>
         </h1>
+
+        <!-- Visit essentials: status, where, and the two things people come to do -->
+        <div class="hero-info-strip">
+          <p class="hero-open-status" data-open-state="unknown">
+            <span class="hero-status-dot" aria-hidden="true"></span>
+            <span data-open-status>Open daily 11 AM – 10 PM</span>
+          </p>
+          <p class="hero-location-line">
+            Laurente Beach, Burias Island ·
+            <a href="https://maps.app.goo.gl/vNYohzy8UWbM4d5P6" target="_blank" rel="noopener">Directions ↗</a>
+          </p>
+          <div class="hero-cta-row">
+            <a href="#menu" class="hero-cta hero-cta-primary">See the Menu</a>
+            <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="hero-cta hero-cta-secondary">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
+              </svg>
+              Message Us
+            </a>
+          </div>
+        </div>
       </div>
 
       <!-- Hero Right Column: 3D Visual Centerpiece -->
@@ -479,7 +495,7 @@ svg { display: block; max-width: 100%; }
               <span class="stat-label">Fresh Burgers & Free Skimboards</span>
             </div>
             <div class="stat-item">
-              <span class="stat-num">11am–10pm</span>
+              <span class="stat-num" data-hours="cafeCompact">11am–10pm</span>
               <span class="stat-label">Beachfront Service</span>
             </div>
           </div>
@@ -518,6 +534,28 @@ svg { display: block; max-width: 100%; }
           </div>
         </div>
       </div>
+
+    <!-- Life by the Bay: atmosphere photos (formerly a separate section) -->
+    <div class="container story-atmosphere">
+      <div class="atmosphere-grid">
+        <div class="atmosphere-card">
+          <img src="./images/eveningmood.webp" alt="BAIA beachfront dining tables and twilight coastal ambience on the sand" width="1200" height="800" loading="lazy" decoding="async" />
+          <div class="atmosphere-overlay">Twilight ambience</div>
+        </div>
+        <div class="atmosphere-card">
+          <img src="./images/afternoonchill.webp" alt="Afternoon sea breeze at the beachfront dining tables" width="1200" height="690" loading="lazy" decoding="async" />
+          <div class="atmosphere-overlay">Afternoon breeze</div>
+        </div>
+        <div class="atmosphere-card">
+          <img src="./images/afterdusk.webp" alt="Beach tables and string lanterns reflected in a round mirror on a tree after dusk" width="1179" height="1176" loading="lazy" decoding="async" />
+          <div class="atmosphere-overlay">After dusk</div>
+        </div>
+        <div class="atmosphere-card">
+          <img src="./images/Cottage.webp" alt="Barangay Laurente Floating Cottage anchored on calm turquoise water" width="1179" height="1176" loading="lazy" decoding="async" />
+          <div class="atmosphere-overlay">Floating cottage</div>
+        </div>
+      </div>
+    </div>
     </section>
 
     <!-- ==========================================================================
@@ -644,7 +682,7 @@ svg { display: block; max-width: 100%; }
             <div class="card-action-bar">
               <span class="card-price-highlight">From ₱135</span>
               <button class="btn-card-action" data-order-drinks-filter>
-                Order Drinks →
+                Browse Drinks →
               </button>
             </div>
           </article>
@@ -654,7 +692,6 @@ svg { display: block; max-width: 100%; }
             <div class="spicy-flame-burst" aria-hidden="true"></div>
             <div class="card-top-content" style="z-index: 4;">
               <span class="spicy-badge-pill">Freshly Smashed</span>
-              <span class="card-script-title" style="color: var(--golden-amber);">The</span>
               <h3 class="card-main-title">BAIA SMASH</h3>
               <p class="card-body-text">
                 Crispy double beef smash patties, molten cheddar cheese, smokey bacon, and seasoned fries.
@@ -673,7 +710,7 @@ svg { display: block; max-width: 100%; }
             <div class="card-action-bar">
               <span class="card-price-highlight">₱230</span>
               <button class="btn-card-action" data-order-item="burger-smash">
-                Message to Order (₱230)
+                Add to Order
               </button>
             </div>
           </article>
@@ -723,7 +760,7 @@ svg { display: block; max-width: 100%; }
               </div>
 
               <button class="btn-bundle-order" data-order-bundle="double-trouble">
-                Order This Pairing (₱565)
+                Add Pairing to Order
               </button>
             </div>
           </article>
@@ -747,12 +784,12 @@ svg { display: block; max-width: 100%; }
     </section>
 
         <!-- 6. COMMUNITY PHOTO WALL & BAIA FAMILY COLLAGE -->
-    <section class="reviews-section" id="reviews" data-theme="navy-dusk" aria-label="BAIA Family Community Photo Wall and Moments">
+    <section class="reviews-section" id="reviews" data-theme="sand" aria-label="BAIA Family Community Photo Wall and Moments">
       <div class="container">
         <div class="reviews-header-block">
           <span class="reviews-tag">BAIA Family</span>
           <h2 class="reviews-title">The Faces &amp; Stories of <span class="script-accent">BAIA</span></h2>
-          <p class="reviews-subtitle">Real beach laughs, sunset coffee moments, and sweet notes from our extended family on the shore.</p>
+          <p class="reviews-subtitle">Beach days, sunset coffee and good company: moments from our Facebook page and the BAIA family.</p>
         </div>
 
         <!-- Coffee Cup Shaped Community Collage Wrap -->
@@ -1844,7 +1881,7 @@ svg { display: block; max-width: 100%; }
               </div>
               <div class="tip-text">
                 <p class="tip-label">Floating Cottage</p>
-                <p class="tip-value">Daily boarding 11:00 AM – 6:00 PM</p>
+                <p class="tip-value">Daily boarding <span data-hours="cottage">11 AM – 6 PM</span></p>
               </div>
             </div>
             <div class="tip-metric">
@@ -1868,36 +1905,6 @@ svg { display: block; max-width: 100%; }
         <div class="boards-grid" id="boards-grid-root"></div>
       </div>
     </section>
-
-    <!-- 8. COASTAL ATMOSPHERE PHOTO GALLERY -->
-    <section class="atmosphere-section" id="atmosphere" data-theme="navy-twilight" aria-label="Atmosphere and Beach Life Photo Gallery">
-      <div class="container">
-        <div class="atmosphere-header-block">
-          <span class="boards-tag">Beach Life &amp; Atmosphere</span>
-          <h2 class="boards-title">Life by the Bay</h2>
-          <p class="atmosphere-subtitle">From morning iced lattes to golden hour glow on Laurente beach.</p>
-        </div>
-
-        <div class="atmosphere-grid">
-          <div class="atmosphere-card">
-            <img src="./images/eveningmood.webp" alt="BAIA beachfront dining tables and twilight coastal ambience on the sand" width="1200" height="800" loading="lazy" decoding="async" />
-            <div class="atmosphere-overlay">Twilight Ambience</div>
-          </div>
-          <div class="atmosphere-card">
-            <img src="./images/afternoonchill.webp" alt="Afternoon sea breeze at the beachfront dining tables" width="1200" height="690" loading="lazy" decoding="async" />
-            <div class="atmosphere-overlay">Afternoon Breeze</div>
-          </div>
-          <div class="atmosphere-card">
-            <img src="./images/twilight.webp" alt="Beach chairs and fairy string lanterns at sunset twilight" width="800" height="1200" loading="lazy" decoding="async" />
-            <div class="atmosphere-overlay">Twilight Glow</div>
-          </div>
-          <div class="atmosphere-card">
-            <img src="./images/Cottage.webp" alt="Barangay Laurente Floating Cottage anchored on calm turquoise water" width="1179" height="1176" loading="lazy" decoding="async" />
-            <div class="atmosphere-overlay">Floating Cottage</div>
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 
   <!-- 9. SITE FOOTER & TRUST ANCHORS -->
@@ -1913,38 +1920,31 @@ svg { display: block; max-width: 100%; }
           <p class="footer-brand-desc">
             Artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers & shore recreation on Laurente beachfront.
           </p>
-          <div class="footer-location-badge">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-2px; margin-right:4px;" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            <span>Barangay Laurente, San Pascual, Burias Island, Masbate (Plus Code: 42PF+G8) • </span>
-            <a href="https://maps.app.goo.gl/vNYohzy8UWbM4d5P6" target="_blank" rel="noopener" class="loc-map-link">Maps ↗</a>
-          </div>
-          <div class="footer-hours-box">
-            <p class="hours-title">OPERATING HOURS</p>
-            <p class="hours-schedule">Monday – Sunday: 11:00 AM – 10:00 PM</p>
-            <p class="footer-kitchen-note">Kitchen closes at 9:00 PM • Floating Cottage 11:00 AM – 6:00 PM</p>
-          </div>
         </div>
 
-        <!-- Col 2: Sunset Countdown & Shore Hub -->
+        <!-- Col 2: Visit — hours & directions (values filled from src/data/siteInfo.js) -->
         <div class="footer-col-vibe">
-          <div class="sunset-countdown-card">
-            <div class="sunset-header">
-              <span class="sunset-label">Golden Hour Sunset</span>
-              <span class="sunset-target">Daily ~5:58 PM</span>
+          <div class="visit-card">
+            <div class="visit-card-header">
+              <h3 class="visit-card-title">Visit Us</h3>
+              <p class="visit-status-pill" data-open-state="unknown">
+                <span class="hero-status-dot" aria-hidden="true"></span>
+                <span data-open-status>Open daily</span>
+              </p>
             </div>
-            <div class="sunset-time-row">
-              <div class="sunset-time-display" id="sunset-countdown-display" aria-label="Time until sunset">
-                Daily ~5:58 PM
-              </div>
-              <span class="sunset-time-label">Until Sunset</span>
-            </div>
-            <p class="sunset-note">
-              Catch the golden hour over Burias Island waters with your favorite BAIA iced latte or double smash burger on the sand.
+            <dl class="visit-hours-list">
+              <div><dt>Café</dt><dd>Daily, <span data-hours="cafe">11 AM – 10 PM</span></dd></div>
+              <div><dt>Kitchen</dt><dd><span data-hours="kitchen">until 9 PM</span></dd></div>
+              <div><dt>Floating Cottage</dt><dd><span data-hours="cottage">11 AM – 6 PM</span></dd></div>
+            </dl>
+            <p class="visit-address">
+              Barangay Laurente, San Pascual, Burias Island, Masbate
+              <span class="visit-pluscode">Plus Code 42PF+G8</span>
             </p>
-            <div class="sunset-spot-footer">
-              <span>Barangay Laurente, San Pascual, Burias Island</span>
-              <span>Open Daily 11:00 AM – 10:00 PM</span>
-            </div>
+            <a href="https://maps.app.goo.gl/vNYohzy8UWbM4d5P6" target="_blank" rel="noopener" class="visit-directions-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              Get Directions ↗
+            </a>
           </div>
         </div>
 
@@ -1952,14 +1952,14 @@ svg { display: block; max-width: 100%; }
         <div class="footer-col-newsletter">
           <h3 class="footer-col-title">Team BAIA Community</h3>
           <p class="footer-newsletter-p">
-            Order ahead via Messenger, or follow our daily beach life, sunset updates, and fresh kitchen releases on Instagram.
+            Build your order on the menu and send it on Messenger, or follow our daily beach life and fresh kitchen releases on Instagram.
           </p>
           <div class="footer-buttons-stack">
             <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow footer-social-btn" style="background: #0084FF;">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                 <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
               </svg>
-              <span>Message &amp; Order on Messenger</span>
+              <span>Message Us on Messenger</span>
               <span aria-hidden="true">↗</span>
             </a>
             <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill footer-social-btn">
@@ -1977,7 +1977,7 @@ svg { display: block; max-width: 100%; }
                 <line x1="3" y1="6" x2="21" y2="6"></line>
                 <path d="M16 10a4 4 0 0 1-8 0"></path>
               </svg>
-              <span>View Order List (Shore Delivery)</span>
+              <span>View My Order</span>
             </button>
           </div>
         </div>
@@ -2015,8 +2015,8 @@ svg { display: block; max-width: 100%; }
     <!-- Drawer Header -->
     <div class="drawer-header">
       <div class="drawer-title-group">
-        <h3 id="drawer-heading">Order Ahead</h3>
-        <span class="drawer-count-tag">0</span>
+        <h3 id="drawer-heading">My Order</h3>
+        <span class="drawer-count-tag" data-empty>0</span>
       </div>
       <button class="btn-close-drawer" id="drawer-close-btn" aria-label="Close order drawer">✕</button>
     </div>
@@ -2071,7 +2071,7 @@ svg { display: block; max-width: 100%; }
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" style="display:inline-block; vertical-align: -2px;">
             <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
           </svg>
-          <span>Message Order to BAIA</span>
+          <span>Send Order on Messenger</span>
           <span aria-hidden="true">→</span>
         </button>
         <button class="btn-clear-cart" id="drawer-clear-btn" aria-label="Clear all items in order">Clear</button>
@@ -2095,12 +2095,14 @@ svg { display: block; max-width: 100%; }
         </svg>
         <span>Menu</span>
       </a>
-      <button class="mobile-bar-cart-btn" data-open-cart>
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true" style="display:inline-block; vertical-align: -1px;">
-          <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
+      <button class="mobile-bar-cart-btn" data-open-cart aria-label="My Order — review and send your order">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block; vertical-align: -1px;">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
         </svg>
-        <span>Message Ahead</span>
-        <span class="mobile-cart-badge cart-count-badge">0</span>
+        <span>My Order</span>
+        <span class="mobile-cart-badge cart-count-badge" data-empty>0</span>
       </button>
     </div>
   </div>

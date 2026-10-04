@@ -63,8 +63,9 @@
 }
 
 .glyph-3 {
-  top: 72%;
-  left: 4%;
+  /* Bottom-left corner, clear of the hero info strip */
+  top: 88%;
+  left: 2%;
   width: 44px;
   height: 44px;
   opacity: 0.3;
@@ -205,6 +206,114 @@
   max-width: 640px;
   width: 100%;
   box-sizing: border-box;
+}
+
+/* Visit essentials under the headline: status, location, primary actions */
+.hero-info-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+  gap: 10px;
+  margin-top: clamp(18px, 3vh, 28px);
+}
+
+.hero-open-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(14, 26, 69, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* Shared with the footer Visit card */
+.hero-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+[data-open-state="open"] .hero-status-dot { background: #4ADE80; box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25); }
+[data-open-state="closing-soon"] .hero-status-dot { background: var(--golden-amber); box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.25); }
+[data-open-state="closed"] .hero-status-dot { background: #F87171; }
+
+.hero-location-line {
+  color: var(--cream);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.hero-location-line a {
+  color: var(--amber-contrast);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.hero-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: transform var(--duration-fast), background-color var(--duration-fast);
+}
+
+.hero-cta:hover {
+  transform: translateY(-2px);
+}
+
+.hero-cta-primary {
+  background: var(--golden-amber);
+  color: var(--deep-navy);
+  box-shadow: 0 6px 18px rgba(245, 166, 35, 0.35);
+}
+
+.hero-cta-secondary {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  color: var(--white);
+}
+
+.hero-cta-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 1024px) {
+  .hero-info-strip {
+    /* Same order as the headline (order: 1 below), so DOM order keeps it underneath */
+    order: 1;
+    align-items: center;
+    text-align: center;
+  }
+  .hero-cta-row {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-cta {
+    padding: 0 18px;
+    font-size: 0.9rem;
+  }
 }
 
 .hero-primary-block {
@@ -473,6 +582,8 @@
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: background 0.3s ease;
 }
 

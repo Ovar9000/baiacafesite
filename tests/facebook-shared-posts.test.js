@@ -475,3 +475,24 @@ describe('page wiring — sync output is fetched + rendered', () => {
     }
   });
 });
+
+// --- Hours: one source (src/data/siteInfo.js) feeds the crawler-visible HTML --
+
+describe('site info injection', async () => {
+  const { injectSiteInfo } = await import('../src/utils/injectSiteInfo.js');
+  const { HOURS, HOURS_TEXT } = await import('../src/data/siteInfo.js');
+
+  it('fills meta, JSON-LD and fallback text in index.html from siteInfo', () => {
+    const out = injectSiteInfo(read('index.html'));
+    assert.doesNotMatch(out, /\{\{\w+\}\}/);
+    assert.match(out, new RegExp(`"opens": "${HOURS.cafe.opens}"`));
+    assert.match(out, new RegExp(`"closes": "${HOURS.cafe.closes}"`));
+    for (const m of out.matchAll(/data-hours="(\w+)">([^<]*)</g)) {
+      assert.equal(m[2], HOURS_TEXT[m[1]], `data-hours="${m[1]}" fallback text`);
+    }
+  });
+
+  it('rejects unknown tokens instead of shipping them', () => {
+    assert.throws(() => injectSiteInfo('<p>{{notAThing}}</p>'), /unknown token/);
+  });
+});
