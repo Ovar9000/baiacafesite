@@ -297,10 +297,11 @@ describe('supabase migration — community wall lives in the backend', () => {
     assert.match(sql, /on conflict \(id\) do update/);
   });
 
-  it('sync-guest-photos.js upserts rows + caches images in community-cache', () => {
+  it('sync-guest-photos.js upserts rows + stores WebP photos and tile thumbs', () => {
     const src = read('scripts/sync-guest-photos.js');
     assert.match(src, /from\('community_wall'\)\.upsert\(rows, \{ onConflict: 'id' \}\)/);
-    assert.match(src, /from\('community-cache'\)/);
+    assert.match(src, /const BUCKET = 'community-cache'/);
+    assert.match(src, /uploadWebp\(supabase, BUCKET, `thumb_\$\{name\}`/);
     assert.match(src, /dedupeByContentHash/);
     assert.match(src, /syncWallToSupabase/);
   });
@@ -311,19 +312,19 @@ describe('supabase migration — community wall lives in the backend', () => {
     assert.doesNotMatch(src, /item\.gc = /);
   });
 
-  it('sync never wipes the wall on empty selections (keeps previous file)', () => {
+  it('sync never wipes the wall on empty selections', () => {
     const src = read('scripts/sync-guest-photos.js');
     assert.match(src, /Wall Guard/);
-    assert.match(src, /kept previous/);
+    assert.match(src, /existing wall kept/);
   });
 
-  it('communityWall.js hydrates Supabase-first with JSON fallback', () => {
+  it('communityWall.js hydrates from Supabase; static cards are the offline fallback', () => {
     const src = read('src/components/communityWall.js');
     assert.match(src, /from\('community_wall'\)/);
-    assert.match(src, /\/data\/community-reviews\.json/);
     assert.match(src, /hydrated-supabase/);
-    assert.match(src, /hydrated-json/);
+    assert.match(src, /reason: 'offline'/);
     assert.match(src, /dataset\.wallId/);
+    assert.doesNotMatch(src, /community-reviews\.json/);
   });
 
   it('cron wall step carries Supabase credentials for scheduled auto-updates', () => {
@@ -432,17 +433,15 @@ describe('wall layout — one cup template, never stacks', () => {
 // --- 5. Page wiring: JSON actually reaches the DOM ----------------------------
 
 describe('page wiring — sync output is fetched + rendered', () => {
-  it('sync-guest-photos.js mirrors JSON to public/ for runtime fetch', () => {
+  it('sync-guest-photos.js keeps photos in Supabase, never in the repo', () => {
     const src = read('scripts/sync-guest-photos.js');
-    assert.match(src, /COMMUNITY_PUBLIC_FILE/);
-    assert.match(src, /public.*data.*community-reviews\.json/);
     assert.match(src, /buildCommunityEntries/);
     assert.match(src, /full_picture|FB_WALL_FIELDS|buildTaggedUrl/);
+    assert.doesNotMatch(src, /writeFileSync|images\/community/);
   });
 
-  it('communityWall.js fetches the public JSON and prepends new cards', () => {
+  it('communityWall.js prepends new Supabase cards', () => {
     const src = read('src/components/communityWall.js');
-    assert.match(src, /\/data\/community-reviews\.json/);
     assert.match(src, /insertBefore/);
     assert.match(src, /mosaic-photo-card/);
     assert.match(src, /hydrateCommunityWall/);
@@ -591,6 +590,61 @@ describe('classifyDropPost — rules only, built from the post text', async () =
   it('sync scripts carry no LLM calls', () => {
     for (const f of ['scripts/sync-facebook-posts.js', 'scripts/sync-guest-photos.js']) {
       assert.doesNotMatch(read(f), /generativelanguage\.googleapis|api\.openai\.com|GEMINI_API_KEY/, f);
+    }
+  });
+});
+
+// --- Images: compact WebP everywhere, permanent links, nothing broken --------
+
+describe('image pipeline', async () => {
+  const { isCachedWebp, storageName, toWebp, MAX_SIDE } = await import('../scripts/image-cache.js');
+  const sharp = (await import('sharp')).default;
+
+  it('recognises cached WebPs and storage names', () => {
+    const url = 'https://x.supabase.co/storage/v1/object/public/drops-cache/drop_1.webp';
+    assert.equal(isCachedWebp(url, 'drops-cache'), true);
+    assert.equal(isCachedWebp(url.replace('.webp', '.jpg'), 'drops-cache'), false);
+    assert.equal(isCachedWebp('https://scontent.fbcdn.net/a.jpg', 'drops-cache'), false);
+    assert.equal(storageName(`${url}?v=2`), 'drop_1.webp');
+  });
+
+  it('toWebp shrinks to the display box', async () => {
+    const big = await sharp({ create: { width: 2400, height: 1600, channels: 3, background: '#1E4AFF' } }).jpeg().toBuffer();
+    const meta = await sharp(await toWebp(big)).metadata();
+    assert.equal(meta.format, 'webp');
+    assert.ok(Math.max(meta.width, meta.height) <= MAX_SIDE);
+  });
+
+  it('bucket wall photos map to their uploaded tile thumb', () => {
+    assert.equal(
+      thumbPathFor('https://x.supabase.co/storage/v1/object/public/community-cache/wall_640_1_p1.webp'),
+      'https://x.supabase.co/storage/v1/object/public/community-cache/thumb_wall_640_1_p1.webp'
+    );
+  });
+
+  it('drops sync never swaps a working image for a dead link', () => {
+    const src = read('scripts/sync-facebook-posts.js');
+    assert.match(src, /isCachedWebp\(u, 'drops-cache'\)/);
+    assert.match(src, /freshPostImageUrl/);
+    assert.match(src, /else if \(existingImage\.get\(id\)\)/);
+    assert.doesNotMatch(src, /contentType: 'image\/jpeg'/);
+  });
+
+  it('every local image index.html references exists', () => {
+    const html = read('index.html');
+    const refs = [...html.matchAll(/(?:src|href|data-photo|content)="(?:https:\/\/www\.baia\.cafe)?\.?(\/(?:images|icons)\/[^"]+)"/g)].map((m) => m[1]);
+    assert.ok(refs.length > 30);
+    for (const ref of refs) {
+      assert.ok(fs.existsSync(path.join(ROOT, 'public', decodeURIComponent(ref))), `missing ${ref}`);
+    }
+  });
+
+  it('site photos are display-sized (no 1000px+ originals shipped)', async () => {
+    for (const f of fs.readdirSync(path.join(ROOT, 'public', 'images'))) {
+      if (!/\.(webp|jpe?g|png)$/i.test(f) || /^(baia-|Logo)/.test(f)) continue;
+      const { width, height } = await sharp(fs.readFileSync(path.join(ROOT, 'public', 'images', f))).metadata();
+      const limit = f.startsWith('Cottage rental') ? 1200 : 960;
+      assert.ok(Math.max(width, height) <= limit, `${f} is ${width}x${height}`);
     }
   });
 });

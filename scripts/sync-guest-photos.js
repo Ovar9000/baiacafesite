@@ -5,8 +5,9 @@
  * check-ins, and shared customer photos. Share-wrappers carry photos in
  * `subattachments` / `full_picture` (see scripts/fb-post-utils.js).
  * Skips notice/hiring posts with deterministic text rules (no LLM).
- * Outputs curated data to src/data/community-reviews.json AND
- * public/data/community-reviews.json (runtime fetch for the live photowall).
+ * Photos are stored in Supabase (`community_wall` + `community-cache` bucket)
+ * as WebP with tile thumbs; the page reads them live. The 30 photos built into
+ * index.html are the offline fallback.
  */
 
 import fs from 'node:fs';
@@ -14,7 +15,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
-import { makeWallThumb } from './make-wall-thumbs.js';
+import { THUMB_SIDE, fetchImage, isCachedWebp, safeName, storageName, toWebp, uploadWebp } from './image-cache.js';
 import { failInCi, requireCiSecrets } from './ci-guard.js';
 import {
   buildCommunityEntries,
@@ -31,10 +32,6 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
-const COMMUNITY_FILE = path.join(ROOT_DIR, 'src', 'data', 'community-reviews.json');
-// Public copy so src/components/communityWall.js can fetch() it at runtime
-// without a rebuild — this is what actually updates the live coffee photowall.
-const COMMUNITY_PUBLIC_FILE = path.join(ROOT_DIR, 'public', 'data', 'community-reviews.json');
 const ENV_FILE = path.join(ROOT_DIR, '.env');
 
 function loadEnv() {
@@ -136,129 +133,61 @@ async function queryFacebookForGuestPhotos(pageId, token) {
   }
 }
 
-// Small WebP for the ~56px wall tile (see src/utils/wallThumbs.js).
-// A thumb failure never blocks the sync; the tile falls back to the full photo.
-async function ensureThumb(localUrl) {
-  try {
-    await makeWallThumb(localUrl);
-  } catch (err) {
-    console.warn(`Thumb skipped for ${localUrl}:`, err.message);
-  }
-}
-
-async function downloadAndCachePhoto(url, id) {
-  if (!url || !url.startsWith('http')) return url;
-  const safeId = id.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const fileName = `guest_${safeId}.jpg`;
-  const filePath = path.join(ROOT_DIR, 'public', 'images', 'community', fileName);
-  if (fs.existsSync(filePath)) {
-    await ensureThumb(`/images/community/${fileName}`);
-    return `/images/community/${fileName}`;
-  }
-  try {
-    const res = await fetch(url);
-    if (res.ok) {
-      const buffer = Buffer.from(await res.arrayBuffer());
-      fs.writeFileSync(filePath, buffer);
-      console.log(`💾 Cached community photo: ${fileName}`);
-      await ensureThumb(`/images/community/${fileName}`);
-      return `/images/community/${fileName}`;
-    }
-  } catch (err) {
-    console.warn(`Failed to cache image for ${id}:`, err.message);
-  }
-  return url;
-}
+const WALL_BATCH = 8;
+const BUCKET = 'community-cache';
 
 async function main() {
-  console.log('📸 [BAIA Community Wall] Curating Guest & Supporter Collage...');
+  console.log('📸 [BAIA Community Wall] Collecting photos from Facebook posts...');
   requireCiSecrets({ FB_PAGE_ACCESS_TOKEN, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY });
-  
-  let fbPosts = await queryFacebookForGuestPhotos(FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN);
-  console.log(`📥 Retrieved ${fbPosts.length} potential guest moment(s) from Facebook.`);
+
+  const fbPosts = await queryFacebookForGuestPhotos(FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN);
+  console.log(`📥 Retrieved ${fbPosts.length} candidate photo(s) from Facebook.`);
 
   // Deterministic screen: notice/hiring posts are text graphics, not moments.
-  let curated = fbPosts.filter((item) => !isWallNoticePost({ message: item.caption }));
-  if (curated.length < fbPosts.length) {
-    console.log(`⏭️ Skipped ${fbPosts.length - curated.length} notice/hiring photo(s).`);
+  const candidates = fbPosts.filter((item) => !isWallNoticePost({ message: item.caption }));
+  if (candidates.length < fbPosts.length) {
+    console.log(`⏭️ Skipped ${fbPosts.length - candidates.length} notice/hiring photo(s).`);
   }
 
-  // Cache photos locally to prevent expiration
-  for (const item of curated) {
-    if (item.photo_url?.startsWith('http')) {
-      item.photo_url = await downloadAndCachePhoto(item.photo_url, item.id);
-    }
+  // Download newest-first until the batch has WALL_BATCH distinct photos.
+  // Facebook often serves one photo under several URLs, so repeats are
+  // detected by content hash, not URL.
+  const downloaded = [];
+  const seen = new Set();
+  for (const item of candidates) {
+    if (downloaded.length >= WALL_BATCH) break;
+    const buffer = await fetchImage(item.photo_url);
+    if (!buffer) continue;
+    const hash = 'sha1:' + createHash('sha1').update(buffer).digest('hex');
+    if (seen.has(hash)) continue;
+    seen.add(hash);
+    downloaded.push({ ...item, _buffer: buffer, _hash: hash });
+  }
+  const finalItems = dedupeByContentHash(downloaded, (it) => it._hash, new Set()).items;
+
+  // Never wipe the wall: if nothing usable came back, leave Supabase as is.
+  if (finalItems.length === 0) {
+    console.log('⚠️ [Wall Guard] No usable photos this run; existing wall kept.');
+    return;
   }
 
-  const wallItems = curated.slice(0, 8);
-
-  // Drop byte-identical repeats WITHIN this batch: Facebook often serves the
-  // SAME photo under multiple subattachment URLs (or reposts it), and
-  // URL-dedupe can't catch that. Never compare against the committed history —
-  // the wall selection is rebuilt every run, so cached photos reappearing is
-  // normal and must not empty the wall.
-  const contentHashFor = (item) => {
-    const u = item.photo_url;
-    if (typeof u === 'string' && u.startsWith('/images/')) {
-      const p = path.join(ROOT_DIR, 'public', u.replace(/^\//, ''));
-      if (fs.existsSync(p)) {
-        return 'sha1:' + createHash('sha1').update(fs.readFileSync(p)).digest('hex');
-      }
-    }
-    return 'url:' + String(u);
-  };
-  const deduped = dedupeByContentHash(wallItems, contentHashFor, new Set());
-  if (deduped.removed > 0) {
-    console.log(`🧹 [Dedupe] Dropped ${deduped.removed} byte-identical repeat photo(s).`);
-  }
-  let finalItems = deduped.items;
-
-  finalItems = finalItems.slice(0, 8);
-
-  // Never wipe the wall: if selection collapsed entirely, keep the previous file.
-  if (finalItems.length === 0 && fs.existsSync(COMMUNITY_PUBLIC_FILE)) {
-    try {
-      finalItems = JSON.parse(fs.readFileSync(COMMUNITY_PUBLIC_FILE, 'utf-8'));
-      console.log(`⚠️ [Wall Guard] Empty selection — kept previous ${finalItems.length} wall photo(s).`);
-    } catch {
-      finalItems = [];
-    }
-  }
-
-  // No magic grid coordinates are stored: the browser computes collision-free
-  // slots from each card's position (see src/utils/wallLayout.js).
-  // Strip any stale slots so old magic cells can never stack again.
-  for (const item of finalItems) {
-    delete item.gc;
-    delete item.gr;
-    delete item.mgc;
-    delete item.mgr;
-  }
-
-  fs.mkdirSync(path.dirname(COMMUNITY_FILE), { recursive: true });
-  fs.writeFileSync(COMMUNITY_FILE, JSON.stringify(finalItems, null, 2), 'utf-8');
-  console.log(`✅ Saved ${finalItems.length} cute supporter moments to ${COMMUNITY_FILE}`);
-
-  // Public runtime copy — fetched by src/components/communityWall.js to
-  // actually update the live coffee photowall without a rebuild.
-  fs.mkdirSync(path.dirname(COMMUNITY_PUBLIC_FILE), { recursive: true });
-  fs.writeFileSync(COMMUNITY_PUBLIC_FILE, JSON.stringify(finalItems, null, 2), 'utf-8');
-  console.log(`✅ Mirrored wall data to ${COMMUNITY_PUBLIC_FILE} (live photowall hydration)`);
-
-  // Live backend mirror — upserts wall rows + caches images in Supabase so the
-  // scheduled cron updates the live photowall with zero git churn (same pattern
-  // as the drops table). First run backfills existing entries automatically.
   await syncWallToSupabase(finalItems);
+}
+
+/** Upload a photo as `${name}.webp` plus a small `thumb_${name}.webp` tile. */
+async function storeWallImage(supabase, name, buffer) {
+  const url = await uploadWebp(supabase, BUCKET, name, await toWebp(buffer));
+  if (url) await uploadWebp(supabase, BUCKET, `thumb_${name}`, await toWebp(buffer, THUMB_SIDE, 70));
+  return url;
 }
 
 /**
  * Mirror wall items to Supabase (`community_wall` table + `community-cache`
- * bucket). Gracefully skips when credentials are absent — JSON files above
- * remain the offline fallback.
+ * bucket). Gracefully skips when credentials are absent (local runs).
  */
 async function syncWallToSupabase(wallItems) {
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-    console.log('ℹ️ [Supabase] No credentials — skipping live wall mirror (JSON fallback written).');
+    console.log('ℹ️ [Supabase] No credentials: nothing to store (local dry run).');
     return;
   }
   try {
@@ -267,94 +196,86 @@ async function syncWallToSupabase(wallItems) {
       auth: { persistSession: false },
     });
 
-    // 1. Ensure 'community-cache' public bucket exists
     try {
       const { data: buckets } = await supabase.storage.listBuckets();
-      if (!buckets?.some((b) => b.name === 'community-cache')) {
-        await supabase.storage.createBucket('community-cache', { public: true, fileSizeLimit: 5242880 });
+      if (!buckets?.some((b) => b.name === BUCKET)) {
+        await supabase.storage.createBucket(BUCKET, { public: true, fileSizeLimit: 5242880 });
       }
     } catch (bErr) {
       console.warn('⚠️ [Storage Notice]:', bErr.message);
     }
 
-    // 2. Cache each wall image in the bucket (remote fetch, else local file)
-    const rows = [];
+    // 1. Images: reuse cached WebPs, upload the rest (photo + tile thumb).
+    const { data: existingRows } = await supabase.from('community_wall').select('id,photo_url');
+    const existingPhoto = new Map((existingRows || []).map((r) => [r.id, r.photo_url]));
+    let uploaded = 0;
     for (const item of wallItems) {
-      let bucketUrl = null;
-      try {
-        const safeId = String(item.id).replace(/[^a-zA-Z0-9_-]/g, '_');
-        const fileName = `wall_${safeId}.jpg`;
-        let buffer = null;
-
-        if (typeof item.photo_url === 'string' && item.photo_url.startsWith('http') && !item.photo_url.includes('supabase.co')) {
-          const resp = await fetch(item.photo_url, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BaiaWallSync/1.0)' },
-          });
-          if (resp.ok) buffer = Buffer.from(await resp.arrayBuffer());
-        } else if (typeof item.photo_url === 'string' && item.photo_url.startsWith('/images/')) {
-          const localPath = path.join(ROOT_DIR, 'public', item.photo_url.replace(/^\//, ''));
-          if (fs.existsSync(localPath)) buffer = fs.readFileSync(localPath);
-        }
-
-        if (buffer) {
-          const { error: upErr } = await supabase.storage
-            .from('community-cache')
-            .upload(fileName, buffer, { contentType: 'image/jpeg', upsert: true });
-          if (!upErr) {
-            const { data: { publicUrl } } = supabase.storage.from('community-cache').getPublicUrl(fileName);
-            bucketUrl = publicUrl;
-          }
-        }
-      } catch (imgErr) {
-        console.warn(`⚠️ [Image Cache Notice] Could not cache wall image for ${item.id}:`, imgErr.message);
+      const id = String(item.id);
+      const cached = existingPhoto.get(id);
+      if (isCachedWebp(cached, BUCKET)) {
+        item.photo_url = cached;
+        continue;
       }
-
-      rows.push({
-        id: String(item.id),
-        photo_url: bucketUrl || item.photo_url,
-        caption: item.caption || null,
-        guest_name: item.guest_name || null,
-        tagline: item.tagline || null,
-        date: item.date || null,
-        rating: item.rating || 5,
-        source: item.source || null,
-        permalink: item.permalink || null,
-        tilt: item.tilt || null,
-        gc: item.gc ?? null,
-        gr: item.gr ?? null,
-        mgc: item.mgc ?? null,
-        mgr: item.mgr ?? null,
-        z: item.z ?? null,
-      });
+      const url = await storeWallImage(supabase, `wall_${safeName(id)}`, item._buffer);
+      if (url) {
+        item.photo_url = url;
+        uploaded++;
+      } else if (cached) {
+        item.photo_url = cached;
+      }
     }
 
-    // 3. Upsert rows
+    // 2. Upsert rows
+    const rows = wallItems.map((item) => ({
+      id: String(item.id),
+      photo_url: item.photo_url,
+      caption: item.caption || null,
+      guest_name: item.guest_name || null,
+      tagline: item.tagline || null,
+      date: item.date || null,
+      source: item.source || null,
+      permalink: item.permalink || null,
+      tilt: item.tilt || null,
+    }));
     const { error: upsertErr } = await supabase.from('community_wall').upsert(rows, { onConflict: 'id' });
-    if (upsertErr) {
-      console.warn('⚠️ [Supabase Warning] Could not upsert community wall:', upsertErr.message);
-    } else {
-      console.log('✅ [Supabase] Wall photos live in public.community_wall!');
-    }
+    if (upsertErr) failInCi(`Could not upsert community wall: ${upsertErr.message}`);
 
-    // 4. Rolling GC: keep only images referenced by the latest 16 rows
-    // (~1–2 MB, same pattern as the drops-cache collector).
+    // 3. Older rows the site still shows (latest 16): convert legacy .jpg copies.
+    const { data: latest } = await supabase
+      .from('community_wall').select('id,photo_url').order('created_at', { ascending: false }).limit(16);
+    for (const r of latest || []) {
+      if (isCachedWebp(r.photo_url, BUCKET)) continue;
+      const buffer = await fetchImage(r.photo_url);
+      const url = buffer && await storeWallImage(supabase, `wall_${safeName(r.id)}`, buffer);
+      if (url) {
+        await supabase.from('community_wall').update({ photo_url: url }).eq('id', r.id);
+        uploaded++;
+      }
+    }
+    console.log(`🖼️ [Images] Stored ${uploaded} wall photo(s) as WebP (+ tile thumbs).`);
+
+    // 4. Storage cleanup: delete only files that NO row uses.
     try {
-      const { data: files } = await supabase.storage.from('community-cache').list();
-      if (files && files.length > 16) {
-        const active = new Set(
-          rows.map((r) => r.photo_url?.split('/').pop()).filter(Boolean)
-        );
-        const toPurge = files
-          .filter((f) => f.name.startsWith('wall_') && !active.has(f.name))
-          .map((f) => f.name);
-        if (toPurge.length > 0) {
-          console.log(`🧹 [Rolling Memory] Pruning ${toPurge.length} older wall image(s)...`);
-          await supabase.storage.from('community-cache').remove(toPurge);
-        }
+      const [{ data: files }, { data: allRows }] = await Promise.all([
+        supabase.storage.from(BUCKET).list(undefined, { limit: 1000 }),
+        supabase.from('community_wall').select('photo_url'),
+      ]);
+      const inUse = new Set();
+      for (const r of allRows || []) {
+        const name = storageName(r.photo_url);
+        if (name) inUse.add(name).add(`thumb_${name}`);
+      }
+      const toPurge = (files || [])
+        .filter((f) => /^(thumb_)?wall_/.test(f.name) && !inUse.has(f.name))
+        .map((f) => f.name);
+      if (toPurge.length > 0) {
+        await supabase.storage.from(BUCKET).remove(toPurge);
+        console.log(`🧹 [Storage] Removed ${toPurge.length} unused wall image(s).`);
       }
     } catch (gcErr) {
-      console.warn('⚠️ [Rolling Memory Warning]:', gcErr.message);
+      console.warn('⚠️ [Storage cleanup]:', gcErr.message);
     }
+    console.log('✅ [Supabase] Wall photos live in public.community_wall!');
   } catch (sbErr) {
     failInCi(`Error syncing wall to Supabase: ${sbErr.message}`);
   }

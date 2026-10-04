@@ -4,9 +4,9 @@
  * The cup shape lives in src/utils/wallLayout.js: a fixed list of slots that
  * cards fill in DOM order. This module:
  *   1. lays out the static cards from index.html immediately, then
- *   2. once the wall is near the viewport, fetches fresh photos
- *      (Supabase `community_wall` first, `public/data/community-reviews.json`
- *      as fallback), prepends the new ones and re-lays out. The newest photos
+ *   2. once the wall is near the viewport, fetches fresh photos from the
+ *      Supabase `community_wall` table, prepends the new ones and re-lays
+ *      out (the static cards are the offline fallback). The newest photos
  *      take the central slots; the oldest drop off the end, so the cup never
  *      changes shape and cards never stack.
  *
@@ -19,7 +19,6 @@ import { thumbPathFor } from '../utils/wallThumbs.js';
 import { applyWallLayout } from '../utils/wallLayout.js';
 import { whenNear } from '../utils/whenNear.js';
 
-const COMMUNITY_JSON_URL = '/data/community-reviews.json';
 const MAX_HYDRATED_CARDS = 8;
 
 export function buildCommunityCardHTML(item) {
@@ -52,8 +51,7 @@ function isUsablePhoto(url) {
   return t.startsWith('/') || t.startsWith('./') || t.startsWith('https://');
 }
 
-// Live source: Supabase rows carry the same field shape as the JSON fallback.
-// Null = fall through to JSON.
+// Live source. Null = offline / not configured (static cards stay).
 async function fetchWallFromSupabase() {
   try {
     const { supabase } = await import('../lib/supabaseClient.js');
@@ -64,30 +62,18 @@ async function fetchWallFromSupabase() {
       .limit(16);
     if (!error && Array.isArray(data) && data.length > 0) return data;
   } catch {
-    // Offline / missing env / table not migrated yet → JSON fallback below.
+    // Offline / missing env / table not migrated yet.
   }
   return null;
 }
 
-async function fetchWallFromJson(fetchImpl) {
-  try {
-    const res = await fetchImpl(COMMUNITY_JSON_URL, { cache: 'no-store' });
-    if (!res.ok) return null;
-    const items = await res.json();
-    return Array.isArray(items) && items.length > 0 ? items : null;
-  } catch {
-    return null;
-  }
-}
-
-export async function hydrateCommunityWall(fetchImpl = fetch) {
+export async function hydrateCommunityWall() {
   const cup = document.querySelector('.baia-coffee-cup');
   if (!cup) return { added: 0, reason: 'no-wall' };
 
-  const fromDb = await fetchWallFromSupabase();
-  const items = fromDb || (await fetchWallFromJson(fetchImpl));
-  const source = fromDb ? 'hydrated-supabase' : 'hydrated-json';
-  if (!items) return { added: 0, reason: 'empty' };
+  // Offline or empty: the static cards already on the page stay as they are.
+  const items = await fetchWallFromSupabase();
+  if (!items) return { added: 0, reason: 'offline' };
 
   // Match on data-photo, tile src and data-wall-id, so the same photo under
   // another URL form (bucket vs local) isn't duplicated across sources.
@@ -128,7 +114,7 @@ export async function hydrateCommunityWall(fetchImpl = fetch) {
     cup.insertBefore(cards[i], cup.firstChild);
   }
   applyWallLayout(cup);
-  return { added: fresh.length, reason: source };
+  return { added: fresh.length, reason: 'hydrated-supabase' };
 }
 
 export function initCommunityWall() {

@@ -28,6 +28,7 @@ import {
   classifyDropPost,
 } from './fb-post-utils.js';
 import { failInCi, requireCiSecrets } from './ci-guard.js';
+import { fetchImage, firstImage, freshPostImageUrl, isCachedWebp, safeName, storageName, toWebp, uploadWebp } from './image-cache.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -419,31 +420,38 @@ async function runSync() {
           console.warn('⚠️ [Storage Notice]:', bErr.message);
         }
 
-        // 2. Cache new drop images into Supabase Storage
+        // 2. Every drop image lives in Supabase as a compact WebP (Facebook
+        //    links expire). Reuse cached WebPs; never replace a working image
+        //    with a dead link; repair missing ones from the post itself.
+        const { data: existingRows } = await supabase.from('drops').select('id,image_url');
+        const existingImage = new Map((existingRows || []).map((r) => [r.id, r.image_url]));
+        let cachedCount = 0;
         for (const item of updatedList) {
-          if (item.image_url && item.image_url.startsWith('http') && !item.image_url.includes('supabase.co')) {
-            try {
-              const cleanId = String(item.id).replace(/[^a-zA-Z0-9_-]/g, '_');
-              const fileName = `drop_${cleanId}.jpg`;
-              const resp = await fetch(item.image_url, {
-                headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BaiaSyncAgent/1.0)' }
-              });
-              if (resp.ok) {
-                const buffer = Buffer.from(await resp.arrayBuffer());
-                const { error: upErr } = await supabase.storage
-                  .from('drops-cache')
-                  .upload(fileName, buffer, { contentType: 'image/jpeg', upsert: true });
-
-                if (!upErr) {
-                  const { data: { publicUrl } } = supabase.storage.from('drops-cache').getPublicUrl(fileName);
-                  item.image_url = publicUrl;
-                }
-              }
-            } catch (imgErr) {
-              console.warn(`⚠️ [Image Cache Notice] Could not cache image for ${item.title}:`, imgErr.message);
+          const id = String(item.id);
+          const reusable = [item.image_url, existingImage.get(id)].find((u) => isCachedWebp(u, 'drops-cache'));
+          if (reusable) {
+            item.image_url = reusable;
+            continue;
+          }
+          try {
+            const freshPost = posts.find((p) => p.id === id);
+            let buffer = await firstImage([freshPost && extractImageUrls(freshPost)[0], item.image_url, existingImage.get(id)]);
+            if (!buffer) buffer = await fetchImage(await freshPostImageUrl(id, FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN));
+            const url = buffer && await uploadWebp(supabase, 'drops-cache', `drop_${safeName(id)}`, await toWebp(buffer));
+            if (url) {
+              item.image_url = url;
+              cachedCount++;
+            } else if (existingImage.get(id)) {
+              item.image_url = existingImage.get(id);
             }
+          } catch (imgErr) {
+            console.warn(`⚠️ [Image Cache Notice] Could not cache image for ${item.title}:`, imgErr.message);
+            if (existingImage.get(id)) item.image_url = existingImage.get(id);
           }
         }
+        console.log(`🖼️ [Images] Cached ${cachedCount} drop image(s) as WebP.`);
+        // Keep the committed fallback on permanent links, not expiring Facebook URLs.
+        fs.writeFileSync(UPDATES_FILE, JSON.stringify(updatedList, null, 2), 'utf-8');
 
         // 3. Upsert drops to public.drops
         const dropsToUpsert = updatedList.map(item => ({
@@ -471,29 +479,21 @@ async function runSync() {
           console.log(`✅ [Supabase] Successfully synced drops to public.drops!`);
         }
 
-        // 4. Rolling Memory Garbage Collector: Keeps only latest 25 cached images in storage
-        // Guarantees storage usage stays < 2MB (0.2% of 1GB limit), preventing any free tier bloat
+        // 4. Storage cleanup: delete only images that NO row in the table uses
+        //    (e.g. the old .jpg copies once a drop has its WebP).
         try {
-          const { data: files } = await supabase.storage.from('drops-cache').list();
-          if (files && files.length > 25) {
-            const activeFilenames = new Set(
-              updatedList
-                .slice(0, 25)
-                .map(d => d.image_url?.split('/').pop())
-                .filter(Boolean)
-            );
-            const toPurge = files
-              .filter(f => f.name.startsWith('drop_') && !activeFilenames.has(f.name))
-              .map(f => f.name);
-
-            if (toPurge.length > 0) {
-              console.log(`🧹 [Rolling Memory] Pruning ${toPurge.length} older drop images from Supabase Storage...`);
-              await supabase.storage.from('drops-cache').remove(toPurge);
-              console.log(`✅ [Rolling Memory] Cleaned up older images. Storage usage kept under 2MB.`);
-            }
+          const [{ data: files }, { data: rowsNow }] = await Promise.all([
+            supabase.storage.from('drops-cache').list(undefined, { limit: 1000 }),
+            supabase.from('drops').select('image_url'),
+          ]);
+          const inUse = new Set((rowsNow || []).map((r) => storageName(r.image_url)).filter(Boolean));
+          const toPurge = (files || []).filter((f) => f.name.startsWith('drop_') && !inUse.has(f.name)).map((f) => f.name);
+          if (toPurge.length > 0) {
+            await supabase.storage.from('drops-cache').remove(toPurge);
+            console.log(`🧹 [Storage] Removed ${toPurge.length} unused drop image(s).`);
           }
         } catch (gcErr) {
-          console.warn('⚠️ [Rolling Memory Warning]:', gcErr.message);
+          console.warn('⚠️ [Storage cleanup]:', gcErr.message);
         }
 
       } catch (sbErr) {
