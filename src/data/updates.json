@@ -1,47 +1,5 @@
 [
   {
-    "id": "640323492494372_122186165348834483",
-    "category": "food",
-    "title": "New Food Drop",
-    "description": "Full house today!💙\n\nDelivery orders may take a little longer than usual. Thanks for your patience!",
-    "price": null,
-    "event_date": null,
-    "winner": null,
-    "status": null,
-    "image_url": "./images/Baia%20skimboard%20and%20coffee.webp",
-    "permalink": "https://www.facebook.com/122183033894834483/posts/122186165348834483",
-    "published_at": "2026-09-28T07:29:18+0000",
-    "badge": "Fresh Drop"
-  },
-  {
-    "id": "640323492494372_122184430916834483",
-    "category": "food",
-    "title": "New Food Drop",
-    "description": "FULL HOUSE TODAY 💙\n\nFeeling so grateful for the love! 🥹 We’ll pause deliveries for now and focus on everyone here at BAIA. Thank you, always. 🙏🏻\n\nNew menu before the month ends. \n\n#baiacafe",
-    "price": null,
-    "event_date": null,
-    "winner": null,
-    "status": null,
-    "image_url": "https://scontent-lga3-2.xx.fbcdn.net/v/t39.30808-6/805979162_122184430838834483_7411161916581559915_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=GPiGU2le1NcQ7kNvwEUSetU&_nc_oc=AdoNfIoXBaU8pnACK1wc7vJMQJMg4L7w28sG53lN-vMvOspXxoqQHhPUu1rBOlsaO-8&_nc_zt=23&_nc_ht=scontent-lga3-2.xx&edm=AKIiGfEEAAAA&_nc_gid=3l6DVsFaapY3oidZAGSgwQ&_nc_tpa=Q5bMBQJOXZ8CQz14q7AkvqTSWlaXwGuHIiIp5_-nl-jc2HEFthbs0cnW62WFhJFwrT7OxLBnuWDaZdnkhQ&oh=00_AQMWL1KjRpyLnYWZY8Tx_c8I762112L4_EzXihxHtprTaA&oe=6AC7C30F",
-    "permalink": "https://www.facebook.com/122183033894834483/posts/122184430916834483",
-    "published_at": "2026-09-14T09:03:20+0000",
-    "badge": "Fresh Drop"
-  },
-  {
-    "id": "640323492494372_122183525726834483",
-    "category": "event",
-    "title": "BAIA, Now Online",
-    "description": "A new digital home for everything BAIA. Explore what's new, browse our beachside menu and prices before ordering, discover shore activities, and book your stay at Laurente Cottage.",
-    "price": null,
-    "event_date": "Live Now • baia.cafe",
-    "winner": null,
-    "status": null,
-    "image_url": "https://scontent-lga3-2.xx.fbcdn.net/v/t39.30808-6/790425816_122183526164834483_1139186541564110102_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_ohc=0rtSEvYO9bcQ7kNvwH4POhA&_nc_oc=AdqUh3tjuWvwfi7YJV7Xky_SQZZWiQkPdR2-Do_KF46IMlpTUAhykT-H1vsLcgo17A8&_nc_zt=23&_nc_ht=scontent-lga3-2.xx&edm=AKIiGfEEAAAA&_nc_gid=3l6DVsFaapY3oidZAGSgwQ&_nc_tpa=Q5bMBQITpR8S_bB6l8nwXEPgKbmTM-xuAktcJvQ-Jc1YF573x17lYR5Nl77AchTBKApFK7fX-l7haLLNGA&oh=00_AQPTT_fvZXUXOnXnAZ_je5t6JXLTGxcVQn-T0YmtovuAcg&oe=6AC7B2D0",
-    "permalink": "https://www.facebook.com/122183033894834483/posts/122183525726834483",
-    "published_at": "2026-09-05T09:18:49+0000",
-    "badge": "Live Event"
-  },
-  {
     "id": "640323492494372_122183128280834483",
     "category": "event",
     "title": "BAIA, Now Online",

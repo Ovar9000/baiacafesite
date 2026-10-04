@@ -7,9 +7,10 @@
  * 2. Deterministic code filter: pure reshares with no BAIA commentary are
  *    skipped; shares WITH BAIA commentary + image are kept for classification
  *    (see scripts/fb-post-utils.js `shouldSkipShareForDrops`).
- * 3. Non-skipped posts sent to LLM with strict classification prompt & few-shot examples.
- * 4. Merges classified new releases/events into src/data/updates.json & sync-state.json.
- * 5. Changes committed to repo, triggering automatic Vercel/Netlify deployment.
+ * 3. Deterministic classifier (`classifyDropPost` in fb-post-utils.js) builds
+ *    each card from the post's own text; same-day notices are skipped. No LLM.
+ * 4. Merges classified new releases/events into src/data/updates.json & sync-state.json,
+ *    and upserts them to the Supabase `drops` table the site reads live.
  */
 
 import fs from 'node:fs';
@@ -24,6 +25,7 @@ import {
   isTrivialPost as isTrivialSharedPost,
   markSource,
   mergePostEdges,
+  classifyDropPost,
 } from './fb-post-utils.js';
 import { failInCi, requireCiSecrets } from './ci-guard.js';
 
@@ -57,130 +59,9 @@ const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABAS
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 const FB_PAGE_ID = process.env.FB_PAGE_ID || process.env.FACEBOOK_PAGE_ID || 'thebaiacafe';
 const FB_PAGE_ACCESS_TOKEN = process.env.FB_PAGE_ACCESS_TOKEN || process.env.FACEBOOK_PAGE_ACCESS_TOKEN || process.env.FB_ACCESS_TOKEN;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const isDryRun = process.argv.includes('--dry-run');
 const isTestMock = process.argv.includes('--test-mock');
-
-const CLASSIFIER_SYSTEM_PROMPT = `SYSTEM PROMPT — BAIA Cafe Facebook Post Classifier
-
-You are a content classification agent for BAIA Cafe's website. You will be
-given the text and image(s) of a single Facebook post from BAIA Cafe's Page.
-Decide whether this post announces a genuinely NEW food/drink item or an
-upcoming event, and if so, extract structured data for it.
-
-You are the only thing standing between the cafe's raw Facebook feed and
-content published live on their website with NO human review. Be conservative:
-when in doubt, skip. A missed post can be added later; a wrongly-published
-post sits on the live site until someone notices.
-
-INPUT YOU WILL RECEIVE (per post)
-- post_id
-- message (caption text)
-- created_time
-- image_urls (one or more, may be empty)
-- permalink_url
-
-RULE 1 — What counts as publishable
-Classify as relevant ONLY if the caption clearly announces something NEW:
-- NEW_FOOD_ITEM — a new dish, flavor, or food-menu addition
-- NEW_DRINK_ITEM — a new drink, flavor, or drink-menu addition
-- EVENT — an upcoming happening, community GIVEAWAY or guessing contest (e.g., 'Guess to Win', 'Free Burger/Drink Giveaway'), live acoustic music, promo weekend, holiday hours, or 1-day weather advisory notice.
-
-Signals a post IS one of these: "New Drop", "newest flavor", "joining our
-menu/wings/lineup", "Available now", "Introducing", "win a FREE", "giveaway", "comment your guess", a price attached to a
-described item, an explicit date, "#new".
-
-Signals a post is NOT relevant (skip it):
-- General mood/lifestyle photos (sunsets, beach shots) with no specific
-  new-item or event announcement
-- Customer reviews, testimonials, reposts, staff/behind-the-scenes posts
-- Generic greetings, holiday wishes, thank-you posts
-- Posts referencing an existing item without "new" framing
-- Anything you're not confident about
-
-RULE 2 — Multiple items in one post
-If a post announces more than one new thing (e.g. a new dish AND a new
-topping), create ONE entry: the primary item is the title, the secondary
-item is mentioned in the description. Do not split into multiple entries.
-
-RULE 3 — 1-Day Weather Closures & Advisories
-When an announcement is a temporary closure (e.g., weather break, maintenance):
-- This closure lasts for ONLY 1 DAY. Always assume the shop reopens the next day.
-- Classify as "event", and in description make it explicit that this was a 1-day advisory and the cafe reopened the following day (e.g. "1-day weather advisory. Regular cafe service resumed the next day.").
-- If title mentions closure, make it informative (e.g. "1-Day Weather Advisory (Reopened Next Day)").
-
-RULE 4 — Giveaways & Contest Status Lifecycle
-When a post is a community giveaway or contest:
-- Classify as category: "event".
-- Inspect both the post message AND the post comments.
-- If the comments or post mention that a winner was declared/awarded (or if the contest end/launch date mentioned in the post is in the past):
-  - Set "status": "concluded".
-  - Set "badge": "Winner Awarded".
-  - Set "winner": "<Winner Name, e.g. Cassandra Espinosa>".
-  - Set "event_date": "Winner Awarded".
-  - Set "description" to summarize the contest outcome and congratulate the winner.
-- ONLY set "status": "active" and "badge": "Giveaway" if the deadline is currently in the future and NO winner has been declared yet.
-
-RULE 5 — Official Website Launch & Brand Debut
-When a post announces a major digital rollout or brand debut (e.g., "BAIA, now online", official website launch at www.baia.cafe, new apparel/stickers collection debut):
-- Classify as category: "event".
-- Set "badge": "Website Launch" (or "New Debut").
-- Set "event_date": "Live Now • baia.cafe" (or status date).
-- Write a clean description highlighting the website features, online menu access, and cottage stays.
-
-OUTPUT FORMAT
-Respond with ONE JSON object. Nothing else — no preamble, no markdown fences.
-
-Skip:
-{"action": "skip", "reason": "not-new" | "testimonial" | "unclear" | "other"}
-
-Publish:
-{
-  "action": "publish",
-  "id": "<post_id>",
-  "category": "food" | "drink" | "event",
-  "title": "<short human-friendly title, max ~8 words>",
-  "description": "<1-3 sentences, your own words, no hashtags, no emoji spam>",
-  "price": "<price string if mentioned, else null>",
-  "event_date": "<ISO date/range or status text, else null>",
-  "winner": "<winner name string if concluded, else null>",
-  "status": "active" | "concluded" | null,
-  "image_url": "<best single image — prefer a clear product shot over lifestyle>",
-  "permalink": "<permalink_url>",
-  "published_at": "<created_time>"
-}
-
-FEW-SHOT EXAMPLES
-
-Example A
-message: "New Drop 👀
-Nacho-Crusted Chicken Tenders with White Garlic Cajun Sauce.
-And for the sweet side of things, Whipped Honey! Add it on top of any drink. 🍯🐝
-#baiacafe"
-→
-{"action":"publish","id":"...","category":"food","title":"Nacho-Crusted Chicken Tenders","description":"Crispy nacho-crusted chicken tenders served with a white garlic cajun sauce. Also new: Whipped Honey, available as a topping on any drink.","price":null,"event_date":null,"image_url":"...","permalink":"...","published_at":"..."}
-
-Example B
-message: "Annyeong, BAIA fam. 👋🇰🇷
-Yangnyeom is the newest flavor joining our wings.
-A Korean-inspired glaze with a sweet-savory finish and just enough heat. 🌶️
-Available now at BAIA.
-#baiacafe"
-→
-{"action":"publish","id":"...","category":"food","title":"Yangnyeom Wings","description":"A new Korean-inspired wing flavor with a sweet-savory glaze and a touch of heat, available now.","price":null,"event_date":null,"image_url":"...","permalink":"...","published_at":"..."}
-
-Example C
-message: "Golden hour at BAIA never disappoints 🌅✨ #baiacafe"
-→
-{"action":"skip","reason":"not-new"}
-
-Example D
-(post is a share of another Page's content — filtered out in code before
-reaching you, shown here for completeness)
-→
-{"action":"skip","reason":"share"}`;
 
 // Mock posts for testing pipeline without live Facebook token
 const MOCK_FACEBOOK_POSTS = [
@@ -376,215 +257,6 @@ function extractImageUrls(post) {
 }
 
 /**
- * Step 3: LLM Classification via Gemini / OpenAI / Fallback
- */
-async function classifyPostWithLLM(post) {
-  const imageUrls = extractImageUrls(post);
-  const comments = post.comments?.data?.map(c => ({
-    from: c.from?.name || 'User',
-    message: c.message || '',
-    created_time: c.created_time
-  })) || [];
-
-  const inputPayload = {
-    post_id: post.id,
-    message: post.message || '',
-    created_time: post.created_time,
-    comments: comments,
-    image_urls: imageUrls,
-    permalink_url: post.permalink_url || `https://www.facebook.com/${FB_PAGE_ID}/posts/${post.id}`
-  };
-
-  const userPrompt = `INPUT POST TO CLASSIFY:
-${JSON.stringify(inputPayload, null, 2)}
-
-Classify and return ONE strict JSON object according to the system instructions.`;
-
-  // 1. Try Gemini API if GEMINI_API_KEY is provided
-  if (GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 5) {
-    const candidateModels = ['gemini-flash-latest'];
-    for (const model of candidateModels) {
-      try {
-        console.log(`✨ [LLM] Calling Google Gemini API (${model})...`);
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 6000);
-        
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY.trim()}`;
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              role: 'user',
-              parts: [{ text: `${CLASSIFIER_SYSTEM_PROMPT}\n\n---\n\n${userPrompt}` }]
-            }],
-            generationConfig: {
-              temperature: 0.1,
-              responseMimeType: "application/json"
-            }
-          }),
-          signal: controller.signal
-        });
-        clearTimeout(timeout);
-
-        if (response.ok) {
-          const data = await response.json();
-          const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-          const cleanedText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-          const result = JSON.parse(cleanedText);
-          if (result.action === 'publish' && !result.image_url && imageUrls.length > 0) {
-            result.image_url = imageUrls[0];
-          }
-          return result;
-        } else {
-          const errText = await response.text();
-          console.warn(`⚠️ Gemini model (${model}) returned HTTP ${response.status}: ${errText.slice(0, 100)}`);
-        }
-      } catch (e) {
-        console.warn(`⚠️ Gemini API (${model}) attempt failed:`, e.message);
-      }
-    }
-  }
-
-  // 2. Try OpenAI API if OPENAI_API_KEY is provided
-  if (OPENAI_API_KEY) {
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: CLASSIFIER_SYSTEM_PROMPT },
-            { role: 'user', content: userPrompt }
-          ],
-          temperature: 0.1,
-          response_format: { type: 'json_object' }
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const content = data.choices?.[0]?.message?.content || '{}';
-        return JSON.parse(content);
-      }
-    } catch (e) {
-      console.warn('⚠️ OpenAI API attempt failed, falling back:', e.message);
-    }
-  }
-
-  // 3. Robust Rule-Based Fallback Classifier (Matches exact prompt guidelines)
-  return fallbackRuleClassifier(post);
-}
-
-/**
- * Resilient deterministic rule-based extractor for reliable execution
- */
-function fallbackRuleClassifier(post) {
-  const msg = post.message || '';
-  const lower = msg.toLowerCase();
-  const imageUrls = extractImageUrls(post);
-
-  // Check for skip signals
-  if (lower.includes('golden hour') || lower.includes('memory') || lower.includes('thank you everyone') || lower.includes('vibes only')) {
-    return { action: 'skip', reason: 'not-new' };
-  }
-
-  const isGiveaway = (lower.includes('guess') && lower.includes('free')) || lower.includes('giveaway') || lower.includes('contest');
-  const isClosure = lower.includes('closed for the day') || lower.includes('weather break') || lower.includes('closed today');
-  const isWebsiteLaunch = lower.includes('baia, now online') || lower.includes('baia.cafe') || lower.includes('now online');
-  const isNew = lower.includes('new drop') || lower.includes('newest') || lower.includes('flavor') || lower.includes('joining our') || lower.includes('available now') || lower.includes('introducing') || lower.includes('bean selection') || lower.includes('#new') || isWebsiteLaunch;
-  const isEvent = isGiveaway || isClosure || isWebsiteLaunch || lower.includes('live') || lower.includes('acoustic') || lower.includes('grand opening') || lower.includes('promo weekend') || lower.includes('holiday');
-
-  if (!isNew && !isEvent) {
-    return { action: 'skip', reason: 'not-new' };
-  }
-
-  let category = 'food';
-  let title = 'New Food Drop';
-  let description = msg;
-  let badge = 'Fresh Drop';
-  let winner = null;
-  let status = null;
-  let event_date = null;
-  let price = null;
-
-  if (isGiveaway) {
-    category = 'event';
-    title = 'Burger Launch Giveaway: Guess & Win';
-    description = 'Community guessing contest on Facebook: Shoutout to our winner Cassandra Espinosa for correctly guessing the Longganisa Breakfast Burger and claiming her free launch burger!';
-    badge = 'Winner Awarded';
-    winner = 'Cassandra Espinosa';
-    status = 'concluded';
-    event_date = 'Winner Awarded';
-  } else if (isClosure) {
-    category = 'event';
-    title = '1-Day Weather Advisory';
-    description = 'Temporary 1-day weather break due to coastal rain. BAIA Cafe resumed normal operations the following day.';
-    badge = '1-Day Advisory';
-    event_date = '1-Day Break • Now Open';
-  } else if (isWebsiteLaunch) {
-    category = 'event';
-    title = 'BAIA, Now Online';
-    description = 'A new digital home for everything BAIA. Explore what\'s new, browse our beachside menu and prices before ordering, discover shore activities, and book your stay at Laurente Cottage.';
-    badge = 'Website Launch';
-    event_date = 'Live Now • baia.cafe';
-  } else if (lower.includes('bean') || lower.includes('latte') || lower.includes('coffee') || lower.includes('drink') || lower.includes('soda')) {
-    category = 'drink';
-    badge = 'Drink Drop';
-    if (lower.includes('bean')) {
-      title = 'New Coffee Bean Selection';
-      description = 'We are open today with a brand new coffee bean selection waiting for you to try.';
-    } else if (lower.includes('hazelnut')) {
-      title = 'Iced Shaken Hazelnut Latte';
-      description = 'Our newest Iced Shaken Hazelnut Latte features espresso shaken with brown sugar, cinnamon, and hazelnut. Available now for your daily plans.';
-    } else {
-      title = 'Whipped Honey Foam Latte';
-      description = 'Golden whipped wild honey foam layered over rich espresso. Available on all specialty coffee pours.';
-    }
-  } else if (lower.includes('longganisa') || lower.includes('breakfast burger')) {
-    category = 'food';
-    title = 'Longganisa Breakfast Burger';
-    description = 'Introducing the new Longganisa Breakfast Burger, loaded with a beef patty, homemade longganisa patty, Holy Smoke Sauce, and a sunny side up egg. Available now.';
-    badge = 'Fresh Drop';
-  } else if (lower.includes('nacho') || lower.includes('tenders')) {
-    category = 'food';
-    title = 'Nacho-Crusted Chicken Tenders';
-    description = 'Crispy nacho-crusted chicken tenders served with a white garlic cajun sauce. Also available now: Whipped Honey as a new drink topping.';
-    badge = 'Fresh Drop';
-  } else if (lower.includes('yangnyeom') || lower.includes('wings')) {
-    category = 'food';
-    title = 'Yangnyeom Wings';
-    description = 'A new Korean-inspired wing flavor featuring a sweet-savory glaze and a touch of heat, available now at BAIA.';
-    badge = 'Fresh Drop';
-  }
-
-  const priceMatch = msg.match(/₱\s*(\d+)/);
-  if (priceMatch) {
-    price = `₱${priceMatch[1]}`;
-  }
-
-  return {
-    action: 'publish',
-    id: post.id,
-    category,
-    title,
-    description,
-    price,
-    event_date,
-    badge,
-    winner,
-    status,
-    image_url: imageUrls[0] || './images/Baia%20skimboard%20and%20coffee.webp',
-    permalink: post.permalink_url || `https://www.facebook.com/${FB_PAGE_ID}/posts/${post.id}`,
-    published_at: post.created_time || new Date().toISOString()
-  };
-}
-
-/**
  * Main Sync Runner
  */
 async function runSync() {
@@ -653,41 +325,31 @@ async function runSync() {
       continue;
     }
 
-    // Step 3: LLM Classification
-    console.log(`🤖 [LLM] Sending post to classifier...`);
-    const classification = await classifyPostWithLLM(post);
+    // Step 3: Deterministic classification from the post's own text (no LLM)
+    const classification = classifyDropPost(post);
+
+    if (classification.action === 'publish' && classification.kind === 'launch' &&
+        [...currentUpdates, ...newItemsToPublish].some((u) => u.id !== post.id && (u.badge === 'Website Launch' || /now online/i.test(u.title || '')))) {
+      console.log('⏭️ [SKIP] Website launch already announced.');
+      continue;
+    }
 
     if (classification.action === 'publish') {
-      console.log(`✅ [PUBLISH] Classified as relevant "${classification.category}": "${classification.title}"`);
-      
-      let badge = 'New Drop';
-      if (classification.category === 'food') badge = 'Fresh Drop';
-      if (classification.category === 'drink') badge = 'Drink Drop';
-      if (classification.category === 'event') {
-        const text = `${classification.title} ${classification.description}`.toLowerCase();
-        if (classification.winner || classification.status === 'concluded') {
-          badge = 'Winner Awarded';
-        } else if (text.includes('giveaway') || text.includes('guess') || text.includes('win')) {
-          badge = 'Giveaway';
-        } else if (text.includes('weather') || text.includes('closed') || text.includes('closure') || text.includes('break')) {
-          badge = '1-Day Advisory';
-        } else {
-          badge = 'Live Event';
-        }
-      }
+      console.log(`✅ [PUBLISH] ${classification.category} "${classification.title}"`);
+      const badge = classification.badge;
 
       const itemRecord = {
         id: classification.id || post.id,
         category: classification.category || 'food',
-        title: classification.title || 'New BAIA Special',
-        description: classification.description || post.message,
-        price: classification.price || null,
-        event_date: classification.event_date || null,
-        winner: classification.winner || null,
-        status: classification.status || null,
-        image_url: classification.image_url || extractImageUrls(post)[0] || './images/Baia%20skimboard%20and%20coffee.webp',
-        permalink: classification.permalink || post.permalink_url,
-        published_at: classification.published_at || post.created_time || new Date().toISOString(),
+        title: classification.title,
+        description: classification.description,
+        price: classification.price,
+        event_date: null,
+        winner: null,
+        status: classification.status,
+        image_url: extractImageUrls(post)[0] || './images/Baia%20skimboard%20and%20coffee.webp',
+        permalink: post.permalink_url || `https://www.facebook.com/${FB_PAGE_ID}/posts/${post.id}`,
+        published_at: post.created_time || new Date().toISOString(),
         badge: badge
       };
 

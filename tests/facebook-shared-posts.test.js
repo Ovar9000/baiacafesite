@@ -528,3 +528,60 @@ describe('site info injection', async () => {
     assert.throws(() => injectSiteInfo('<p>{{notAThing}}</p>'), /unknown token/);
   });
 });
+
+// --- Drops: deterministic classifier, real captions, no invented copy --------
+
+describe('classifyDropPost — rules only, built from the post text', async () => {
+  const { classifyDropPost, isWallNoticePost, titleFromPost, normalizePostText } = await import('../scripts/fb-post-utils.js');
+  const post = (message) => ({ id: 'x', message });
+
+  it('skips same-day notices ("delivery" is not "live")', () => {
+    assert.deepEqual(classifyDropPost(post('Full house today!💙\n\nDelivery orders may take a little longer than usual.')),
+      { action: 'skip', reason: 'operational-notice' });
+    assert.equal(classifyDropPost(post('FULL HOUSE TODAY 💙 We’ll pause deliveries for now.')).action, 'skip');
+    assert.equal(classifyDropPost(post('We’re hiring! ☕️💙 1 Male Barista')).reason, 'operational-notice');
+  });
+
+  it('food vs drink by keyword weight, titled from the real text', () => {
+    const c = classifyDropPost(post('New Drop 👀\nNacho-Crusted Chicken Tenders with White Garlic Cajun Sauce.\nAnd Whipped Honey! Add it on top of any drink. 🍯\nAvailable now for ₱215.\n#baiacafe'));
+    assert.equal(c.category, 'food');
+    assert.equal(c.title, 'Nacho-Crusted Chicken Tenders with White Garlic Cajun Sauce.');
+    assert.equal(c.price, '₱215');
+    assert.doesNotMatch(c.description, /#baiacafe/);
+    assert.equal(classifyDropPost(post('WE ARE OPEN TODAY!\nA new bean selection is waiting for you to try.')).category, 'drink');
+  });
+
+  it('never invents product copy', () => {
+    const msg = 'Introducing our NEW Iced Latte with oat milk. Available now.';
+    const c = classifyDropPost(post(msg));
+    assert.equal(c.description, msg);
+    assert.doesNotMatch(JSON.stringify(c), /Whipped Honey Foam|Cassandra|wild honey/);
+  });
+
+  it('closures are advisories; only "now online" is the website launch', () => {
+    assert.equal(classifyDropPost(post('Taking a little weather break today. 🌧️ We are closed today.')).badge, '1-Day Advisory');
+    assert.equal(classifyDropPost(post('BAIA, now online. 💻 Visit baia.cafe')).badge, 'Website Launch');
+    assert.notEqual(classifyDropPost(post('THE BAIA DIGITAL LOYALTY CARD ☕️ Get yours at baia.cafe/card')).badge, 'Website Launch');
+  });
+
+  it('chatty posts and emoji-only posts are not drops', () => {
+    assert.equal(classifyDropPost(post('Monday calls for a good burger. 🍔')).action, 'skip');
+    assert.equal(classifyDropPost(post('💙💙💙')).action, 'skip');
+  });
+
+  it('titles skip greetings and header-only lines; fancy Unicode is normalized', () => {
+    assert.equal(titleFromPost('Annyeong, BAIA fam. 👋\nYangnyeom is the newest flavor joining our wings.'), 'Yangnyeom is the newest flavor joining our wings.');
+    assert.equal(normalizePostText('𝐈𝐧𝐭𝐫𝐨𝐝𝐮𝐜𝐢𝐧𝐠 our burger #baiacafe'), 'Introducing our burger');
+  });
+
+  it('wall skips notice/hiring graphics', () => {
+    assert.equal(isWallNoticePost(post('We’re hiring! Check the caption.')), true);
+    assert.equal(isWallNoticePost(post('For the matcha people who also need a beach break.')), false);
+  });
+
+  it('sync scripts carry no LLM calls', () => {
+    for (const f of ['scripts/sync-facebook-posts.js', 'scripts/sync-guest-photos.js']) {
+      assert.doesNotMatch(read(f), /generativelanguage\.googleapis|api\.openai\.com|GEMINI_API_KEY/, f);
+    }
+  });
+});

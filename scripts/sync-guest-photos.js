@@ -4,7 +4,7 @@
  * Fetches Facebook Page posts (/posts) + tagged posts (/tagged), guest
  * check-ins, and shared customer photos. Share-wrappers carry photos in
  * `subattachments` / `full_picture` (see scripts/fb-post-utils.js).
- * Screens candidates using Gemini 1.5 Flash (free tier) to verify cute aesthetics.
+ * Skips notice/hiring posts with deterministic text rules (no LLM).
  * Outputs curated data to src/data/community-reviews.json AND
  * public/data/community-reviews.json (runtime fetch for the live photowall).
  */
@@ -25,6 +25,7 @@ import {
   isShareWrapper,
   markSource,
   mergePostEdges,
+  isWallNoticePost,
 } from './fb-post-utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -56,7 +57,6 @@ loadEnv();
 
 const FB_PAGE_ID = process.env.FB_PAGE_ID || process.env.FACEBOOK_PAGE_ID || 'thebaiacafe';
 const FB_PAGE_ACCESS_TOKEN = process.env.FB_PAGE_ACCESS_TOKEN || process.env.FACEBOOK_PAGE_ACCESS_TOKEN || process.env.FB_ACCESS_TOKEN;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
@@ -136,49 +136,6 @@ async function queryFacebookForGuestPhotos(pageId, token) {
   }
 }
 
-async function verifyCutePhotosWithGemini(photos) {
-  if (!GEMINI_API_KEY || photos.length === 0) {
-    return photos;
-  }
-
-  console.log(`🤖 Screening ${photos.length} candidate photo(s) with Gemini Vision...`);
-  const approved = [];
-  for (const item of photos.slice(0, 8)) {
-    try {
-      const prompt = `You are an aesthetic curator for BAIA Cafe, a beachside coffee shop in Masbate, Philippines.
-The cafe has a photo wall of supporters and guests.
-Examine this image caption: "${item.caption}".
-Is this a cute, welcoming moment (e.g. happy people, coffee moments, friends on the beach, pleasant coastal vibe)?
-Respond with JSON only: {"is_cute": true}`;
-
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: "application/json" }
-        })
-      });
-
-      if (res.ok) {
-        const geminiData = await res.json();
-        const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-        const parsed = JSON.parse(text);
-        // Screening only: the real Facebook caption/author are never rewritten.
-        if (parsed.is_cute !== false) {
-          approved.push(item);
-        }
-      } else {
-        approved.push(item);
-      }
-    } catch {
-      approved.push(item);
-    }
-  }
-
-  return approved.length >= 3 ? approved : photos;
-}
-
 // Small WebP for the ~56px wall tile (see src/utils/wallThumbs.js).
 // A thumb failure never blocks the sync; the tile falls back to the full photo.
 async function ensureThumb(localUrl) {
@@ -220,9 +177,10 @@ async function main() {
   let fbPosts = await queryFacebookForGuestPhotos(FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN);
   console.log(`📥 Retrieved ${fbPosts.length} potential guest moment(s) from Facebook.`);
 
-  let curated = [];
-  if (fbPosts.length > 0) {
-    curated = await verifyCutePhotosWithGemini(fbPosts);
+  // Deterministic screen: notice/hiring posts are text graphics, not moments.
+  let curated = fbPosts.filter((item) => !isWallNoticePost({ message: item.caption }));
+  if (curated.length < fbPosts.length) {
+    console.log(`⏭️ Skipped ${fbPosts.length - curated.length} notice/hiring photo(s).`);
   }
 
   // Cache photos locally to prevent expiration
