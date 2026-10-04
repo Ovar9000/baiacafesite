@@ -149,7 +149,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'script-defer',
-      includeAssets: ['favicon.ico', 'images/Logo.webp', 'images/Logo-black.webp', 'images/crew.webp'],
+      includeAssets: ['favicon.ico', 'icons/icon-192.png', 'images/Logo.webp', 'images/Logo-black.webp'],
       workbox: {
         navigateFallbackDenylist: [/^\/admin/, /^\/api/],
         cleanupOutdatedCaches: true,
@@ -176,14 +176,15 @@ export default defineConfig({
         start_url: '/card/',
         icons: [
           {
-            src: '/images/Logo.webp',
+            src: '/icons/icon-192.png',
             sizes: '192x192',
-            type: 'image/webp'
+            type: 'image/png'
           },
           {
-            src: '/images/Logo.webp',
+            src: '/icons/icon-512.png',
             sizes: '512x512',
-            type: 'image/webp'
+            type: 'image/png',
+            purpose: 'any'
           }
         ]
       }

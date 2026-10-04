@@ -13,7 +13,8 @@
     "sync:fb:mock": "node scripts/sync-facebook-posts.js --test-mock",
     "sync:community": "node scripts/sync-guest-photos.js",
     "test:fb": "node --test \"tests/*.test.js\"",
-    "thumbs:wall": "node scripts/make-wall-thumbs.js"
+    "thumbs:wall": "node scripts/make-wall-thumbs.js",
+    "images:optimize": "node scripts/optimize-images.js"
   },
   "devDependencies": {
     "@vitejs/plugin-basic-ssl": "^1.2.0",
