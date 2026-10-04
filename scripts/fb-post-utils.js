@@ -203,11 +203,11 @@ export function buildCommunityEntries(post, opts = {}) {
   return images.slice(0, 5).map((photoUrl, i) => ({
     id: images.length > 1 ? `${post.id}_p${i + 1}` : String(post.id),
     photo_url: photoUrl,
-    caption: message || 'A warm beachside moment with our friends & supporters at BAIA Cafe.',
-    guest_name: post?.from?.name || post?.attachments?.data?.[0]?.title || 'BAIA Guest & Friend',
-    tagline: post?._source === 'tagged' ? 'Tagged Community Moment' : isShare ? 'Shared Community Moment' : 'Beach Supporter',
+    // Real post text and author only; never placeholder praise or names.
+    caption: message || '',
+    guest_name: post?.from?.name || null,
+    tagline: post?._source === 'tagged' ? 'Tagged on Facebook' : isShare ? 'Shared on Facebook' : 'From our Facebook page',
     date,
-    rating: 5,
     source: post?._source === 'tagged' ? 'Facebook Tagged Post' : 'Facebook Community Post',
     permalink: post?.permalink_url || `https://www.facebook.com/${post?.id || ''}`,
     tilt: tilts[(baseIdx + i) % tilts.length],

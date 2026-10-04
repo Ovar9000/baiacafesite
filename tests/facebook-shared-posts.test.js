@@ -228,7 +228,7 @@ describe('buildCommunityEntries — shared/tagged photos reach the wall', () => 
     const entries = buildCommunityEntries({ ...TAGGED_GUEST_POST, _source: 'tagged' });
     assert.equal(entries.length, 1);
     assert.equal(entries[0].photo_url, 'https://scontent-mnl3-1.xx.fbcdn.net/v/t39/tagged.jpg');
-    assert.equal(entries[0].tagline, 'Tagged Community Moment');
+    assert.equal(entries[0].tagline, 'Tagged on Facebook');
     assert.equal(entries[0].guest_name, 'Maria Santos');
   });
 

@@ -25,6 +25,7 @@ import {
   markSource,
   mergePostEdges,
 } from './fb-post-utils.js';
+import { failInCi, requireCiSecrets } from './ci-guard.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -313,6 +314,7 @@ async function fetchFacebookPosts(pageId, token, sinceId = null) {
         console.warn('\n👉 The Facebook Access Token has expired (short-lived token).');
         console.warn('👉 Existing website drops remain active and safe on the live site.');
         console.warn('👉 To resume background sync, update the FB_PAGE_ACCESS_TOKEN secret with a long-lived Page token.\n');
+        failInCi('Facebook access token expired or invalid; update the FB_PAGE_ACCESS_TOKEN secret.');
         return [];
       }
       throw new Error(`Facebook API Error (${response.status}): ${responseText}`);
@@ -588,6 +590,10 @@ function fallbackRuleClassifier(post) {
 async function runSync() {
   console.log('🚀 [BAIA Sync Agent] Starting Facebook → Website Sync...');
   console.log(`📌 Page: ${FB_PAGE_ID} | Dry Run: ${isDryRun} | Mock Mode: ${isTestMock}`);
+  if (!isTestMock && !isDryRun) {
+    // Without these, fetch silently falls back to mock posts and nothing is written.
+    requireCiSecrets({ FB_PAGE_ACCESS_TOKEN, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY });
+  }
 
   // Load existing updates (filter out any mock test data)
   let currentUpdates = [];
