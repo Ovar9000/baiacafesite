@@ -804,7 +804,7 @@ async function runSync() {
           .upsert(dropsToUpsert, { onConflict: 'id' });
 
         if (upsertErr) {
-          console.warn('⚠️ [Supabase Warning] Could not upsert drops to database:', upsertErr.message);
+          failInCi(`Could not upsert drops to Supabase: ${upsertErr.message}`);
         } else {
           console.log(`✅ [Supabase] Successfully synced drops to public.drops!`);
         }
@@ -835,7 +835,7 @@ async function runSync() {
         }
 
       } catch (sbErr) {
-        console.warn('⚠️ [Supabase Warning] Error syncing to Supabase:', sbErr.message);
+        failInCi(`Error syncing drops to Supabase: ${sbErr.message}`);
       }
     }
   } else {

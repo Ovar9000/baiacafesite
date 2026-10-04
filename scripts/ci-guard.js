@@ -13,6 +13,8 @@ export const IN_CI = process.env.GITHUB_ACTIONS === 'true';
 export function failInCi(message) {
   if (IN_CI) {
     console.error(`\n❌ [CI] ${message}\n`);
+    // Workflow command: surfaces as a run annotation, readable without log access.
+    console.log(`::error title=Facebook sync::${message.replace(/\r?\n/g, ' ')}`);
     process.exit(1);
   }
   console.warn(`⚠️ ${message}`);
