@@ -1286,3 +1286,208 @@ body.admin-body {
   }
 }
 
+
+/* Counter card-tap panel (admin QR tab) */
+.tap-ready-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  border-radius: 20px;
+  background: #131314;
+  color: #FFE699;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: tap-ready-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes tap-ready-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.45); }
+  50% { box-shadow: 0 0 0 12px rgba(251, 146, 60, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tap-ready-icon { animation: none; }
+}
+
+.animate-spin {
+  animation: loyalty-spin 0.9s linear infinite;
+}
+
+@keyframes loyalty-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Physical tap card offer (/card) */
+.tapcard-section {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFF4E6 100%);
+  border: 1.5px solid #F5E9D6;
+  box-shadow: var(--loyalty-shadow);
+  overflow: hidden;
+}
+
+.tapcard-section--waiting {
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFE8CC 100%);
+  border-color: #FDBA74;
+}
+
+.tapcard-section--dark {
+  background: linear-gradient(135deg, #131314 0%, #24242A 100%);
+  border-color: rgba(255, 230, 153, 0.3);
+}
+
+.tapcard-art {
+  flex-shrink: 0;
+  aspect-ratio: 1.586;
+  box-sizing: border-box;
+  padding: 10px 11px;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(251, 146, 60, 0.45), transparent 55%),
+    linear-gradient(140deg, #1E1E22 0%, #0A0A0B 100%);
+  border: 1px solid rgba(255, 230, 153, 0.25);
+  box-shadow: 0 12px 24px -8px rgba(19, 19, 20, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tapcard-section:hover .tapcard-art {
+  transform: rotate(0deg) scale(1.03) !important;
+}
+
+.tapcard-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.tapcard-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: #131314;
+  margin: 6px 0 4px;
+  line-height: 1.2;
+}
+
+.tapcard-line {
+  font-size: 0.84rem;
+  color: #64748B;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.tapcard-cta {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 9999px;
+  background: #131314;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.tapcard-cta:hover { background: #EA580C; }
+.tapcard-cta:active { transform: scale(0.97); }
+.tapcard-cta:disabled { opacity: 0.7; cursor: default; }
+.tapcard-cta--wide { width: 100%; padding: 14px; font-size: 0.95rem; }
+
+.tapcard-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.tapcard-modal {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  box-sizing: border-box;
+  padding: 26px 22px 20px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #FFF4E6 0%, #FFFFFF 45%);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+}
+
+.tapcard-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(19, 19, 20, 0.06);
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.tapcard-perks {
+  list-style: none;
+  margin: 14px 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tapcard-perks li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #FAF4EB;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #131314;
+}
+
+.tapcard-perks li svg { color: #EA580C; flex-shrink: 0; }
+
+.tapcard-error {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #FEF2F2;
+  color: #B91C1C;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+@media (max-width: 380px) {
+  .tapcard-section { flex-direction: column; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tapcard-art, .tapcard-cta { transition: none; }
+}

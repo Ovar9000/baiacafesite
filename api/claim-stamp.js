@@ -169,7 +169,7 @@ export default async function handler(req, res) {
 
     const { data: todayStamps, error: checkError } = await supabaseAdmin
       .from('stamps')
-      .select('id, awarded_at')
+      .select('id, awarded_at, staff_note')
       .eq('user_id', user.id)
       .gte('awarded_at', startOfDayISO)
       .lte('awarded_at', endOfDayISO);
@@ -180,8 +180,11 @@ export default async function handler(req, res) {
     }
 
     if (todayStamps && todayStamps.length > 0) {
+      const viaCard = todayStamps.some((s) => s.staff_note?.includes('NFC Tap'));
       return res.status(400).json({
-        error: 'You have already collected today’s stamp! Enjoy your drink and come back tomorrow for another.'
+        error: viaCard
+          ? 'Your tap card already collected today’s stamp at the counter! Your Wi-Fi code is on your loyalty card page. Come back tomorrow for another.'
+          : 'You have already collected today’s stamp! Enjoy your drink and come back tomorrow for another.'
       });
     }
 

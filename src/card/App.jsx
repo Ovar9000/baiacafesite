@@ -7,6 +7,7 @@ import AuthModal from '../components/AuthModal';
 import QrScanner from '../components/QrScanner';
 import RedemptionCountdown from '../components/RedemptionCountdown';
 import LegalModal from '../components/LegalModal';
+import TapCardOffer from '../components/TapCardOffer';
 import { 
   Coffee, 
   Gift, 
@@ -23,8 +24,6 @@ import {
   Check,
   HelpCircle,
   Trash2,
-  CheckCircle2,
-  CreditCard,
   Sparkles
 } from 'lucide-react';
 import '../styles/loyalty.css';
@@ -66,7 +65,6 @@ export default function CardApp() {
   const [activeCard, setActiveCard] = useState(null);
   const [pendingCardRequest, setPendingCardRequest] = useState(null);
   const [loadingCardStatus, setLoadingCardStatus] = useState(false);
-  const [showRequestCardModal, setShowRequestCardModal] = useState(false);
   const [submittingCardRequest, setSubmittingCardRequest] = useState(false);
   const [cardRequestError, setCardRequestError] = useState('');
 
@@ -197,7 +195,7 @@ export default function CardApp() {
   }, [user, session, loadLoyaltyData, fetchPhysicalCardStatus]);
 
   const handleRequestPhysicalCard = async () => {
-    if (!session?.access_token || submittingCardRequest) return;
+    if (!session?.access_token || submittingCardRequest) return false;
     try {
       setSubmittingCardRequest(true);
       setCardRequestError('');
@@ -213,11 +211,13 @@ export default function CardApp() {
         throw new Error(data.error || 'Failed to submit card request.');
       }
       setPendingCardRequest(data.request);
-      setShowRequestCardModal(false);
-      setToastMsg('Card request submitted! Visit the Barista Cashier to claim your card & free Classic Coffee ☕');
+      setToastMsg('Card reserved! Grab it at the counter ☕');
+      setTimeout(() => setToastMsg(''), 5000);
       confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+      return true;
     } catch (err) {
       setCardRequestError(err.message || 'Error requesting physical card.');
+      return false;
     } finally {
       setSubmittingCardRequest(false);
     }
@@ -884,128 +884,15 @@ export default function CardApp() {
               </button>
             )}
 
-            {/* Physical Tap Card (NFC) Status & Request Section */}
-            <div style={{
-              background: activeCard 
-                ? 'linear-gradient(135deg, #131314 0%, #1E1E22 100%)' 
-                : pendingCardRequest 
-                ? 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)' 
-                : '#FFFFFF',
-              border: activeCard 
-                ? '1.5px solid rgba(255, 230, 153, 0.35)' 
-                : pendingCardRequest 
-                ? '1.5px solid #F59E0B' 
-                : '1.5px solid #E2E8F0',
-              borderRadius: '20px',
-              padding: '18px 20px',
-              boxShadow: 'var(--loyalty-shadow)',
-              color: activeCard ? '#FFFFFF' : '#1E293B'
-            }}>
-              {activeCard ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{
-                      width: '44px',
-                      height: '44px',
-                      borderRadius: '14px',
-                      background: 'rgba(255, 230, 153, 0.15)',
-                      color: '#FFE699',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0
-                    }}>
-                      <CreditCard size={22} />
-                    </div>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '0.72rem', fontWeight: 800, background: '#15803D', color: '#FFFFFF', padding: '2px 8px', borderRadius: '9999px', textTransform: 'uppercase' }}>
-                          ACTIVE
-                        </span>
-                        <span style={{ fontSize: '0.94rem', fontWeight: 800, color: '#FFE699' }}>
-                          Physical Tap Card Linked
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.75)', marginTop: '4px' }}>
-                        Card UID: •••• {activeCard.card_uid.slice(-4)} • Tap at barista cashier when ordering
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: '#86EFAC', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <CheckCircle2 size={15} />
-                    <span>Phone-Free Ready</span>
-                  </div>
-                </div>
-              ) : pendingCardRequest ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 800, background: '#B45309', color: '#FFFFFF', padding: '2px 8px', borderRadius: '9999px', textTransform: 'uppercase' }}>
-                      PENDING PICKUP
-                    </span>
-                    <span style={{ fontSize: '0.94rem', fontWeight: 800, color: '#92400E' }}>
-                      Physical Card Ready for Pickup
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '0.82rem', color: '#78350F', margin: 0, lineHeight: 1.45 }}>
-                    Visit the <strong>Barista Cashier</strong> at BAIA Café. Pay <strong>₱120</strong> to activate your card and claim your complimentary <strong>Classic Coffee ☕</strong>!
-                  </p>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{
-                      width: '44px',
-                      height: '44px',
-                      borderRadius: '14px',
-                      background: '#0F172A',
-                      color: '#FFE699',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0
-                    }}>
-                      <CreditCard size={22} />
-                    </div>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '0.96rem', fontWeight: 800, color: '#0F172A' }}>
-                          Physical Tap Card (NFC)
-                        </span>
-                        <span style={{ fontSize: '0.76rem', fontWeight: 800, background: '#FEF3C7', color: '#B45309', padding: '2px 8px', borderRadius: '9999px' }}>
-                          ₱120
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '3px' }}>
-                        No phone needed at counter • Tap to stamp • Includes 1 Free Classic Coffee ☕
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCardRequestError('');
-                      setShowRequestCardModal(true);
-                    }}
-                    style={{
-                      background: 'var(--loyalty-navy, #0F172A)',
-                      color: '#FFFFFF',
-                      border: 'none',
-                      padding: '10px 18px',
-                      borderRadius: '12px',
-                      fontWeight: 700,
-                      fontSize: '0.84rem',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <span>Request Card (₱120)</span>
-                    <ChevronRight size={15} />
-                  </button>
-                </div>
-              )}
-            </div>
+            {/* Physical Tap Card (NFC) */}
+            <TapCardOffer
+              activeCard={activeCard}
+              pendingRequest={pendingCardRequest}
+              submitting={submittingCardRequest}
+              error={cardRequestError}
+              onOpen={() => setCardRequestError('')}
+              onRequest={handleRequestPhysicalCard}
+            />
 
             {/* 4. Featured Specialty Coffee Spotlight */}
             <div style={{
@@ -1453,143 +1340,6 @@ export default function CardApp() {
                 }}
               >
                 {deletingAccount ? 'Deleting...' : 'Yes, Delete'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal: Request Physical Card Confirmation */}
-      {showRequestCardModal && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(15, 23, 42, 0.75)',
-          backdropFilter: 'blur(6px)',
-          zIndex: 99999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '16px'
-        }}>
-          <div style={{
-            background: '#FFFFFF',
-            borderRadius: '24px',
-            maxWidth: '460px',
-            width: '100%',
-            padding: '26px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
-            position: 'relative'
-          }}>
-            <button
-              type="button"
-              onClick={() => setShowRequestCardModal(false)}
-              style={{
-                position: 'absolute',
-                top: '18px',
-                right: '18px',
-                background: '#F1F5F9',
-                border: 'none',
-                borderRadius: '50%',
-                width: '32px',
-                height: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                color: '#64748B'
-              }}
-            >
-              <X size={18} />
-            </button>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '12px',
-                background: '#0F172A',
-                color: '#FFE699',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <CreditCard size={20} />
-              </div>
-              <div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                  Request BAIA Tap Card
-                </h3>
-                <p style={{ fontSize: '0.78rem', color: '#64748B', margin: '2px 0 0 0' }}>
-                  Personal Waterproof Vinyl NFC Card
-                </p>
-              </div>
-            </div>
-
-            <div style={{
-              background: '#FAF4EB',
-              border: '1.5px solid #F1E5D4',
-              borderRadius: '16px',
-              padding: '16px',
-              marginBottom: '16px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: '8px' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#475569' }}>Card Issuance Price:</span>
-                <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0F172A' }}>₱120</span>
-              </div>
-              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '0.82rem', color: '#334155', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <li><strong>Includes 1 Free Classic Coffee:</strong> Claim a Long Black, Cafe Latte, Cappuccino, or Flat White upon card collection.</li>
-                <li><strong>Never Need a Phone:</strong> Tap your card directly at the cashier register when ordering to collect stamps.</li>
-                <li><strong>Cloud Synced:</strong> Your stamps and rewards sync to your existing online account.</li>
-                <li><strong>Payment on Pickup:</strong> Pay ₱120 in cash or GCash at the counter when claiming.</li>
-              </ul>
-            </div>
-
-            {cardRequestError && (
-              <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', padding: '10px 14px', borderRadius: '12px', fontSize: '0.82rem', marginBottom: '14px' }}>
-                {cardRequestError}
-              </div>
-            )}
-
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button
-                type="button"
-                onClick={() => setShowRequestCardModal(false)}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  borderRadius: '12px',
-                  border: '1.5px solid #CBD5E1',
-                  background: '#FFFFFF',
-                  color: '#475569',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer'
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleRequestPhysicalCard}
-                disabled={submittingCardRequest}
-                style={{
-                  flex: 1.5,
-                  padding: '12px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  background: '#0F172A',
-                  color: '#FFFFFF',
-                  fontWeight: 800,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
-                {submittingCardRequest ? <Loader2 size={16} className="animate-spin" /> : <span>Confirm Request (₱120) →</span>}
               </button>
             </div>
           </div>

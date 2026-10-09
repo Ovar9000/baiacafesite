@@ -9,7 +9,7 @@ import {
   Loader2
 } from 'lucide-react';
 
-export default function DailyStandeeView({ password, tokenData, setTokenData, loadingToken, fetchDailyToken }) {
+export default function DailyStandeeView({ password, tokenData, setTokenData, loadingToken, fetchDailyToken, children }) {
   // Manual stamp grant state
   const [manualEmail, setManualEmail] = useState('');
   const [manualNote, setManualNote] = useState('');
@@ -68,6 +68,48 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
 
   return (
     <div className="admin-tab-pane" style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '640px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+      {/* Printable Acrylic Standee Card */}
+      <div className="standee-print-card" style={{ width: '100%', boxSizing: 'border-box' }}>
+        <img src="/images/Logo.webp" alt="BAIA Cafe Logo" className="standee-header-logo" />
+        <h1 className="standee-title">BAIA CAFÉ</h1>
+        <div className="standee-subtitle">SHORE LOYALTY CARD</div>
+
+        <div className="standee-qr-frame" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
+          {tokenData ? (
+            <QRCodeSVG 
+              value={tokenData.productionUrl || tokenData.claimUrl}
+              size={220}
+              level="H"
+              includeMargin={false}
+              style={{ maxWidth: '100%', height: 'auto', display: 'block', margin: '0 auto' }}
+              imageSettings={{
+                src: "/images/Logo.webp",
+                x: undefined,
+                y: undefined,
+                height: 44,
+                width: 44,
+                excavate: true,
+              }}
+            />
+          ) : (
+            <div style={{ width: 220, height: 220, maxWidth: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Loader2 className="animate-spin" size={32} />
+            </div>
+          )}
+        </div>
+
+        <div>
+          <div className="standee-date-pill">
+            {tokenData?.formattedDate || 'Daily Barista QR'}
+          </div>
+        </div>
+
+        <p className="standee-instructions">
+          <strong>Drink Pickup Bar Only</strong><br />
+          Scan with your phone camera when picking up your handcrafted beverage to collect today’s loyalty stamp. Max 1 stamp per day.
+        </p>
+      </div>
+
       {/* Action Bar (No Print) */}
       <div className="admin-controls-card no-print" style={{
         display: 'flex',
@@ -157,47 +199,8 @@ export default function DailyStandeeView({ password, tokenData, setTokenData, lo
         )}
       </div>
 
-      {/* Printable Acrylic Standee Card */}
-      <div className="standee-print-card" style={{ width: '100%', boxSizing: 'border-box' }}>
-        <img src="/images/Logo.webp" alt="BAIA Cafe Logo" className="standee-header-logo" />
-        <h1 className="standee-title">BAIA CAFÉ</h1>
-        <div className="standee-subtitle">SHORE LOYALTY CARD</div>
-
-        <div className="standee-qr-frame" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
-          {tokenData ? (
-            <QRCodeSVG 
-              value={tokenData.productionUrl || tokenData.claimUrl}
-              size={220}
-              level="H"
-              includeMargin={false}
-              style={{ maxWidth: '100%', height: 'auto', display: 'block', margin: '0 auto' }}
-              imageSettings={{
-                src: "/images/Logo.webp",
-                x: undefined,
-                y: undefined,
-                height: 44,
-                width: 44,
-                excavate: true,
-              }}
-            />
-          ) : (
-            <div style={{ width: 220, height: 220, maxWidth: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Loader2 className="animate-spin" size={32} />
-            </div>
-          )}
-        </div>
-
-        <div>
-          <div className="standee-date-pill">
-            {tokenData?.formattedDate || 'Daily Barista QR'}
-          </div>
-        </div>
-
-        <p className="standee-instructions">
-          <strong>Drink Pickup Bar Only</strong><br />
-          Scan with your phone camera when picking up your handcrafted beverage to collect today’s loyalty stamp. Max 1 stamp per day.
-        </p>
-      </div>
+      {/* Counter card tapping sits under the standee (No Print) */}
+      {children}
 
       {/* Manual Stamp Grant Section (No Print) */}
       <div className="loyalty-section-card no-print" style={{ width: '100%', boxSizing: 'border-box' }}>

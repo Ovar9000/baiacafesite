@@ -66,23 +66,12 @@ function devApiPlugin() {
         let handlerModule;
 
         try {
-          if (endpoint === 'claim-stamp') {
-            handlerModule = await import('./api/claim-stamp.js');
-          } else if (endpoint === 'redeem-reward') {
-            handlerModule = await import('./api/redeem-reward.js');
-          } else if (endpoint === 'admin-token') {
-            handlerModule = await import('./api/admin-token.js');
-          } else if (endpoint === 'admin-manual-stamp') {
-            handlerModule = await import('./api/admin-manual-stamp.js');
-          } else if (endpoint === 'admin-rewards') {
-            handlerModule = await import('./api/admin-rewards.js');
-          } else if (endpoint === 'admin-activity') {
-            handlerModule = await import('./api/admin-activity.js');
-          } else if (endpoint === 'delete-account') {
-            handlerModule = await import('./api/delete-account.js');
-          } else {
+          // Any api/<name>.js handler (files starting with _ are shared helpers)
+          const handlerPath = path.resolve('api', `${endpoint}.js`);
+          if (!/^[a-z0-9-]+$/.test(endpoint) || !fs.existsSync(handlerPath)) {
             return next();
           }
+          handlerModule = await import(url.pathToFileURL(handlerPath).href);
 
           // Parse JSON body if POST
           let body = {};

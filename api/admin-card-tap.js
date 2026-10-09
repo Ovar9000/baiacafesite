@@ -2,6 +2,31 @@ import { createClient } from '@supabase/supabase-js';
 import { setCorsHeaders, isRateLimited, rejectUnlessAdmin, getSupabaseConfig } from './_security.js';
 
 const CAFE_TIMEZONE = process.env.CAFE_TIMEZONE || 'Asia/Manila';
+const WIFI_VOUCHER_DAILY_CAP = parseInt(process.env.WIFI_VOUCHER_DAILY_CAP || '150', 10);
+
+// Same dispenser as the QR claim; it returns the member's existing voucher if they
+// already got one today. Staff verified the purchase, so no new-account/IP limits
+// (the request IP is the cashier's, not the customer's).
+async function getWifiVoucher(supabaseAdmin, userId) {
+  try {
+    const { data, error } = await supabaseAdmin.rpc('claim_next_wifi_voucher_v2', {
+      p_user_id: userId,
+      p_ip_hash: null,
+      p_is_new_account: false,
+      p_daily_cap: WIFI_VOUCHER_DAILY_CAP,
+      p_new_account_ip_cap: 0
+    });
+    if (error || !data?.length) return null;
+    return {
+      code: data[0].voucher_code,
+      durationHours: data[0].duration || 1,
+      deviceLimit: data[0].devices || 2
+    };
+  } catch (err) {
+    console.warn('Wi-Fi voucher dispensing non-fatal notice:', err.message);
+    return null;
+  }
+}
 
 function cleanCardUid(raw) {
   if (!raw || typeof raw !== 'string') return '';
@@ -133,6 +158,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         status: 'already_stamped',
+        wifiVoucher: await getWifiVoucher(supabaseAdmin, card.user_id),
         user: userProfile,
         cardUid: cleanUid,
         totalStamps: currentTotalStamps,
@@ -155,6 +181,7 @@ export default async function handler(req, res) {
       if (insertError.code === '23505' || insertError.message?.toLowerCase().includes('unique')) {
         return res.status(200).json({
           status: 'already_stamped',
+          wifiVoucher: await getWifiVoucher(supabaseAdmin, card.user_id),
           user: userProfile,
           cardUid: cleanUid,
           totalStamps: currentTotalStamps,
@@ -179,6 +206,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       status: 'awarded',
+      wifiVoucher: await getWifiVoucher(supabaseAdmin, card.user_id),
       user: userProfile,
       cardUid: cleanUid,
       totalStamps: newTotalStamps,
