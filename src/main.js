@@ -3,13 +3,11 @@ import { motionSystem } from './utils/motionSystem.js';
 import { initHero3D } from './components/hero3D.js';
 import { initMenuExplorer } from './components/menuExplorer.js';
 import { initBoardsRental } from './components/boardsRental.js';
-import { initBayVibesAudio } from './components/bayVibesAudio.js';
-import { initShoreConditions } from './components/shoreConditions.js';
 import { initLiquidFloaties } from './components/liquidFloaties.js';
-import { initWeatherEasterEgg } from './components/weatherEasterEgg.js';
 import { initCartDrawer } from './components/cartDrawer.js';
 import { initNewDrops } from './components/newDrops.js';
 import { initCommunityWall } from './components/communityWall.js';
+import { initOpenStatus } from './components/openStatus.js';
 import { injectSpeedInsights } from '@vercel/speed-insights';
 import { inject } from '@vercel/analytics';
 
@@ -18,80 +16,6 @@ injectSpeedInsights();
 
 // Initialize Vercel Web Analytics
 inject();
-
-/**
- * Smart 24-Hour Scroll Position Manager
- * - Fresh visitors or visits > 24 hours start cleanly at the top (0, 0) with a snug hero.
- * - Accidental micro-scrolls in the hero (<= 150px) reset to 0 so the wave divider stays flush.
- * - Active browsing down in the content (> 150px) within 24h is smoothly remembered across reloads/repeat visits.
- */
-const SCROLL_CACHE_KEY = 'baia_scroll_pos';
-const MAX_SCROLL_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
-const HERO_SNUG_THRESHOLD = 150;
-
-function initSmartScrollRestoration() {
-  if (typeof window === 'undefined') return;
-
-  if ('scrollRestoration' in history) {
-    history.scrollRestoration = 'manual';
-  }
-
-  // Preserve explicit hash navigation (e.g. #menu, #drops)
-  if (window.location.hash) {
-    setupScrollSaver();
-    return;
-  }
-
-  try {
-    const raw = localStorage.getItem(SCROLL_CACHE_KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      const isFresh = Date.now() - (data.time || 0) < MAX_SCROLL_AGE_MS;
-      if (isFresh && typeof data.y === 'number' && data.y > HERO_SNUG_THRESHOLD) {
-        window.scrollTo(0, data.y);
-        window.addEventListener('load', () => {
-          if (!window.location.hash) {
-            window.scrollTo(0, data.y);
-          }
-        }, { once: true });
-        setupScrollSaver();
-        return;
-      }
-    }
-  } catch (_) {}
-
-  // First-time visit, expired (>24h), or was within hero: start snug at top
-  window.scrollTo(0, 0);
-  window.addEventListener('load', () => {
-    if (!window.location.hash && window.scrollY < HERO_SNUG_THRESHOLD) {
-      window.scrollTo(0, 0);
-    }
-  }, { once: true });
-
-  setupScrollSaver();
-}
-
-function setupScrollSaver() {
-  let saveTimer = null;
-  const persist = () => {
-    try {
-      localStorage.setItem(SCROLL_CACHE_KEY, JSON.stringify({
-        y: Math.round(window.scrollY),
-        time: Date.now()
-      }));
-    } catch (_) {}
-  };
-
-  window.addEventListener('scroll', () => {
-    if (saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(persist, 400);
-  }, { passive: true });
-
-  window.addEventListener('pagehide', persist, { passive: true });
-  window.addEventListener('beforeunload', persist, { passive: true });
-}
-
-initSmartScrollRestoration();
 
 /**
  * ============================================================================
@@ -175,6 +99,7 @@ function initApp() {
   };
 
   safeInit('rootAuth', handleRootAuthCallback);
+  safeInit('openStatus', initOpenStatus);
   safeInit('heroLoyaltyCta', initHeroLoyaltyCta);
   safeInit('loyaltyPrefetch', initLoyaltyPrefetch);
   safeInit('hero3D', initHero3D);
@@ -183,17 +108,15 @@ function initApp() {
   safeInit('boardsRental', initBoardsRental);
   safeInit('cartDrawer', initCartDrawer);
   safeInit('seasonalPromos', initSeasonalPromosToggle);
-  // Hydrate fresh shared/tagged community photos BEFORE binding the lightbox
-  // so dynamically prepended cards also open in the modal.
+  // Lays out the cup now; fetches fresh photos only once the wall is near
+  // (that pulls in the Supabase client). The lightbox uses delegated clicks,
+  // so cards prepended later still open in the modal.
   safeInit('communityWall', initCommunityWall);
   safeInit('polaroidWall', initPolaroidWall);
 
   // Defer non-critical ambient features to idle time
   const initAmbientFeatures = () => {
-    safeInit('bayVibesAudio', initBayVibesAudio);
-    safeInit('shoreConditions', initShoreConditions);
     safeInit('liquidFloaties', initLiquidFloaties);
-    safeInit('weatherEasterEgg', initWeatherEasterEgg);
   };
 
   if ('requestIdleCallback' in window) {
@@ -292,7 +215,7 @@ function initPolaroidWall() {
       modalImg.alt = author ? `Customer moment by ${author}` : 'Community photo';
     }
     if (modalQuote) modalQuote.textContent = quote ? `"${quote.replace(/^["']|["']$/g, '')}"` : '';
-    if (modalAuthor) modalAuthor.textContent = author || 'BAIA Cafe Guest';
+    if (modalAuthor) modalAuthor.textContent = author || 'Shared on Facebook';
     if (modalMeta) modalMeta.textContent = meta || 'Shared Community Moment';
     if (modalFbBtn) modalFbBtn.href = permalink;
 

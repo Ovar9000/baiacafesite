@@ -452,3 +452,31 @@
   }
 }
 
+
+/* Life by the Bay photo strip at the foot of the About section */
+.story-atmosphere {
+  position: relative;
+  z-index: 2;
+  margin-top: var(--space-3xl);
+}
+
+.story-atmosphere .atmosphere-grid {
+  margin-top: 0;
+}
+
+.story-atmosphere .atmosphere-card {
+  border-color: rgba(22, 37, 92, 0.12);
+  box-shadow: 0 12px 28px rgba(22, 37, 92, 0.18);
+}
+
+.story-atmosphere .atmosphere-overlay {
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+  .story-atmosphere {
+    margin-top: var(--space-2xl);
+  }
+}

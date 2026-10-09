@@ -17,6 +17,8 @@
  * import this file safely.
  */
 
+import { thumbPathFor } from '../src/utils/wallThumbs.js';
+
 export const FB_GRAPH_VERSION = 'v19.0';
 
 // Requested on BOTH /posts and /tagged. `full_picture` is the critical
@@ -201,11 +203,11 @@ export function buildCommunityEntries(post, opts = {}) {
   return images.slice(0, 5).map((photoUrl, i) => ({
     id: images.length > 1 ? `${post.id}_p${i + 1}` : String(post.id),
     photo_url: photoUrl,
-    caption: message || 'A warm beachside moment with our friends & supporters at BAIA Cafe.',
-    guest_name: post?.from?.name || post?.attachments?.data?.[0]?.title || 'BAIA Guest & Friend',
-    tagline: post?._source === 'tagged' ? 'Tagged Community Moment' : isShare ? 'Shared Community Moment' : 'Beach Supporter',
+    // Real post text and author only; never placeholder praise or names.
+    caption: message || '',
+    guest_name: post?.from?.name || null,
+    tagline: post?._source === 'tagged' ? 'Tagged on Facebook' : isShare ? 'Shared on Facebook' : 'From our Facebook page',
     date,
-    rating: 5,
     source: post?._source === 'tagged' ? 'Facebook Tagged Post' : 'Facebook Community Post',
     permalink: post?.permalink_url || `https://www.facebook.com/${post?.id || ''}`,
     tilt: tilts[(baseIdx + i) % tilts.length],
@@ -221,54 +223,123 @@ function escapeHtmlAttr(s) {
 }
 
 /**
- * Spread slots so runtime cards land on DIFFERENT cells instead of stacking.
- * Desktop cup is 14 cols × 8 rows; mobile cup is 7 cols × 6 rows.
- * MUST stay in sync with `src/components/communityWall.js` `wallSlot`.
- */
-const DESKTOP_SLOTS = [[3,2],[11,2],[6,3],[10,4],[4,5],[12,5],[7,6],[2,4]];
-const MOBILE_SLOTS = [[2,2],[6,2],[4,3],[3,4],[5,4],[2,5],[6,5],[4,5]];
-const SLOT_ROTS = ['-3deg','2.5deg','-2deg','3deg','-1.5deg','2deg','-2.5deg','1.5deg'];
-
-export function wallSlot(index = 0) {
-  const i = ((index % DESKTOP_SLOTS.length) + DESKTOP_SLOTS.length) % DESKTOP_SLOTS.length;
-  return {
-    gc: DESKTOP_SLOTS[i][0],
-    gr: DESKTOP_SLOTS[i][1],
-    mgc: MOBILE_SLOTS[i][0],
-    mgr: MOBILE_SLOTS[i][1],
-    rot: SLOT_ROTS[i],
-    z: 4 + (i % 3),
-  };
-}
-
-/**
  * Card markup contract — MUST stay in sync with
  * `src/components/communityWall.js` `buildCommunityCardHTML`.
  * Tests assert this contract (data-photo / data-permalink / img src).
+ * Position comes from the card's index via src/utils/wallLayout.js
+ * (applyWallLayout), so cards carry no grid coordinates of their own.
  */
-export function buildCommunityCardHTML(item, index = 0) {
-  const slot = wallSlot(index);
-  const asGridNum = (v, fb) => {
-    const n = parseInt(v, 10);
-    return Number.isFinite(n) && n > 0 ? n : fb;
-  };
-  const gc = asGridNum(item.gc, slot.gc);
-  const gr = asGridNum(item.gr, slot.gr);
-  const mgc = asGridNum(item.mgc, slot.mgc);
-  const mgr = asGridNum(item.mgr, slot.mgr);
-  const z = asGridNum(item.z, slot.z);
+export function buildCommunityCardHTML(item) {
   const photo = escapeHtmlAttr(item.photo_url);
+  const tile = escapeHtmlAttr(thumbPathFor(item.photo_url) || item.photo_url);
   const quote = escapeHtmlAttr(item.caption);
-  const author = escapeHtmlAttr(item.guest_name || 'BAIA Cafe Guest');
-  const meta = escapeHtmlAttr(`${item.date || 'Recently'} • ${item.tagline || 'Shared Community Moment'}`);
+  const author = escapeHtmlAttr(item.guest_name || 'Shared on Facebook');
+  const meta = escapeHtmlAttr(`${item.date || 'Recently'} • ${item.tagline || 'Shared on Facebook'}`);
   const permalink = escapeHtmlAttr(item.permalink || 'https://www.facebook.com/thebaiacafe');
-  const rot = escapeHtmlAttr(item.tilt || slot.rot);
   return (
-    `<button type="button" class="mosaic-photo-card" style="--gc: ${gc}; --gr: ${gr}; --mgc: ${mgc}; --mgr: ${mgr}; --rot: ${rot}; --z: ${z};"` +
+    `<button type="button" class="mosaic-photo-card"` +
     ` data-wall-id="${escapeHtmlAttr(item.id || '')}" data-photo="${photo}" data-quote="${quote}" data-author="${author}" data-meta="${meta}"` +
     ` data-permalink="${permalink}" data-community-hydrated="1" aria-label="View photo by ${author}">` +
     `<div class="mosaic-photo-frame">` +
-    `<img src="${photo}" alt="BAIA Family guest photo" class="mosaic-photo-img" loading="lazy" />` +
+    `<img src="${tile}" alt="BAIA Family guest photo" class="mosaic-photo-img" loading="lazy" />` +
     `</div></button>`
   );
+}
+
+// --- Drops classification (deterministic, no LLM) ----------------------------
+//
+// Decides whether a BAIA page post belongs in "New Drops & Events" and builds
+// the card from the post's OWN text. Nothing is invented: no product copy,
+// no winners, no dates that the post doesn't contain.
+
+const RX = {
+  // Same-day operational updates: shown briefly as "Cafe Update", never as drops.
+  notice: /\b(full house|fully booked|deliver(?:y|ies)\b[^.\n]*\b(?:paused?|on hold|suspended|delayed|longer)|paus(?:e|ing) deliver(?:y|ies)|may take (?:a little )?longer)\b/,
+  hiring: /\b(now hiring|we(?:'|’)?re hiring|hiring|job opening|looking for)\b/,
+  // Café news that isn't a menu item.
+  announce: /\b(loyalty (?:card|program)|stamp card)\b/,
+  closure: /\b(closed (?:today|for the day|tomorrow)|we(?:'|’)?(?:re| are) closed|weather (?:break|advisory)|temporar(?:y|ily) closed|closure)\b/,
+  launch: /\b(now online|new website)\b/,
+  giveaway: /\b(giveaway|contest|guess (?:the|our|what|which)|to win|win a|free .* for the first)\b/,
+  winner: /\b(congrat(?:s|ulations)|winner|won)\b/,
+  isNew: /\b(new|newest|introducing|now available|available now|just dropped|drop|launch(?:ing|ed)?|back on the menu|(?:is|are) back|joining (?:our|the) menu|now serving)\b/,
+  event: /\b(live music|acoustic|gig|grand opening|promo|sale|happening|event|this (?:saturday|sunday|weekend)|holiday special)\b/,
+  drink: /\b(latte|coffee|espresso|frapp[eé]|soda|refresher|tea|matcha|drink|brew|bean|einsp[aä]nner|americano|cappuccino|mocha|fizz|beer)\b/,
+  food: /\b(burger|wings?|fries|sandwich|wrap|tenders|waffles?|pasta|rice|meal|chicken|longganisa|nachos?|croffles?|snack|bites?|flavou?r)\b/,
+  greeting: /^(hi|hello|hey|annyeong|good (?:morning|afternoon|evening)|baia fam)\b/,
+  // Header-only lines that make poor card titles ("New Drop 👀", "WE ARE OPEN TODAY!")
+  headerOnly: /^(?:new drop|new|newest|introducing|available now|just dropped|we(?:'|’)?re open(?: today)?|we are open(?: today)?)[\s\p{P}\p{Extended_Pictographic}️]*$/u
+};
+
+/** Plain-text form of a post: fancy Unicode bold/italics → ASCII, no hashtags. */
+export function normalizePostText(message) {
+  return String(message || '')
+    .normalize('NFKC')
+    .replace(/#[\p{L}\p{N}_]+/gu, '')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+/** First meaningful line (not a greeting), trimmed to ~60 chars at a word break. */
+export function titleFromPost(text) {
+  const lines = text.split('\n').map((l) => l.trim()).filter((l) => /[\p{L}\p{N}]/u.test(l));
+  const pick = lines.find((l) => {
+    const lower = l.toLowerCase();
+    return !RX.greeting.test(lower) && !RX.headerOnly.test(lower) && l.split(/\s+/).length >= 2;
+  }) || lines[0] || '';
+  const clean = pick.replace(/\s*[\p{Extended_Pictographic}️‍]+\s*$/gu, '').trim();
+  if (clean.length <= 60) return clean;
+  const cut = clean.slice(0, 60);
+  return cut.slice(0, cut.lastIndexOf(' ') > 30 ? cut.lastIndexOf(' ') : 60).trim() + '…';
+}
+
+/**
+ * @returns {{action:'skip', reason:string} |
+ *           {action:'publish', kind:string, category:string, title:string, description:string,
+ *            badge:string, price:string|null, status:string|null}}
+ */
+export function classifyDropPost(post) {
+  const text = normalizePostText(post?.message);
+  const lower = text.toLowerCase();
+  if (!text) return { action: 'skip', reason: 'no-text' };
+
+  const base = (kind, category, badge, status = null) => {
+    const price = text.match(/₱\s*([\d,]+)/);
+    return {
+      action: 'publish', kind, category, badge, status,
+      title: titleFromPost(text),
+      description: text,
+      price: price ? `₱${price[1]}` : null
+    };
+  };
+
+  if (RX.closure.test(lower)) return base('advisory', 'event', '1-Day Advisory');
+  if (RX.hiring.test(lower)) return { action: 'skip', reason: 'hiring' };
+  if (RX.notice.test(lower)) return base('update', 'event', 'Cafe Update');
+  if (RX.launch.test(lower)) return base('launch', 'event', 'Website Launch');
+  if (RX.announce.test(lower)) return base('news', 'event', 'New at BAIA');
+  if (RX.giveaway.test(lower)) {
+    return RX.winner.test(lower)
+      ? base('giveaway', 'event', 'Winner Awarded', 'concluded')
+      : base('giveaway', 'event', 'Giveaway');
+  }
+  if (RX.isNew.test(lower)) {
+    // Food vs drink by keyword count ("chicken tenders … top of any drink" is food).
+    const count = (rx) => (lower.match(new RegExp(rx.source, 'g')) || []).length;
+    const food = count(RX.food);
+    const drink = count(RX.drink);
+    if (food || drink) {
+      return food >= drink ? base('drop', 'food', 'Fresh Drop') : base('drop', 'drink', 'Drink Drop');
+    }
+    return base('news', 'event', 'New at BAIA');
+  }
+  if (RX.event.test(lower)) return base('event', 'event', 'Live Event');
+  return { action: 'skip', reason: 'not-a-drop' };
+}
+
+/** Wall: skip notice/hiring posts (their images are text graphics, not moments). */
+export function isWallNoticePost(post) {
+  const lower = normalizePostText(post?.message).toLowerCase();
+  return RX.notice.test(lower) || RX.closure.test(lower) || RX.hiring.test(lower);
 }

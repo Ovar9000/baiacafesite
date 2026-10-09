@@ -4,7 +4,6 @@
 
 @import './hero.css';
 @import './floaties.css';
-@import './weather.css';
 @import './divider.css';
 @import './story.css';
 @import './promo-grid.css';
@@ -96,6 +95,11 @@ main > section,
   outline: none;
 }
 
+/* Skip-link target: receives focus programmatically, no page-wide focus ring */
+#main-content:focus {
+  outline: none;
+}
+
 /* Fix mobile sub-pixel gaps between adjacent stacked sections */
 main > section + section,
 main + .site-footer {
@@ -135,7 +139,6 @@ main + .site-footer {
 [data-theme="midnight"],
 .theme-midnight,
 .menu-section,
-.reviews-section,
 .boards-section,
 .atmosphere-section,
 .site-footer {
@@ -270,7 +273,6 @@ main,
 .story-section,
 .promo-grid-section,
 .menu-section,
-.reviews-section,
 .boards-section,
 .atmosphere-section {
   position: relative;
@@ -678,10 +680,12 @@ main,
 /* ==========================================================================
    REVIEWS & TESTIMONIALS SECTION
    ========================================================================== */
+/* Light section between the navy menu and navy recreation blocks */
 .reviews-section {
   padding-top: 64px;
   padding-bottom: 80px;
-  background: #0E1A45;
+  background: var(--depth-sand-cream);
+  color: var(--deep-navy);
   position: relative;
 }
 
@@ -734,10 +738,9 @@ main,
 }
 
 /* ==========================================================================
-   BAIA FAMILY DENSE MOSAIC COLLAGE (Web & Mobile — Compact, Zero Excessive Scroll)
-   ========================================================================== */
-/* ==========================================================================
-   BAIA FAMILY COFFEE CUP SILHOUETTE (Dense 50+ Real Community Photos)
+   BAIA FAMILY COFFEE CUP PHOTO COLLAGE
+   Slot positions come from src/utils/wallLayout.js (applyWallLayout sets
+   --gc/--gr for desktop and --mgc/--mgr for phones on each card).
    ========================================================================== */
 .baia-coffee-silhouette-wrap {
   position: relative;
@@ -745,84 +748,79 @@ main,
   margin: 12px auto 0 auto;
 }
 
-/* Desktop: Dense 14-Column Ceramic Coffee Mug (57 Photos) */
-.baia-coffee-cup-desktop {
+/* Desktop: 7 × 6 cup (30 photos). Tiles are a bit wider than their column
+   so neighbouring polaroids overlap slightly. */
+.baia-coffee-cup {
+  --cup-col: 104px;
+  --cup-row: 128px;
+  --cup-steam-row: 92px;
+  --tile: 112px;
+  --steam-tile: 76px;
   display: grid;
-  grid-template-columns: repeat(14, 48px);
-  grid-template-rows: 44px 44px 58px 58px 58px 58px 52px 46px;
-  position: relative;
-  max-width: 780px;
-  margin: 0 auto;
-  padding: 4px 10px 24px 10px;
-  overflow: visible;
+  grid-template-columns: repeat(7, var(--cup-col));
+  grid-template-rows: var(--cup-steam-row) repeat(5, var(--cup-row));
   justify-content: center;
   align-items: center;
+  justify-items: center;
+  margin: 0 auto;
+  padding: 4px 0 28px 0;
 }
 
-/* Card Core Styles (Crucial: maps --gc and --gr to CSS Grid!) */
 .mosaic-photo-card {
   grid-column: var(--gc);
   grid-row: var(--gr);
-  transform: rotate(var(--rot, 0deg)) scale(var(--s, 1));
+  transform: rotate(var(--rot, 0deg));
   z-index: var(--z, 1);
-  width: 56px;
+  width: var(--tile, 112px);
   aspect-ratio: 4 / 5;
-  padding: 3px 3px 8px 3px;
+  padding: 5px 5px 14px 5px;
   background: #FFFFFF;
-  border-radius: 2px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  border-radius: 3px;
+  box-shadow: 0 6px 16px rgba(22, 37, 92, 0.22);
   border: none;
   cursor: pointer;
   outline: none;
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
-  will-change: transform;
   margin: 0;
   display: block;
   -webkit-tap-highlight-color: transparent;
 }
 
 .mosaic-photo-card.is-steam {
-  width: 42px;
+  width: var(--steam-tile);
   aspect-ratio: 1 / 1;
-  padding: 2.5px 2.5px 5px 2.5px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
-}
-
-.mosaic-photo-card.is-center-star {
-  z-index: 25 !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 14px rgba(245, 166, 35, 0.35);
+  padding: 4px 4px 10px 4px;
 }
 
 .mosaic-photo-card:focus {
-  outline: none !important;
+  outline: none;
 }
 
 .mosaic-photo-card:focus-visible {
-  outline: none !important;
-  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px var(--royal-blue), 0 8px 20px rgba(0, 0, 0, 0.5) !important;
-  z-index: 100 !important;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px var(--royal-blue), 0 8px 20px rgba(22, 37, 92, 0.3);
+  z-index: 100;
 }
 
-.mosaic-photo-card:hover {
-  transform: scale(1.28) translateY(-4px) rotate(0deg) !important;
-  z-index: 100 !important;
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65), 0 0 18px rgba(245, 166, 35, 0.25);
+@media (hover: hover) {
+  .mosaic-photo-card:hover {
+    transform: scale(1.12) rotate(0deg);
+    z-index: 100;
+    box-shadow: 0 16px 32px rgba(22, 37, 92, 0.32);
+  }
 }
 
 .mosaic-photo-card:active {
-  transform: scale(0.96) rotate(var(--rot, 0deg)) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transform: scale(0.97) rotate(var(--rot, 0deg));
   transition-duration: 0.1s;
 }
 
 .mosaic-photo-frame {
   width: 100%;
   height: 100%;
-  border-radius: 1.5px;
+  border-radius: 2px;
   overflow: hidden;
   background: #CBD5E1;
   position: relative;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
 .mosaic-photo-img {
@@ -830,39 +828,20 @@ main,
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.4s ease;
 }
 
-.mosaic-photo-card:hover .mosaic-photo-img {
-  transform: scale(1.08);
-}
-
-/* Hide mobile cup by default on desktop & tablets */
-.baia-coffee-cup-mobile {
-  display: none !important;
-}
-
-/* Tablet Layout (601px - 1024px, including iPad Mini 768px & iPad Pro): Heroic Scale Mosaic */
+/* Tablets: same 7 × 6 cup, scaled to the viewport */
 @media (max-width: 1024px) {
-  .baia-coffee-cup-desktop {
-    grid-template-columns: repeat(14, clamp(38px, 5.8vw, 48px));
-    grid-template-rows: 38px 38px 48px 48px 48px 48px 44px 38px;
-    max-width: 96%;
-    margin: 0 auto;
-    padding: 4px 0 20px 0;
-    justify-content: center;
-    align-items: center;
-  }
-  .baia-coffee-cup-desktop .mosaic-photo-card {
-    width: clamp(44px, 6.8vw, 56px);
-    padding: 2.5px 2.5px 6px 2.5px;
-  }
-  .baia-coffee-cup-desktop .mosaic-photo-card.is-steam {
-    width: clamp(32px, 5vw, 42px);
+  .baia-coffee-cup {
+    --cup-col: clamp(72px, 12vw, 104px);
+    --cup-row: calc(var(--cup-col) * 1.22);
+    --cup-steam-row: calc(var(--cup-col) * 0.88);
+    --tile: calc(var(--cup-col) + 8px);
+    --steam-tile: calc(var(--cup-col) * 0.72);
   }
 }
 
-/* Mobile Phones (<= 600px): Clean Compact Mug with Scaled Readable Photos */
+/* Phones: 5 × 5 cup showing the first 18 photos */
 @media (max-width: 600px) {
   .reviews-section {
     padding-top: 36px;
@@ -889,52 +868,38 @@ main,
     margin-right: auto;
   }
 
-  .baia-coffee-cup-desktop {
-    display: none !important;
+  .baia-coffee-cup {
+    --cup-col: clamp(54px, 17vw, 66px);
+    --cup-row: calc(var(--cup-col) * 1.2);
+    --cup-steam-row: calc(var(--cup-col) * 0.82);
+    --tile: calc(var(--cup-col) + 6px);
+    --steam-tile: calc(var(--cup-col) * 0.72);
+    grid-template-columns: repeat(5, var(--cup-col));
+    grid-template-rows: var(--cup-steam-row) repeat(4, var(--cup-row));
+    padding-bottom: 16px;
   }
 
-  .baia-coffee-cup-mobile {
-    display: grid !important;
-    grid-template-columns: repeat(7, clamp(36px, 11vw, 44px));
-    grid-template-rows: 32px 42px 42px 42px 38px 34px;
-    justify-content: center;
-    align-items: center;
-    max-width: 330px;
-    margin: 10px auto 0 auto;
-    padding: 4px 0 16px 0;
-    position: relative;
+  .baia-coffee-cup .mosaic-photo-card {
+    grid-column: var(--mgc);
+    grid-row: var(--mgr);
+    padding: 3px 3px 9px 3px;
   }
 
-  .baia-coffee-cup-mobile .mosaic-photo-card {
-    width: clamp(40px, 12vw, 48px);
+  /* Desktop steam cards are regular tiles on phones, and vice versa */
+  .baia-coffee-cup .mosaic-photo-card.is-steam {
+    width: var(--tile);
     aspect-ratio: 4 / 5;
-    padding: 2px 2px 5px 2px;
-    border-radius: 2px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+    padding: 3px 3px 9px 3px;
   }
 
-  /* Runtime-hydrated cards carry their own mobile slot (--mgc/--mgr) so they
-     don't inherit desktop coordinates in the 7-column mobile cup. */
-  .baia-coffee-cup-mobile .mosaic-photo-card[data-community-hydrated="1"] {
-    grid-column: var(--mgc, var(--gc));
-    grid-row: var(--mgr, var(--gr));
-  }
-
-  .baia-coffee-cup-mobile .mosaic-photo-card.is-steam {
-    width: clamp(28px, 8.5vw, 34px);
+  .baia-coffee-cup .mosaic-photo-card.is-steam-m {
+    width: var(--steam-tile);
     aspect-ratio: 1 / 1;
-    padding: 1.5px 1.5px 3.5px 1.5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    padding: 3px 3px 7px 3px;
   }
 
-  .baia-coffee-cup-mobile .mosaic-photo-card:active {
-    transform: scale(0.94) rotate(var(--rot, 0deg)) !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-    transition-duration: 0.1s;
-  }
-
-  .baia-coffee-cup-mobile .mosaic-photo-card:focus {
-    outline: none !important;
+  .baia-coffee-cup .mosaic-photo-card.is-mobile-hidden {
+    display: none;
   }
 }
 
@@ -1198,6 +1163,12 @@ main,
   text-transform: uppercase;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(245, 166, 35, 0.4);
+}
+
+/* Hidden until the order has at least one item (set by cartDrawer.js) */
+.cart-count-badge[data-empty],
+.drawer-count-tag[data-empty] {
+  display: none;
 }
 
 .mobile-cart-badge {
@@ -1563,6 +1534,21 @@ main,
    RESPONSIVE LAYOUTS & PREFERS-REDUCED-MOTION
    ========================================================================== */
 
+/* Common laptop widths (1280–1440px): collapse Messenger to an icon so the
+   My Order button never runs off the right edge */
+@media (max-width: 1440px) {
+  .nav-phone-link {
+    padding: 0;
+    width: 38px;
+    min-width: 38px;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  .nav-phone-text {
+    display: none;
+  }
+}
+
 /* Laptops & Tablets Landscape (<= 1200px) */
 @media (max-width: 1200px) {
   .main-nav-links {
@@ -1818,3 +1804,78 @@ main,
   to { opacity: 1; }
 }
 
+
+/* ==========================================================================
+   TYPE DISCIPLINE
+   The handwritten script (Caveat) is reserved for the hero "Crafted" and the
+   polaroid photo captions. Every other headline accent uses the main type
+   with a single accent colour, so sections read as one site.
+   ========================================================================== */
+.drops-script-accent {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--amber-contrast);
+  transform: none;
+  margin-bottom: 12px;
+}
+
+.title-word-script {
+  font-family: inherit;
+  font-size: 1em;
+  color: var(--electric-blue);
+  text-transform: uppercase;
+  transform: none;
+  text-shadow: none;
+}
+
+.card-script-title {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--amber-contrast);
+  line-height: 1.2;
+  transform: none;
+  text-shadow: none;
+  margin-bottom: 4px;
+}
+
+.headline-script-line .script-accent {
+  font-family: var(--font-headline);
+  font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+  font-weight: 700;
+  transform: none;
+}
+
+.reviews-title .script-accent,
+.boards-title .script-accent {
+  font-family: inherit;
+  font-size: 1em;
+  font-weight: inherit;
+  line-height: inherit;
+  color: var(--golden-amber);
+  text-transform: inherit;
+  letter-spacing: inherit;
+  transform: none;
+  margin: 0;
+}
+
+/* Photo wall on sand */
+.reviews-section .reviews-tag {
+  color: #92400E;
+  background: rgba(245, 166, 35, 0.16);
+}
+.reviews-section .reviews-title {
+  color: var(--deep-navy);
+}
+.reviews-section .reviews-title .script-accent {
+  color: var(--electric-blue);
+}
+.reviews-section .reviews-subtitle {
+  color: #38466b;
+  opacity: 1;
+}

@@ -201,7 +201,7 @@ export const menuData = {
     { id: "addon-syrup", name: "1 Pump Syrup (Vanilla, Hazelnut etc)", price: 30 },
     { id: "addon-shot", name: "Extra Espresso Shot", price: 40 }
   ],
-  boardDisclaimer: "Prices are subject to change without prior notice due to fluctuations in raw ingredient costs, and customers who accidentally break any glassware will be responsible for covering the full replacement cost."
+  boardDisclaimer: "Prices may change with ingredient costs. Accidents happen by the shore. If a glass breaks, we'll just ask you to cover the replacement."
 };
 
 export function getDrinkCategory(itemId) {

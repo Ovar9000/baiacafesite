@@ -207,6 +207,18 @@
   box-sizing: border-box;
 }
 
+/* Shared with the footer Visit card */
+.hero-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+[data-open-state="open"] .hero-status-dot { background: #4ADE80; box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25); }
+[data-open-state="closing-soon"] .hero-status-dot { background: var(--golden-amber); box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.25); }
+[data-open-state="closed"] .hero-status-dot { background: #F87171; }
+
 .hero-primary-block {
   display: flex;
   flex-direction: column;
@@ -473,6 +485,8 @@
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: background 0.3s ease;
 }
 

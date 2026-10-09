@@ -113,11 +113,19 @@ export function initHero3D() {
         }, 150);
       };
 
-      if (imgLoader.complete) {
+      if (imgLoader.complete && imgLoader.naturalWidth > 0) {
         doSwap();
       } else {
         imgLoader.onload = doSwap;
-        imgLoader.onerror = doSwap;
+        // A dead drop photo (e.g. expired link) must never leave a broken hero:
+        // fall back to this slot's curated default instead.
+        imgLoader.onerror = () => {
+          const fallback = DEFAULT_SHOWCASE_ITEMS[idx];
+          if (fallback && fallback.img !== item.img) {
+            showcaseSlots[idx] = fallback;
+            applySlot(idx, true);
+          }
+        };
       }
     } else {
       showcaseImg.src = item.img;
@@ -132,8 +140,10 @@ export function initHero3D() {
     }
   }
 
-  // Keep signature hero image stable on initial page load for instant, zero-lag LCP
-  // (No delayed 2-second swap that causes image flickering/lag)
+  // Show the photo for the current Manila time slot right away. The static HTML
+  // ships slot 0 (it can't know the time), so other slots swap in at startup,
+  // before the visitor scrolls, with no fade.
+  if (activeIndex !== 0) applySlot(activeIndex);
 
   // 2. Hydrate showcase slots with time-appropriate food/drink items from Supabase
   // The Hero card is strictly a food & drink showcase by time-of-day:
@@ -214,14 +224,33 @@ export function initHero3D() {
           };
         }
 
-        // Slots are updated for background schedule without jarring initial swaps
+        // A newer drop photo for the slot on screen crossfades in once; other
+        // slots just wait for their time window.
+        const current = showcaseSlots[activeIndex];
+        if (current && showcaseImg && showcaseImg.getAttribute('src') !== current.img) {
+          applySlot(activeIndex, true);
+        }
       }
     } catch (e) {
       // Graceful fallback to curated beach defaults
     }
   }
 
-  hydrateHeroFromSupabase();
+  // The default card is already on screen, so the ~200 KB Supabase client can
+  // wait until the page has loaded and gone idle instead of competing with
+  // first paint on slow mobile data.
+  const hydrateWhenIdle = () => {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(hydrateHeroFromSupabase, { timeout: 3000 });
+    } else {
+      setTimeout(hydrateHeroFromSupabase, 1500);
+    }
+  };
+  if (document.readyState === 'complete') {
+    hydrateWhenIdle();
+  } else {
+    window.addEventListener('load', hydrateWhenIdle, { once: true });
+  }
 
   // 3. Periodic check: if 6-hour boundary changes while page remains open, crossfade to next feature
   setInterval(() => {

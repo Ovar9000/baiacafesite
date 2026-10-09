@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import url from 'url';
 import fs from 'fs';
 import path from 'path';
+import { injectSiteInfo } from './src/utils/injectSiteInfo.js';
 
 // Automatically load local .env variables into Node's process.env for local dev server API endpoints
 try {
@@ -127,15 +128,28 @@ function devApiPlugin() {
   };
 }
 
+// Fills hours in index.html (meta description, JSON-LD, fallback text) from
+// src/data/siteInfo.js so crawlers and link previews never see stale hours.
+function siteInfoHtmlPlugin() {
+  return {
+    name: 'baia-site-info-html',
+    transformIndexHtml: {
+      order: 'pre',
+      handler: (html) => injectSiteInfo(html)
+    }
+  };
+}
+
 export default defineConfig({
   base: '/',
   plugins: [
     react(),
     devApiPlugin(),
+    siteInfoHtmlPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'script-defer',
-      includeAssets: ['favicon.ico', 'images/Logo.webp', 'images/Logo-black.webp', 'images/crew.webp'],
+      includeAssets: ['favicon.ico', 'icons/icon-192.png', 'images/Logo.webp', 'images/Logo-black.webp'],
       workbox: {
         navigateFallbackDenylist: [/^\/admin/, /^\/api/],
         cleanupOutdatedCaches: true,
@@ -162,14 +176,15 @@ export default defineConfig({
         start_url: '/card/',
         icons: [
           {
-            src: '/images/Logo.webp',
+            src: '/icons/icon-192.png',
             sizes: '192x192',
-            type: 'image/webp'
+            type: 'image/png'
           },
           {
-            src: '/images/Logo.webp',
+            src: '/icons/icon-512.png',
             sizes: '512x512',
-            type: 'image/webp'
+            type: 'image/png',
+            purpose: 'any'
           }
         ]
       }

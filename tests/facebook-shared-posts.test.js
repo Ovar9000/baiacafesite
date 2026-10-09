@@ -31,14 +31,18 @@ import {
   markSource,
   mergePostEdges,
   shouldSkipShareForDrops,
-  wallSlot,
 } from '../scripts/fb-post-utils.js';
 
 import {
-  collectOccupiedCells,
-  parseGridCoord,
-  rankFreeCells,
-} from '../src/components/communityWall.js';
+  DESKTOP_GRID,
+  DESKTOP_SLOTS,
+  MOBILE_GRID,
+  MOBILE_SLOTS,
+  WALL_SIZE,
+  wallSlot,
+  wallSlotAttrs,
+} from '../src/utils/wallLayout.js';
+import { thumbPathFor } from '../src/utils/wallThumbs.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -224,7 +228,7 @@ describe('buildCommunityEntries — shared/tagged photos reach the wall', () => 
     const entries = buildCommunityEntries({ ...TAGGED_GUEST_POST, _source: 'tagged' });
     assert.equal(entries.length, 1);
     assert.equal(entries[0].photo_url, 'https://scontent-mnl3-1.xx.fbcdn.net/v/t39/tagged.jpg');
-    assert.equal(entries[0].tagline, 'Tagged Community Moment');
+    assert.equal(entries[0].tagline, 'Tagged on Facebook');
     assert.equal(entries[0].guest_name, 'Maria Santos');
   });
 
@@ -262,41 +266,15 @@ describe('buildCommunityCardHTML — page-update contract', () => {
     assert.match(html, /&quot;&gt;&lt;script&gt;/);
   });
 
-  it('spreads consecutive cards across DIFFERENT grid cells (no stacking)', () => {
-    const cells = new Set();
-    for (let i = 0; i < 8; i++) {
-      const html = buildCommunityCardHTML({ photo_url: `/images/community/guest_new_${i}.jpg` }, i);
-      const m = html.match(/--gc: (\d+); --gr: (\d+); --mgc: (\d+); --mgr: (\d+);/);
-      assert.ok(m, 'card must carry desktop + mobile grid slots');
-      const [, gc, gr, mgc, mgr] = m.map(Number);
-      assert.ok(gc >= 1 && gc <= 14, `desktop gc ${gc} within 14-col cup`);
-      assert.ok(gr >= 1 && gr <= 8, `desktop gr ${gr} within 8-row cup`);
-      assert.ok(mgc >= 1 && mgc <= 7, `mobile mgc ${mgc} within 7-col cup`);
-      assert.ok(mgr >= 1 && mgr <= 6, `mobile mgr ${mgr} within 6-row cup`);
-      const key = `${gc}x${gr}`;
-      assert.ok(!cells.has(key), `cell ${key} must not repeat (stacking bug)`);
-      cells.add(key);
-    }
-    assert.equal(cells.size, 8);
+  it('cards carry no grid coordinates; position comes from their index', () => {
+    const html = buildCommunityCardHTML({ photo_url: '/x.jpg', gc: 5, gr: 6 });
+    assert.doesNotMatch(html, /--gc|--gr|style=/);
   });
 
-  it('wallSlot() mirrors the browser builder slots (shared layout contract)', () => {
-    const a = wallSlot(0);
-    const b = wallSlot(1);
-    assert.notDeepEqual([a.gc, a.gr], [b.gc, b.gr]);
-    const html = buildCommunityCardHTML({ photo_url: '/x.jpg' }, 0);
-    assert.match(html, new RegExp(`--gc: ${a.gc}; --gr: ${a.gr};`));
-  });
-
-  it('stored per-item layout wins over slot rotation (stable Supabase rows)', () => {
-    const html = buildCommunityCardHTML({ photo_url: '/x.jpg', gc: 5, gr: 6, mgc: 3, mgr: 4 }, 0);
-    assert.match(html, /--gc: 5; --gr: 6; --mgc: 3; --mgr: 4;/);
-  });
-
-  it('main.css maps hydrated cards to mobile slots in the 7-col cup', () => {
+  it('main.css maps phone slots (--mgc/--mgr) in the cup', () => {
     const css = read('src/styles/main.css');
-    assert.match(css, /\[data-community-hydrated="1"\]/);
-    assert.match(css, /grid-column: var\(--mgc, var\(--gc\)\)/);
+    assert.match(css, /\.baia-coffee-cup \.mosaic-photo-card \{\s*grid-column: var\(--mgc\);\s*grid-row: var\(--mgr\);/);
+    assert.match(css, /\.is-mobile-hidden \{\s*display: none;/);
   });
 
   it('cards carry a stable data-wall-id for cross-source dedupe', () => {
@@ -319,10 +297,11 @@ describe('supabase migration — community wall lives in the backend', () => {
     assert.match(sql, /on conflict \(id\) do update/);
   });
 
-  it('sync-guest-photos.js upserts rows + caches images in community-cache', () => {
+  it('sync-guest-photos.js upserts rows + stores WebP photos and tile thumbs', () => {
     const src = read('scripts/sync-guest-photos.js');
     assert.match(src, /from\('community_wall'\)\.upsert\(rows, \{ onConflict: 'id' \}\)/);
-    assert.match(src, /from\('community-cache'\)/);
+    assert.match(src, /const BUCKET = 'community-cache'/);
+    assert.match(src, /uploadWebp\(supabase, BUCKET, `thumb_\$\{name\}`/);
     assert.match(src, /dedupeByContentHash/);
     assert.match(src, /syncWallToSupabase/);
   });
@@ -333,19 +312,19 @@ describe('supabase migration — community wall lives in the backend', () => {
     assert.doesNotMatch(src, /item\.gc = /);
   });
 
-  it('sync never wipes the wall on empty selections (keeps previous file)', () => {
+  it('sync never wipes the wall on empty selections', () => {
     const src = read('scripts/sync-guest-photos.js');
     assert.match(src, /Wall Guard/);
-    assert.match(src, /kept previous/);
+    assert.match(src, /existing wall kept/);
   });
 
-  it('communityWall.js hydrates Supabase-first with JSON fallback', () => {
+  it('communityWall.js hydrates from Supabase; static cards are the offline fallback', () => {
     const src = read('src/components/communityWall.js');
     assert.match(src, /from\('community_wall'\)/);
-    assert.match(src, /\/data\/community-reviews\.json/);
     assert.match(src, /hydrated-supabase/);
-    assert.match(src, /hydrated-json/);
+    assert.match(src, /reason: 'offline'/);
     assert.match(src, /dataset\.wallId/);
+    assert.doesNotMatch(src, /community-reviews\.json/);
   });
 
   it('cron wall step carries Supabase credentials for scheduled auto-updates', () => {
@@ -358,57 +337,79 @@ describe('supabase migration — community wall lives in the backend', () => {
 
 // --- 7. Collision-free placement + byte dedupe --------------------------------
 
-describe('wall placement — free cells only, repeats removed', () => {
-  it('parseGridCoord accepts positive ints, rejects junk', () => {
-    assert.equal(parseGridCoord('3'), 3);
-    assert.equal(parseGridCoord(5), 5);
-    assert.equal(parseGridCoord('0'), null);
-    assert.equal(parseGridCoord('-2'), null);
-    assert.equal(parseGridCoord('abc'), null);
-    assert.equal(parseGridCoord(undefined), null);
-  });
-
-  it('collectOccupiedCells dedupes and drops invalid coords', () => {
-    const occ = collectOccupiedCells([
-      { gc: '3', gr: '2' },
-      { gc: '3', gr: '2' },
-      { gc: 'x', gr: '2' },
-      { gc: '4', gr: null },
-    ]);
-    assert.deepEqual([...occ], ['3,2']);
-  });
-
-  it('rankFreeCells never returns occupied cells (the double-stack bug)', () => {
-    const occ = new Set(['3,2', '6,3', '4,5', '12,5', '7,6', '2,4']);
-    const cells = rankFreeCells(14, 8, occ, 8);
-    assert.equal(cells.length, 8);
-    for (const [gc, gr] of cells) {
-      assert.ok(!occ.has(`${gc},${gr}`), `cell ${gc},${gr} must be free`);
-      assert.ok(gc >= 1 && gc <= 14 && gr >= 1 && gr <= 8);
+describe('wall layout — one cup template, never stacks', () => {
+  const cellsOk = (slots, grid) => {
+    const keys = slots.map(([c, r]) => `${c},${r}`);
+    assert.equal(new Set(keys).size, slots.length, 'every slot is a different cell');
+    for (const [c, r] of slots) {
+      assert.ok(c >= 1 && c <= grid.cols && r >= 1 && r <= grid.rows, `${c},${r} inside ${grid.cols}x${grid.rows}`);
     }
-    assert.equal(new Set(cells.map((c) => c.join(','))).size, 8);
+  };
+
+  it('desktop and phone templates use unique cells inside their grids', () => {
+    assert.equal(WALL_SIZE, 30);
+    cellsOk(DESKTOP_SLOTS, DESKTOP_GRID);
+    cellsOk(MOBILE_SLOTS, MOBILE_GRID);
+    assert.ok(MOBILE_SLOTS.length < DESKTOP_SLOTS.length);
   });
 
-  it('rankFreeCells grows from the existing mass (nearest first)', () => {
-    const cells = rankFreeCells(5, 5, new Set(['3,3']), 4);
-    // All four orthogonal neighbours (Manhattan distance 1) come first.
-    for (const [gc, gr] of cells) {
-      assert.equal(Math.abs(gc - 3) + Math.abs(gr - 3), 1);
-    }
+  it('wallSlot maps index to slot; extra cards are hidden on phones', () => {
+    assert.deepEqual([wallSlot(0).gc, wallSlot(0).gr], DESKTOP_SLOTS[0]);
+    assert.deepEqual([wallSlot(0).mgc, wallSlot(0).mgr], MOBILE_SLOTS[0]);
+    assert.equal(wallSlot(MOBILE_SLOTS.length).mobileHidden, true);
+    assert.equal(wallSlot(WALL_SIZE - 1).steam, true);
+    assert.equal(wallSlot(WALL_SIZE).hidden, true);
+    assert.ok(wallSlotAttrs(MOBILE_SLOTS.length).classes.includes('is-mobile-hidden'));
   });
 
-  it('rankFreeCells returns fewer (never stacks) when the grid is full', () => {
-    const occ = new Set(['1,1', '2,1', '1,2', '2,2']);
-    assert.deepEqual(rankFreeCells(2, 2, occ, 5), []);
-    assert.equal(rankFreeCells(2, 2, new Set(['1,1']), 9).length, 3);
+  it('static index.html cup matches the template card-for-card', () => {
+    const html = read('index.html');
+    const cup = html.slice(html.indexOf('<div class="baia-coffee-cup">'));
+    const cards = [...cup.matchAll(/<button type="button" class="(mosaic-photo-card[^"]*)" style="([^"]*)"/g)];
+    assert.equal(cards.length, WALL_SIZE);
+    cards.forEach((m, i) => {
+      const { style, classes } = wallSlotAttrs(i);
+      assert.equal(m[2], style, `card ${i} style`);
+      assert.equal(m[1], ['mosaic-photo-card', ...classes].join(' '), `card ${i} classes`);
+    });
   });
 
-  it('communityWall.js places per-container from live DOM cells', () => {
+  it('hydration prepends then re-lays out the whole cup (oldest drop off)', async () => {
+    const { applyWallLayout } = await import('../src/utils/wallLayout.js');
+    // Minimal fake container: 30 static cards + 5 fresh ones prepended.
+    const made = [];
+    const mkCard = (id) => {
+      const card = {
+        id, attrs: {}, cls: new Set(['mosaic-photo-card']), removed: false,
+        setAttribute(k, v) { this.attrs[k] = v; },
+        classList: null,
+        remove() { this.removed = true; },
+      };
+      card.classList = {
+        add: (...c) => c.forEach((x) => card.cls.add(x)),
+        remove: (...c) => c.forEach((x) => card.cls.delete(x)),
+      };
+      made.push(card);
+      return card;
+    };
+    const list = [
+      ...Array.from({ length: 5 }, (_, i) => mkCard(`fresh${i}`)),
+      ...Array.from({ length: WALL_SIZE }, (_, i) => mkCard(`static${i}`)),
+    ];
+    const container = { querySelectorAll: () => list };
+    assert.equal(applyWallLayout(container), WALL_SIZE);
+    assert.deepEqual(list.filter((c) => c.removed).map((c) => c.id),
+      ['static25', 'static26', 'static27', 'static28', 'static29']);
+    const cells = list.filter((c) => !c.removed).map((c) => c.attrs.style.match(/--gc: (\d+); --gr: (\d+)/).slice(1).join(','));
+    assert.equal(new Set(cells).size, WALL_SIZE, 'no two cards share a cell');
+    assert.match(list[0].attrs.style, new RegExp(`--gc: ${DESKTOP_SLOTS[0][0]}; --gr: ${DESKTOP_SLOTS[0][1]};`));
+  });
+
+  it('communityWall.js lays out with the shared template', () => {
     const src = read('src/components/communityWall.js');
-    assert.match(src, /readContainerCells\(desktop, false\)/);
-    assert.match(src, /readContainerCells\(mobile, true\)/);
-    assert.match(src, /rankFreeCells\(/);
-    assert.match(src, /grid-full/);
+    assert.match(src, /applyWallLayout\(cup\)/);
+    assert.match(src, /insertBefore/);
+    assert.doesNotMatch(src, /rankFreeCells|readContainerCells/);
   });
 
   it('dedupeByContentHash drops byte-identical repeats, keeps the rest', () => {
@@ -432,17 +433,15 @@ describe('wall placement — free cells only, repeats removed', () => {
 // --- 5. Page wiring: JSON actually reaches the DOM ----------------------------
 
 describe('page wiring — sync output is fetched + rendered', () => {
-  it('sync-guest-photos.js mirrors JSON to public/ for runtime fetch', () => {
+  it('sync-guest-photos.js keeps photos in Supabase, never in the repo', () => {
     const src = read('scripts/sync-guest-photos.js');
-    assert.match(src, /COMMUNITY_PUBLIC_FILE/);
-    assert.match(src, /public.*data.*community-reviews\.json/);
     assert.match(src, /buildCommunityEntries/);
     assert.match(src, /full_picture|FB_WALL_FIELDS|buildTaggedUrl/);
+    assert.doesNotMatch(src, /writeFileSync|images\/community/);
   });
 
-  it('communityWall.js fetches the public JSON and prepends new cards', () => {
+  it('communityWall.js prepends new Supabase cards', () => {
     const src = read('src/components/communityWall.js');
-    assert.match(src, /\/data\/community-reviews\.json/);
     assert.match(src, /insertBefore/);
     assert.match(src, /mosaic-photo-card/);
     assert.match(src, /hydrateCommunityWall/);
@@ -472,6 +471,180 @@ describe('page wiring — sync output is fetched + rendered', () => {
       const html = buildCommunityCardHTML(item);
       assert.match(html, new RegExp(item.photo_url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').slice(0, 40)));
       assert.match(html, /data-permalink="https:\/\/www\.facebook\.com/);
+    }
+  });
+});
+
+// --- Photowall thumbnails: tiles load small WebPs, lightbox keeps full photo --
+
+describe('wall thumbnails', () => {
+  it('maps local photos to /images/thumbs/<name>.webp', () => {
+    assert.equal(thumbPathFor('/images/community/guest_1.jpg'), '/images/thumbs/guest_1.webp');
+    assert.equal(thumbPathFor('./images/skimboard.webp'), '/images/thumbs/skimboard.webp');
+    assert.equal(thumbPathFor('/images/Baia%20refreshers.jpg'), '/images/thumbs/Baia%20refreshers.webp');
+  });
+
+  it('leaves remote and already-thumb URLs alone', () => {
+    assert.equal(thumbPathFor('https://scontent-mnl3-1.xx.fbcdn.net/v/t39/a.jpg'), null);
+    assert.equal(thumbPathFor('/images/thumbs/guest_1.webp'), null);
+    assert.equal(thumbPathFor(undefined), null);
+  });
+
+  it('card tile uses the thumb while data-photo stays full-size', () => {
+    const html = buildCommunityCardHTML({ photo_url: '/images/community/guest_x.jpg' }, 0);
+    assert.match(html, /data-photo="\/images\/community\/guest_x\.jpg"/);
+    assert.match(html, /<img src="\/images\/thumbs\/guest_x\.webp"/);
+  });
+
+  it('every static wall tile in index.html points at an existing thumb', () => {
+    const html = read('index.html');
+    const srcs = [...html.matchAll(/<img\s+src="([^"]+)"[^>]*class="mosaic-photo-img"/g)].map((m) => m[1]);
+    assert.ok(srcs.length > 0);
+    for (const src of srcs) {
+      assert.ok(src.startsWith('/images/thumbs/'), `${src} should be a thumb`);
+      assert.ok(fs.existsSync(path.join(ROOT, 'public', decodeURIComponent(src))), `${src} missing on disk`);
+    }
+  });
+});
+
+// --- Hours: one source (src/data/siteInfo.js) feeds the crawler-visible HTML --
+
+describe('site info injection', async () => {
+  const { injectSiteInfo } = await import('../src/utils/injectSiteInfo.js');
+  const { HOURS, HOURS_TEXT } = await import('../src/data/siteInfo.js');
+
+  it('fills meta, JSON-LD and fallback text in index.html from siteInfo', () => {
+    const out = injectSiteInfo(read('index.html'));
+    assert.doesNotMatch(out, /\{\{\w+\}\}/);
+    assert.match(out, new RegExp(`"opens": "${HOURS.cafe.opens}"`));
+    assert.match(out, new RegExp(`"closes": "${HOURS.cafe.closes}"`));
+    for (const m of out.matchAll(/data-hours="(\w+)">([^<]*)</g)) {
+      assert.equal(m[2], HOURS_TEXT[m[1]], `data-hours="${m[1]}" fallback text`);
+    }
+  });
+
+  it('rejects unknown tokens instead of shipping them', () => {
+    assert.throws(() => injectSiteInfo('<p>{{notAThing}}</p>'), /unknown token/);
+  });
+});
+
+// --- Drops: deterministic classifier, real captions, no invented copy --------
+
+describe('classifyDropPost — rules only, built from the post text', async () => {
+  const { classifyDropPost, isWallNoticePost, titleFromPost, normalizePostText } = await import('../scripts/fb-post-utils.js');
+  const post = (message) => ({ id: 'x', message });
+
+  it('same-day notices are Cafe Updates, never drops ("delivery" is not "live")', () => {
+    const c = classifyDropPost(post('Full house today!💙\n\nDelivery orders may take a little longer than usual.'));
+    assert.equal(c.badge, 'Cafe Update');
+    assert.equal(c.category, 'event');
+    assert.equal(c.title, 'Full house today!');
+    assert.equal(classifyDropPost(post('FULL HOUSE TODAY 💙 We’ll pause deliveries for now.\nNew menu before the month ends.')).badge, 'Cafe Update');
+    assert.deepEqual(classifyDropPost(post('We’re hiring! ☕️💙 1 Male Barista')), { action: 'skip', reason: 'hiring' });
+  });
+
+  it('loyalty card announcement is News, not a launch duplicate', () => {
+    const c = classifyDropPost(post('𝗧𝗛𝗘 𝗕𝗔𝗜𝗔 𝗗𝗜𝗚𝗜𝗧𝗔𝗟 𝗟𝗢𝗬𝗔𝗟𝗧𝗬 𝗖𝗔𝗥𝗗 ☕️\n\nVisit www.baia.cafe/card/'));
+    assert.equal(c.badge, 'New at BAIA');
+    assert.equal(c.title, 'THE BAIA DIGITAL LOYALTY CARD');
+  });
+
+  it('food vs drink by keyword weight, titled from the real text', () => {
+    const c = classifyDropPost(post('New Drop 👀\nNacho-Crusted Chicken Tenders with White Garlic Cajun Sauce.\nAnd Whipped Honey! Add it on top of any drink. 🍯\nAvailable now for ₱215.\n#baiacafe'));
+    assert.equal(c.category, 'food');
+    assert.equal(c.title, 'Nacho-Crusted Chicken Tenders with White Garlic Cajun Sauce.');
+    assert.equal(c.price, '₱215');
+    assert.doesNotMatch(c.description, /#baiacafe/);
+    assert.equal(classifyDropPost(post('WE ARE OPEN TODAY!\nA new bean selection is waiting for you to try.')).category, 'drink');
+  });
+
+  it('never invents product copy', () => {
+    const msg = 'Introducing our NEW Iced Latte with oat milk. Available now.';
+    const c = classifyDropPost(post(msg));
+    assert.equal(c.description, msg);
+    assert.doesNotMatch(JSON.stringify(c), /Whipped Honey Foam|Cassandra|wild honey/);
+  });
+
+  it('closures are advisories; only "now online" is the website launch', () => {
+    assert.equal(classifyDropPost(post('Taking a little weather break today. 🌧️ We are closed today.')).badge, '1-Day Advisory');
+    assert.equal(classifyDropPost(post('BAIA, now online. 💻 Visit baia.cafe')).badge, 'Website Launch');
+    assert.notEqual(classifyDropPost(post('THE BAIA DIGITAL LOYALTY CARD ☕️ Get yours at baia.cafe/card')).badge, 'Website Launch');
+  });
+
+  it('chatty posts and emoji-only posts are not drops', () => {
+    assert.equal(classifyDropPost(post('Monday calls for a good burger. 🍔')).action, 'skip');
+    assert.equal(classifyDropPost(post('💙💙💙')).action, 'skip');
+  });
+
+  it('titles skip greetings and header-only lines; fancy Unicode is normalized', () => {
+    assert.equal(titleFromPost('Annyeong, BAIA fam. 👋\nYangnyeom is the newest flavor joining our wings.'), 'Yangnyeom is the newest flavor joining our wings.');
+    assert.equal(normalizePostText('𝐈𝐧𝐭𝐫𝐨𝐝𝐮𝐜𝐢𝐧𝐠 our burger #baiacafe'), 'Introducing our burger');
+  });
+
+  it('wall skips notice/hiring graphics', () => {
+    assert.equal(isWallNoticePost(post('We’re hiring! Check the caption.')), true);
+    assert.equal(isWallNoticePost(post('Full house today! Deliveries may take longer.')), true);
+    assert.equal(isWallNoticePost(post('For the matcha people who also need a beach break.')), false);
+  });
+
+  it('sync scripts carry no LLM calls', () => {
+    for (const f of ['scripts/sync-facebook-posts.js', 'scripts/sync-guest-photos.js']) {
+      assert.doesNotMatch(read(f), /generativelanguage\.googleapis|api\.openai\.com|GEMINI_API_KEY/, f);
+    }
+  });
+});
+
+// --- Images: compact WebP everywhere, permanent links, nothing broken --------
+
+describe('image pipeline', async () => {
+  const { isCachedWebp, storageName, toWebp, MAX_SIDE } = await import('../scripts/image-cache.js');
+  const sharp = (await import('sharp')).default;
+
+  it('recognises cached WebPs and storage names', () => {
+    const url = 'https://x.supabase.co/storage/v1/object/public/drops-cache/drop_1.webp';
+    assert.equal(isCachedWebp(url, 'drops-cache'), true);
+    assert.equal(isCachedWebp(url.replace('.webp', '.jpg'), 'drops-cache'), false);
+    assert.equal(isCachedWebp('https://scontent.fbcdn.net/a.jpg', 'drops-cache'), false);
+    assert.equal(storageName(`${url}?v=2`), 'drop_1.webp');
+  });
+
+  it('toWebp shrinks to the display box', async () => {
+    const big = await sharp({ create: { width: 2400, height: 1600, channels: 3, background: '#1E4AFF' } }).jpeg().toBuffer();
+    const meta = await sharp(await toWebp(big)).metadata();
+    assert.equal(meta.format, 'webp');
+    assert.ok(Math.max(meta.width, meta.height) <= MAX_SIDE);
+  });
+
+  it('bucket wall photos map to their uploaded tile thumb', () => {
+    assert.equal(
+      thumbPathFor('https://x.supabase.co/storage/v1/object/public/community-cache/wall_640_1_p1.webp'),
+      'https://x.supabase.co/storage/v1/object/public/community-cache/thumb_wall_640_1_p1.webp'
+    );
+  });
+
+  it('drops sync never swaps a working image for a dead link', () => {
+    const src = read('scripts/sync-facebook-posts.js');
+    assert.match(src, /isCachedWebp\(u, 'drops-cache'\)/);
+    assert.match(src, /freshPostImageUrl/);
+    assert.match(src, /else if \(existingImage\.get\(id\)\)/);
+    assert.doesNotMatch(src, /contentType: 'image\/jpeg'/);
+  });
+
+  it('every local image index.html references exists', () => {
+    const html = read('index.html');
+    const refs = [...html.matchAll(/(?:src|href|data-photo|content)="(?:https:\/\/www\.baia\.cafe)?\.?(\/(?:images|icons)\/[^"]+)"/g)].map((m) => m[1]);
+    assert.ok(refs.length > 30);
+    for (const ref of refs) {
+      assert.ok(fs.existsSync(path.join(ROOT, 'public', decodeURIComponent(ref))), `missing ${ref}`);
+    }
+  });
+
+  it('site photos are display-sized (no 1000px+ originals shipped)', async () => {
+    for (const f of fs.readdirSync(path.join(ROOT, 'public', 'images'))) {
+      if (!/\.(webp|jpe?g|png)$/i.test(f) || /^(baia-|Logo)/.test(f)) continue;
+      const { width, height } = await sharp(fs.readFileSync(path.join(ROOT, 'public', 'images', f))).metadata();
+      const limit = f.startsWith('Cottage rental') ? 1200 : 960;
+      assert.ok(Math.max(width, height) <= limit, `${f} is ${width}x${height}`);
     }
   });
 });

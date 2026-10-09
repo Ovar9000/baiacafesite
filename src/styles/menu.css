@@ -367,8 +367,8 @@
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   padding: 4px 6px;
-  mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+  mask-image: linear-gradient(to right, black calc(100% - 48px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 48px), transparent 100%);
   transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1),
               opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
