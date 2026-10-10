@@ -26,7 +26,8 @@ instead of competing for attention. The look and feel follow iPhone (iOS 26/27
 
 ### Header and navigation
 - The header is a floating glass capsule (after the Lot 7 site) with a
-  magnifying "lens" that glides to the section you're in.
+  magnifying "lens" that glides to the section you're in, and hides over
+  sections that have no menu link (like House Signatures).
 - The logo is a circle that sits concentric with the capsule's rounded end.
 - Phones get a menu button and a slide-in glass drawer with all sections,
   Messenger, live open/closed status and the location. Before, phones had no
@@ -52,12 +53,17 @@ instead of competing for attention. The look and feel follow iPhone (iOS 26/27
 ### Menu
 - Drinks / Food switch, a search field that looks across both, and
   swipeable category tabs that stay pinned under the header while you scroll.
-- One category at a time as a compact list: name, one line of description,
-  price and a round + button.
+- One category at a time: a compact list on phones, a grid of tiles on
+  laptops (2 columns, 3 on wider screens) with the controls side by side.
+- Each item shows its name, one line of description, the price and a round
+  + button.
 - Drink options (temperature, size, add-ons) open in a bottom sheet with
   sliding segmented controls and a live total.
 
 ### Ordering
+- Adding something no longer opens My Order, so you can keep browsing and
+  add several things in a row. A banner confirms each add (with a View
+  button), the + button pops and the My Order count bumps.
 - My Order is an iPhone-style sheet: a bottom sheet you can swipe down to
   close on phones, a floating panel on laptops.
 - Order type is a segmented control; items are one clean list with a filled
@@ -73,6 +79,9 @@ instead of competing for attention. The look and feel follow iPhone (iOS 26/27
   cards, and pill shapes only for things you tap.
 - Heavy headlines got slightly looser letter spacing so letter pairs like
   F–T no longer touch.
+- The floaties no longer follow the mouse; they just bob in place.
+- The search field shows one soft focus ring around the whole field instead
+  of an amber box around the text inside it.
 - Earlier on this branch: glows replaced by one shared shadow scale, and more
   liquid-glass floaties across sections.
 

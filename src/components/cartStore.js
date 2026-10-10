@@ -64,8 +64,14 @@ class CartStore {
     }
 
     const customizationNote = (item.addOns && item.addOns.length > 0) ? ` (+${item.addOns.length} add-on${item.addOns.length > 1 ? 's' : ''})` : '';
-    this.showToast('Added to My Order', `${item.name}${customizationNote} (${this.formatCurrency(price)})`, '✓');
-    this.openDrawer();
+    // Stay on the menu: people often add several things in a row, so the
+    // order sheet opens only when they ask for it (the View button or My Order)
+    this.showToast('Added to your order', `${item.name}${customizationNote} · ${this.formatCurrency(price)}`, '✓', this.viewOrderAction());
+    this.notify();
+  }
+
+  viewOrderAction() {
+    return { label: 'View', onClick: () => this.openDrawer() };
   }
 
   toggleItemAddOn(key, addOn) {
@@ -149,8 +155,7 @@ class CartStore {
     });
 
     this.notify();
-    this.showToast('Shore Pairing Added', 'Smash Burger, Sea Salt Latte & Fries added (₱565)', '✓');
-    this.openDrawer();
+    this.showToast('Shore pairing added', 'Smash Burger, Sea Salt Latte & Fries · ₱565', '✓', this.viewOrderAction());
   }
 
   updateQuantity(key, delta) {
@@ -276,7 +281,11 @@ class CartStore {
     return `₱${val.toLocaleString()}`;
   }
 
-  showToast(title, message, icon = '✓') {
+  /**
+   * Shows a banner at the top. `action` ({ label, onClick }) adds a button,
+   * e.g. View to open the order sheet.
+   */
+  showToast(title, message, icon = '✓', action = null) {
     const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     const safeIcon = ['✓', '!', '×'].includes(icon) ? icon : '✓';
     const toast = {
@@ -298,7 +307,16 @@ class CartStore {
           <h4>${esc(title)}</h4>
           <p>${esc(message)}</p>
         </div>
+        ${action ? `<button type="button" class="toast-action">${esc(action.label)}</button>` : ''}
       `;
+      if (action) {
+        toastEl.querySelector('.toast-action').addEventListener('click', () => {
+          action.onClick();
+          toastEl.remove();
+        });
+      }
+      // Adding several things in a row: keep at most two banners on screen
+      while (toastContainer.children.length >= 2) toastContainer.firstElementChild.remove();
       toastContainer.appendChild(toastEl);
 
       setTimeout(() => {

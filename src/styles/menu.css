@@ -264,8 +264,14 @@
   transition: background-color var(--duration-fast);
 }
 
+/* The focus ring goes around the whole field, not the bare input inside it */
 .mx-search:focus-within {
   background: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.mx-search input:focus-visible {
+  outline: none !important;
 }
 
 .mx-search input {
@@ -790,5 +796,83 @@
     margin: 8px auto 12px;
     border-radius: var(--radius-pill);
     background: rgba(60, 60, 67, 0.3);
+  }
+}
+
+/* ==========================================================================
+   MENU ON WIDE SCREENS: use the width. Controls side by side, items as a
+   grid of tiles (2 columns, then 3); phones keep the single grouped list.
+   ========================================================================== */
+@media (min-width: 900px) {
+  #menu-explorer-root {
+    max-width: 1180px;
+  }
+
+  .mx-top {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .mx-board {
+    flex: 0 0 300px;
+  }
+
+  .mx-search {
+    flex: 1;
+  }
+
+  .mx-category-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 14px 4px 14px;
+  }
+
+  .mx-category-meta {
+    margin-top: 0;
+  }
+
+  .mx-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    background: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .mx-row {
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    padding: 16px 16px 16px 20px;
+    align-items: flex-start;
+    transition: transform 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-smooth);
+  }
+
+  .mx-row + .mx-row::before {
+    display: none;
+  }
+
+  .mx-row:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Keep the price on the tile's bottom edge so a row of tiles lines up */
+  .mx-row-text {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mx-row-price {
+    margin-top: auto;
+    padding-top: 8px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .mx-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

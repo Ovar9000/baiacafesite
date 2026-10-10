@@ -1025,6 +1025,13 @@
   background: rgba(255, 255, 255, 0.55);
 }
 
+/* These fields draw their own blue focus border; skip the site-wide ring */
+.delivery-field select:focus-visible,
+.delivery-field textarea:focus-visible,
+.dd-btn:focus-visible {
+  outline: none !important;
+}
+
 .delivery-hint {
   color: var(--label-2);
   padding: 0 4px;

@@ -75,14 +75,20 @@ export function initGlassNav() {
     if (!hovered) moveTo(current);
   };
 
+  // Every section on the page, linked or not, so a section without a nav link
+  // (House Signatures) clears the lens instead of leaving the previous link lit
+  const sections = [...document.querySelectorAll('main > section[id]:not([hidden]), footer[id]')];
+  const linkFor = new Map(pairs.map(([link, section]) => [section, link]));
+
   // The current section is the last one whose top has passed a line a third
-  // of the way down the screen, so in-between sections keep the previous link.
+  // of the way down the screen.
   const update = () => {
     const line = window.innerHeight * 0.33;
-    let found = null;
-    for (const [link, section] of pairs) {
-      if (section.getBoundingClientRect().top <= line) found = link;
+    let section = null;
+    for (const s of sections) {
+      if (s.getBoundingClientRect().top <= line) section = s;
     }
+    let found = section ? linkFor.get(section) || null : null;
     // The footer is shorter than the screen, so its top never reaches the
     // line: at the very bottom of the page, the last link is current.
     const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;

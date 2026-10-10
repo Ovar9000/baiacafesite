@@ -154,6 +154,7 @@ export function initCartDrawer() {
   });
 
   // Re-render when store updates
+  let lastCount = cartStore.getItemCount();
   cartStore.subscribe((store) => {
     if (store.isDrawerOpen) {
       backdrop?.classList.add('active');
@@ -167,6 +168,15 @@ export function initCartDrawer() {
     }
 
     const totalCount = store.getItemCount();
+    // Something was added: bump the My Order buttons instead of opening the sheet
+    if (totalCount > lastCount) {
+      document.querySelectorAll('.nav-cart-btn, .mobile-bar-cart-btn').forEach((btn) => {
+        btn.classList.remove('is-bumping');
+        void btn.offsetWidth;
+        btn.classList.add('is-bumping');
+      });
+    }
+    lastCount = totalCount;
     countTags.forEach(tag => {
       // The sheet header reads "Your Order · 2 items"; the cart buttons show just the number
       tag.textContent = tag.classList.contains('drawer-count-tag')

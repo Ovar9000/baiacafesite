@@ -1,14 +1,10 @@
 /**
- * Liquid-glass floaties: collision avoidance + mouse parallax.
+ * Liquid-glass floaties: collision avoidance.
  *
  * Floaties sit behind section content, but behind translucent panels a
  * white glass bubble can wash out white text. Positions are percentages, so
  * whether one lands under content depends on the screen; each floatie is
  * checked against the content around it and tucked away if it overlaps.
- *
- * Parallax: the CSS bobbing animation owns each floatie's `transform`, so the
- * mouse offset uses the independent `translate` / `rotate` properties, which
- * compose with it. Updates are batched to one per animation frame.
  */
 
 const CONTENT = [
@@ -114,37 +110,6 @@ function initCollisionAvoidance() {
   document.fonts?.ready?.then(() => sections.forEach(schedule));
 }
 
-function initParallax() {
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const hasMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  if (prefersReducedMotion || !hasMouse) return;
-
-  const floaties = document.querySelectorAll('.glass-floatie');
-  if (!floaties.length) return;
-
-  let pending = null;
-  const apply = () => {
-    const { x, y } = pending;
-    pending = null;
-    floaties.forEach((floatie, idx) => {
-      const depth = 0.15 + (idx % 6) * 0.12;
-      const tilt = (idx % 2 === 0 ? 1 : -1) * x * 0.15;
-      floatie.style.translate = `${(x * depth).toFixed(1)}px ${(y * depth).toFixed(1)}px`;
-      floatie.style.rotate = `${tilt.toFixed(1)}deg`;
-    });
-  };
-
-  window.addEventListener('mousemove', (e) => {
-    const first = pending === null;
-    pending = {
-      x: (e.clientX / window.innerWidth - 0.5) * 40,
-      y: (e.clientY / window.innerHeight - 0.5) * 40
-    };
-    if (first) requestAnimationFrame(apply);
-  }, { passive: true });
-}
-
 export function initLiquidFloaties() {
   initCollisionAvoidance();
-  initParallax();
 }
