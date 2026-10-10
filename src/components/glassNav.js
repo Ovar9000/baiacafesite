@@ -45,6 +45,7 @@ export function initGlassNav() {
   const moveTo = (link) => {
     if (!link || link.offsetParent === null) {
       lens.classList.remove('is-visible');
+      pairs.forEach(([l]) => l.classList.remove('is-under-lens'));
       return;
     }
     const navBox = nav.getBoundingClientRect();
@@ -52,6 +53,9 @@ export function initGlassNav() {
     lens.style.setProperty('--lens-x', `${box.left - navBox.left}px`);
     lens.style.setProperty('--lens-w', `${box.width}px`);
     lens.classList.add('is-visible');
+    // The lens is clear glass: hide the real label under it so only the
+    // enlarged copy inside the lens shows, not both
+    pairs.forEach(([l]) => l.classList.toggle('is-under-lens', l === link));
   };
 
   const setCurrent = (link) => {
@@ -76,9 +80,16 @@ export function initGlassNav() {
   };
 
   // Every section on the page, linked or not, so a section without a nav link
-  // (House Signatures) clears the lens instead of leaving the previous link lit
+  // clears the lens instead of leaving the previous link lit
   const sections = [...document.querySelectorAll('main > section[id]:not([hidden]), footer[id]')];
   const linkFor = new Map(pairs.map(([link, section]) => [section, link]));
+  // A section without its own link can count as part of another one via
+  // data-nav-link (House Signatures belongs to the Menu)
+  sections.forEach((section) => {
+    const href = section.dataset.navLink;
+    const link = href && pairs.find(([l]) => l.getAttribute('href') === href)?.[0];
+    if (link) linkFor.set(section, link);
+  });
 
   // The current section is the last one whose top has passed a line a third
   // of the way down the screen.

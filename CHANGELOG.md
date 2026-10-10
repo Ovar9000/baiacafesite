@@ -26,8 +26,8 @@ instead of competing for attention. The look and feel follow iPhone (iOS 26/27
 
 ### Header and navigation
 - The header is a floating glass capsule (after the Lot 7 site) with a
-  magnifying "lens" that glides to the section you're in, and hides over
-  sections that have no menu link (like House Signatures).
+  clear-glass magnifying "lens" that glides to the section you're in.
+  House Signatures counts as part of the Menu.
 - The logo is a circle that sits concentric with the capsule's rounded end.
 - Phones get a menu button and a slide-in glass drawer with all sections,
   Messenger, live open/closed status and the location. Before, phones had no
