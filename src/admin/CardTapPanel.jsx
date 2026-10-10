@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import confetti from 'canvas-confetti';
-import { CreditCard, Check, Clock, Gift, Wifi, X, Loader2, AlertCircle } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
+import { CreditCard, Check, Clock, Gift, Wifi, X, Loader2, AlertCircle, Link2 } from 'lucide-react';
 
 const RESULT_TIMEOUT_MS = 45_000;
 const ORDERS_REFRESH_MS = 30_000;
@@ -30,6 +32,10 @@ function beep(kind) {
   }
 }
 
+function orderPrice(order) {
+  return order.includes_free_coffee ? `₱${order.price_php || 120} · with free coffee` : `₱${order.price_php || 50} · card only`;
+}
+
 function firstName(profile) {
   const name = profile?.display_name || profile?.email?.split('@')[0] || 'Member';
   return name.split(' ')[0];
@@ -43,6 +49,7 @@ export default function CardTapPanel({ password, adminSession }) {
   const [giveState, setGiveState] = useState({ status: 'waiting', message: '' });
   const [typing, setTyping] = useState(false);
   const [typedUid, setTypedUid] = useState('');
+  const [linkInfo, setLinkInfo] = useState(null);
 
   const bufferRef = useRef('');
   const lastKeyRef = useRef(0);
@@ -130,8 +137,43 @@ export default function CardTapPanel({ password, adminSession }) {
     }
   }, [post, loadOrders]);
 
+  // Shared wrapper for one-off counter actions on the current result
+  const runAction = useCallback(async (fn) => {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
+    try {
+      await fn();
+    } catch (err) {
+      beep('warn');
+      setResult({ status: 'error', message: err.message });
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
+    }
+  }, []);
+
+  const activateCard = (uid) => runAction(async () => {
+    await post('admin-activate-card', { cardUid: uid });
+    beep('ok');
+    setResult({ status: 'activated', cardUid: uid });
+  });
+
+  const redeemReward = (current) => runAction(async () => {
+    const data = await post('admin-redeem-card', { cardUid: current.cardUid });
+    beep('ok');
+    confetti({ particleCount: 60, spread: 60, origin: { y: 0.4 } });
+    setResult({ ...current, pendingRewards: data.pendingRewards, justRedeemed: true });
+  });
+
+  const startLink = (current) => runAction(async () => {
+    const data = await post('admin-card-link', { cardUid: current.cardUid });
+    setLinkInfo({ url: data.linkUrl });
+  });
+
   // While handing over a new card, a scan links it; otherwise a scan is a stamp tap
   onScanRef.current = (uid) => {
+    if (linkInfo) return;
     if (giveTo && giveState.status === 'waiting') linkCard(giveTo, uid);
     else if (!giveTo) tapCard(uid);
   };
@@ -212,7 +254,15 @@ export default function CardTapPanel({ password, adminSession }) {
         ) : !result ? (
           <ReadyState typing={typing} setTyping={setTyping} typedForm={typedForm} />
         ) : (
-          <TapResult result={result} orders={orders} onGive={(order) => linkCard(order, result.cardUid)} onDone={() => setResult(null)} />
+          <TapResult
+            result={result}
+            orders={orders}
+            onGive={(order) => linkCard(order, result.cardUid)}
+            onActivate={() => activateCard(result.cardUid)}
+            onRedeem={() => redeemReward(result)}
+            onLink={() => startLink(result)}
+            onDone={() => setResult(null)}
+          />
         )}
       </section>
 
@@ -227,7 +277,7 @@ export default function CardTapPanel({ password, adminSession }) {
               <div key={order.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '10px 12px', background: '#FAF4EB', borderRadius: '12px' }}>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontWeight: 800, color: '#131314', fontSize: '0.92rem' }}>{order.profiles?.display_name || 'Member'}</div>
-                  <div style={{ fontSize: '0.74rem', color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{order.profiles?.email}</div>
+                  <div style={{ fontSize: '0.74rem', color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{orderPrice(order)} · {order.profiles?.email}</div>
                 </div>
                 <button type="button" onClick={() => openGive(order)} style={pillButton('#131314', '#FFFFFF')}>
                   <CreditCard size={15} />
@@ -239,13 +289,17 @@ export default function CardTapPanel({ password, adminSession }) {
         </section>
       )}
 
-      {giveTo && (
+      {/* Portaled: the admin tab pane animates with a transform, which would trap position: fixed */}
+      {linkInfo && createPortal(<LinkOverlay url={linkInfo.url} onClose={() => { setLinkInfo(null); setResult(null); }} />, document.body)}
+
+      {giveTo && createPortal(
         <GiveCardOverlay
           order={giveTo}
           state={giveState}
           onCancel={() => { if (giveState.status !== 'linking') setGiveTo(null); }}
           onTyped={(uid) => linkCard(giveTo, uid)}
-        />
+        />,
+        document.body
       )}
     </div>
   );
@@ -272,9 +326,9 @@ function ReadyState({ typing, setTyping, typedForm }) {
   );
 }
 
-function TapResult({ result, orders, onGive, onDone }) {
+function TapResult({ result, orders, onGive, onActivate, onRedeem, onLink, onDone }) {
   const { status } = result;
-  const name = result.user?.display_name || 'Member';
+  const name = result.walkIn ? `Walk-in card ···${result.cardUid?.slice(-4)}` : (result.user?.display_name || 'Member');
 
   if (status === 'error') {
     return (
@@ -291,22 +345,40 @@ function TapResult({ result, orders, onGive, onDone }) {
     return (
       <div>
         <div style={chip('#475569', '#E2E8F0')}>New card</div>
-        <h3 style={headline}>This card isn’t linked yet</h3>
-        {orders.length > 0 ? (
+        <h3 style={headline}>Selling this card?</h3>
+        <p style={subline}>Works right away, no account needed.</p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
+          <span style={chip('#131314', '#FAF4EB')}>Card ₱50</span>
+          <span style={chip('#131314', '#FAF4EB')}>₱120 with free Classic Coffee</span>
+        </div>
+        <button type="button" onClick={onActivate} style={{ ...pillButton('#131314', '#FFFFFF'), marginTop: '14px' }}>
+          <CreditCard size={15} /> Start walk-in card
+        </button>
+        {orders.length > 0 && (
           <>
-            <p style={subline}>Who is it for?</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', marginTop: '12px' }}>
+            <p style={{ ...subline, marginTop: '16px' }}>Or give it to an online order:</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', marginTop: '8px' }}>
               {orders.map((order) => (
-                <button key={order.id} type="button" onClick={() => onGive(order)} style={pillButton('#131314', '#FFFFFF')}>
-                  Give to {order.profiles?.display_name || 'Member'}
+                <button key={order.id} type="button" onClick={() => onGive(order)} style={pillButton('#F1F5F9', '#131314')}>
+                  {order.profiles?.display_name || 'Member'}
                 </button>
               ))}
             </div>
           </>
-        ) : (
-          <p style={subline}>No card orders waiting. The customer orders one on their loyalty page first.</p>
         )}
-        <button type="button" onClick={onDone} style={{ ...linkButton, marginTop: '14px' }}>Dismiss</button>
+        <div><button type="button" onClick={onDone} style={{ ...linkButton, marginTop: '14px' }}>Dismiss</button></div>
+      </div>
+    );
+  }
+
+  if (status === 'activated') {
+    return (
+      <div>
+        <div className="tap-ready-icon" style={{ background: '#16A34A', color: '#FFFFFF' }}><Check size={30} /></div>
+        <h3 style={headline}>Walk-in card ready!</h3>
+        <p style={subline}>Collect ₱50, or ₱120 and hand over a free Classic Coffee.</p>
+        <p style={{ ...subline, marginTop: '6px', fontWeight: 700, color: '#131314' }}>Buying a drink too? Tap the card again for today’s stamp.</p>
+        <button type="button" onClick={onDone} style={{ ...pillButton('#131314', '#FFFFFF'), marginTop: '14px' }}>Done</button>
       </div>
     );
   }
@@ -336,9 +408,14 @@ function TapResult({ result, orders, onGive, onDone }) {
       <div style={{ fontSize: '0.82rem', color: '#64748B', fontWeight: 700 }}>{filled} / 10 stamps</div>
 
       {result.pendingRewards > 0 && (
-        <div style={{ margin: '14px auto 0', maxWidth: '380px', background: '#FFF7ED', border: '1.5px solid #FB923C', color: '#9A3412', borderRadius: '14px', padding: '10px 14px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <Gift size={18} />
-          <span>Free Classic Coffee ready!</span>
+        <div style={{ margin: '14px auto 0', maxWidth: '380px', background: '#FFF7ED', border: '1.5px solid #FB923C', color: '#9A3412', borderRadius: '14px', padding: '10px 14px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><Gift size={18} /> Free Classic Coffee ready!</span>
+          <button type="button" onClick={onRedeem} style={pillButton('#EA580C', '#FFFFFF')}>Give it now</button>
+        </div>
+      )}
+      {result.justRedeemed && (
+        <div style={{ margin: '14px auto 0', maxWidth: '380px', color: '#15803D', fontWeight: 800 }}>
+          ☕ Free coffee redeemed. Enjoy!
         </div>
       )}
 
@@ -353,7 +430,30 @@ function TapResult({ result, orders, onGive, onDone }) {
         </div>
       )}
 
-      <button type="button" onClick={onDone} style={{ ...pillButton('#131314', '#FFFFFF'), marginTop: '16px' }}>Done</button>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
+        {result.walkIn && (
+          <button type="button" onClick={onLink} style={pillButton('#F1F5F9', '#131314')}>
+            <Link2 size={15} /> Link to account
+          </button>
+        )}
+        <button type="button" onClick={onDone} style={pillButton('#131314', '#FFFFFF')}>Done</button>
+      </div>
+    </div>
+  );
+}
+
+function LinkOverlay({ url, onClose }) {
+  return (
+    <div role="dialog" aria-modal="true" aria-label="Link card to account" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 1000 }}>
+      <div style={{ background: '#FFFFFF', borderRadius: '24px', padding: '24px 22px', width: '100%', maxWidth: '380px', textAlign: 'center', boxSizing: 'border-box' }}>
+        <h3 style={{ ...headline, marginTop: 0 }}>Scan to link this card</h3>
+        <p style={subline}>Customer scans with their phone camera and signs in.</p>
+        <div style={{ display: 'inline-block', background: '#FFFFFF', padding: '12px', borderRadius: '16px', border: '1.5px solid #E2E8F0', margin: '16px 0 10px' }}>
+          <QRCodeSVG value={url} size={200} level="M" />
+        </div>
+        <p style={{ ...subline, fontSize: '0.8rem' }}>New accounts only. Stamps move over. Expires in 10 minutes.</p>
+        <button type="button" onClick={onClose} style={{ ...pillButton('#131314', '#FFFFFF'), marginTop: '14px' }}>Done</button>
+      </div>
     </div>
   );
 }
@@ -375,7 +475,7 @@ function GiveCardOverlay({ order, state, onCancel, onTyped }) {
           <>
             <div className="tap-ready-icon" style={{ background: '#16A34A', color: '#FFFFFF' }}><Check size={30} /></div>
             <h3 style={headline}>Card linked to {name}!</h3>
-            <p style={subline}>Hand it over with their free Classic Coffee.</p>
+            <p style={subline}>{order.includes_free_coffee !== false ? 'Hand it over with their free Classic Coffee.' : 'Hand it over. Enjoy!'}</p>
           </>
         ) : (
           <>
@@ -386,8 +486,8 @@ function GiveCardOverlay({ order, state, onCancel, onTyped }) {
             <p style={subline}>Put a fresh card on the reader.</p>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '14px', flexWrap: 'wrap' }}>
-              <span style={chip('#131314', '#FAF4EB')}>Collect ₱120</span>
-              <span style={chip('#131314', '#FAF4EB')}>☕ Free Classic Coffee</span>
+              <span style={chip('#131314', '#FAF4EB')}>Collect ₱{order.price_php || 120}</span>
+              {order.includes_free_coffee !== false && <span style={chip('#131314', '#FAF4EB')}>☕ Free Classic Coffee</span>}
             </div>
 
             {state.message && (

@@ -1,50 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { setCorsHeaders, isRateLimited, rejectUnlessAdmin, getSupabaseConfig } from './_security.js';
+import { cleanCardUid, manilaDayBounds, forHolder, holderProgress, holderName, holderWifiVoucher, CARD_SELECT } from './_cards.js';
 
 const CAFE_TIMEZONE = process.env.CAFE_TIMEZONE || 'Asia/Manila';
-const WIFI_VOUCHER_DAILY_CAP = parseInt(process.env.WIFI_VOUCHER_DAILY_CAP || '150', 10);
-
-// Same dispenser as the QR claim; it returns the member's existing voucher if they
-// already got one today. Staff verified the purchase, so no new-account/IP limits
-// (the request IP is the cashier's, not the customer's).
-async function getWifiVoucher(supabaseAdmin, userId) {
-  try {
-    const { data, error } = await supabaseAdmin.rpc('claim_next_wifi_voucher_v2', {
-      p_user_id: userId,
-      p_ip_hash: null,
-      p_is_new_account: false,
-      p_daily_cap: WIFI_VOUCHER_DAILY_CAP,
-      p_new_account_ip_cap: 0
-    });
-    if (error || !data?.length) return null;
-    return {
-      code: data[0].voucher_code,
-      durationHours: data[0].duration || 1,
-      deviceLimit: data[0].devices || 2
-    };
-  } catch (err) {
-    console.warn('Wi-Fi voucher dispensing non-fatal notice:', err.message);
-    return null;
-  }
-}
-
-function cleanCardUid(raw) {
-  if (!raw || typeof raw !== 'string') return '';
-  return raw.replace(/[:\s-]/g, '').trim().toUpperCase();
-}
-
-function getManilaDateString(date = new Date()) {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: CAFE_TIMEZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).formatToParts(date);
-  const year = parts.find(p => p.type === 'year')?.value;
-  const month = parts.find(p => p.type === 'month')?.value;
-  const day = parts.find(p => p.type === 'day')?.value;
-  return `${year}-${month}-${day}`;
-}
 
 export default async function handler(req, res) {
   setCorsHeaders(req, res, 'POST,OPTIONS');
@@ -66,9 +24,7 @@ export default async function handler(req, res) {
   try {
     if (await rejectUnlessAdmin(req, res)) return;
 
-    const { cardUid } = req.body || {};
-    const cleanUid = cleanCardUid(cardUid);
-
+    const cleanUid = cleanCardUid((req.body || {}).cardUid);
     if (!cleanUid || cleanUid.length < 4 || cleanUid.length > 32) {
       return res.status(400).json({ error: 'Invalid card UID format.' });
     }
@@ -81,22 +37,10 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Server database configuration error.' });
     }
 
-    // 1. Find active card
+    // 1. Find the active card (linked to an account or a walk-in card)
     const { data: card, error: cardErr } = await supabaseAdmin
       .from('loyalty_cards')
-      .select(`
-        id,
-        user_id,
-        card_uid,
-        status,
-        last_tapped_at,
-        profiles (
-          id,
-          display_name,
-          email,
-          avatar_url
-        )
-      `)
+      .select(CARD_SELECT)
       .eq('card_uid', cleanUid)
       .eq('status', 'active')
       .maybeSingle();
@@ -106,117 +50,72 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Database error searching card.' });
     }
 
-    // Card not linked to any active user
     if (!card) {
-      return res.status(200).json({
-        status: 'unlinked_card',
-        cardUid: cleanUid,
-        message: `Card ${cleanUid} is unassigned. Tap "Assign to Member" to link it.`
-      });
+      return res.status(200).json({ status: 'unlinked_card', cardUid: cleanUid });
     }
 
-    const userProfile = card.profiles || { id: card.user_id, display_name: 'Member' };
-    const todayManila = getManilaDateString();
-    const startOfDayISO = new Date(`${todayManila}T00:00:00+08:00`).toISOString();
-    const endOfDayISO = new Date(`${todayManila}T23:59:59.999+08:00`).toISOString();
+    const holder = {
+      cardUid: cleanUid,
+      walkIn: !card.user_id,
+      user: { display_name: holderName(card) }
+    };
 
-    // 2. Check if already stamped today
-    const { data: todayStamps, error: checkError } = await supabaseAdmin
-      .from('stamps')
-      .select('id, awarded_at')
-      .eq('user_id', card.user_id)
-      .gte('awarded_at', startOfDayISO)
-      .lte('awarded_at', endOfDayISO);
+    // 2. One stamp per holder per Manila day
+    const { start, end } = manilaDayBounds();
+    const { data: todayStamps, error: checkError } = await forHolder(
+      supabaseAdmin.from('stamps').select('id, awarded_at'),
+      card
+    ).gte('awarded_at', start).lte('awarded_at', end);
 
     if (checkError) {
       console.error('Database query error checking stamps:', checkError);
       return res.status(500).json({ error: 'Failed to verify today’s stamp status.' });
     }
 
-    // 3. Fetch lifetime stamps and redemptions count
-    const { count: totalStampsCount } = await supabaseAdmin
-      .from('stamps')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', card.user_id);
-
-    const { count: redemptionsCount } = await supabaseAdmin
-      .from('redemptions')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', card.user_id);
-
-    const currentTotalStamps = totalStampsCount || 0;
-    const currentRedemptions = redemptionsCount || 0;
-
-    // Already collected today
-    if (todayStamps && todayStamps.length > 0) {
-      const awardedTime = new Intl.DateTimeFormat('en-PH', {
-        timeZone: CAFE_TIMEZONE,
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      }).format(new Date(todayStamps[0].awarded_at));
-
+    if (todayStamps?.length) {
+      const progress = await holderProgress(supabaseAdmin, card);
       return res.status(200).json({
         status: 'already_stamped',
-        wifiVoucher: await getWifiVoucher(supabaseAdmin, card.user_id),
-        user: userProfile,
-        cardUid: cleanUid,
-        totalStamps: currentTotalStamps,
-        cycleProgress: currentTotalStamps % 10,
-        pendingRewards: Math.max(0, Math.floor(currentTotalStamps / 10) - currentRedemptions),
-        lastAwardedTime: awardedTime,
-        message: `${userProfile.display_name} already collected today’s stamp at ${awardedTime}! ☕`
+        ...holder,
+        ...progress,
+        wifiVoucher: await holderWifiVoucher(supabaseAdmin, card),
+        lastAwardedTime: new Intl.DateTimeFormat('en-PH', {
+          timeZone: CAFE_TIMEZONE, hour: 'numeric', minute: '2-digit', hour12: true
+        }).format(new Date(todayStamps[0].awarded_at))
       });
     }
 
-    // 4. Record new stamp
+    // 3. Record the stamp (card_id kept on linked stamps too, for history)
     const { error: insertError } = await supabaseAdmin
       .from('stamps')
-      .insert({
-        user_id: card.user_id,
-        staff_note: 'Cashier Counter NFC Tap'
-      });
+      .insert({ user_id: card.user_id, card_id: card.id, staff_note: 'Cashier Counter NFC Tap' });
 
     if (insertError) {
       if (insertError.code === '23505' || insertError.message?.toLowerCase().includes('unique')) {
+        const progress = await holderProgress(supabaseAdmin, card);
         return res.status(200).json({
           status: 'already_stamped',
-          wifiVoucher: await getWifiVoucher(supabaseAdmin, card.user_id),
-          user: userProfile,
-          cardUid: cleanUid,
-          totalStamps: currentTotalStamps,
-          cycleProgress: currentTotalStamps % 10,
-          pendingRewards: Math.max(0, Math.floor(currentTotalStamps / 10) - currentRedemptions),
-          message: `${userProfile.display_name} already collected today’s stamp!`
+          ...holder,
+          ...progress,
+          wifiVoucher: await holderWifiVoucher(supabaseAdmin, card)
         });
       }
+      console.error('Failed to award stamp:', insertError);
       return res.status(500).json({ error: 'Failed to award stamp.' });
     }
 
-    // Update last_tapped_at on card
     await supabaseAdmin
       .from('loyalty_cards')
       .update({ last_tapped_at: new Date().toISOString() })
       .eq('id', card.id);
 
-    const newTotalStamps = currentTotalStamps + 1;
-    const milestoneNumber = Math.floor(newTotalStamps / 10);
-    const rewardUnlockedNow = (newTotalStamps % 10 === 0);
-    const pendingRewards = Math.max(0, milestoneNumber - currentRedemptions);
-
+    const progress = await holderProgress(supabaseAdmin, card);
     return res.status(200).json({
       status: 'awarded',
-      wifiVoucher: await getWifiVoucher(supabaseAdmin, card.user_id),
-      user: userProfile,
-      cardUid: cleanUid,
-      totalStamps: newTotalStamps,
-      cycleProgress: newTotalStamps % 10,
-      rewardUnlockedNow,
-      pendingRewards,
-      milestoneNumber,
-      message: rewardUnlockedNow
-        ? `🎉 Milestone Reached! ${userProfile.display_name} earned a Free Classic Coffee!`
-        : `Stamp recorded! ${userProfile.display_name} now has ${newTotalStamps} ${newTotalStamps === 1 ? 'stamp' : 'stamps'}.`
+      ...holder,
+      ...progress,
+      rewardUnlockedNow: progress.totalStamps > 0 && progress.totalStamps % 10 === 0,
+      wifiVoucher: await holderWifiVoucher(supabaseAdmin, card)
     });
 
   } catch (err) {

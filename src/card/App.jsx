@@ -8,6 +8,28 @@ import QrScanner from '../components/QrScanner';
 import RedemptionCountdown from '../components/RedemptionCountdown';
 import LegalModal from '../components/LegalModal';
 import TapCardOffer from '../components/TapCardOffer';
+import CardLookup from '../components/CardLookup';
+
+const PENDING_LINK_KEY = 'baia_pending_card_link';
+
+// /card/?u=<chip UID> comes from tapping a card with a phone; /card/?link=<token>
+// comes from the barista's "Link to account" QR. The token is kept across sign-in.
+function readCardParams() {
+  if (typeof window === 'undefined') return { tapUid: '' };
+  const params = new URLSearchParams(window.location.search);
+  const link = params.get('link');
+  if (link) {
+    try { sessionStorage.setItem(PENDING_LINK_KEY, link); } catch { /* private mode */ }
+    params.delete('link');
+    const qs = params.toString();
+    window.history.replaceState(null, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash);
+  }
+  return { tapUid: params.get('u') || '' };
+}
+
+function getPendingLink() {
+  try { return sessionStorage.getItem(PENDING_LINK_KEY) || ''; } catch { return ''; }
+}
 import { 
   Coffee, 
   Gift, 
@@ -36,6 +58,8 @@ export default function CardApp() {
   const [redemptions, setRedemptions] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
   const [toastMsg, setToastMsg] = useState('');
+  const [{ tapUid }] = useState(readCardParams);
+  const [pendingLink, setPendingLink] = useState(getPendingLink);
   
   // Reward redemption state
   const [activeRedemption, setActiveRedemption] = useState(null);
@@ -194,7 +218,39 @@ export default function CardApp() {
     }
   }, [user, session, loadLoyaltyData, fetchPhysicalCardStatus]);
 
-  const handleRequestPhysicalCard = async () => {
+  // Link a walk-in card once signed in (new accounts only; the API explains otherwise)
+  useEffect(() => {
+    if (!pendingLink || !session?.access_token) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/link-card', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+          body: JSON.stringify({ token: pendingLink })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (!res.ok) throw new Error(data.error || 'Could not link the card.');
+        const moved = data.stampsMoved || 0;
+        setToastMsg(`Card linked! ${moved} ${moved === 1 ? 'stamp' : 'stamps'} saved to your account ☕`);
+        setTimeout(() => setToastMsg(''), 6000);
+        confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
+        loadLoyaltyData();
+        fetchPhysicalCardStatus(session.access_token);
+      } catch (err) {
+        if (!cancelled) setErrorMsg(err.message);
+      } finally {
+        if (!cancelled) {
+          try { sessionStorage.removeItem(PENDING_LINK_KEY); } catch { /* private mode */ }
+          setPendingLink('');
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [pendingLink, session, loadLoyaltyData, fetchPhysicalCardStatus]);
+
+  const handleRequestPhysicalCard = async (withCoffee = true) => {
     if (!session?.access_token || submittingCardRequest) return false;
     try {
       setSubmittingCardRequest(true);
@@ -204,7 +260,8 @@ export default function CardApp() {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`
-        }
+        },
+        body: JSON.stringify({ withCoffee })
       });
       const data = await res.json();
       if (!res.ok) {
@@ -450,6 +507,11 @@ export default function CardApp() {
 
       {/* Main Content Area */}
       <main className="loyalty-main-content" style={{ flex: 1, padding: '20px 16px' }}>
+        {tapUid && (
+          <div style={{ marginBottom: '18px' }}>
+            <CardLookup uid={tapUid} signedIn={Boolean(user)} />
+          </div>
+        )}
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
             <div className="spinner-border" />
@@ -459,6 +521,12 @@ export default function CardApp() {
           </div>
         ) : !user ? (
           <div>
+            {pendingLink && (
+              <div className="tapcard-section tapcard-section--waiting" style={{ marginBottom: '16px', display: 'block', textAlign: 'center' }}>
+                <h3 className="tapcard-title">Almost there!</h3>
+                <p className="tapcard-line">Sign in with a new account to save your walk-in card’s stamps.</p>
+              </div>
+            )}
             <AuthModal onSuccess={(s) => {
               setSession(s);
               setUser(s.user);

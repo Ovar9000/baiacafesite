@@ -154,7 +154,7 @@ export default async function handler(req, res) {
       success: true,
       card: newCard,
       user: profile || { id: targetUserId },
-      message: `Card ${cleanUid} successfully linked to ${profile?.display_name || 'member'}! Collect ₱120 and dispense complimentary Classic Coffee.`
+      message: `Card ${cleanUid} linked to ${profile?.display_name || 'member'}.`
     });
 
   } catch (err) {

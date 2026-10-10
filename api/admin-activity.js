@@ -210,7 +210,7 @@ export default async function handler(req, res) {
       activities.push({
         id: `stamp-${s.id}`,
         type: 'stamp',
-        customerName: profile?.display_name || profile?.email?.split('@')[0] || 'Store Guest',
+        customerName: profile?.display_name || profile?.email?.split('@')[0] || (s.user_id ? 'Store Guest' : 'Walk-in card'),
         customerEmail: profile?.email || '',
         timestamp: s.awarded_at,
         distanceMeters: s.distance_meters,
@@ -223,7 +223,7 @@ export default async function handler(req, res) {
       activities.push({
         id: `redemption-${r.id}`,
         type: 'redemption',
-        customerName: profile?.display_name || profile?.email?.split('@')[0] || 'Store Guest',
+        customerName: profile?.display_name || profile?.email?.split('@')[0] || (r.user_id ? 'Store Guest' : 'Walk-in card'),
         customerEmail: profile?.email || '',
         timestamp: r.redeemed_at,
         rewardType: r.reward_type,

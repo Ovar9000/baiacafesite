@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { getSupabaseConfig, setCorsHeaders, isRateLimited } from './_security.js';
 
+const CARD_PRICE = 50;
+const CARD_PRICE_WITH_COFFEE = 120;
+
 export default async function handler(req, res) {
   setCorsHeaders(req, res, 'GET,OPTIONS,POST');
 
@@ -76,13 +79,8 @@ export default async function handler(req, res) {
       });
     }
 
-    // Handle POST: Submit new request
-    if (activeCard) {
-      return res.status(400).json({
-        error: 'You already have an active physical loyalty card! If your card was lost, please ask our counter barista for a replacement.'
-      });
-    }
-
+    // Handle POST: Submit new request. Members with an active card may order a
+    // replacement (lost card); linking the new one retires the old card.
     if (latestRequest && latestRequest.status === 'pending') {
       return res.status(400).json({
         error: 'You already have a pending card request! Please visit the Barista Cashier to claim your card and enjoy your complimentary coffee.'
@@ -97,14 +95,16 @@ export default async function handler(req, res) {
       avatar_url: user.user_metadata?.avatar_url || null
     }, { onConflict: 'id', ignoreDuplicates: true });
 
-    // Insert pending card request
+    // Card only ₱50, or ₱120 with a free Classic Coffee
+    const withCoffee = (req.body || {}).withCoffee !== false;
     const { data: newRequest, error: insertErr } = await supabaseAdmin
       .from('card_requests')
       .insert({
         user_id: user.id,
         status: 'pending',
-        price_php: 120,
-        includes_free_coffee: true
+        price_php: withCoffee ? CARD_PRICE_WITH_COFFEE : CARD_PRICE,
+        includes_free_coffee: withCoffee,
+        notes: activeCard ? 'Replacement for a lost card' : null
       })
       .select()
       .single();
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       request: newRequest,
-      message: 'Card requested! Visit the Barista Cashier at BAIA Café to pay ₱120, receive your physical tap card, and claim your free Classic Coffee.'
+      message: 'Card reserved! Grab it at the counter.'
     });
 
   } catch (err) {

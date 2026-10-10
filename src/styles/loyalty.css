@@ -1491,3 +1491,96 @@ body.admin-body {
 @media (prefers-reduced-motion: reduce) {
   .tapcard-art, .tapcard-cta { transition: none; }
 }
+
+.tapcard-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0 4px;
+}
+
+.tapcard-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 2px solid #F1E5D4;
+  background: #FFFFFF;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.tapcard-option.is-selected {
+  border-color: #EA580C;
+  background: #FFF7ED;
+}
+
+.tapcard-option-price {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #131314;
+}
+
+.tapcard-option-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #131314;
+}
+
+.tapcard-option-title svg { color: #EA580C; }
+
+.tapcard-option-note {
+  font-size: 0.74rem;
+  color: #64748B;
+}
+
+.tapcard-link {
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.76rem;
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Phone-tap stamp view (/card/?u=...) */
+.cardlookup {
+  border-radius: 20px;
+  padding: 20px 18px;
+  text-align: center;
+  background: linear-gradient(140deg, #1E4AFF 0%, #1838C7 100%);
+  color: #FFFFFF;
+  box-shadow: var(--loyalty-shadow);
+}
+
+.cardlookup-dots {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 14px 0 8px;
+}
+
+.cardlookup-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+  box-sizing: border-box;
+}
+
+.cardlookup-dot.is-on {
+  background: #FFFFFF;
+  border: 2px solid #FFFFFF;
+}
