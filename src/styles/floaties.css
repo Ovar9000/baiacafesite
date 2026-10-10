@@ -21,9 +21,26 @@
   border-radius: 50%;
   backdrop-filter: blur(12px) saturate(190%);
   -webkit-backdrop-filter: blur(12px) saturate(190%);
-  will-change: transform;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  /* The bobbing animation owns `transform`; mouse parallax uses the separate
+     `translate`/`rotate` properties so the two combine instead of fighting. */
+  will-change: transform, translate;
+  transition: translate 0.6s cubic-bezier(0.16, 1, 0.3, 1), rotate 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
+}
+
+/* Floaties fade in once placement has been checked (liquidFloaties.js);
+   any that would sit under content at this screen size stay hidden. */
+.section-floaties-layer .glass-floatie {
+  opacity: 0;
+}
+
+.section-floaties-layer.is-ready .glass-floatie {
+  opacity: 1;
+  transition: opacity 0.8s ease, translate 0.6s cubic-bezier(0.16, 1, 0.3, 1), rotate 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-floatie.is-tucked {
+  visibility: hidden;
 }
 
 /* Glass Specular Reflection Highlight */
@@ -166,6 +183,7 @@
 
 /* Ensure All Section Main Contents Always Stay Above Floaties */
 .hero-grid,
+.new-drops-section .container,
 .snapshot-container,
 .story-container,
 .promo-grid-section .container,
@@ -182,6 +200,13 @@
   .section-floaties-layer {
     display: block;
     opacity: 0.65;
+  }
+
+  /* Floaties sit over flat section colours, where a backdrop blur is
+     invisible but costly on phones; the glass look comes from the gradient. */
+  .glass-floatie {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   /* Retain a curated, performance-friendly 2-floatie constellation per section on mobile */

@@ -8,6 +8,7 @@ import { initCartDrawer } from './components/cartDrawer.js';
 import { initNewDrops } from './components/newDrops.js';
 import { initCommunityWall } from './components/communityWall.js';
 import { initOpenStatus } from './components/openStatus.js';
+import { initGlassNav } from './components/glassNav.js';
 import { injectSpeedInsights } from '@vercel/speed-insights';
 import { inject } from '@vercel/analytics';
 
@@ -100,6 +101,7 @@ function initApp() {
 
   safeInit('rootAuth', handleRootAuthCallback);
   safeInit('openStatus', initOpenStatus);
+  safeInit('glassNav', initGlassNav);
   safeInit('heroLoyaltyCta', initHeroLoyaltyCta);
   safeInit('loyaltyPrefetch', initLoyaltyPrefetch);
   safeInit('hero3D', initHero3D);
