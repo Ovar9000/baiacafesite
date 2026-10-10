@@ -30,6 +30,10 @@ function tuckColliding(section) {
   if (!floaties.length) return;
 
   // Restore authored positions before measuring (layout may have changed).
+  // Authored tops are percentages of the section height; they are turned into
+  // pixels here, so a section that grows or shrinks later (the menu switching
+  // categories) doesn't drag its floaties up and down with it.
+  const height = section.getBoundingClientRect().height;
   floaties.forEach((f) => {
     if (!('origLeft' in f.dataset)) {
       f.dataset.origLeft = f.style.left;
@@ -38,7 +42,8 @@ function tuckColliding(section) {
     }
     f.style.left = f.dataset.origLeft;
     f.style.right = f.dataset.origRight;
-    f.style.top = f.dataset.origTop;
+    const top = f.dataset.origTop;
+    f.style.top = top.endsWith('%') ? `${Math.round((parseFloat(top) / 100) * height)}px` : top;
     f.classList.remove('is-tucked');
   });
 
@@ -101,13 +106,23 @@ function initCollisionAvoidance() {
       pending.clear();
     });
   };
-  // Re-check whenever a section's size changes (menu expands, drops load, resize).
+  // Re-place only when a section's width changes (rotation, window resize).
+  // Height-only changes (the menu switching categories, drops loading) leave
+  // the floaties where they are, so they never jump while someone browses.
   if ('ResizeObserver' in window) {
-    const ro = new ResizeObserver((entries) => entries.forEach((e) => schedule(e.target)));
+    const widths = new WeakMap();
+    const ro = new ResizeObserver((entries) => entries.forEach((e) => {
+      const width = Math.round(e.contentRect.width);
+      if (widths.get(e.target) === width) return;
+      widths.set(e.target, width);
+      schedule(e.target);
+    }));
     sections.forEach((s) => ro.observe(s));
   }
   sections.forEach(schedule);
+  // Fonts and photos settle the first layout; place once more after them
   document.fonts?.ready?.then(() => sections.forEach(schedule));
+  window.addEventListener('load', () => sections.forEach(schedule), { once: true });
 }
 
 export function initLiquidFloaties() {

@@ -81,7 +81,8 @@ instead of competing for attention. The look and feel follow iPhone (iOS 26/27
   cards, and pill shapes only for things you tap.
 - Heavy headlines got slightly looser letter spacing so letter pairs like
   F–T no longer touch.
-- The floaties no longer follow the mouse; they just bob in place.
+- The floaties no longer follow the mouse; they just bob in place, and they
+  stay put when the menu changes height between categories.
 - The search field shows one soft focus ring around the whole field instead
   of an amber box around the text inside it.
 - Earlier on this branch: glows replaced by one shared shadow scale, and more
