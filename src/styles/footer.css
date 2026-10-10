@@ -101,7 +101,7 @@
   color: var(--cream);
   background: rgba(255, 255, 255, 0.1);
   padding: 4px 10px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
 }
 
 .visit-hours-list {
@@ -307,4 +307,22 @@
   .footer-social-links {
     gap: 6px 14px;
   }
+}
+
+/* One quiet line for returning guests (the card itself lives at /card/) */
+.footer-loyalty-link {
+  display: inline-block;
+  margin-top: 16px;
+  color: var(--cream);
+  opacity: 0.75;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-decoration-color: rgba(245, 233, 214, 0.35);
+  text-underline-offset: 4px;
+  transition: opacity var(--duration-fast), text-decoration-color var(--duration-fast);
+}
+
+.footer-loyalty-link:hover {
+  opacity: 1;
+  text-decoration-color: var(--golden-amber);
 }

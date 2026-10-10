@@ -290,7 +290,7 @@ class CartStore {
     const toastContainer = document.getElementById('toast-container');
     if (toastContainer) {
       const toastEl = document.createElement('div');
-      toastEl.className = 'toast-item';
+      toastEl.className = safeIcon === '✓' ? 'toast-item' : 'toast-item is-warning';
       toastEl.setAttribute('role', 'alert');
       toastEl.innerHTML = `
         <div class="toast-icon" aria-hidden="true">${esc(safeIcon)}</div>
@@ -303,7 +303,7 @@ class CartStore {
 
       setTimeout(() => {
         toastEl.style.opacity = '0';
-        toastEl.style.transform = 'translateY(12px)';
+        toastEl.style.transform = 'translateY(-12px)';
         setTimeout(() => toastEl.remove(), 400);
       }, 3500);
     }

@@ -1,6 +1,5 @@
 import { menuData, getAvailableDrinkAddOns, shouldOpenDrinkCustomizer } from '../data/menuData.js';
 import { cartStore } from './cartStore.js';
-import { motionSystem } from '../utils/motionSystem.js';
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -12,246 +11,149 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+const BOARD_LABELS = { drinks: 'Drinks', food: 'Food' };
+
+/** Lowest price in a category, for the "From ₱…" line */
+function fromPrice(items) {
+  const prices = items.map((i) => i.price || i.priceM).filter(Boolean);
+  return prices.length ? Math.min(...prices) : null;
+}
+
+/** What a category lets you choose, shown once in its header instead of on every item */
+function categoryNote(cat) {
+  if (cat.hasHotCold) return 'Hot or iced';
+  if (cat.hasSizes) return 'Medium or large';
+  return '';
+}
+
+/**
+ * BAIA menu: Drinks / Food switch, a row of category tabs (one category at a
+ * time, so the section stays short on the homepage), compact item rows, and
+ * search across both boards. Drinks with options open a sheet
+ * (openDrinkCustomizer); everything else adds in one tap.
+ *
+ * Other scripts can open a category with:
+ *   window.dispatchEvent(new CustomEvent('baia:show-menu', { detail: { board, category } }))
+ */
 export function initMenuExplorer() {
   const container = document.getElementById('menu-explorer-root');
   if (!container) return;
 
-  let activeBoard = 'drinks'; // 'drinks' | 'food'
+  let activeBoard = 'drinks';
+  const activeCategory = {
+    drinks: menuData.drinks[0]?.id,
+    food: menuData.food[0]?.id
+  };
   let searchQuery = '';
-  let openCategories = new Set();
 
-  function getTotalBoardItemsCount() {
-    const list = menuData[activeBoard] || [];
-    return list.reduce((sum, c) => sum + (c.items ? c.items.length : 0), 0);
+  // ---- Markup ------------------------------------------------------------
+
+  function itemRow(item, cat, board) {
+    const sized = cat.hasSizes || (!item.price && item.priceM);
+    const price = sized ? item.priceM : item.price || 0;
+    const priceText = sized
+      ? `M ₱${item.priceM} · L ₱${item.priceL}`
+      : price > 0 ? `₱${price}` : 'Ask us';
+    const flag = item.isSpecialty ? 'Specialty' : item.isPopular ? 'Popular' : '';
+
+    return `
+      <li class="mx-row" data-item-id="${escapeHtml(item.id)}">
+        <div class="mx-row-text">
+          <p class="mx-row-name">
+            ${escapeHtml(item.name)}
+            ${flag ? `<span class="mx-flag">${flag}</span>` : ''}
+          </p>
+          ${item.description ? `<p class="mx-row-desc">${escapeHtml(item.description)}</p>` : ''}
+          <p class="mx-row-price">${escapeHtml(priceText)}</p>
+        </div>
+        <button
+          type="button"
+          class="mx-add ${price > 0 ? '' : 'mx-add--ask'}"
+          data-add-id="${escapeHtml(item.id)}"
+          data-add-name="${escapeHtml(item.name)}"
+          data-add-price="${escapeHtml(String(price))}"
+          data-add-desc="${escapeHtml(item.description || '')}"
+          data-add-board="${board}"
+          data-category-id="${escapeHtml(cat.id)}"
+          data-has-hot-cold="${cat.hasHotCold ? 'true' : 'false'}"
+          data-has-sizes="${cat.hasSizes ? 'true' : 'false'}"
+          data-price-m="${escapeHtml(String(item.priceM || ''))}"
+          data-price-l="${escapeHtml(String(item.priceL || ''))}"
+          aria-label="${price > 0 ? `Add ${escapeHtml(item.name)} to your order` : `Ask about ${escapeHtml(item.name)} on Messenger`}"
+        >
+          ${price > 0
+            ? '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>'
+            : 'Ask'}
+        </button>
+      </li>
+    `;
   }
 
-  function getGroupedItems() {
-    const categories = menuData[activeBoard] || [];
-    const q = searchQuery.toLowerCase().trim();
+  function categoryBlock(cat, board, items, { showBoard = false } = {}) {
+    const from = fromPrice(cat.items || []);
+    const meta = [
+      showBoard ? BOARD_LABELS[board] : '',
+      `${items.length} ${items.length === 1 ? 'item' : 'items'}`,
+      categoryNote(cat),
+      from && !showBoard ? `from ₱${from}` : ''
+    ].filter(Boolean).join(' · ');
 
-    return categories.map(cat => {
-      let filteredItems = cat.items || [];
-      if (q) {
-        filteredItems = filteredItems.filter(item => 
+    return `
+      <section class="mx-category" aria-label="${escapeHtml(cat.category)}">
+        <header class="mx-category-head">
+          <h3 class="mx-category-title">${escapeHtml(cat.category)}</h3>
+          <p class="mx-category-meta">${escapeHtml(meta)}</p>
+        </header>
+        <ul class="mx-list">
+          ${items.map((item) => itemRow(item, cat, board)).join('')}
+        </ul>
+      </section>
+    `;
+  }
+
+  function searchResults(q) {
+    const blocks = [];
+    for (const board of ['drinks', 'food']) {
+      for (const cat of menuData[board]) {
+        const items = (cat.items || []).filter((item) =>
           item.name.toLowerCase().includes(q) ||
-          (item.description && item.description.toLowerCase().includes(q)) ||
+          (item.description || '').toLowerCase().includes(q) ||
           cat.category.toLowerCase().includes(q) ||
-          (item.subcategory && item.subcategory.toLowerCase().includes(q))
+          (item.subcategory || '').toLowerCase().includes(q)
         );
+        if (items.length) blocks.push(categoryBlock(cat, board, items, { showBoard: true }));
       }
-      return {
-        id: cat.id,
-        name: cat.category,
-        hasHotCold: cat.hasHotCold,
-        hasSizes: cat.hasSizes,
-        items: filteredItems,
-        totalItemsCount: (cat.items || []).length
-      };
-    }).filter(group => !q || group.items.length > 0);
+    }
+    return blocks.length
+      ? blocks.join('')
+      : `<div class="mx-empty"><p class="mx-empty-title">Nothing matches "${escapeHtml(searchQuery)}"</p><p>Try another word, or ask us on Messenger.</p></div>`;
   }
 
+  // The shell (board switch, search field, notes) renders once; the tabs and
+  // results below it update in place, so typing never re-creates the field
+  // (which would flicker the keyboard on phones).
   function render() {
-    const totalCount = getTotalBoardItemsCount();
-    const groupedItems = getGroupedItems();
-    const isSearching = searchQuery.trim().length > 0;
-    const allExpanded = groupedItems.length > 0 && groupedItems.every(g => openCategories.has(g.id) || isSearching);
-
-    const drinkCount = menuData.drinks.reduce((s, c) => s + c.items.length, 0);
-    const foodCount = menuData.food.reduce((s, c) => s + c.items.length, 0);
-
     container.innerHTML = `
-      <!-- Board Switcher Tabs (Drinks First) -->
-      <div class="board-switcher" id="menu-board-switcher" role="tablist" aria-label="Menu Boards">
-        <button 
-          role="tab" 
-          aria-selected="${activeBoard === 'drinks'}" 
-          class="board-tab-btn ${activeBoard === 'drinks' ? 'active' : ''}" 
-          data-board="drinks"
-          id="tab-drinks"
-        >
-          <span>Drinks &amp; Espresso</span>
-          <span class="board-count-pill">${drinkCount} items</span>
-        </button>
-        <button 
-          role="tab" 
-          aria-selected="${activeBoard === 'food'}" 
-          class="board-tab-btn ${activeBoard === 'food' ? 'active' : ''}" 
-          data-board="food"
-          id="tab-food"
-        >
-          <span>Food &amp; Kitchen Bites</span>
-          <span class="board-count-pill">${foodCount} items</span>
-        </button>
-      </div>
-
-      <!-- Search Field & Expand/Collapse Toggle -->
-      <div class="menu-controls-row">
-        <div class="search-input-wrapper">
-          <svg class="search-icon-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-            <path d="M21.71 20.29l-5.4-5.39A7.9 7.9 0 0 0 18 10a8 8 0 1 0-8 8 7.9 7.9 0 0 0 4.9-1.69l5.39 5.4a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42zM4 10a6 6 0 1 1 6 6 6 6 0 0 1-6-6z"/>
-          </svg>
-          <input 
-            type="text" 
-            class="menu-search-input" 
-            placeholder="Search ${activeBoard === 'drinks' ? 'lattes, frappes, fruit sodas, iced teas...' : 'smash burgers, waffles, rice meals, pasta...'}"
-            value="${escapeHtml(searchQuery)}"
-            id="menu-search-field"
-            aria-label="Search menu items"
-          />
+      <div class="mx-top">
+        <div class="mx-board" role="tablist" aria-label="Menu board">
+          ${['drinks', 'food'].map((board) => `
+            <button type="button" role="tab" class="mx-board-btn" data-board="${board}">
+              ${BOARD_LABELS[board]}
+            </button>
+          `).join('')}
         </div>
 
-        <div class="menu-accordion-actions">
-          <span class="total-items-badge">${totalCount} Items • Tap category to expand</span>
-          <button class="toggle-all-btn" id="toggle-all-categories-btn">
-            ${allExpanded ? 'Collapse All' : 'Expand All'}
+        <label class="mx-search">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>
+          <input type="search" id="menu-search-field" placeholder="Search drinks and food" aria-label="Search the menu" autocomplete="off" />
+          <button type="button" class="mx-search-clear" aria-label="Clear search" hidden>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="10" opacity="0.35"></circle><path d="M9 9l6 6M15 9l-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round"></path></svg>
           </button>
-        </div>
+        </label>
       </div>
 
-      <!-- Collapsible Accordion Category Groups -->
-      <div class="menu-accordion-wrapper">
-        ${groupedItems.length === 0 ? `
-          <div class="menu-no-results">
-            <h3>No items match "${escapeHtml(searchQuery)}"</h3>
-        ` : groupedItems.map(group => {
-          const isOpen = isSearching ? true : openCategories.has(group.id);
-          // Keep the preview short enough that the "+N more" hint stays on screen
-          // instead of the row being cut off mid-name; avoid an awkward "+1 more".
-          const maxAllowed = 4;
-          let maxSneak = Math.min(group.items.length, maxAllowed);
-          if (group.items.length - maxSneak === 1) {
-            maxSneak = group.items.length;
-          }
-          const sneakPeekItems = group.items.slice(0, maxSneak);
-          const remainingCount = group.items.length - maxSneak;
+      <div class="mx-body"></div>
 
-          let minPrice = Infinity;
-          group.items.forEach(item => {
-            const p = item.price || item.priceM;
-            if (p && p < minPrice) minPrice = p;
-          });
-          const priceTeaserMarkup = minPrice !== Infinity ? `<span class="category-price-pill">From ₱${minPrice}</span>` : '';
-
-          const previewCapsulesMarkup = `
-            ${sneakPeekItems.map((item, idx) => {
-              const isFeatured = item.isPopular || item.isSpecialty;
-              const isLast = idx === sneakPeekItems.length - 1 && remainingCount <= 0;
-              return `
-                <span 
-                  class="sneak-peek-pill ${isFeatured ? 'is-featured' : ''}" 
-                  data-target-item-id="${escapeHtml(item.id)}"
-                  data-parent-category-id="${escapeHtml(group.id)}"
-                  title="Explore ${escapeHtml(item.name)}"
-                >
-                  ${isFeatured ? '<span class="note-star" aria-hidden="true">★</span>' : ''}
-                  <span class="pill-name">${escapeHtml(item.name)}</span>
-                </span>
-                ${!isLast ? '<span class="tasting-dot" aria-hidden="true">·</span>' : ''}
-              `;
-            }).join('')}
-            ${remainingCount > 0 ? `
-              <span 
-                class="tasting-more" 
-                data-parent-category-id="${escapeHtml(group.id)}"
-                title="View all ${group.items.length} items in ${escapeHtml(group.name)}"
-              >
-                +${remainingCount} more
-              </span>
-            ` : ''}
-          `;
-
-          return `
-            <div class="menu-accordion-card ${isOpen ? 'is-open' : ''}" id="cat-card-${escapeHtml(group.id)}">
-              <div 
-                class="category-accordion-btn" 
-                data-category-id="${escapeHtml(group.id)}" 
-                role="button" 
-                tabindex="0" 
-                aria-expanded="${isOpen}"
-                aria-controls="cat-body-${escapeHtml(group.id)}"
-              >
-                <div class="category-header-main">
-                  <div class="category-title-left">
-                    <h3 class="category-title-text">${escapeHtml(group.name)}</h3>
-                    <span class="category-count-pill">${group.items.length} ${group.items.length === 1 ? 'item' : 'items'}</span>
-                    ${priceTeaserMarkup}
-                  </div>
-
-                  <div class="category-sneak-peek-track" aria-label="Sneak peek of ${escapeHtml(group.name)}">
-                    ${previewCapsulesMarkup}
-                  </div>
-
-                  <div class="category-toggle-indicator">
-                    <span>${isOpen ? 'Hide' : 'View'}</span>
-                    <span class="chevron-icon" aria-hidden="true">▼</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="category-accordion-body" id="cat-body-${group.id}" ${isOpen ? '' : 'hidden'}>
-                <div class="category-items-grid">
-                  ${group.items.map(item => {
-                    let priceDisplay = item.price ? `₱${item.price}` : 'Ask Cashier';
-                    let itemPrice = item.price || 0;
-                    if (group.hasSizes || (!item.price && item.priceM)) {
-                      priceDisplay = `M ₱${item.priceM} / L ₱${item.priceL}`;
-                      itemPrice = item.priceM;
-                    }
-
-                    let modifierTag = '';
-                    if (group.hasHotCold) modifierTag = 'Hot or Cold';
-                    else if (group.hasSizes) modifierTag = 'Medium / Large';
-                    else if (item.subcategory) modifierTag = item.subcategory;
-
-                    return `
-                      <article class="menu-card" data-item-id="${escapeHtml(item.id)}">
-                        <div class="menu-card-main">
-                          <div class="card-header-row">
-                            <div class="item-name-group">
-                              <h4 class="item-name">${escapeHtml(item.name)}</h4>
-                              <div class="item-badges">
-                                ${item.isSpecialty ? '<span class="badge-special">Specialty</span>' : ''}
-                                ${item.isPopular ? '<span class="badge-pop">Popular</span>' : ''}
-                              </div>
-                            </div>
-                            <div class="item-price-tag">${escapeHtml(priceDisplay)}</div>
-                          </div>
-                          <p class="item-desc">${escapeHtml(item.description || 'Crafted fresh daily on the shore with premium ingredients.')}</p>
-                        </div>
-
-                        <div class="card-footer-action-row">
-                          <div class="card-footer-tags">
-                            <span class="item-cat-tag">${escapeHtml(group.name)}</span>
-                            ${modifierTag ? `<span class="item-mod-tag">${escapeHtml(modifierTag)}</span>` : ''}
-                          </div>
-                          <button 
-                            class="btn-add-item" 
-                            data-add-id="${escapeHtml(item.id)}"
-                            data-add-name="${escapeHtml(item.name)}"
-                            data-add-price="${escapeHtml(String(itemPrice))}"
-                            data-add-desc="${escapeHtml(item.description || '')}"
-                            data-add-board="${escapeHtml(activeBoard)}"
-                            data-category-id="${escapeHtml(group.id)}"
-                            data-has-hot-cold="${group.hasHotCold ? 'true' : 'false'}"
-                            data-has-sizes="${group.hasSizes ? 'true' : 'false'}"
-                            data-price-m="${escapeHtml(String(item.priceM || ''))}"
-                            data-price-l="${escapeHtml(String(item.priceL || ''))}"
-                            aria-label="Add ${escapeHtml(item.name)} to order"
-                          >
-                            <span>${itemPrice > 0 ? '+ Add' : 'Inquire'}</span>
-                          </button>
-                        </div>
-                      </article>
-                    `;
-                  }).join('')}
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-
-      <!-- Official Physical Menu Board Notice -->
       <div class="menu-disclaimer-card">
         <div class="disclaimer-text">
           <p><strong>Good to know</strong></p>
@@ -260,270 +162,99 @@ export function initMenuExplorer() {
       </div>
     `;
 
-    attachEventListeners();
+    attachShellListeners();
+    renderBody();
   }
 
-  function attachEventListeners() {
-    // Board Switcher Tabs
-    container.querySelectorAll('.board-tab-btn').forEach(btn => {
+  function renderBody() {
+    const q = searchQuery.toLowerCase().trim();
+    const categories = menuData[activeBoard] || [];
+    const current = categories.find((c) => c.id === activeCategory[activeBoard]) || categories[0];
+
+    container.querySelectorAll('.mx-board-btn').forEach((btn) => {
+      const on = btn.dataset.board === activeBoard;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-selected', String(on));
+    });
+    container.querySelector('.mx-search-clear').hidden = !q;
+
+    container.querySelector('.mx-body').innerHTML = `
+      ${q ? '' : `
+        <!-- Category tabs: sticky under the header while you browse the menu -->
+        <div class="mx-chips-bar">
+          <div class="mx-chips" role="tablist" aria-label="${BOARD_LABELS[activeBoard]} categories">
+            ${categories.map((cat) => `
+              <button type="button" role="tab" class="mx-chip ${cat.id === current?.id ? 'active' : ''}" data-category-id="${escapeHtml(cat.id)}" aria-selected="${cat.id === current?.id}">
+                ${escapeHtml(cat.category)}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `}
+
+      <div class="mx-results" aria-live="polite">
+        ${q ? searchResults(q) : current ? categoryBlock(current, activeBoard, current.items || []) : ''}
+      </div>
+    `;
+
+    attachBodyListeners();
+  }
+
+  function showCategory(board, categoryId, { scroll = false } = {}) {
+    if (board && menuData[board]) activeBoard = board;
+    if (categoryId && menuData[activeBoard].some((c) => c.id === categoryId)) {
+      activeCategory[activeBoard] = categoryId;
+    }
+    if (searchQuery) {
+      searchQuery = '';
+      container.querySelector('#menu-search-field').value = '';
+    }
+    renderBody();
+    const chips = container.querySelector('.mx-chips');
+    const chip = container.querySelector('.mx-chip.active');
+    if (chips && chip) {
+      chips.scrollTo({ left: chip.offsetLeft - (chips.clientWidth - chip.offsetWidth) / 2, behavior: 'smooth' });
+    }
+    if (scroll) {
+      container.querySelector('.mx-chips-bar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  // ---- Events ------------------------------------------------------------
+
+  function attachShellListeners() {
+    container.querySelectorAll('.mx-board-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
-        activeBoard = btn.dataset.board;
-        searchQuery = '';
-        openCategories = new Set();
-        render();
+        if (btn.dataset.board === activeBoard && !searchQuery) return;
+        showCategory(btn.dataset.board);
       });
     });
 
-    // Helper to sync Toggle All button text
-    const syncToggleAllButton = () => {
-      const toggleAllBtn = document.getElementById('toggle-all-categories-btn');
-      if (toggleAllBtn) {
-        const groupedItems = getGroupedItems();
-        const allExpanded = groupedItems.length > 0 && groupedItems.every(g => openCategories.has(g.id));
-        toggleAllBtn.textContent = allExpanded ? 'Collapse All' : 'Expand All';
-      }
-    };
+    const searchInput = container.querySelector('#menu-search-field');
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      renderBody();
+    });
 
-    // Morph accordion pills into cards (and reverse) using View Transition API
-    const toggleAccordion = (card, catId, willOpen, btn, indicatorText) => {
-      if (!card) return;
+    container.querySelector('.mx-search-clear').addEventListener('click', () => {
+      searchQuery = '';
+      searchInput.value = '';
+      renderBody();
+      searchInput.focus();
+    });
+  }
 
-      const isMobile = typeof window !== 'undefined' && (window.innerWidth <= 768 || window.matchMedia('(max-width: 768px)').matches);
-      const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (isMobile || prefersReducedMotion || !document.startViewTransition) {
-        // Fallback / Mobile Viewports: clean native CSS accordion animations without pill-to-card ghost text distortion
-        card.querySelectorAll('.sneak-peek-pill, .menu-card').forEach(el => {
-          el.style.viewTransitionName = '';
-          el.removeAttribute('data-vt-morph');
-        });
-        card.querySelectorAll('.menu-card').forEach(c => c.classList.remove('morph-settled'));
-        if (willOpen) {
-          openCategories.add(catId);
-          motionSystem.animateCategoryPillsFlight(card, true);
-          card.classList.add('is-open');
-          btn?.setAttribute('aria-expanded', 'true');
-          if (indicatorText) indicatorText.textContent = 'Hide';
-        } else {
-          openCategories.delete(catId);
-          motionSystem.animateCategoryPillsFlight(card, false);
-          card.classList.remove('is-open');
-          btn?.setAttribute('aria-expanded', 'false');
-          if (indicatorText) indicatorText.textContent = 'View';
-        }
-        syncToggleAllButton();
-        return;
-      }
-
-      // Cancel any ongoing transition on this card
-      if (card._activeVT) {
-        try {
-          card._activeVT.skipTransition();
-        } catch (_) {}
-        card._activeVT = null;
-      }
-
-      const pills = Array.from(card.querySelectorAll('.category-sneak-peek-track .sneak-peek-pill')).slice(0, 5);
-      const logo = document.querySelector('.brand-logo-img, .loyalty-logo-img');
-
-      if (willOpen) {
-        // Suppress brand logo during in-page accordion morph so it doesn't freeze the page for 1.5s
-        if (logo) logo.style.viewTransitionName = 'none';
-
-        pills.forEach((pill, idx) => {
-          pill.style.viewTransitionName = `morph-${idx}`;
-        });
-        document.documentElement.classList.add('vt-morph-active');
-        card.classList.add('vt-morphing');
-
-        const transition = document.startViewTransition(() => {
-          pills.forEach(p => { p.style.viewTransitionName = ''; });
-
-          openCategories.add(catId);
-          motionSystem.animateCategoryPillsFlight(card, true);
-          card.classList.add('is-open');
-          btn?.setAttribute('aria-expanded', 'true');
-          if (indicatorText) indicatorText.textContent = 'Hide';
-          syncToggleAllButton();
-
-          const cards = Array.from(card.querySelectorAll('.category-items-grid .menu-card')).slice(0, pills.length);
-          cards.forEach((itemCard, idx) => {
-            itemCard.style.viewTransitionName = `morph-${idx}`;
-            itemCard.setAttribute('data-vt-morph', 'true');
-            itemCard.classList.add('morph-settled');
-          });
-        });
-
-        card._activeVT = transition;
-
-        const cleanup = () => {
-          document.documentElement.classList.remove('vt-morph-active');
-          card.classList.remove('vt-morphing');
-          if (logo) logo.style.viewTransitionName = '';
-          pills.forEach(p => { p.style.viewTransitionName = ''; });
-          card.querySelectorAll('.menu-card').forEach(c => {
-            c.style.viewTransitionName = '';
-            c.removeAttribute('data-vt-morph');
-            // Retain .morph-settled so CSS cascade animation doesn't re-trigger
-          });
-          card._activeVT = null;
-        };
-
-        transition.finished.then(cleanup, cleanup);
-      } else {
-        if (logo) logo.style.viewTransitionName = 'none';
-
-        const cards = Array.from(card.querySelectorAll('.category-items-grid .menu-card')).slice(0, pills.length);
-        cards.forEach((itemCard, idx) => {
-          itemCard.style.viewTransitionName = `morph-${idx}`;
-          itemCard.setAttribute('data-vt-morph', 'true');
-        });
-        document.documentElement.classList.add('vt-morph-active');
-        card.classList.add('vt-morphing');
-
-        const transition = document.startViewTransition(() => {
-          cards.forEach(c => {
-            c.style.viewTransitionName = '';
-            c.classList.remove('morph-settled');
-          });
-
-          openCategories.delete(catId);
-          motionSystem.animateCategoryPillsFlight(card, false);
-          card.classList.remove('is-open');
-          btn?.setAttribute('aria-expanded', 'false');
-          if (indicatorText) indicatorText.textContent = 'View';
-          syncToggleAllButton();
-
-          pills.forEach((pill, idx) => {
-            pill.style.viewTransitionName = `morph-${idx}`;
-          });
-        });
-
-        card._activeVT = transition;
-
-        const cleanup = () => {
-          document.documentElement.classList.remove('vt-morph-active');
-          card.classList.remove('vt-morphing');
-          if (logo) logo.style.viewTransitionName = '';
-          cards.forEach(c => {
-            c.style.viewTransitionName = '';
-            c.removeAttribute('data-vt-morph');
-            c.classList.remove('morph-settled');
-          });
-          pills.forEach(p => {
-            p.style.viewTransitionName = '';
-          });
-          card._activeVT = null;
-        };
-
-        transition.finished.then(cleanup, cleanup);
-      }
-    };
-
-    // Accordion Header Buttons (Expand / Collapse with Smooth In-Place Animation & Capsule Jumps)
-    container.querySelectorAll('.category-accordion-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        // If the click was on a sneak peek capsule or overflow pill, handle targeted jump
-        const pill = e.target.closest('.sneak-peek-pill, .sneak-peek-overflow');
-        if (pill) {
-          e.stopPropagation();
-          const catId = pill.dataset.parentCategoryId || btn.dataset.categoryId;
-          const targetItemId = pill.dataset.targetItemId;
-          const card = document.getElementById(`cat-card-${catId}`) || btn.closest('.menu-accordion-card');
-          const indicatorText = btn.querySelector('.category-toggle-indicator span:first-child');
-
-          // Ensure category is opened
-          if (!card?.classList.contains('is-open')) {
-            toggleAccordion(card, catId, true, btn, indicatorText);
-          }
-
-          // If a specific item was clicked, smooth-scroll to it and pulse-highlight it
-          if (targetItemId) {
-            setTimeout(() => {
-              const targetEl = card?.querySelector(`[data-item-id="${targetItemId}"]`);
-              if (targetEl) {
-                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                targetEl.classList.remove('item-highlight-pulse');
-                void targetEl.offsetWidth; // Force CSS reflow to re-trigger pulse
-                targetEl.classList.add('item-highlight-pulse');
-                setTimeout(() => {
-                  targetEl.classList.remove('item-highlight-pulse');
-                }, 1600);
-              }
-            }, 250);
-          }
-          return;
-        }
-
-        // Standard accordion header toggle
-        const catId = btn.dataset.categoryId;
-        const card = document.getElementById(`cat-card-${catId}`) || btn.closest('.menu-accordion-card');
-        const indicatorText = btn.querySelector('.category-toggle-indicator span:first-child');
-        const willOpen = !card?.classList.contains('is-open');
-
-        toggleAccordion(card, catId, willOpen, btn, indicatorText);
-      });
-
-      // Keyboard accessibility (Enter / Space)
-      btn.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          if (e.target.closest('.sneak-peek-pill, .sneak-peek-overflow')) return;
-          e.preventDefault();
-          btn.click();
-        }
+  function attachBodyListeners() {
+    container.querySelectorAll('.mx-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        // If the tabs are pinned under the header, bring the new category's top into view
+        const pinned = container.querySelector('.mx-chips-bar')?.getBoundingClientRect().top <= 120;
+        showCategory(activeBoard, chip.dataset.categoryId, { scroll: pinned });
       });
     });
 
-    // Toggle All Categories
-    const toggleAllBtn = document.getElementById('toggle-all-categories-btn');
-    if (toggleAllBtn) {
-      toggleAllBtn.addEventListener('click', () => {
-        const groupedItems = getGroupedItems();
-        const allExpanded = groupedItems.length > 0 && groupedItems.every(g => openCategories.has(g.id));
-        
-        groupedItems.forEach(g => {
-          const card = document.getElementById(`cat-card-${g.id}`);
-          const btn = card?.querySelector('.category-accordion-btn');
-          const indicatorText = btn?.querySelector('.category-toggle-indicator span:first-child');
-          
-          if (allExpanded) {
-            openCategories.delete(g.id);
-            motionSystem.animateCategoryPillsFlight(card, false);
-            card?.querySelectorAll('.menu-card').forEach(c => c.classList.remove('morph-settled'));
-            card?.classList.remove('is-open');
-            btn?.setAttribute('aria-expanded', 'false');
-            if (indicatorText) indicatorText.textContent = 'View';
-          } else {
-            openCategories.add(g.id);
-            motionSystem.animateCategoryPillsFlight(card, true);
-            card?.querySelectorAll('.menu-card').forEach(c => c.classList.remove('morph-settled'));
-            card?.classList.add('is-open');
-            btn?.setAttribute('aria-expanded', 'true');
-            if (indicatorText) indicatorText.textContent = 'Hide';
-          }
-        });
-
-        toggleAllBtn.textContent = allExpanded ? 'Expand All' : 'Collapse All';
-      });
-    }
-
-    // Search Input
-    const searchInput = document.getElementById('menu-search-field');
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        searchQuery = e.target.value;
-        render();
-        const inputAfter = document.getElementById('menu-search-field');
-        if (inputAfter) {
-          inputAfter.focus();
-          inputAfter.selectionStart = inputAfter.selectionEnd = inputAfter.value.length;
-        }
-      });
-    }
-
-    // Add to Order buttons
-    container.querySelectorAll('.btn-add-item').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
+    container.querySelectorAll('.mx-add').forEach((btn) => {
+      btn.addEventListener('click', () => {
         const id = btn.dataset.addId;
         const name = btn.dataset.addName;
         const price = parseFloat(btn.dataset.addPrice) || 0;
@@ -541,34 +272,27 @@ export function initMenuExplorer() {
           return;
         }
 
-        const drinkItem = {
-          id,
-          name,
-          price,
-          priceM,
-          priceL,
-          description,
-          hasHotCold,
-          hasSizes,
-          categoryId
-        };
+        const drinkItem = { id, name, price, priceM, priceL, description, hasHotCold, hasSizes, categoryId };
 
         if (board === 'drinks' && shouldOpenDrinkCustomizer(drinkItem, categoryId)) {
           openDrinkCustomizer(drinkItem);
         } else {
-          // Food items or fixed drinks (fruit sodas, iced teas): direct 1-click add
-          cartStore.addItem({
-            id,
-            name,
-            price,
-            description,
-            isDrink: board === 'drinks',
-            categoryId
-          });
+          // Food items or fixed drinks (fruit sodas, iced teas): one tap adds
+          cartStore.addItem({ id, name, price, description, isDrink: board === 'drinks', categoryId });
+          btn.classList.remove('is-added');
+          void btn.offsetWidth;
+          btn.classList.add('is-added');
         }
       });
     });
   }
+
+  window.addEventListener('baia:show-menu', (e) => {
+    const { board, category } = e.detail || {};
+    showCategory(board, category, { scroll: true });
+  });
+
+  // ---- Drink options sheet ----------------------------------------------
 
   function openDrinkCustomizer(itemData) {
     let modal = document.getElementById('drink-customizer-modal');
@@ -586,216 +310,161 @@ export function initMenuExplorer() {
     const hasSizes = itemData.hasSizes;
     const priceM = itemData.priceM || itemData.price || 0;
     const priceL = itemData.priceL || (itemData.price ? itemData.price + 20 : 0);
+    const addOnsList = getAvailableDrinkAddOns(itemData.id);
 
     let selectedTemp = hasHotCold ? 'Iced' : null;
     let selectedSize = hasSizes ? 'M' : null;
-    let selectedAddOns = new Set();
+    const selectedAddOns = new Set();
     let quantity = 1;
 
-    const addOnsList = getAvailableDrinkAddOns(itemData.id);
+    const unitPrice = () => {
+      const base = hasSizes ? (selectedSize === 'L' ? priceL : priceM) : itemData.price || 0;
+      return base + addOnsList.filter((a) => selectedAddOns.has(a.id)).reduce((sum, a) => sum + (Number(a.price) || 0), 0);
+    };
 
-    function calculateCurrentUnitPrice() {
-      let base = itemData.price || 0;
-      if (hasSizes) {
-        base = selectedSize === 'L' ? priceL : priceM;
-      }
-      const addOnsCost = Array.from(selectedAddOns).reduce((sum, addOnId) => {
-        const found = addOnsList.find(a => a.id === addOnId);
-        return sum + (found ? found.price : 0);
-      }, 0);
-      return base + addOnsCost;
-    }
+    const segmented = (name, options, selected) => `
+      <div class="cz-seg" role="radiogroup" data-seg="${name}">
+        ${options.map((o) => `
+          <button type="button" role="radio" class="cz-seg-btn ${o.value === selected ? 'active' : ''}" data-value="${o.value}" aria-checked="${o.value === selected}">
+            <span>${o.label}</span>${o.sub ? `<small>${o.sub}</small>` : ''}
+          </button>
+        `).join('')}
+      </div>
+    `;
 
-    function renderModalContent() {
-      const unitPrice = calculateCurrentUnitPrice();
-      const grandTotal = unitPrice * quantity;
-
-      modal.innerHTML = `
-        <div class="modal-dialog-card drink-customizer-card">
-          <div class="customizer-header-row">
-            <div>
-              <div class="modal-badge">Drink Customization</div>
-              <h3 id="drink-customizer-title" class="customizer-drink-title">${escapeHtml(itemData.name)}</h3>
-              <p class="customizer-drink-desc">${escapeHtml(itemData.description || 'Crafted fresh on the shore with artisanal ingredients.')}</p>
-            </div>
-            <button type="button" class="modal-dialog-close-btn" id="customizer-close-btn" aria-label="Close customizer">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
+    modal.innerHTML = `
+      <div class="modal-dialog-card drink-customizer-card">
+        <div class="cz-grabber" aria-hidden="true"></div>
+        <div class="cz-head">
+          <div>
+            <h3 id="drink-customizer-title" class="cz-title">${escapeHtml(itemData.name)}</h3>
+            ${itemData.description ? `<p class="cz-desc">${escapeHtml(itemData.description)}</p>` : ''}
           </div>
-
-          ${hasHotCold ? `
-            <div class="customizer-section">
-              <div class="customizer-section-title">Serving Temperature</div>
-              <div class="customizer-segmented-grid">
-                <button type="button" class="customizer-option-btn ${selectedTemp === 'Iced' ? 'is-selected' : ''}" data-temp="Iced">
-                  <span class="customizer-option-label">Iced</span>
-                  <span class="customizer-option-sub">Chilled over beachside ice</span>
-                </button>
-                <button type="button" class="customizer-option-btn ${selectedTemp === 'Hot' ? 'is-selected' : ''}" data-temp="Hot">
-                  <span class="customizer-option-label">Hot</span>
-                  <span class="customizer-option-sub">Steamed &amp; velvety warm</span>
-                </button>
-              </div>
-            </div>
-          ` : ''}
-
-          ${hasSizes ? `
-            <div class="customizer-section">
-              <div class="customizer-section-title">Cup Size</div>
-              <div class="customizer-segmented-grid">
-                <button type="button" class="customizer-option-btn ${selectedSize === 'M' ? 'is-selected' : ''}" data-size="M">
-                  <span class="customizer-option-label">Medium (16oz)</span>
-                  <span class="customizer-option-sub">₱${priceM}</span>
-                </button>
-                <button type="button" class="customizer-option-btn ${selectedSize === 'L' ? 'is-selected' : ''}" data-size="L">
-                  <span class="customizer-option-label">Large (22oz)</span>
-                  <span class="customizer-option-sub">₱${priceL}</span>
-                </button>
-              </div>
-            </div>
-          ` : ''}
-
-          ${addOnsList.length > 0 ? `
-            <div class="customizer-section">
-              <div class="customizer-section-title">
-                <span>Drink Customizations &amp; Add-ons</span>
-                <span style="font-weight: 500; font-size: 0.7rem; color: #64748B;">Optional</span>
-              </div>
-              <div class="customizer-addons-stack">
-                ${addOnsList.map(addon => {
-                  const isChecked = selectedAddOns.has(addon.id);
-                  return `
-                    <div class="customizer-addon-row ${isChecked ? 'is-checked' : ''}" data-addon-id="${escapeHtml(addon.id)}" role="checkbox" aria-checked="${isChecked}" tabindex="0">
-                      <div class="addon-left-info">
-                        <div class="addon-checkbox-indicator">${isChecked ? '✓' : ''}</div>
-                        <span class="addon-row-name">${escapeHtml(addon.name)}</span>
-                      </div>
-                      <span class="addon-row-price">+₱${Number(addon.price) || 0}</span>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
-          ` : ''}
-
-          <div class="customizer-footer-row">
-            <div class="customizer-qty-stepper" role="group" aria-label="Quantity">
-              <button type="button" class="btn-customizer-qty" id="customizer-qty-minus" aria-label="Decrease quantity">−</button>
-              <span class="customizer-qty-val">${quantity}</span>
-              <button type="button" class="btn-customizer-qty" id="customizer-qty-plus" aria-label="Increase quantity">+</button>
-            </div>
-            <button type="button" class="btn-customizer-submit" id="customizer-submit-btn">
-              <span>Add to Order</span>
-              <span>•</span>
-              <span>₱${grandTotal.toLocaleString()}</span>
-            </button>
-          </div>
+          <button type="button" class="cz-close" id="customizer-close-btn" aria-label="Close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
-      `;
 
-      // Attach events inside modal
-      modal.querySelector('#customizer-close-btn')?.addEventListener('click', closeModal);
+        ${hasHotCold ? `
+          <p class="cz-label">Temperature</p>
+          ${segmented('temp', [{ value: 'Iced', label: 'Iced' }, { value: 'Hot', label: 'Hot' }], selectedTemp)}
+        ` : ''}
 
-      modal.querySelectorAll('[data-temp]').forEach(btn => {
+        ${hasSizes ? `
+          <p class="cz-label">Size</p>
+          ${segmented('size', [{ value: 'M', label: 'Medium', sub: `16 oz · ₱${priceM}` }, { value: 'L', label: 'Large', sub: `22 oz · ₱${priceL}` }], selectedSize)}
+        ` : ''}
+
+        ${addOnsList.length ? `
+          <p class="cz-label">Add-ons <span>Optional</span></p>
+          <ul class="cz-addons">
+            ${addOnsList.map((a) => `
+              <li>
+                <button type="button" class="cz-addon" data-addon-id="${escapeHtml(a.id)}" role="checkbox" aria-checked="false">
+                  <span class="cz-addon-name">${escapeHtml(a.name)}</span>
+                  <span class="cz-addon-price">+₱${Number(a.price) || 0}</span>
+                  <span class="cz-check" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12.5 10 17 19 7.5"></polyline></svg>
+                  </span>
+                </button>
+              </li>
+            `).join('')}
+          </ul>
+        ` : ''}
+
+        <div class="cz-foot">
+          <div class="cz-stepper" role="group" aria-label="Quantity">
+            <button type="button" id="customizer-qty-minus" aria-label="Decrease quantity">−</button>
+            <span class="cz-qty" aria-live="polite">1</span>
+            <button type="button" id="customizer-qty-plus" aria-label="Increase quantity">+</button>
+          </div>
+          <button type="button" class="cz-submit" id="customizer-submit-btn">
+            Add to order · <span class="cz-total"></span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Update in place, so the segmented highlights slide instead of redrawing
+    const totalEl = modal.querySelector('.cz-total');
+    const qtyEl = modal.querySelector('.cz-qty');
+    const refresh = () => {
+      totalEl.textContent = `₱${(unitPrice() * quantity).toLocaleString()}`;
+      qtyEl.textContent = String(quantity);
+    };
+
+    modal.querySelectorAll('.cz-seg').forEach((seg) => {
+      seg.querySelectorAll('.cz-seg-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
-          selectedTemp = btn.dataset.temp;
-          renderModalContent();
+          seg.querySelectorAll('.cz-seg-btn').forEach((b) => {
+            b.classList.toggle('active', b === btn);
+            b.setAttribute('aria-checked', String(b === btn));
+          });
+          if (seg.dataset.seg === 'temp') selectedTemp = btn.dataset.value;
+          if (seg.dataset.seg === 'size') selectedSize = btn.dataset.value;
+          refresh();
         });
       });
+    });
 
-      modal.querySelectorAll('[data-size]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          selectedSize = btn.dataset.size;
-          renderModalContent();
-        });
+    modal.querySelectorAll('.cz-addon').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.addonId;
+        const on = !selectedAddOns.has(id);
+        if (on) selectedAddOns.add(id);
+        else selectedAddOns.delete(id);
+        btn.classList.toggle('is-checked', on);
+        btn.setAttribute('aria-checked', String(on));
+        refresh();
       });
+    });
 
-      modal.querySelectorAll('.customizer-addon-row').forEach(row => {
-        const toggle = () => {
-          const aId = row.dataset.addonId;
-          if (selectedAddOns.has(aId)) {
-            selectedAddOns.delete(aId);
-          } else {
-            selectedAddOns.add(aId);
-          }
-          renderModalContent();
-        };
-        row.addEventListener('click', toggle);
-        row.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            toggle();
-          }
-        });
+    modal.querySelector('#customizer-qty-minus').addEventListener('click', () => {
+      if (quantity > 1) quantity -= 1;
+      refresh();
+    });
+    modal.querySelector('#customizer-qty-plus').addEventListener('click', () => {
+      quantity += 1;
+      refresh();
+    });
+
+    modal.querySelector('#customizer-submit-btn').addEventListener('click', () => {
+      cartStore.addItem({
+        id: itemData.id,
+        name: itemData.name,
+        price: hasSizes ? (selectedSize === 'L' ? priceL : priceM) : itemData.price || 0,
+        description: itemData.description,
+        temp: selectedTemp,
+        size: selectedSize,
+        addOns: addOnsList.filter((a) => selectedAddOns.has(a.id)),
+        quantity,
+        isDrink: true,
+        categoryId: itemData.categoryId
       });
+      closeModal();
+    });
 
-      modal.querySelector('#customizer-qty-minus')?.addEventListener('click', () => {
-        if (quantity > 1) {
-          quantity -= 1;
-          renderModalContent();
-        }
-      });
-
-      modal.querySelector('#customizer-qty-plus')?.addEventListener('click', () => {
-        quantity += 1;
-        renderModalContent();
-      });
-
-      modal.querySelector('#customizer-submit-btn')?.addEventListener('click', () => {
-        const chosenAddOns = Array.from(selectedAddOns).map(id => addOnsList.find(a => a.id === id)).filter(Boolean);
-        let basePrice = itemData.price || 0;
-        if (hasSizes) {
-          basePrice = selectedSize === 'L' ? priceL : priceM;
-        }
-
-        cartStore.addItem({
-          id: itemData.id,
-          name: itemData.name,
-          price: basePrice,
-          description: itemData.description,
-          temp: selectedTemp,
-          size: selectedSize,
-          addOns: chosenAddOns,
-          quantity: quantity,
-          isDrink: true,
-          categoryId: itemData.categoryId
-        });
-
-        closeModal();
-      });
-    }
-
-    function openModal() {
-      renderModalContent();
-      modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-      const onKey = (e) => {
-        if (e.key === 'Escape') {
-          closeModal();
-        }
-      };
-      window.addEventListener('keydown', onKey);
-      modal._escHandler = onKey;
-    }
+    const onKey = (e) => {
+      if (e.key === 'Escape') closeModal();
+    };
 
     function closeModal() {
       modal.classList.remove('active');
       document.body.style.overflow = '';
-      if (modal._escHandler) {
-        window.removeEventListener('keydown', modal._escHandler);
-        modal._escHandler = null;
-      }
+      window.removeEventListener('keydown', onKey);
     }
 
+    modal.querySelector('#customizer-close-btn').addEventListener('click', closeModal);
     modal.onclick = (e) => {
-      if (e.target === modal) {
-        closeModal();
-      }
+      if (e.target === modal) closeModal();
     };
 
-    openModal();
+    refresh();
+    // Next frame, so the sheet animates in from its closed position
+    requestAnimationFrame(() => modal.classList.add('active'));
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
   }
 
-  // Initial render (ensures dynamic preview capsules & event listeners mount on both / and /menu/)
   render();
 }

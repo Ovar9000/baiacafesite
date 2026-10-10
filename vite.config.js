@@ -43,11 +43,7 @@ function devApiPlugin() {
           res.writeHead(302, { Location: '/#location' });
           return res.end();
         }
-        if (pathname === '/floating-cottage' || pathname === '/floating-cottage/') {
-          res.writeHead(302, { Location: '/#boards' });
-          return res.end();
-        }
-        const multiPages = ['/claim', '/card', '/admin', '/admin/rewards', '/admin/activity', '/privacy', '/terms'];
+        const multiPages = ['/claim', '/card', '/admin', '/admin/rewards', '/admin/activity', '/privacy', '/terms', '/floating-cottage'];
         if (multiPages.includes(pathname)) {
           req.url = `${pathname}/` + (parsedUrl.search || '') + (parsedUrl.hash || '');
         }
@@ -200,7 +196,8 @@ export default defineConfig({
         adminRewards: resolve(__dirname, 'admin/rewards/index.html'),
         adminActivity: resolve(__dirname, 'admin/activity/index.html'),
         privacy: resolve(__dirname, 'privacy/index.html'),
-        terms: resolve(__dirname, 'terms/index.html')
+        terms: resolve(__dirname, 'terms/index.html'),
+        floatingCottage: resolve(__dirname, 'floating-cottage/index.html')
       }
     }
   },

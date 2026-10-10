@@ -1,14 +1,18 @@
 /**
- * Liquid-glass navigation highlight.
+ * Liquid-glass navigation lens (after the Lot 7 header).
  *
- * A glass pill slides under the nav link for the section currently on screen
- * (scroll spy), and follows the pointer while hovering the nav. The current
- * link also gets aria-current="location" for assistive tech.
+ * A bright glass bubble glides to the nav link for the section currently on
+ * screen (scroll spy), and to the link under the pointer while hovering the
+ * nav. It holds a scaled copy of the links lined up with the real ones, so
+ * whatever sits under it reads enlarged, mid-glide included. The current link
+ * (and its row in the phone drawer) gets aria-current="location".
  */
 export function initGlassNav() {
   const nav = document.querySelector('.main-nav-wrapper');
-  const pill = nav?.querySelector('.nav-glass-indicator');
-  if (!nav || !pill) return;
+  const list = nav?.querySelector('.main-nav-links');
+  const lens = nav?.querySelector('.nav-lens');
+  const track = lens?.querySelector('.lens-track');
+  if (!nav || !list || !lens || !track) return;
 
   // Nav links paired with the section they jump to, in page order.
   const pairs = [...nav.querySelectorAll('.nav-link[href^="#"]')]
@@ -16,21 +20,38 @@ export function initGlassNav() {
     .filter(([, section]) => section);
   if (!pairs.length) return;
 
-  nav.classList.add('has-glass-pill');
+  // The lens copy: the same list with the same classes, so it lays out
+  // exactly like the real one. Links become plain spans so it holds nothing
+  // focusable.
+  const copy = list.cloneNode(true);
+  copy.querySelectorAll('a').forEach((a) => {
+    const span = document.createElement('span');
+    span.className = a.className;
+    span.innerHTML = a.innerHTML;
+    a.replaceWith(span);
+  });
+  track.append(copy);
+
+  // The phone drawer rows and bottom tabs mirror the current section too
+  const drawerItems = document.querySelectorAll('.nav-drawer-item[href^="#"], .mobile-bar-tab[href^="#"]');
+  const header = document.getElementById('site-header');
+
+  nav.classList.add('has-lens');
   let current = null;
   let hovered = null;
 
+  // Keeps its last position while hidden, so it reappears where it left
+  // rather than sliding in from 0.
   const moveTo = (link) => {
     if (!link || link.offsetParent === null) {
-      pill.classList.remove('is-visible');
+      lens.classList.remove('is-visible');
       return;
     }
     const navBox = nav.getBoundingClientRect();
     const box = link.getBoundingClientRect();
-    pill.style.setProperty('--pill-x', `${box.left - navBox.left}px`);
-    pill.style.setProperty('--pill-w', `${box.width}px`);
-    pill.style.setProperty('--pill-h', `${box.height}px`);
-    pill.classList.add('is-visible');
+    lens.style.setProperty('--lens-x', `${box.left - navBox.left}px`);
+    lens.style.setProperty('--lens-w', `${box.width}px`);
+    lens.classList.add('is-visible');
   };
 
   const setCurrent = (link) => {
@@ -44,6 +65,13 @@ export function initGlassNav() {
       current.classList.add('is-current');
       current.setAttribute('aria-current', 'location');
     }
+    const href = current?.getAttribute('href');
+    drawerItems.forEach((item) => {
+      const isCurrent = item.getAttribute('href') === href;
+      item.classList.toggle('is-current', isCurrent);
+      if (isCurrent) item.setAttribute('aria-current', 'location');
+      else item.removeAttribute('aria-current');
+    });
     if (!hovered) moveTo(current);
   };
 
@@ -73,19 +101,28 @@ export function initGlassNav() {
   };
 
   for (const [link] of pairs) {
-    link.addEventListener('mouseenter', () => {
+    link.addEventListener('pointerenter', () => {
       hovered = link;
       moveTo(link);
     });
   }
-  nav.addEventListener('mouseleave', () => {
+  nav.addEventListener('pointerleave', () => {
     hovered = null;
     moveTo(current);
   });
 
+  // A soft light that follows the pointer across the glass bar (mouse and
+  // trackpad only).
+  const bar = header?.querySelector('.nav-container');
+  if (bar && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    bar.addEventListener('pointermove', (e) => {
+      const rect = bar.getBoundingClientRect();
+      bar.style.setProperty('--spec-x', `${e.clientX - rect.left}px`);
+    });
+  }
+
   window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', () => moveTo(hovered || current), { passive: true });
-  // Link widths change once the web fonts arrive.
-  document.fonts?.ready?.then(() => moveTo(hovered || current));
+  // Re-measure when the nav reflows (web fonts arriving, window resizing).
+  new ResizeObserver(() => moveTo(hovered || current)).observe(nav);
   update();
 }

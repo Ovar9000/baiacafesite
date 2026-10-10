@@ -41,7 +41,7 @@
   font-size: clamp(2.4rem, 5vw, 3.8rem);
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.01em;
   color: var(--white);
   margin-bottom: 14px;
 }
@@ -152,7 +152,7 @@
   width: 100%;
   height: 340px;
   max-height: 340px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, 0.2);
 }
@@ -175,7 +175,7 @@
   font-weight: 800;
   text-transform: uppercase;
   padding: 4px 14px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   margin-bottom: 12px;
 }
 
@@ -318,7 +318,7 @@
   width: 100%;
   height: 160px;
   max-height: 160px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   overflow: hidden;
   margin-bottom: 14px;
   background: #0f172a;
@@ -360,7 +360,7 @@
   font-weight: 800;
   text-transform: uppercase;
   padding: 3px 10px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(255,255,255,0.3);
 }
 
@@ -476,4 +476,189 @@
   .cottage-image-frame {
     height: 240px;
   }
+}
+
+/* ==========================================================================
+   FLOATING COTTAGE: homepage teaser card (links to /floating-cottage/)
+   ========================================================================== */
+.cottage-teaser {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 48px;
+  padding: 12px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  color: var(--white);
+  text-decoration: none;
+  position: relative;
+  z-index: 2;
+  transition: background-color var(--duration-fast), transform 0.2s var(--ease-smooth);
+}
+
+.cottage-teaser:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.cottage-teaser:active {
+  transform: scale(0.98);
+}
+
+/* Inner corner = card corner minus the 12px padding, so the curves line up */
+.cottage-teaser-photo {
+  aspect-ratio: 4 / 3;
+  border-radius: calc(var(--radius-lg) - 12px);
+  overflow: hidden;
+}
+
+.cottage-teaser-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cottage-teaser-text .cottage-title {
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+}
+
+.cottage-teaser-meta {
+  color: var(--cream);
+  opacity: 0.85;
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+}
+
+.cottage-teaser-link {
+  color: var(--golden-amber);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+  .cottage-teaser {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 10px 10px 20px;
+  }
+
+  .cottage-teaser-photo {
+    aspect-ratio: 16 / 10;
+    border-radius: calc(var(--radius-lg) - 10px);
+  }
+
+  .cottage-teaser-text {
+    padding: 0 8px;
+  }
+}
+
+/* ==========================================================================
+   FLOATING COTTAGE PAGE (/floating-cottage/)
+   ========================================================================== */
+.cottage-page {
+  background: var(--deep-navy-dark);
+}
+
+.cottage-back-chevron {
+  color: var(--cream);
+  margin-right: -4px;
+}
+
+.cottage-hero {
+  position: relative;
+  min-height: min(72vh, 620px);
+  display: flex;
+  align-items: flex-end;
+  padding: calc(var(--header-height) + 24px) 0 36px;
+  overflow: hidden;
+}
+
+.cottage-hero img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 60%;
+}
+
+.cottage-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(14, 26, 69, 0.35) 0%, rgba(14, 26, 69, 0) 35%, rgba(14, 26, 69, 0.55) 70%, var(--deep-navy-dark) 100%);
+}
+
+.cottage-hero-text {
+  position: relative;
+}
+
+.cottage-hero-kicker {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--amber-contrast);
+  margin-bottom: 8px;
+}
+
+.cottage-hero-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  line-height: 1.05;
+  color: var(--white);
+  max-width: 14ch;
+}
+
+.cottage-details-section {
+  padding: 8px 0 56px;
+}
+
+/* The frame holds the barangay's official rate poster here: show all of it */
+.cottage-page .cottage-image-frame {
+  height: auto;
+  max-height: none;
+}
+
+.cottage-page .cottage-image-frame img {
+  height: auto;
+}
+
+.cottage-guidelines {
+  max-width: 640px;
+}
+
+.cottage-guidelines-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.3rem;
+  color: var(--white);
+  margin-bottom: 14px;
+}
+
+.cottage-footer {
+  padding: 28px 0 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(245, 233, 214, 0.7);
+  font-size: 0.9rem;
+}
+
+.cottage-footer .container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cottage-footer a {
+  color: var(--cream);
+}
+
+.cottage-footer-back {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-decoration: none;
 }

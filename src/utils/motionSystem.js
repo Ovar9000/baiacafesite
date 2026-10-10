@@ -108,25 +108,6 @@ class MotionSystem {
     root.style.setProperty('--motion-duration-fade', this.currentMetrics.fadeDuration);
     root.style.setProperty('--motion-ease-logo', this.currentMetrics.logoEase);
   }
-
-  /**
-   * Cleans up any legacy flight clones and coordinates clean accordion state.
-   * Eliminates the janky clone plopping over real cards.
-   *
-   * @param {HTMLElement} card - The .menu-accordion-card element
-   * @param {boolean} isOpening - True if expanding, false if collapsing
-   */
-  animateCategoryPillsFlight(card, isOpening) {
-    if (!card || typeof window === 'undefined') return;
-
-    // Clean up any lingering flight entities
-    document.querySelectorAll('.pill-flight-entity, .pill-flight-clone').forEach(el => el.remove());
-    card.querySelectorAll('.menu-card').forEach(c => {
-      c.classList.remove('is-flying');
-      c.style.opacity = '';
-      c.style.pointerEvents = '';
-    });
-  }
 }
 
 export const motionSystem = new MotionSystem();

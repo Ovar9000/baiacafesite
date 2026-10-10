@@ -12,11 +12,6 @@
       "source": "/location/:path*",
       "destination": "/#location",
       "permanent": false
-    },
-    {
-      "source": "/floating-cottage/:path*",
-      "destination": "/#boards",
-      "permanent": false
     }
   ],
   "headers": [

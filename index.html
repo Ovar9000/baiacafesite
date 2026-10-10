@@ -23,10 +23,10 @@
   <meta property="og:title" content="BAIA Cafe — Beachfront Specialty Coffee, Smash Burgers &amp; Good Vibes" />
   <meta property="og:description"
     content="Artisanal Asin Tibuok lattes, handcrafted double smash burgers, fresh fruit sodas, and shore recreation right on Laurente beach, Burias Island, Masbate." />
-  <meta property="og:image" content="https://www.baia.cafe/images/Baia%20skimboard%20and%20coffee.webp" />
-  <meta property="og:image:width" content="960" />
-  <meta property="og:image:height" content="958" />
-  <meta property="og:image:alt" content="BAIA iced specialty coffee and custom skimboard on the shoreline sand" />
+  <meta property="og:image" content="https://www.baia.cafe/images/og-shore.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Lanterns over beach chairs and cafe tables on the sand at BAIA, Laurente Beach, with an outrigger boat on the sea" />
   <meta property="og:site_name" content="BAIA Cafe" />
   <meta property="og:locale" content="en_PH" />
 
@@ -36,10 +36,11 @@
   <meta name="twitter:title" content="BAIA Cafe — Beachfront Specialty Coffee &amp; Good Vibes" />
   <meta name="twitter:description"
     content="Artisanal Asin Tibuok lattes, handcrafted double smash burgers, and shore recreation on Laurente beach, Burias Island, Masbate. Message &amp; order ahead via Facebook Messenger." />
-  <meta name="twitter:image" content="https://www.baia.cafe/images/Baia%20skimboard%20and%20coffee.webp" />
+  <meta name="twitter:image" content="https://www.baia.cafe/images/og-shore.jpg" />
 
   <!-- Preload Critical Hero Asset & Google Fonts -->
-  <link rel="preload" as="image" href="./images/Baia%20skimboard%20and%20coffee.webp" type="image/webp" fetchpriority="high" />
+  <!-- Picks the hero photo for the time of day at the beach and preloads it (public/hero-daypart.js) -->
+  <script src="/hero-daypart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- Plain stylesheet: the media="print" + onload swap is an inline handler the CSP blocks -->
@@ -74,7 +75,7 @@
   --font-mono: 'Space Grotesk', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   --font-price: 'Space Grotesk', 'Outfit', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px;
-  --radius-sm: 8px; --radius-md: 14px; --radius-lg: 20px; --radius-xl: 32px; --radius-pill: 9999px;
+  --radius-sm: 8px; --radius-md: 14px; --radius-lg: 24px; --radius-xl: 24px; --radius-pill: 9999px;
   --shadow-sm: 0 2px 8px rgba(22, 37, 92, 0.06);
   --shadow-md: 0 8px 24px rgba(22, 37, 92, 0.1);
   --shadow-lg: 0 16px 40px rgba(22, 37, 92, 0.16);
@@ -89,7 +90,7 @@
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; scroll-padding-top: var(--header-height, 80px); font-size: 16px; -webkit-font-smoothing: antialiased; overflow-x: hidden; max-width: 100vw; }
-body { font-family: var(--font-body); background-color: var(--electric-blue); color: var(--white); line-height: 1.5; overflow-x: hidden; max-width: 100vw; position: relative; }
+body { font-family: var(--font-body); background-color: var(--electric-blue); color: var(--white); line-height: 1.5; overflow-x: hidden; overflow-x: clip; max-width: 100vw; position: relative; }
 .skip-link { position: absolute; top: -120px; left: 16px; background: var(--golden-amber); color: var(--deep-navy); font-weight: 800; padding: 12px 20px; border-radius: var(--radius-sm); z-index: 9999; text-decoration: none; }
 .skip-link:focus { top: 16px !important; }
 .container { width: 100%; max-width: var(--max-width); margin-left: auto; margin-right: auto; padding-left: var(--container-padding); padding-right: var(--container-padding); }
@@ -98,10 +99,13 @@ svg { display: block; max-width: 100%; }
 .wordmark { font-family: var(--font-display); font-weight: 900; letter-spacing: -0.04em; text-transform: uppercase; }
 .script-accent { font-family: var(--font-script); font-weight: 700; font-size: 1.35em; line-height: 0.9; display: inline-block; transform: rotate(-3deg); }
 .script-accent.pink { color: #ff6b9d; }
-.site-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height); z-index: 100; background: rgba(30, 74, 255, 0.94); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
-.nav-container { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.site-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height); z-index: 100; display: flex; align-items: center; pointer-events: none; }
+.nav-container { position: relative; height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 8px; border-radius: 9999px; pointer-events: auto; background: rgba(22, 37, 92, 0.42); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 0 0 0.5px rgba(255, 255, 255, 0.2); }
+.nav-menu-toggle { display: none; }
+@media (max-width: 900px) { .main-nav-wrapper { display: none; } .nav-container { justify-content: flex-start; gap: 10px; padding: 0 7px; } .nav-menu-toggle { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border: none; border-radius: 50%; background: rgba(255, 255, 255, 0.14); color: #fff; } .nav-actions { margin-left: auto; } }
+dialog.nav-drawer:not([open]) { display: none; }
 .brand-logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--white); }
-.brand-logo-img { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; border: 1.5px solid rgba(255,255,255,0.35); view-transition-name: baia-brand-logo; contain: paint; transform: translateZ(0); will-change: transform; }
+.brand-logo-img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; view-transition-name: baia-brand-logo; contain: paint; transform: translateZ(0); will-change: transform; }
 :root { --motion-duration-logo: 1.1s; --motion-duration-page: 0.9s; --motion-duration-fade: 0.6s; --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1); }
 @media (max-width: 768px) { :root { --motion-duration-logo: 0.75s; --motion-duration-page: 0.70s; --motion-duration-fade: 0.55s; --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1); } }
 @view-transition { navigation: auto; }
@@ -118,17 +122,17 @@ svg { display: block; max-width: 100%; }
 .brand-text-block { display: flex; flex-direction: column; }
 .brand-title { font-size: 1.4rem; line-height: 1; color: var(--white); }
 .brand-subtitle { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; color: var(--amber-contrast); text-transform: uppercase; }
-.main-nav-links { display: flex; align-items: center; gap: 18px; list-style: none; }
-.nav-link { color: var(--cream); text-decoration: none; font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; text-transform: uppercase; padding: 6px 10px; border-radius: var(--radius-sm); }
+.main-nav-links { display: flex; align-items: center; gap: 2px; list-style: none; }
+.nav-link { display: inline-flex; align-items: center; color: var(--cream); text-decoration: none; font-family: var(--font-display); font-weight: 700; font-size: 0.86rem; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; padding: 9px 14px; border-radius: 9999px; }
+.nav-lens { position: absolute; opacity: 0; pointer-events: none; }
 .nav-actions { display: flex; align-items: center; gap: 10px; }
-.audio-toggle-btn { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); color: var(--white); padding: 0 14px; height: 38px; border-radius: var(--radius-pill); font-family: var(--font-display); font-weight: 800; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-.nav-phone-link { display: inline-flex; align-items: center; gap: 6px; color: var(--cream); text-decoration: none; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; padding: 0 12px; height: 38px; border-radius: var(--radius-pill); border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.15); }
+.nav-icon-link { display: inline-flex; align-items: center; gap: 6px; color: var(--cream); text-decoration: none; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; padding: 0 12px; height: 38px; border-radius: var(--radius-pill); border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.15); }
 .nav-cart-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--golden-amber); color: var(--deep-navy); border: none; font-family: var(--font-display); font-weight: 900; font-size: 0.85rem; text-transform: uppercase; padding: 0 16px; height: 38px; border-radius: var(--radius-pill); cursor: pointer; }
 .cart-count-badge { background: var(--hot-pink); color: var(--white); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 900; width: 20px; height: 20px; min-width: 20px; min-height: 20px; max-width: 20px; max-height: 20px; aspect-ratio: 1 / 1; flex-shrink: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; line-height: 1; padding: 0; box-sizing: border-box; }
 .hero-section { position: relative; min-height: calc(100vh - 28px); min-height: calc(100dvh - 28px); height: auto; padding-top: calc(var(--header-height) + clamp(16px, 2.5vh, 32px)); padding-bottom: clamp(16px, 2.5vh, 32px); background: radial-gradient(120% 90% at 50% 25%, #2a52ff 0%, #1a3fe8 55%, #142eb8 100%); overflow: hidden; display: flex; flex-direction: column; justify-content: center; width: 100%; box-sizing: border-box; }
 .hero-grid { display: grid; grid-template-columns: 1.15fr 0.95fr; align-items: center; gap: clamp(24px, 4vw, var(--space-2xl)); position: relative; z-index: 2; width: 100%; }
 .hero-content { display: flex; flex-direction: column; align-items: flex-start; max-width: 640px; width: 100%; }
-.hero-trust-pill { display: inline-flex; align-items: center; gap: 8px 10px; background: rgba(22, 37, 92, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.2px solid rgba(255, 255, 255, 0.22); padding: 6px 16px; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--white); margin-bottom: 16px; align-self: flex-start; }
+.hero-trust-pill { display: inline-flex; align-items: center; gap: 8px 10px; background: rgba(22, 37, 92, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.2px solid rgba(255, 255, 255, 0.22); padding: 6px 16px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--white); margin-bottom: 16px; align-self: flex-start; }
 .hero-headline.hero-vertical-focus { margin-bottom: 16px; position: relative; z-index: 1; width: 100%; }
 .tagline-stack { display: flex; flex-direction: column; gap: 0px; width: 100%; }
 .tagline-row { display: flex; align-items: center; gap: 14px; line-height: 0.90; letter-spacing: -0.035em; white-space: nowrap; }
@@ -139,24 +143,16 @@ svg { display: block; max-width: 100%; }
 .script-crafted-fatseed { font-family: var(--font-script); font-weight: 700; font-size: clamp(3.2rem, min(9.0vw, 10.2vh), 5.8rem); color: #ff6b9d; transform: rotate(-4deg); display: inline-block; line-height: 0.82; }
 .bay-chunky { font-family: var(--font-headline); font-weight: 900; font-size: clamp(2.4rem, min(6.8vw, 7.8vh), 4.4rem); text-transform: uppercase; color: var(--white); }
 .hero-subtitle { font-size: clamp(1.02rem, 2vw, 1.15rem); line-height: 1.6; color: var(--cream); margin-bottom: 0; max-width: 540px; position: relative; z-index: 1; }
-.hero-visual-container { display: flex; justify-content: center; align-items: center; perspective: 1200px; position: relative; width: 100%; min-height: 0; }
-.hero-3d-card { position: relative; width: 100%; max-width: min(440px, calc((100dvh - var(--header-height) - 80px) * 0.92)); height: auto; aspect-ratio: 11 / 12; max-height: min(480px, calc(100dvh - var(--header-height) - 80px)); min-height: 280px; transform-style: preserve-3d; }
-.hero-image-frame { width: 100%; height: 100%; border-radius: var(--radius-xl); overflow: hidden; position: relative; transform: rotate(-3deg); box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255, 255, 255, 0.25); border: 4px solid var(--white); background: #0f172a; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease; }
-.hero-image-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center 65%; display: block; }
-.floating-flavor-pill { position: absolute; bottom: 16px; left: 16px; background: rgba(16, 28, 75, 0.94); backdrop-filter: blur(12px); color: var(--white); padding: 8px 16px; border-radius: var(--radius-pill); border: 2px solid rgba(255, 255, 255, 0.9); display: inline-flex; align-items: center; gap: 8px; font-size: 0.825rem; font-weight: 800; box-shadow: var(--shadow-sm); z-index: 10; transform: translateZ(40px) rotate(3deg); pointer-events: none; }
-.flavor-tag { background: var(--hot-pink); color: var(--white); font-family: var(--font-mono); font-size: 0.68rem; font-weight: 900; padding: 2px 8px; border-radius: var(--radius-pill); text-transform: uppercase; letter-spacing: 0.04em; }
-.mobile-sticky-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 990; background: rgba(22, 37, 92, 0.96); backdrop-filter: blur(16px); border-top: 2px solid var(--golden-amber); padding: 10px 16px; box-shadow: 0 -4px 16px rgba(10, 20, 60, 0.18); transform: translateY(115%); opacity: 0; pointer-events: none; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease; }
+.mobile-sticky-bar { display: none; position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 990; transform: translateY(calc(100% + 24px)); opacity: 0; pointer-events: none; }
 .mobile-sticky-bar.is-visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
 @media (max-width: 1024px) {
-  .brand-logo-img { width: 38px; height: 38px; min-width: 38px; min-height: 38px; }
   .brand-title { font-size: 1.25rem; }
   .brand-subtitle { font-size: 0.58rem; letter-spacing: 0.08em; }
   .main-nav-links { gap: 6px; }
   .nav-link { font-size: 0.76rem; padding: 4px 6px; letter-spacing: 0.01em; }
   .nav-actions { gap: 6px; }
-  .nav-loyalty-btn { padding: 0 8px; height: 36px; font-size: 0.74rem; gap: 4px; }
-  .nav-phone-link { padding: 0; width: 36px; height: 36px; min-width: 36px; min-height: 36px; justify-content: center; border-radius: 50%; }
-  .nav-phone-text { display: none; }
+  .nav-icon-link { padding: 0; width: 36px; height: 36px; min-width: 36px; min-height: 36px; justify-content: center; border-radius: 50%; }
+  .nav-icon-text { display: none; }
   .nav-cart-btn { padding: 0 10px; height: 36px; font-size: 0.76rem; gap: 6px; }
   .cart-count-badge { width: 18px; height: 18px; min-width: 18px; min-height: 18px; font-size: 0.68rem; }
   .hero-section { min-height: calc(100dvh - 28px); height: auto; display: flex; flex-direction: column; justify-content: center; padding-top: calc(var(--header-height) + clamp(16px, 2.8vh, 28px)); padding-bottom: clamp(20px, 3.5vh, 32px); }
@@ -170,10 +166,10 @@ svg { display: block; max-width: 100%; }
   .script-crafted-fatseed { font-size: clamp(3.2rem, 9.8vw, 4.6rem); }
   .bay-chunky { font-size: clamp(2.3rem, 7.0vw, 3.4rem); }
   .row-crafted-bay { justify-content: center; align-items: baseline; gap: clamp(8px, 1.8vw, 12px); margin-top: 0px; white-space: nowrap; }
-  .hero-visual-container { width: 100%; margin: 0 auto; flex: 0 0 auto; min-height: 0; display: flex; justify-content: center; align-items: center; padding: 0; }
-  .hero-3d-card { aspect-ratio: 1 / 1; width: 100%; height: auto; min-height: 0; max-width: min(340px, 86vw, calc(100dvh - var(--header-height) - 290px)); flex: 0 0 auto; margin: 0 auto; }
 }
 @media (max-width: 640px) {
+  .nav-container { height: 54px; }
+  .nav-menu-toggle { width: 40px; height: 40px; }
   :root {
     --header-height: 70px;
   }
@@ -191,12 +187,19 @@ svg { display: block; max-width: 100%; }
   .hero-doodle.doodle-mug { width: clamp(28px, 7.5vw, 36px); height: clamp(28px, 7.5vw, 36px); }
   .hero-doodle.doodle-food { width: clamp(28px, 7.5vw, 36px); height: clamp(28px, 7.5vw, 36px); }
   .hero-doodle.doodle-sparkle { width: clamp(18px, 5.0vw, 24px); height: clamp(18px, 5.0vw, 24px); position: relative !important; }
-  .hero-visual-container { width: 100%; margin: 0 auto; flex: 0 0 auto; min-height: 0; display: flex; justify-content: center; align-items: center; padding: 0; }
-  .hero-3d-card { aspect-ratio: 1 / 1; width: 100%; height: auto; min-height: 0; max-width: min(320px, 84vw, calc(100dvh - var(--header-height) - 290px)); flex: 0 0 auto; margin: 0 auto; }
-  .floating-flavor-pill { bottom: 10px; left: 10px; padding: 5px 12px; font-size: 0.74rem; transform: translateZ(40px) rotate(3deg); }
-  .floating-flavor-pill .flavor-tag { font-size: 0.62rem; padding: 2px 6px; }
 }
-  </style>
+  
+:root, [data-daypart="day"] { --hero-photo-portrait: url("/images/hero/day-portrait.webp"); --hero-photo-wide: url("/images/hero/day-wide.webp"); --hero-focus-portrait: 20% center; --hero-focus-wide: 35% 70%; }
+[data-daypart="sunrise"] { --hero-photo-portrait: url("/images/hero/sunrise-portrait.webp"); --hero-photo-wide: url("/images/hero/sunrise-wide.webp"); --hero-focus-portrait: 55% center; --hero-focus-wide: 55% 30%; }
+[data-daypart="sunset"] { --hero-photo-portrait: url("/images/hero/sunset-portrait.webp"); --hero-photo-wide: url("/images/hero/sunset-wide.webp"); --hero-focus-portrait: 50% center; --hero-focus-wide: 45% 85%; }
+[data-daypart="night"] { --hero-photo-portrait: url("/images/hero/night-portrait.webp"); --hero-photo-wide: url("/images/hero/night-wide.webp"); --hero-focus-portrait: 60% center; --hero-focus-wide: 60% 90%; }
+.hero-section { background: #0E1A45; }
+.hero-photo { position: absolute; inset: 0; background: #0E1A45 var(--hero-photo-portrait) var(--hero-focus-portrait) / cover no-repeat; }
+@media (min-aspect-ratio: 1/1) { .hero-photo { background-image: var(--hero-photo-wide); background-position: var(--hero-focus-wide); } }
+.hero-scrim { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(14, 26, 69, 0.62) 0%, rgba(14, 26, 69, 0.38) 38%, rgba(14, 26, 69, 0) 64%), linear-gradient(180deg, rgba(14, 26, 69, 0) 72%, rgba(14, 26, 69, 0.55) 100%); }
+.hero-grid { display: flex; flex-direction: column; align-items: flex-start; }
+@media (max-width: 1024px) { .hero-section { justify-content: flex-start; } .hero-grid { flex: 0 0 auto; align-items: center; padding-top: clamp(8px, 3vh, 32px); } .hero-scrim { background: linear-gradient(180deg, rgba(14, 26, 69, 0.62) 0%, rgba(14, 26, 69, 0.34) 30%, rgba(14, 26, 69, 0) 52%), linear-gradient(180deg, rgba(14, 26, 69, 0) 76%, rgba(14, 26, 69, 0.5) 100%); } }
+</style>
 
   <!-- Master Stylesheet and Main Entry Module -->
   <link rel="stylesheet" href="/src/styles/main.css" />
@@ -214,7 +217,7 @@ svg { display: block; max-width: 100%; }
       "BAIA Cafe Burias Island"
     ],
     "description": "Beachfront specialty coffee shop, eatery, and floating cottage destination in Barangay Laurente, San Pascual, Burias Island, Masbate (Plus Code: 42PF+G8), serving artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers, and coastal refreshment.",
-    "image": "https://www.baia.cafe/images/Baia%20skimboard%20and%20coffee.webp",
+    "image": "https://www.baia.cafe/images/og-shore.jpg",
     "logo": "https://www.baia.cafe/images/Logo.webp",
     "url": "https://www.baia.cafe/",
     "hasMap": "https://maps.app.goo.gl/vNYohzy8UWbM4d5P6",
@@ -278,11 +281,22 @@ svg { display: block; max-width: 100%; }
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Site Navigation Header -->
+  <!-- Floating liquid-glass capsule: the page scrolls underneath it -->
   <header class="site-header" id="site-header" role="banner">
-    <div class="container nav-container">
+    <div class="container">
+    <div class="nav-container">
+      <!-- Phones and tablets: opens the section drawer (src/components/navDrawer.js) -->
+      <button type="button" class="nav-menu-toggle" aria-label="Open navigation menu" aria-haspopup="dialog" aria-controls="nav-drawer" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <line x1="4" y1="7" x2="20" y2="7"></line>
+          <line x1="4" y1="12" x2="20" y2="12"></line>
+          <line x1="4" y1="17" x2="20" y2="17"></line>
+        </svg>
+      </button>
+
       <!-- Left: Brand Logo Lockup -->
       <a href="#hero" class="brand-logo-link">
-        <img src="./images/Logo.webp" alt="BAIA Cafe Circular Brand Logo" width="42" height="42" class="brand-logo-img" />
+        <img src="./images/Logo.webp" alt="BAIA Cafe logo" width="42" height="42" class="brand-logo-img" />
         <div class="brand-text-block">
           <span class="brand-title wordmark">BAIA</span>
           <span class="brand-subtitle">COFFEE • FOOD • SHORE</span>
@@ -291,36 +305,28 @@ svg { display: block; max-width: 100%; }
 
       <!-- Center Nav Links -->
       <nav class="main-nav-wrapper" aria-label="Primary Navigation">
-        <!-- Liquid-glass pill that slides to the section you're in (src/components/glassNav.js) -->
-        <span class="nav-glass-indicator" aria-hidden="true"></span>
         <ul class="main-nav-links">
           <li><a href="#about" class="nav-link">About</a></li>
-          <li><a href="#drops" class="nav-link nav-link-drops"><span class="nav-drop-badge">NEW</span> Drops</a></li>
-          <li><a href="#menu" class="nav-link">Menu</a></li>
           <li><a href="#reviews" class="nav-link">Photos</a></li>
-          <li><a href="#boards" class="nav-link">Recreation</a></li>
+          <li><a href="#boards" class="nav-link">Shore</a></li>
+          <li><a href="#menu" class="nav-link">Menu</a></li>
+          <li><a href="#drops" class="nav-link">What's New</a></li>
           <li><a href="#location" class="nav-link">Visit</a></li>
         </ul>
+        <!-- Magnifying lens that glides to the section you're in, or the hovered link
+             (src/components/glassNav.js fills the track with an enlarged copy of the links) -->
+        <span class="nav-lens" aria-hidden="true"><span class="lens-track"></span></span>
       </nav>
 
       <!-- Right Nav Controls -->
       <div class="nav-actions">
-        <a href="/card/" class="nav-loyalty-btn" id="nav-loyalty-pill" title="View BAIA Digital Loyalty Card">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-            <line x1="6" y1="1" x2="6" y2="4"></line>
-            <line x1="10" y1="1" x2="10" y2="4"></line>
-            <line x1="14" y1="1" x2="14" y2="4"></line>
+        <a href="/card/" class="nav-icon-link nav-loyalty-link" aria-label="Your BAIA loyalty card">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="5" width="20" height="14" rx="3"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
+            <line x1="6" y1="15" x2="10" y2="15"></line>
           </svg>
-          <span class="nav-loyalty-btn-label">Loyalty Card</span>
-        </a>
-
-        <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="nav-phone-link" aria-label="Message BAIA Cafe on Facebook Messenger">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
-            <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
-          </svg>
-          <span class="nav-phone-text">Messenger</span>
+          <span class="nav-icon-text">Loyalty Card</span>
         </a>
 
         <!-- Header Cart Trigger Button -->
@@ -335,32 +341,59 @@ svg { display: block; max-width: 100%; }
         </button>
       </div>
     </div>
+    </div>
   </header>
+
+  <!-- Section drawer for phones and tablets: a modal dialog that slides in from the left
+       as a floating glass sheet. Escape and backdrop clicks close it. -->
+  <dialog class="nav-drawer" id="nav-drawer" aria-label="Site navigation">
+    <div class="nav-drawer-header">
+      <a href="#hero" class="nav-drawer-brand" data-close-drawer>
+        <img src="./images/Logo.webp" alt="" width="36" height="36" />
+        <span class="wordmark">BAIA</span>
+      </a>
+      <button type="button" class="nav-drawer-close" data-close-drawer aria-label="Close navigation menu" autofocus>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="nav-drawer-body">
+      <nav class="nav-drawer-list" aria-label="Page sections">
+        <a href="#about" class="nav-drawer-item" data-close-drawer><span class="nav-drawer-idx">01</span><span class="nav-drawer-text">About</span></a>
+        <a href="#reviews" class="nav-drawer-item" data-close-drawer><span class="nav-drawer-idx">02</span><span class="nav-drawer-text">Photos</span></a>
+        <a href="#boards" class="nav-drawer-item" data-close-drawer><span class="nav-drawer-idx">03</span><span class="nav-drawer-text">The Shore</span></a>
+        <a href="#menu" class="nav-drawer-item" data-close-drawer><span class="nav-drawer-idx">04</span><span class="nav-drawer-text">Menu</span></a>
+        <a href="#drops" class="nav-drawer-item" data-close-drawer><span class="nav-drawer-idx">05</span><span class="nav-drawer-text">What's New</span></a>
+        <a href="#location" class="nav-drawer-item" data-close-drawer><span class="nav-drawer-idx">06</span><span class="nav-drawer-text">Visit &amp; Hours</span></a>
+      </nav>
+
+      <div class="nav-drawer-footer">
+        <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="nav-drawer-cta">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+            <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
+          </svg>
+          <span>Message us on Messenger</span>
+        </a>
+        <p class="nav-drawer-status" data-open-state=""><span class="nav-drawer-status-dot" aria-hidden="true"></span><span data-open-status>Open daily</span></p>
+        <p class="nav-drawer-location">Laurente Beach · Burias Island</p>
+      </div>
+    </div>
+  </dialog>
 
   <!-- MAIN CONTENT CONTAINER -->
   <main id="main-content" tabindex="-1">
-  <!-- 1. HERO SECTION (Commanding Vertical Focus — Fat Seed Energy with Coastal Restraint) -->
+  <!-- 1. HERO: the shore itself, with the brand headline over it -->
   <section class="hero-section" id="hero" data-theme="surface-blue" aria-label="Welcome to BAIA Cafe">
-    <!-- Ambient Floating Glyphs (BAIA Brand Logo Icons: Flower, Palm, Waves, Cup) -->
-    <div class="floating-glyphs-layer" aria-hidden="true">
-      <div class="floating-glyph glyph-1">
-        <img src="./images/baia-flower-white.webp" alt="" width="48" height="48" />
-      </div>
-      <div class="floating-glyph glyph-6">
-        <img src="./images/baia-palm-white.webp" alt="" width="52" height="52" />
-      </div>
-      <div class="floating-glyph glyph-8">
-        <img src="./images/baia-wave-white.webp" alt="" width="46" height="46" />
-      </div>
-      <div class="floating-glyph glyph-3">
-        <img src="./images/baia-cup-white.webp" alt="" width="44" height="44" />
-      </div>
-    </div>
+    <!-- The beach right now: sunrise, day, sunset or night (hero.css "TIME OF DAY") -->
+    <div class="hero-photo" role="img" aria-label="Laurente Beach at BAIA Cafe, as it looks at this time of day"></div>
+    <!-- A soft navy shade behind the headline; the rest of the photo keeps its colour -->
+    <div class="hero-scrim" aria-hidden="true"></div>
 
     <div class="container hero-grid">
-      <!-- Hero Left Column: Vertical Focus Typography Stack (Headline Block) -->
       <div class="hero-content headline-block">
-        <!-- Dominant Vertical-Focus Tagline (Fat Seed Inspiration) -->
         <h1 class="hero-headline hero-vertical-focus">
           <span class="tagline-stack">
             <span class="tagline-row row-coffee">
@@ -405,29 +438,6 @@ svg { display: block; max-width: 100%; }
           </span>
         </h1>
       </div>
-
-      <!-- Hero Right Column: 3D Visual Centerpiece -->
-      <div class="hero-visual-container">
-        <div class="hero-3d-card" id="hero-3d-card">
-          <div class="hero-image-frame">
-            <img 
-              id="hero-showcase-img"
-              src="./images/Baia%20skimboard%20and%20coffee.webp" 
-              alt="BAIA Hazelnut Iced Coffee and custom branded skimboard on the beach sand at Laurente shore" 
-              width="440" 
-              height="480" 
-              fetchpriority="high" 
-              decoding="sync" 
-            />
-          </div>
-
-          <!-- Floating Flavor Tag -->
-          <div class="floating-flavor-pill" id="hero-flavor-pill">
-            <span class="flavor-tag" id="hero-flavor-badge">House Special</span>
-            <span id="hero-flavor-title">Iced Hazelnut Latte &amp; Skimboard</span>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -467,25 +477,6 @@ svg { display: block; max-width: 100%; }
             Artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers, and the open shore. Located right on the beach sand in Barangay Laurente, San Pascual on Burias Island, Masbate, we serve specialty espresso, fresh hearty food, and offer complimentary skimboards for every cafe guest.
           </p>
 
-          <div class="story-stats-grid">
-            <div class="stat-item">
-              <span class="stat-num">100%</span>
-              <span class="stat-label">Artisan Beans & Bohol Salt</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-num">Daily</span>
-              <span class="stat-label">Fresh Burgers & Free Skimboards</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-num" data-hours="cafeCompact">11am–10pm</span>
-              <span class="stat-label">Beachfront Service</span>
-            </div>
-          </div>
-
-          <a href="/card/" class="btn-story-pill" id="hero-loyalty-cta">
-            <span id="hero-loyalty-cta-text">Join Loyalty Card</span>
-            <span aria-hidden="true">→</span>
-          </a>
         </div>
 
         <!-- Scattered Real Polaroid Gallery -->
@@ -525,286 +516,19 @@ svg { display: block; max-width: 100%; }
           <div class="atmosphere-overlay">Twilight ambience</div>
         </div>
         <div class="atmosphere-card">
-          <img src="./images/afternoonchill.webp" alt="Afternoon sea breeze at the beachfront dining tables" width="1200" height="690" loading="lazy" decoding="async" />
-          <div class="atmosphere-overlay">Afternoon breeze</div>
+          <img src="./images/stars-over-the-tree.webp" alt="The Milky Way over BAIA's beach tree and cottages at night" width="720" height="960" loading="lazy" decoding="async" />
+          <div class="atmosphere-overlay">Stars over the tree</div>
         </div>
         <div class="atmosphere-card">
           <img src="./images/afterdusk.webp" alt="Beach tables and string lanterns reflected in a round mirror on a tree after dusk" width="1179" height="1176" loading="lazy" decoding="async" />
           <div class="atmosphere-overlay">After dusk</div>
         </div>
         <div class="atmosphere-card">
-          <img src="./images/Cottage.webp" alt="Barangay Laurente Floating Cottage anchored on calm turquoise water" width="1179" height="1176" loading="lazy" decoding="async" />
-          <div class="atmosphere-overlay">Floating cottage</div>
+          <img src="./images/evening-walk.webp" alt="Someone walking a dog along the shallows under pink evening clouds at Laurente Beach" width="720" height="960" loading="lazy" decoding="async" />
+          <div class="atmosphere-overlay">Evening walk</div>
         </div>
       </div>
     </div>
-    </section>
-
-    <!-- ==========================================================================
-         NEW RELEASES & FACEBOOK DROPS SHOWCASE (Auto-Synced from Facebook)
-         ========================================================================== -->
-    <section class="new-drops-section" id="drops" data-theme="bay-blue" aria-label="New Releases and Facebook Food and Drink Drops">
-      <div class="section-floaties-layer" aria-hidden="true">
-        <div class="glass-floatie frost-white anim-1 size-lg shape-flower" style="top: 8%; left: 2%;">
-          <img src="./images/baia-flower-white.webp" alt="" class="floatie-icon-img" width="34" height="34" loading="lazy" decoding="async" />
-        </div>
-        <div class="glass-floatie frost-white anim-2 size-md shape-wave" style="top: 84%; right: 3%;">
-          <img src="./images/baia-wave-white.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
-        </div>
-        <div class="glass-floatie frost-white anim-3 size-md" style="top: 14%; right: 5%;">
-          <img src="./images/baia-cup-white.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
-        </div>
-        <div class="glass-floatie frost-white anim-4 size-xl" style="top: 58%; left: 2.5%;">
-          <img src="./images/baia-palm-white.webp" alt="" class="floatie-icon-img" width="40" height="40" loading="lazy" decoding="async" />
-        </div>
-      </div>
-      <div class="container" id="new-drops-root">
-        <!-- Injected dynamically by src/components/newDrops.js -->
-      </div>
-    </section>
-
-  <!-- ==========================================================================
-       SEASONAL PROMOS & HOLIDAY EVENTS SECTION (SCAFFOLDED PLACEHOLDER)
-       Toggle: Controlled via SHOW_PROMOS_SECTION flag in src/main.js (defaults to false).
-       To enable: Set SHOW_PROMOS_SECTION = true in src/main.js or remove hidden attribute.
-       ========================================================================== -->
-  <section class="seasonal-events-section is-hidden" id="seasonal-events" aria-label="Seasonal Events and Holiday Specials" hidden>
-    <div class="container">
-      <div class="events-header-block">
-        <span class="events-tag-pill">Beachside Events</span>
-        <h2 class="events-title">
-          <span class="script-accent">Beachside</span>
-          <span class="wordmark">Events &amp; Specials</span>
-        </h2>
-        <p class="events-subtitle">
-          Upcoming sunset acoustic sessions, holiday beach celebrations, and seasonal guest specials.
-        </p>
-      </div>
-
-      <div class="events-cards-grid">
-        <!-- Event Card 1: Sunset Acoustic Weekend -->
-        <article class="event-card">
-          <div class="event-card-badge">Upcoming Event</div>
-          <h3 class="event-card-title">Sunset Acoustic by the Shore</h3>
-          <p class="event-card-date">Saturday Evenings • 5:00 PM – 8:00 PM</p>
-          <p class="event-card-desc">Live beach acoustic music, coastal fairy lights, and signature Asin Tibuok iced lattes right on the sand.</p>
-          <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-event-rsvp">Reserve a Beach Spot →</a>
-        </article>
-
-        <!-- Event Card 2: Seasonal Holiday Feature -->
-        <article class="event-card">
-          <div class="event-card-badge">Seasonal Special</div>
-          <h3 class="event-card-title">Holiday Bay Roast &amp; Coconut Cold Brew</h3>
-          <p class="event-card-date">Limited Seasonal Feature</p>
-          <p class="event-card-desc">Freshly harvested Masbate coconut water infused with artisan slow-drip cold brew and toasted cinnamon spice.</p>
-          <button class="btn-event-rsvp" data-open-cart>Explore Holiday Menu →</button>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- 6. HOUSE SIGNATURES SHOWCASE TILES (Fat Seed Illustrated Creative Direction) -->
-  <section class="promo-grid-section" id="promos" data-theme="sand-deck" aria-label="House Signatures and Specialties">
-    <div class="section-floaties-layer" aria-hidden="true">
-      <div class="glass-floatie frost-blue anim-2 size-lg" style="top: 5%; right: 3%;">
-        <img src="./images/baia-palm-icon.webp" alt="" class="floatie-icon-img" width="34" height="34" loading="lazy" decoding="async" />
-      </div>
-      <div class="glass-floatie frost-blue anim-1 size-md" style="top: 88%; left: 2%;">
-        <img src="./images/baia-cup-icon.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
-      </div>
-      <div class="glass-floatie frost-blue anim-3 size-md shape-wave" style="top: 40%; left: 1.5%;">
-        <img src="./images/baia-wave-icon.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
-      </div>
-      <div class="glass-floatie frost-blue anim-4 size-xl shape-flower" style="top: 70%; right: 2%;">
-        <img src="./images/baia-flower-icon.webp" alt="" class="floatie-icon-img" width="40" height="40" loading="lazy" decoding="async" />
-      </div>
-    </div>
-    <div class="container">
-      <!-- Illustrated Header with Scattered Brand Doodles -->
-      <div class="promo-header-block">
-        <div class="promo-doodle-container">
-          <!-- Brand Doodle: Bubbly Beach Flower (Amber & Hot Pink) -->
-          <svg class="doodle-accent doodle-flower" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M24 16C24 10 18 10 18 16C12 16 12 22 18 22C12 24 12 30 18 30C18 36 24 36 24 30C24 36 30 36 30 30C36 30 36 24 30 22C36 22 36 16 30 16C30 10 24 10 24 16Z" fill="#F5A623" stroke="#FAF4EB" stroke-width="2.5" stroke-linejoin="round" />
-            <circle cx="24" cy="22" r="4.5" fill="#E8237A" stroke="#FAF4EB" stroke-width="1.5" />
-          </svg>
-
-          <!-- Brand Doodle: Coffee Cup with Steam Swirl (Cream & Navy) -->
-          <svg class="doodle-accent doodle-cup" viewBox="0 0 54 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M8 20C8 20 9 38 24 38C39 38 40 20 40 20H8Z" fill="#FAF4EB" stroke="#16255C" stroke-width="2.5" stroke-linejoin="round" />
-            <path d="M40 24C45 24 48 26 48 29C48 32 45 34 40 34" stroke="#FAF4EB" stroke-width="2.5" stroke-linecap="round" />
-            <path d="M16 14C16 11 18 8 20 6C22 4 20 2 20 2" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" />
-            <path d="M26 15C26 11 28 8 30 6C32 4 30 2 30 2" stroke="#E8237A" stroke-width="2.5" stroke-linecap="round" />
-          </svg>
-
-          <!-- Brand Doodle: Tropical Palm Frond (Golden Amber) -->
-          <svg class="doodle-accent doodle-palm" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M10 40C16 32 26 22 40 10" stroke="#F5A623" stroke-width="3" stroke-linecap="round" />
-            <path d="M24 24C28 18 34 16 40 16" stroke="#FAF4EB" stroke-width="2.5" stroke-linecap="round" />
-            <path d="M20 28C22 34 26 38 32 40" stroke="#FAF4EB" stroke-width="2.5" stroke-linecap="round" />
-            <path d="M30 18C36 14 42 12 44 14" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" />
-            <path d="M26 22C28 28 32 32 36 34" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" />
-          </svg>
-
-          <!-- Brand Doodle: Ocean Wave Squiggle -->
-          <svg class="doodle-accent doodle-wave" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M4 12C9 6 15 6 20 12C25 18 31 18 36 12C41 6 47 6 52 12" stroke="#F5A623" stroke-width="3" stroke-linecap="round" />
-            <path d="M8 18C12 14 16 14 20 18C24 22 28 22 32 18C36 14 40 14 44 18" stroke="#FAF4EB" stroke-width="2" stroke-linecap="round" opacity="0.8" />
-          </svg>
-
-          <!-- Illustrated Tag Pill -->
-          <div class="promo-tag-pill">
-            <span>House Specials &amp; Favorites</span>
-          </div>
-
-          <!-- Hand-Lettered Bubbly Headline Treatment (Fat Seed technique in BAIA palette) -->
-          <h2 class="promo-illustrated-title">
-            <span class="title-word-script">House</span>
-            <span class="title-word-bold">SIGNATURES</span>
-          </h2>
-
-          <p class="promo-subtitle">
-            Handcrafted beachside bites & signature brews made to order right by the Burias Island waves.
-          </p>
-        </div>
-      </div>
-
-        <div class="promo-grid">
-          <!-- CARD 1: Ready-to-Sip (Fruit Sodas & Frappes) -->
-          <article class="poster-card card-ready-sip">
-            <div class="card-top-content">
-              <span class="card-script-title">Ready-to-Sip</span>
-              <h3 class="card-main-title">FRUIT SODAS & FRAPPES</h3>
-              <p class="card-body-text">
-                Sunset Fizz (Peach), Crimson Pop (Strawberry), Island Fizz, and whipped frappes crafted for tropical days.
-              </p>
-            </div>
-            <div class="card-image-box">
-              <img 
-                src="./images/Tripleorder.webp" 
-                alt="Trio of BAIA iced fruit sodas and blueberry frappes on cafe table" 
-                width="1200" 
-                height="682" 
-                loading="lazy" 
-                decoding="async" 
-              />
-            </div>
-            <div class="card-action-bar">
-              <span class="card-price-highlight">From ₱135</span>
-              <button class="btn-card-action" data-order-drinks-filter>
-                Browse Drinks →
-              </button>
-            </div>
-          </article>
-
-          <!-- CARD 2: The Spicy Bite (BAIA Smash Burger) -->
-          <article class="poster-card card-spicy-bite">
-            <div class="spicy-flame-burst" aria-hidden="true"></div>
-            <div class="card-top-content" style="z-index: 4;">
-              <span class="spicy-badge-pill">Freshly Smashed</span>
-              <h3 class="card-main-title">BAIA SMASH</h3>
-              <p class="card-body-text">
-                Crispy double beef smash patties, molten cheddar cheese, smokey bacon, and seasoned fries.
-              </p>
-            </div>
-            <div class="card-image-box">
-              <img 
-                src="./images/smashburger.webp" 
-                alt="BAIA Double Smash Burger with melted cheddar cheese and crispy seasoned fries" 
-                width="1179" 
-                height="1176" 
-                loading="lazy" 
-                decoding="async" 
-              />
-            </div>
-            <div class="card-action-bar">
-              <span class="card-price-highlight">₱230</span>
-              <button class="btn-card-action" data-order-item="burger-smash">
-                Add to Order
-              </button>
-            </div>
-          </article>
-
-          <!-- CARD 3: Popular Shore Pairing Receipt Card -->
-          <article class="poster-card card-double-trouble">
-            <div class="receipt-paper">
-              <div class="receipt-zigzag-top" aria-hidden="true"></div>
-              <div class="receipt-zigzag-bottom" aria-hidden="true"></div>
-
-              <!-- Metal Binder Clip Graphic -->
-              <div class="binder-clip-graphic" aria-hidden="true">
-                <svg viewBox="0 0 44 32" width="44" height="32">
-                  <rect x="12" y="8" width="20" height="20" rx="3" fill="#334155" stroke="#0F172A" stroke-width="2" />
-                  <path d="M16 8 C16 0, 28 0, 28 8" fill="none" stroke="#CBD5E1" stroke-width="2.5" />
-                  <path d="M18 28 C18 32, 26 32, 26 28" fill="none" stroke="#94A3B8" stroke-width="1.5" />
-                </svg>
-              </div>
-
-              <div class="receipt-header">
-                <h3 class="receipt-logo-title">BAIA CAFE</h3>
-                <p class="receipt-tagline">Popular Beachside Pairing</p>
-              </div>
-
-              <div class="receipt-pairing-banner">
-                POPULAR SHORE PAIRING
-              </div>
-
-              <div class="receipt-item-list">
-                <div class="receipt-row">
-                  <span>1x BAIA Smash Burger</span>
-                  <span>₱230</span>
-                </div>
-                <div class="receipt-row">
-                  <span>1x Sea Salt Latte (Iced)</span>
-                  <span>₱180</span>
-                </div>
-                <div class="receipt-row">
-                  <span>1x Chili BBQ Seasoned Fries</span>
-                  <span>₱155</span>
-                </div>
-              </div>
-
-              <div class="receipt-total-row">
-                <span class="receipt-total-label">PAIRING TOTAL</span>
-                <span class="receipt-total-amount">₱565</span>
-              </div>
-
-              <button class="btn-bundle-order" data-order-bundle="double-trouble">
-                Add Pairing to Order
-              </button>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. INTERACTIVE MENU EXPLORER (50+ Items with 1-Click Ordering) -->
-    <section class="menu-section" id="menu" data-theme="ocean-depth" aria-label="Full BAIA Cafe Menu Explorer">
-      <div class="section-floaties-layer" aria-hidden="true">
-        <div class="glass-floatie frost-white anim-3 size-xl" style="top: 6%; left: 3%;">
-          <img src="./images/baia-cup-white.webp" alt="" class="floatie-icon-img" width="40" height="40" loading="lazy" decoding="async" />
-        </div>
-        <div class="glass-floatie frost-white anim-1 size-lg shape-flower" style="top: 82%; right: 3%;">
-          <img src="./images/baia-flower-white.webp" alt="" class="floatie-icon-img" width="34" height="34" loading="lazy" decoding="async" />
-        </div>
-        <div class="glass-floatie frost-white anim-2 size-md" style="top: 34%; right: 2%;">
-          <img src="./images/baia-palm-white.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
-        </div>
-        <div class="glass-floatie frost-white anim-4 size-md shape-wave" style="top: 62%; left: 2%;">
-          <img src="./images/baia-wave-white.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
-        </div>
-      </div>
-      <div class="container">
-        <div class="menu-header-wrapper">
-          <h2 class="menu-main-title">Crafted Fresh Daily</h2>
-          <p class="menu-subtitle">
-            Authentic espresso, signature Asin Tibuok lattes, blended frappes, sizzling rice meals & gourmet double smash burgers.
-          </p>
-        </div>
-
-        <!-- Menu Root Component -->
-        <div id="menu-explorer-root"></div>
-      </div>
     </section>
 
         <!-- 6. COMMUNITY PHOTO WALL & BAIA FAMILY COLLAGE -->
@@ -1294,6 +1018,215 @@ svg { display: block; max-width: 100%; }
         <div class="boards-grid" id="boards-grid-root"></div>
       </div>
     </section>
+
+  <!-- 6. HOUSE SIGNATURES SHOWCASE TILES (Fat Seed Illustrated Creative Direction) -->
+  <section class="promo-grid-section" id="promos" data-theme="sand-deck" aria-label="House Signatures and Specialties">
+    <div class="section-floaties-layer" aria-hidden="true">
+      <div class="glass-floatie frost-blue anim-2 size-lg" style="top: 5%; right: 3%;">
+        <img src="./images/baia-palm-icon.webp" alt="" class="floatie-icon-img" width="34" height="34" loading="lazy" decoding="async" />
+      </div>
+      <div class="glass-floatie frost-blue anim-1 size-md" style="top: 88%; left: 2%;">
+        <img src="./images/baia-cup-icon.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
+      </div>
+      <div class="glass-floatie frost-blue anim-3 size-md shape-wave" style="top: 40%; left: 1.5%;">
+        <img src="./images/baia-wave-icon.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
+      </div>
+      <div class="glass-floatie frost-blue anim-4 size-xl shape-flower" style="top: 70%; right: 2%;">
+        <img src="./images/baia-flower-icon.webp" alt="" class="floatie-icon-img" width="40" height="40" loading="lazy" decoding="async" />
+      </div>
+    </div>
+    <div class="container">
+      <!-- Illustrated Header with Scattered Brand Doodles -->
+      <div class="promo-header-block">
+        <div class="promo-doodle-container">
+          <!-- Brand Doodle: Bubbly Beach Flower (Amber & Hot Pink) -->
+          <svg class="doodle-accent doodle-flower" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M24 16C24 10 18 10 18 16C12 16 12 22 18 22C12 24 12 30 18 30C18 36 24 36 24 30C24 36 30 36 30 30C36 30 36 24 30 22C36 22 36 16 30 16C30 10 24 10 24 16Z" fill="#F5A623" stroke="#FAF4EB" stroke-width="2.5" stroke-linejoin="round" />
+            <circle cx="24" cy="22" r="4.5" fill="#E8237A" stroke="#FAF4EB" stroke-width="1.5" />
+          </svg>
+
+          <!-- Brand Doodle: Coffee Cup with Steam Swirl (Cream & Navy) -->
+          <svg class="doodle-accent doodle-cup" viewBox="0 0 54 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M8 20C8 20 9 38 24 38C39 38 40 20 40 20H8Z" fill="#FAF4EB" stroke="#16255C" stroke-width="2.5" stroke-linejoin="round" />
+            <path d="M40 24C45 24 48 26 48 29C48 32 45 34 40 34" stroke="#FAF4EB" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M16 14C16 11 18 8 20 6C22 4 20 2 20 2" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M26 15C26 11 28 8 30 6C32 4 30 2 30 2" stroke="#E8237A" stroke-width="2.5" stroke-linecap="round" />
+          </svg>
+
+          <!-- Brand Doodle: Tropical Palm Frond (Golden Amber) -->
+          <svg class="doodle-accent doodle-palm" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M10 40C16 32 26 22 40 10" stroke="#F5A623" stroke-width="3" stroke-linecap="round" />
+            <path d="M24 24C28 18 34 16 40 16" stroke="#FAF4EB" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M20 28C22 34 26 38 32 40" stroke="#FAF4EB" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M30 18C36 14 42 12 44 14" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M26 22C28 28 32 32 36 34" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" />
+          </svg>
+
+          <!-- Brand Doodle: Ocean Wave Squiggle -->
+          <svg class="doodle-accent doodle-wave" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 12C9 6 15 6 20 12C25 18 31 18 36 12C41 6 47 6 52 12" stroke="#F5A623" stroke-width="3" stroke-linecap="round" />
+            <path d="M8 18C12 14 16 14 20 18C24 22 28 22 32 18C36 14 40 14 44 18" stroke="#FAF4EB" stroke-width="2" stroke-linecap="round" opacity="0.8" />
+          </svg>
+          <!-- Hand-Lettered Bubbly Headline Treatment (Fat Seed technique in BAIA palette) -->
+          <h2 class="promo-illustrated-title">
+            <span class="title-word-script">House</span>
+            <span class="title-word-bold">SIGNATURES</span>
+          </h2>
+
+          <p class="promo-subtitle">
+            Handcrafted beachside bites & signature brews made to order right by the Burias Island waves.
+          </p>
+        </div>
+      </div>
+
+        <!-- Three things to try first: compact cards, a swipeable row on phones -->
+      <div class="signature-row">
+        <article class="signature-card">
+          <div class="signature-photo">
+            <img src="./images/Tripleorder.webp" alt="Trio of BAIA iced fruit sodas and blueberry frappes on a cafe table" width="960" height="546" loading="lazy" decoding="async" />
+          </div>
+          <div class="signature-body">
+            <span class="signature-kicker">Ready to sip</span>
+            <h3 class="signature-title">Fruit Sodas &amp; Frappes</h3>
+            <p class="signature-text">Sunset Fizz, Crimson Pop, Island Fizz and whipped frappes.</p>
+            <div class="signature-foot">
+              <span class="signature-price">From &#8369;135</span>
+              <button type="button" class="signature-btn" data-order-drinks-filter>Browse drinks</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="signature-card">
+          <div class="signature-photo">
+            <img src="./images/smashburger.webp" alt="BAIA double smash burger with melted cheddar and seasoned fries" width="960" height="958" loading="lazy" decoding="async" />
+          </div>
+          <div class="signature-body">
+            <span class="signature-kicker">Freshly smashed</span>
+            <h3 class="signature-title">BAIA Smash</h3>
+            <p class="signature-text">Double beef patties, molten cheddar, smoky bacon and seasoned fries.</p>
+            <div class="signature-foot">
+              <span class="signature-price">&#8369;230</span>
+              <button type="button" class="signature-btn" data-order-item="burger-smash">Add to order</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- The pairing keeps its receipt, sized to the same slot as the photos -->
+        <article class="signature-card">
+          <div class="signature-photo signature-receipt" aria-label="Pairing receipt">
+            <p class="signature-receipt-title">BAIA Cafe</p>
+            <ul class="signature-receipt-list">
+              <li><span>BAIA Smash Burger</span><span>&#8369;230</span></li>
+              <li><span>Sea Salt Latte (Iced)</span><span>&#8369;180</span></li>
+              <li><span>Chili BBQ Seasoned Fries</span><span>&#8369;155</span></li>
+            </ul>
+            <p class="signature-receipt-total"><span>Total</span><span>&#8369;565</span></p>
+          </div>
+          <div class="signature-body">
+            <span class="signature-kicker">Shore pairing</span>
+            <h3 class="signature-title">Burger, Latte &amp; Fries</h3>
+            <p class="signature-text">The popular beach lunch, added in one tap.</p>
+            <div class="signature-foot">
+              <span class="signature-price">&#8369;565</span>
+              <button type="button" class="signature-btn" data-order-bundle="double-trouble">Add pairing</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+    </section>
+
+    <!-- 5. INTERACTIVE MENU EXPLORER (50+ Items with 1-Click Ordering) -->
+    <section class="menu-section" id="menu" data-theme="ocean-depth" aria-label="Full BAIA Cafe Menu Explorer">
+      <div class="section-floaties-layer" aria-hidden="true">
+        <div class="glass-floatie frost-white anim-3 size-xl" style="top: 6%; left: 3%;">
+          <img src="./images/baia-cup-white.webp" alt="" class="floatie-icon-img" width="40" height="40" loading="lazy" decoding="async" />
+        </div>
+        <div class="glass-floatie frost-white anim-1 size-lg shape-flower" style="top: 82%; right: 3%;">
+          <img src="./images/baia-flower-white.webp" alt="" class="floatie-icon-img" width="34" height="34" loading="lazy" decoding="async" />
+        </div>
+        <div class="glass-floatie frost-white anim-2 size-md" style="top: 34%; right: 2%;">
+          <img src="./images/baia-palm-white.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
+        </div>
+        <div class="glass-floatie frost-white anim-4 size-md shape-wave" style="top: 62%; left: 2%;">
+          <img src="./images/baia-wave-white.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
+        </div>
+      </div>
+      <div class="container">
+        <div class="menu-header-wrapper">
+          <h2 class="menu-main-title">Crafted Fresh Daily</h2>
+          <p class="menu-subtitle">
+            Authentic espresso, signature Asin Tibuok lattes, blended frappes, sizzling rice meals & gourmet double smash burgers.
+          </p>
+        </div>
+
+        <!-- Menu Root Component -->
+        <div id="menu-explorer-root"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         NEW RELEASES & FACEBOOK DROPS SHOWCASE (Auto-Synced from Facebook)
+         ========================================================================== -->
+    <section class="new-drops-section" id="drops" data-theme="bay-blue" aria-label="What's new at BAIA">
+      <div class="section-floaties-layer" aria-hidden="true">
+        <div class="glass-floatie frost-white anim-1 size-lg shape-flower" style="top: 8%; left: 2%;">
+          <img src="./images/baia-flower-white.webp" alt="" class="floatie-icon-img" width="34" height="34" loading="lazy" decoding="async" />
+        </div>
+        <div class="glass-floatie frost-white anim-2 size-md shape-wave" style="top: 84%; right: 3%;">
+          <img src="./images/baia-wave-white.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
+        </div>
+        <div class="glass-floatie frost-white anim-3 size-md" style="top: 14%; right: 5%;">
+          <img src="./images/baia-cup-white.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
+        </div>
+        <div class="glass-floatie frost-white anim-4 size-xl" style="top: 58%; left: 2.5%;">
+          <img src="./images/baia-palm-white.webp" alt="" class="floatie-icon-img" width="40" height="40" loading="lazy" decoding="async" />
+        </div>
+      </div>
+      <div class="container" id="new-drops-root">
+        <!-- Injected dynamically by src/components/newDrops.js -->
+      </div>
+    </section>
+
+  <!-- ==========================================================================
+       SEASONAL PROMOS & HOLIDAY EVENTS SECTION (SCAFFOLDED PLACEHOLDER)
+       Toggle: Controlled via SHOW_PROMOS_SECTION flag in src/main.js (defaults to false).
+       To enable: Set SHOW_PROMOS_SECTION = true in src/main.js or remove hidden attribute.
+       ========================================================================== -->
+  <section class="seasonal-events-section is-hidden" id="seasonal-events" aria-label="Seasonal Events and Holiday Specials" hidden>
+    <div class="container">
+      <div class="events-header-block">
+        <span class="events-tag-pill">Beachside Events</span>
+        <h2 class="events-title">
+          <span class="script-accent">Beachside</span>
+          <span class="wordmark">Events &amp; Specials</span>
+        </h2>
+        <p class="events-subtitle">
+          Upcoming sunset acoustic sessions, holiday beach celebrations, and seasonal guest specials.
+        </p>
+      </div>
+
+      <div class="events-cards-grid">
+        <!-- Event Card 1: Sunset Acoustic Weekend -->
+        <article class="event-card">
+          <div class="event-card-badge">Upcoming Event</div>
+          <h3 class="event-card-title">Sunset Acoustic by the Shore</h3>
+          <p class="event-card-date">Saturday Evenings • 5:00 PM – 8:00 PM</p>
+          <p class="event-card-desc">Live beach acoustic music, coastal fairy lights, and signature Asin Tibuok iced lattes right on the sand.</p>
+          <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-event-rsvp">Reserve a Beach Spot →</a>
+        </article>
+
+        <!-- Event Card 2: Seasonal Holiday Feature -->
+        <article class="event-card">
+          <div class="event-card-badge">Seasonal Special</div>
+          <h3 class="event-card-title">Holiday Bay Roast &amp; Coconut Cold Brew</h3>
+          <p class="event-card-date">Limited Seasonal Feature</p>
+          <p class="event-card-desc">Freshly harvested Masbate coconut water infused with artisan slow-drip cold brew and toasted cinnamon spice.</p>
+          <button class="btn-event-rsvp" data-open-cart>Explore Holiday Menu →</button>
+        </article>
+      </div>
+    </div>
+  </section>
   </main>
 
   <!-- 9. SITE FOOTER & TRUST ANCHORS -->
@@ -1377,6 +1310,7 @@ svg { display: block; max-width: 100%; }
               <span>View My Order</span>
             </button>
           </div>
+          <a href="/card/" class="footer-loyalty-link">Coming back? Collect stamps on your BAIA loyalty card <span aria-hidden="true">&rarr;</span></a>
         </div>
       </div>
     </div>
@@ -1409,18 +1343,26 @@ svg { display: block; max-width: 100%; }
     aria-labelledby="drawer-heading"
     inert
   >
+    <!-- Grab handle: drag the sheet down to close it on phones (cartDrawer.js) -->
+    <div class="drawer-grabber" aria-hidden="true"></div>
+
     <!-- Drawer Header -->
     <div class="drawer-header">
       <div class="drawer-title-group">
-        <h3 id="drawer-heading">My Order</h3>
+        <h3 id="drawer-heading">Your Order</h3>
         <span class="drawer-count-tag" data-empty>0</span>
       </div>
-      <button class="btn-close-drawer" id="drawer-close-btn" aria-label="Close order drawer">✕</button>
+      <div class="drawer-header-actions">
+        <button class="btn-clear-cart" id="drawer-clear-btn" aria-label="Clear all items in order">Clear</button>
+        <button class="btn-close-drawer" id="drawer-close-btn" aria-label="Close order drawer">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
     </div>
 
-    <!-- Order Type Picker -->
+    <!-- Order Type Picker: an iOS-style segmented control -->
     <div class="order-type-picker">
-      <span class="spot-picker-label">Choose Order Type:</span>
+      <span class="spot-picker-label">Order type</span>
       <div class="spot-options-grid" role="radiogroup" aria-label="Select order type">
         <button class="spot-btn active" data-spot="Dine-In at Cafe" aria-pressed="true">
           Dine-In
@@ -1458,7 +1400,7 @@ svg { display: block; max-width: 100%; }
           <span id="drawer-delivery-fee">₱0</span>
         </div>
         <div class="drawer-total-row grand-total-row">
-          <span>Estimated Total</span>
+          <span>Total</span>
           <span id="drawer-grand-total">₱0</span>
         </div>
       </div>
@@ -1469,40 +1411,40 @@ svg { display: block; max-width: 100%; }
             <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
           </svg>
           <span>Send Order on Messenger</span>
-          <span aria-hidden="true">→</span>
         </button>
-        <button class="btn-clear-cart" id="drawer-clear-btn" aria-label="Clear all items in order">Clear</button>
       </div>
     </div>
   </aside>
 
-  <!-- 11. MOBILE STICKY FLOATING ORDER BAR (Visible on 375px and 768px viewports) -->
-  <div class="mobile-sticky-bar" id="mobile-sticky-bar" aria-label="Mobile quick order bar">
-    <div class="mobile-bar-inner">
-      <a href="#drops" class="mobile-bar-menu-btn" style="background: rgba(232, 35, 122, 0.25); border-color: rgba(232, 35, 122, 0.5); color: #ff6b9d;">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-        </svg>
-        <span>Drops</span>
-      </a>
-      <a href="#menu" class="mobile-bar-menu-btn">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+  <!-- 11. PHONE TAB BAR: a floating glass capsule with two tabs, and the order as
+       its own button beside it (iOS 26/27 style). Shown from the Menu on (main.js). -->
+  <nav class="mobile-sticky-bar" id="mobile-sticky-bar" aria-label="Quick links">
+    <div class="mobile-bar-tabs">
+      <a href="#menu" class="mobile-bar-tab">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"></path>
         </svg>
         <span>Menu</span>
       </a>
-      <button class="mobile-bar-cart-btn" data-open-cart aria-label="My Order — review and send your order">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block; vertical-align: -1px;">
-          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <path d="M16 10a4 4 0 0 1-8 0"></path>
+      <a href="#drops" class="mobile-bar-tab">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path>
+          <path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"></path>
         </svg>
-        <span>My Order</span>
-        <span class="mobile-cart-badge cart-count-badge" data-empty>0</span>
-      </button>
+        <span>What's New</span>
+      </a>
     </div>
-  </div>
+    <button class="mobile-bar-cart-btn" data-open-cart aria-label="My Order — review and send your order">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <path d="M16 10a4 4 0 0 1-8 0"></path>
+      </svg>
+      <span>My Order</span>
+      <span class="mobile-cart-badge cart-count-badge" data-empty>0</span>
+    </button>
+  </nav>
 
   <!-- Animated Detail Lightbox Modal (Clean, No fake badges/ratings) -->
         <div id="polaroid-modal" class="polaroid-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">

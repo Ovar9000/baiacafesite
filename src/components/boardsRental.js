@@ -1,10 +1,13 @@
 import { boardsData, cottageData } from '../data/boardsData.js';
 
 const escBoards = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-const safeImgBoards = (u, fb = './images/Baia%20skimboard%20and%20coffee.webp') => {
+const safeImgBoards = (u, fb = '/images/Baia%20skimboard%20and%20coffee.webp') => {
   if (typeof u !== 'string') return fb;
   const t = u.trim();
-  if (t.startsWith('/') || t.startsWith('./') || t.startsWith('images/')) return t;
+  // Root-relative, so the same paths work on the homepage and on /floating-cottage/
+  if (t.startsWith('./')) return t.slice(1);
+  if (t.startsWith('images/')) return `/${t}`;
+  if (t.startsWith('/')) return t;
   return t.startsWith('https://') ? t : fb;
 };
 
@@ -13,52 +16,21 @@ export function initBoardsRental() {
   const cottageContainer = document.getElementById('cottage-showcase-root');
   if (!container) return;
 
-  // Render Floating Cottage Showcase Card if empty
+  // The homepage shows a teaser; rates and booking live on /floating-cottage/
   if (cottageContainer && cottageContainer.children.length === 0) {
+    const fromPrice = Math.min(...cottageData.rates.map((r) => Number(r.price)));
     cottageContainer.innerHTML = `
-      <div class="cottage-showcase-box">
-        <div>
-          <span class="cottage-badge-tag">Official Booking Partner</span>
+      <a href="/floating-cottage/" class="cottage-teaser">
+        <div class="cottage-teaser-photo">
+          <img src="${safeImgBoards(cottageData.cottagePhoto)}" alt="The Barangay Laurente Floating Cottage anchored on calm turquoise water" width="960" height="958" loading="lazy" decoding="async" />
+        </div>
+        <div class="cottage-teaser-text">
+          <span class="cottage-badge-tag">Floating Cottage</span>
           <h3 class="cottage-title">${escBoards(cottageData.title)}</h3>
-          <p class="cottage-partner">${escBoards(cottageData.subtitle)} • Operating ${escBoards(cottageData.hours)}</p>
-
-          <div class="cottage-rates-grid">
-            ${cottageData.rates.map(r => `
-              <div class="rate-box">
-                <div class="rate-group-title">${escBoards(r.group)} (${escBoards(r.capacity)})</div>
-                <div class="rate-amount">₱${Number(r.price).toLocaleString()}</div>
-                <div class="rate-cap">${escBoards(r.badge)}</div>
-              </div>
-            `).join('')}
-          </div>
-
-          <ul class="cottage-perks-list">
-            ${cottageData.features.map(f => `<li>${escBoards(f)}</li>`).join('')}
-            <li>Snorkeling Mask Rental: <strong>₱50.00</strong></li>
-          </ul>
-
-          <div class="cottage-actions">
-            <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow" style="background: #0084FF;">
-              <span>Book via Facebook Messenger</span>
-              <span aria-hidden="true">↗</span>
-            </a>
-            <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill">
-              <span>View Photos @thebaiacafe</span>
-            </a>
-          </div>
+          <p class="cottage-teaser-meta">Boarding daily from BAIA &middot; from &#8369;${fromPrice.toLocaleString()} per group</p>
+          <span class="cottage-teaser-link">Rates &amp; booking <span aria-hidden="true">&rarr;</span></span>
         </div>
-
-        <div class="cottage-image-frame">
-          <img 
-            src="${safeImgBoards(cottageData.image)}" 
-            alt="Barangay Laurente Floating Cottage with BAIA Cafe booking partner" 
-            width="1200" 
-            height="630" 
-            loading="lazy" 
-            decoding="async" 
-          />
-        </div>
-      </div>
+      </a>
     `;
   }
 
@@ -145,4 +117,63 @@ export function initBoardsRental() {
       );
     });
   });
+}
+
+/**
+ * Full floating cottage details (rates, inclusions, guidelines, booking) for
+ * the /floating-cottage/ page.
+ */
+export function renderCottageDetails(el) {
+  if (!el) return;
+  el.innerHTML = `
+    <div class="cottage-showcase-box">
+      <div>
+        <span class="cottage-badge-tag">Book through BAIA</span>
+        <p class="cottage-partner">Boarding daily ${escBoards(cottageData.hours)}</p>
+
+        <div class="cottage-rates-grid">
+          ${cottageData.rates.map(r => `
+            <div class="rate-box">
+              <div class="rate-group-title">${escBoards(r.group)} (${escBoards(r.capacity)})</div>
+              <div class="rate-amount">₱${Number(r.price).toLocaleString()}</div>
+              <div class="rate-cap">${escBoards(r.badge)}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <ul class="cottage-perks-list">
+          ${cottageData.features.map(f => `<li>${escBoards(f)}</li>`).join('')}
+          <li>Snorkeling Mask Rental: <strong>₱50.00</strong></li>
+        </ul>
+
+        <div class="cottage-actions">
+          <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow" style="background: #0084FF; color: #fff;">
+            <span>Book via Facebook Messenger</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+          <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill">
+            <span>View Photos @thebaiacafe</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="cottage-image-frame">
+        <img 
+          src="${safeImgBoards(cottageData.image)}" 
+          alt="Barangay Laurente Floating Cottage with BAIA Cafe booking partner" 
+          width="1200" 
+          height="630" 
+          loading="lazy" 
+          decoding="async" 
+        />
+      </div>
+    </div>
+    
+    <div class="cottage-guidelines">
+      <h2 class="cottage-guidelines-title">Good to know</h2>
+      <ul class="cottage-perks-list">
+        ${cottageData.guidelines.map((g) => `<li>${escBoards(g)}</li>`).join('')}
+      </ul>
+    </div>
+  `;
 }

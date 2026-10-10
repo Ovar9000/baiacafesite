@@ -5,7 +5,7 @@
 .promo-grid-section {
   background: var(--depth-sand-deck, #FAF4EB);
   color: var(--deep-navy);
-  padding: 110px 0 130px 0;
+  padding: 72px 0 80px 0;
   position: relative;
   overflow: hidden;
 }
@@ -14,7 +14,7 @@
 .promo-header-block {
   text-align: center;
   max-width: 820px;
-  margin: 0 auto 72px auto;
+  margin: 0 auto 36px auto;
   position: relative;
 }
 
@@ -107,38 +107,14 @@
   100% { transform: scale(1.15) rotate(15deg); opacity: 1; }
 }
 
-/* Illustrated Section Tag Pill */
-.promo-tag-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(30, 74, 255, 0.08);
-  backdrop-filter: blur(8px);
-  border: 1.5px solid rgba(30, 74, 255, 0.2);
-  color: var(--royal-blue);
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  padding: 6px 18px;
-  border-radius: var(--radius-pill);
-  margin-bottom: 16px;
-}
-
-.doodle-sparkle-icon {
-  color: var(--golden-amber);
-  font-size: 0.85rem;
-}
-
 /* Hand-Lettered Bubbly Title Display */
 .promo-illustrated-title {
   font-family: var(--font-headline);
   font-weight: 900;
-  font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+  font-size: clamp(2rem, 4.2vw, 3rem);
   line-height: 1.05;
   text-transform: uppercase;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.01em;
   color: var(--deep-navy);
   display: flex;
   align-items: center;
@@ -159,11 +135,11 @@
 
 .title-word-bold {
   color: var(--deep-navy);
-  letter-spacing: -0.04em;
+  letter-spacing: -0.01em;
 }
 
 .promo-subtitle {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #4b5876;
   margin-top: 16px;
   max-width: 580px;
@@ -172,349 +148,15 @@
   line-height: 1.5;
 }
 
-/* 3-Column Promo Grid with Generous Spacing */
-.promo-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
-  align-items: stretch;
-}
-
-/* Individual Poster Card Container */
-.poster-card {
-  position: relative;
-  background: var(--deep-navy);
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-  display: flex;
-  flex-direction: column;
-  border: 3px solid rgba(255, 255, 255, 0.18);
-  transition: transform 0.35s var(--ease-spring), box-shadow 0.35s ease, border-color 0.35s ease;
-}
-
-.poster-card:hover {
-  transform: translateY(-8px);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-/* -------------------------------------------------------------
-   CARD 1: Ready-to-Sip (Drinks Poster)
-   ------------------------------------------------------------- */
-.card-ready-sip {
-  background: linear-gradient(180deg, #1e3a8a 0%, var(--deep-navy) 100%);
-  min-height: 540px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.card-top-content {
-  padding: 36px 30px 18px 30px;
-  position: relative;
-  z-index: 3;
-}
-
-.card-script-title {
-  font-family: var(--font-script);
-  font-size: 2.2rem;
-  color: #ff6b9d;
-  line-height: 0.9;
-  transform: rotate(-3deg);
-  display: inline-block;
-}
-
-.card-main-title {
-  font-family: var(--font-headline);
-  font-weight: 900;
-  font-size: 2.2rem;
-  line-height: 0.95;
-  text-transform: uppercase;
-  letter-spacing: -0.03em;
-  color: var(--white);
-  margin-top: 6px;
-}
-
-.card-body-text {
-  font-size: 0.92rem;
-  color: rgba(255, 255, 255, 0.88);
-  margin-top: 12px;
-  line-height: 1.45;
-}
-
-.card-image-box {
-  position: relative;
-  width: 100%;
-  margin-top: auto;
-  overflow: hidden;
-  height: 280px;
-}
-
-.card-image-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.poster-card:hover .card-image-box img {
-  transform: scale(1.06);
-}
-
-.card-action-bar {
-  padding: 18px 26px;
-  background: rgba(16, 28, 71, 0.95);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  z-index: 3;
-}
-
-.card-price-highlight {
-  font-family: var(--font-price, var(--font-display));
-  font-weight: 900;
-  font-size: 1.15rem;
-  color: var(--golden-amber);
-}
-
-.btn-card-action {
-  background: var(--golden-amber);
-  color: var(--deep-navy);
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 0.88rem;
-  text-transform: uppercase;
-  padding: 12px 20px;
-  border-radius: var(--radius-pill);
-  border: 2px solid var(--white);
-  text-decoration: none;
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-spring);
-}
-
-.btn-card-action:hover {
-  background: #ffb834;
-  transform: scale(1.05);
-}
-
-/* -------------------------------------------------------------
-   CARD 2: The Spicy Bite (Burger Poster)
-   ------------------------------------------------------------- */
-.card-spicy-bite {
-  background: radial-gradient(circle at 50% 30%, #1e40af 0%, var(--deep-navy) 100%);
-  min-height: 540px;
-}
-
-.spicy-flame-burst {
-  position: absolute;
-  top: 12%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle, rgba(232, 35, 122, 0.35) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.spicy-badge-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--hot-pink);
-  color: var(--white);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  padding: 5px 14px;
-  border-radius: var(--radius-pill);
-  margin-bottom: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* -------------------------------------------------------------
-   CARD 3: Double Trouble (Receipt Poster with Metal Binder Clip)
-   ------------------------------------------------------------- */
-.card-double-trouble {
-  background: #111e4f;
-  min-height: 540px;
-  padding: 28px 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Photorealistic Paper Receipt */
-.receipt-paper {
-  position: relative;
-  background: #FFFFFF;
-  color: #1a202c;
-  width: 100%;
-  border-radius: 10px;
-  padding: 40px 22px 26px 22px;
-  box-shadow: var(--shadow-md);
-  font-family: var(--font-mono);
-  display: flex;
-  flex-direction: column;
-}
-
-/* Jagged Zigzag Top & Bottom Cut */
-.receipt-zigzag-top,
-.receipt-zigzag-bottom {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 8px;
-  background-size: 14px 8px;
-}
-
-.receipt-zigzag-top {
-  top: -8px;
-  background-image: linear-gradient(135deg, #FFFFFF 50%, transparent 50%), linear-gradient(225deg, #FFFFFF 50%, transparent 50%);
-}
-
-.receipt-zigzag-bottom {
-  bottom: -8px;
-  background-image: linear-gradient(315deg, #FFFFFF 50%, transparent 50%), linear-gradient(45deg, #FFFFFF 50%, transparent 50%);
-}
-
-/* Metal Binder Clip */
-.binder-clip-graphic {
-  position: absolute;
-  top: -18px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 44px;
-  height: 32px;
-  z-index: 10;
-}
-
-.binder-clip-graphic svg {
-  width: 100%;
-  height: 100%;
-}
-
-.receipt-header {
-  text-align: center;
-  border-bottom: 2px dashed #cbd5e1;
-  padding-bottom: 14px;
-  margin-bottom: 16px;
-}
-
-.receipt-logo-title {
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 1.45rem;
-  letter-spacing: -0.02em;
-  color: var(--deep-navy);
-  line-height: 1;
-}
-
-.receipt-tagline {
-  font-size: 0.68rem;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-top: 4px;
-}
-
-.receipt-deal-banner,
-.receipt-pairing-banner {
-  background: var(--deep-navy);
-  color: var(--golden-amber);
-  text-align: center;
-  font-weight: 900;
-  font-size: 0.95rem;
-  padding: 8px 12px;
-  border-radius: 6px;
-  margin-bottom: 16px;
-  text-transform: uppercase;
-}
-
-.receipt-item-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 0.85rem;
-  border-bottom: 2px dashed #cbd5e1;
-  padding-bottom: 16px;
-  margin-bottom: 16px;
-}
-
-.receipt-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.receipt-row.discount-row {
-  color: var(--hot-pink);
-  font-weight: 700;
-}
-
-.receipt-total-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 4px 0 14px 0;
-}
-
-.receipt-total-label {
-  font-size: 1.05rem;
-  font-weight: 900;
-  color: var(--deep-navy);
-}
-
-.receipt-total-amount {
-  font-family: var(--font-price, var(--font-display));
-  font-size: 1.9rem;
-  font-weight: 900;
-  color: var(--electric-blue);
-  letter-spacing: -0.03em;
-}
-
-.btn-bundle-order {
-  width: 100%;
-  background: var(--golden-amber);
-  color: var(--deep-navy);
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 0.98rem;
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  padding: 14px 20px;
-  border-radius: var(--radius-pill);
-  border: 2px solid var(--white);
-  margin-top: 16px;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  display: inline-block;
-  transition: all var(--duration-fast) var(--ease-spring);
-}
-
-.btn-bundle-order:hover {
-  background: #ffb834;
-  transform: translateY(-2px) scale(1.02);
-}
-
 /* Responsive */
 @media (max-width: 1024px) {
   .promo-grid-section {
-    padding: 80px 0 100px 0;
+    padding: 64px 0 72px 0;
   }
   .promo-header-block {
-    margin-bottom: 48px;
+    margin-bottom: 28px;
   }
-  .promo-grid {
-    grid-template-columns: 1fr;
-    max-width: 520px;
-    margin: 0 auto;
-    gap: 28px;
-  }
+  
   .doodle-flower {
     left: -16px;
     width: 44px;
@@ -596,14 +238,205 @@
     width: 14px;
     height: 14px;
   }
-  .card-top-content {
-    padding: 24px 20px 14px 20px;
-  }
-  .card-main-title {
-    font-size: 1.8rem;
-  }
-  .card-script-title {
-    font-size: 1.8rem;
+  
+  
+  
+}
+
+/* ==========================================================================
+   SIGNATURE CARDS: three compact cards (a swipeable row on phones)
+   ========================================================================== */
+.signature-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  max-width: 1080px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.signature-card {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  padding: 8px;
+  box-shadow: 0 1px 2px rgba(22, 37, 92, 0.06), var(--shadow-sm);
+  transition: transform 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-smooth);
+}
+
+@media (hover: hover) {
+  .signature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 1px 2px rgba(22, 37, 92, 0.06), var(--shadow-md);
   }
 }
 
+/* Photo inset in the card: inner corner = card corner minus the 8px padding */
+.signature-photo {
+  aspect-ratio: 4 / 3;
+  border-radius: calc(var(--radius-lg) - 8px);
+  overflow: hidden;
+  background: var(--sand-light);
+}
+
+.signature-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.signature-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 14px 10px 8px;
+}
+
+.signature-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--electric-blue);
+}
+
+.signature-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  color: var(--deep-navy);
+  margin: 4px 0 6px;
+}
+
+.signature-text {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #4B5876;
+  margin-bottom: 14px;
+}
+
+.signature-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.signature-price {
+  font-family: var(--font-price, var(--font-display));
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--deep-navy);
+}
+
+.signature-btn {
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--golden-amber);
+  color: var(--deep-navy);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 9px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.2s var(--ease-smooth), background-color var(--duration-fast);
+}
+
+.signature-btn:hover {
+  background: #FFB733;
+}
+
+.signature-btn:active {
+  transform: scale(0.95);
+}
+
+/* The pairing's mini receipt, in the photo slot */
+.signature-receipt {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px 20px;
+  background:
+    repeating-linear-gradient(0deg, rgba(22, 37, 92, 0.035) 0 1px, transparent 1px 22px),
+    #FBF7F0;
+  font-family: var(--font-mono);
+  color: var(--deep-navy);
+}
+
+.signature-receipt-title {
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding-bottom: 8px;
+  border-bottom: 1.5px dashed rgba(22, 37, 92, 0.25);
+}
+
+.signature-receipt-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.signature-receipt-list li,
+.signature-receipt-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.signature-receipt-total {
+  padding-top: 8px;
+  border-top: 1.5px dashed rgba(22, 37, 92, 0.25);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.signature-receipt-total span:last-child {
+  color: var(--electric-blue);
+}
+
+/* Tablets and phones: one swipeable row, the next card peeking in */
+@media (max-width: 900px) {
+  .signature-row {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    gap: 14px;
+    margin: 0 calc(-1 * var(--container-padding));
+    padding: 4px var(--container-padding) 16px;
+    scroll-padding-inline: var(--container-padding);
+  }
+
+  .signature-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .signature-card {
+    flex: 0 0 min(78vw, 300px);
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 640px) {
+  .promo-grid-section {
+    padding: 56px 0 56px 0;
+  }
+
+  .promo-header-block {
+    margin-bottom: 24px;
+  }
+}
