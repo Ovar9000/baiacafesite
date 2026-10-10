@@ -1539,17 +1539,17 @@ body:has(dialog.nav-drawer[open]) {
 .mobile-bar-tab {
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  padding: 7px 4px 6px;
+  padding: 0 6px;
+  min-height: 46px;
   border-radius: var(--radius-pill);
-  color: rgba(245, 233, 214, 0.72);
+  color: rgba(245, 233, 214, 0.75);
   font-family: var(--font-body);
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   font-weight: 700;
   text-decoration: none;
+  white-space: nowrap;
   transition: background-color 0.25s var(--ease-smooth), color 0.25s var(--ease-smooth), transform 0.2s var(--ease-smooth);
 }
 

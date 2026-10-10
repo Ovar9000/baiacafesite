@@ -34,8 +34,8 @@ instead of competing for attention. The look and feel follow iPhone (iOS 26/27
   section navigation at all.
 - The loyalty card moved out of the header text into a single card icon, plus
   one quiet line in Visit. It was removed from About and the hero.
-- The phone bottom bar is a floating glass tab bar (Menu, What's New) with
-  My Order beside it. It appears once you reach the Menu, or as soon as your
+- The phone bottom bar is a floating glass tab bar with text-only tabs
+  (Menu, What's New) and My Order beside it. It appears once you reach the Menu, or as soon as your
   order has something in it.
 
 ### Sections
@@ -52,7 +52,9 @@ instead of competing for attention. The look and feel follow iPhone (iOS 26/27
 
 ### Menu
 - Drinks / Food switch, a search field that looks across both, and
-  swipeable category tabs that stay pinned under the header while you scroll.
+  swipeable category tabs in a floating glass capsule that docks under the
+  header while you scroll. A glass lens glides to the category you pick, and
+  the Drinks / Food thumb has the same glass finish.
 - One category at a time: a compact list on phones, a grid of tiles on
   laptops (2 columns, 3 on wider screens) with the controls side by side.
 - Each item shows its name, one line of description, the price and a round

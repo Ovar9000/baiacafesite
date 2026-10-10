@@ -166,10 +166,11 @@ export function initMenuExplorer() {
     renderBody();
   }
 
+  // Board or search changed: rebuild the tab row and the results
   function renderBody() {
     const q = searchQuery.toLowerCase().trim();
     const categories = menuData[activeBoard] || [];
-    const current = categories.find((c) => c.id === activeCategory[activeBoard]) || categories[0];
+    const current = currentCategory();
 
     container.querySelectorAll('.mx-board-btn').forEach((btn) => {
       const on = btn.dataset.board === activeBoard;
@@ -180,9 +181,11 @@ export function initMenuExplorer() {
 
     container.querySelector('.mx-body').innerHTML = `
       ${q ? '' : `
-        <!-- Category tabs: sticky under the header while you browse the menu -->
+        <!-- Category tabs: a glass capsule that pins under the header while
+             you browse; the lens glides to the selected category -->
         <div class="mx-chips-bar">
           <div class="mx-chips" role="tablist" aria-label="${BOARD_LABELS[activeBoard]} categories">
+            <span class="mx-chip-lens" aria-hidden="true"></span>
             ${categories.map((cat) => `
               <button type="button" role="tab" class="mx-chip ${cat.id === current?.id ? 'active' : ''}" data-category-id="${escapeHtml(cat.id)}" aria-selected="${cat.id === current?.id}">
                 ${escapeHtml(cat.category)}
@@ -192,28 +195,82 @@ export function initMenuExplorer() {
         </div>
       `}
 
-      <div class="mx-results" aria-live="polite">
-        ${q ? searchResults(q) : current ? categoryBlock(current, activeBoard, current.items || []) : ''}
-      </div>
+      <div class="mx-results" aria-live="polite"></div>
     `;
 
-    attachBodyListeners();
+    container.querySelectorAll('.mx-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        // If the tabs are pinned under the header, bring the new category's top into view
+        const pinned = container.querySelector('.mx-chips-bar')?.getBoundingClientRect().top <= 140;
+        selectCategory(chip.dataset.categoryId, { scroll: pinned });
+      });
+    });
+
+    renderResults();
+    // Place the lens without animating it in from the left edge
+    moveLens({ instant: true });
+  }
+
+  function currentCategory() {
+    const categories = menuData[activeBoard] || [];
+    return categories.find((c) => c.id === activeCategory[activeBoard]) || categories[0];
+  }
+
+  function renderResults() {
+    const q = searchQuery.toLowerCase().trim();
+    const current = currentCategory();
+    container.querySelector('.mx-results').innerHTML =
+      q ? searchResults(q) : current ? categoryBlock(current, activeBoard, current.items || []) : '';
+    attachAddListeners();
+  }
+
+  // The glass lens sits behind the selected tab and glides between them
+  function moveLens({ instant = false } = {}) {
+    const chips = container.querySelector('.mx-chips');
+    const lens = container.querySelector('.mx-chip-lens');
+    const chip = container.querySelector('.mx-chip.active');
+    if (!chips || !lens || !chip) return;
+    if (instant) lens.style.transition = 'none';
+    lens.style.setProperty('--lens-x', `${chip.offsetLeft}px`);
+    lens.style.setProperty('--lens-w', `${chip.offsetWidth}px`);
+    lens.classList.add('is-visible');
+    if (instant) {
+      void lens.offsetWidth;
+      lens.style.transition = '';
+    }
+    chips.scrollTo({ left: chip.offsetLeft - (chips.clientWidth - chip.offsetWidth) / 2, behavior: instant ? 'auto' : 'smooth' });
+  }
+
+  // Same board, another category: only the lens moves and the results swap
+  function selectCategory(categoryId, { scroll = false } = {}) {
+    if (!menuData[activeBoard].some((c) => c.id === categoryId)) return;
+    activeCategory[activeBoard] = categoryId;
+    container.querySelectorAll('.mx-chip').forEach((chip) => {
+      const on = chip.dataset.categoryId === categoryId;
+      chip.classList.toggle('active', on);
+      chip.setAttribute('aria-selected', String(on));
+    });
+    moveLens();
+    renderResults();
+    if (scroll) {
+      container.querySelector('.mx-chips-bar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   function showCategory(board, categoryId, { scroll = false } = {}) {
-    if (board && menuData[board]) activeBoard = board;
+    const boardChanged = board && menuData[board] && board !== activeBoard;
+    if (boardChanged) activeBoard = board;
     if (categoryId && menuData[activeBoard].some((c) => c.id === categoryId)) {
       activeCategory[activeBoard] = categoryId;
     }
     if (searchQuery) {
       searchQuery = '';
       container.querySelector('#menu-search-field').value = '';
-    }
-    renderBody();
-    const chips = container.querySelector('.mx-chips');
-    const chip = container.querySelector('.mx-chip.active');
-    if (chips && chip) {
-      chips.scrollTo({ left: chip.offsetLeft - (chips.clientWidth - chip.offsetWidth) / 2, behavior: 'smooth' });
+      renderBody();
+    } else if (boardChanged || !container.querySelector('.mx-chips')) {
+      renderBody();
+    } else {
+      selectCategory(activeCategory[activeBoard]);
     }
     if (scroll) {
       container.querySelector('.mx-chips-bar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -244,15 +301,7 @@ export function initMenuExplorer() {
     });
   }
 
-  function attachBodyListeners() {
-    container.querySelectorAll('.mx-chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        // If the tabs are pinned under the header, bring the new category's top into view
-        const pinned = container.querySelector('.mx-chips-bar')?.getBoundingClientRect().top <= 120;
-        showCategory(activeBoard, chip.dataset.categoryId, { scroll: pinned });
-      });
-    });
-
+  function attachAddListeners() {
     container.querySelectorAll('.mx-add').forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.addId;
@@ -467,4 +516,7 @@ export function initMenuExplorer() {
   }
 
   render();
+  // Tab widths change as web fonts arrive and when the window resizes
+  document.fonts?.ready?.then(() => moveLens({ instant: true }));
+  window.addEventListener('resize', () => moveLens({ instant: true }), { passive: true });
 }
