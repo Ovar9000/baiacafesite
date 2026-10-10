@@ -65,6 +65,7 @@ export function initCartDrawer() {
   // Open / Close Handlers
   closeBtn?.addEventListener('click', () => cartStore.closeDrawer());
   backdrop?.addEventListener('click', () => cartStore.closeDrawer());
+  initSheetDrag(panel, () => cartStore.closeDrawer());
 
   // Escape key closes drawer
   window.addEventListener('keydown', (e) => {
@@ -104,18 +105,8 @@ export function initCartDrawer() {
   document.querySelectorAll('[data-order-drinks-filter]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      const menuSection = document.getElementById('menu');
-      if (menuSection) {
-        menuSection.scrollIntoView({ behavior: 'smooth' });
-        setTimeout(() => {
-          const drinksTab = document.querySelector('.board-tab-btn[data-board="drinks"]');
-          drinksTab?.click();
-          const sodaBtn = document.querySelector('.category-accordion-btn[data-category-id="fruit-soda"]');
-          if (sodaBtn && sodaBtn.getAttribute('aria-expanded') !== 'true') {
-            sodaBtn.click();
-          }
-        }, 400);
-      }
+      // The menu opens on Fruit Soda and scrolls to it (menuExplorer.js)
+      window.dispatchEvent(new CustomEvent('baia:show-menu', { detail: { board: 'drinks', category: 'fruit-soda' } }));
     });
   });
 
@@ -129,7 +120,6 @@ export function initCartDrawer() {
       btn.classList.add('active');
       btn.setAttribute('aria-pressed', 'true');
       cartStore.orderType = btn.dataset.spot || 'Dine-In at Cafe';
-      cartStore.showToast('Order Type Set', `${cartStore.orderType}`);
       // Notify so the Delivery Details section + fee rows render immediately
       cartStore.notify();
     });
@@ -164,6 +154,7 @@ export function initCartDrawer() {
   });
 
   // Re-render when store updates
+  let lastCount = cartStore.getItemCount();
   cartStore.subscribe((store) => {
     if (store.isDrawerOpen) {
       backdrop?.classList.add('active');
@@ -177,8 +168,20 @@ export function initCartDrawer() {
     }
 
     const totalCount = store.getItemCount();
+    // Something was added: bump the My Order buttons instead of opening the sheet
+    if (totalCount > lastCount) {
+      document.querySelectorAll('.nav-cart-btn, .mobile-bar-cart-btn').forEach((btn) => {
+        btn.classList.remove('is-bumping');
+        void btn.offsetWidth;
+        btn.classList.add('is-bumping');
+      });
+    }
+    lastCount = totalCount;
     countTags.forEach(tag => {
-      tag.textContent = totalCount;
+      // The sheet header reads "Your Order · 2 items"; the cart buttons show just the number
+      tag.textContent = tag.classList.contains('drawer-count-tag')
+        ? `${totalCount} ${totalCount === 1 ? 'item' : 'items'}`
+        : totalCount;
       // An empty "0" badge reads as noise; only show the count once something is added
       tag.toggleAttribute('data-empty', totalCount === 0);
     });
@@ -466,7 +469,7 @@ export function initCartDrawer() {
                 <div class="cart-item-addons-list">
                   ${addOnsList.map(a => `
                     <span class="cart-addon-badge">
-                      <span>+ ${esc(a.name)} (+₱${Number(a.price) || 0})</span>
+                      <span>${esc(a.name)} <span class="cart-addon-price">+₱${Number(a.price) || 0}</span></span>
                       <button type="button" class="btn-remove-addon" data-key="${esc(item.key)}" data-addon-id="${esc(a.id)}" aria-label="Remove ${esc(a.name)}">×</button>
                     </span>
                   `).join('')}
@@ -485,16 +488,18 @@ export function initCartDrawer() {
               </div>
               ${hasCustomizations ? `
                 <button type="button" class="btn-cart-quick-addon" data-action="toggle-custom-popover" data-target="popover-${esc(cleanKey)}" aria-label="Customize add-ons for ${esc(item.name)}">
-                  <span>+ Customize</span>
+                  <span>Customize</span>
                 </button>
               ` : ''}
             </div>
-            <button class="btn-item-remove" data-key="${esc(item.key)}" aria-label="Remove ${esc(item.name)} from your order">Remove</button>
+            <button class="btn-item-remove" data-key="${esc(item.key)}" aria-label="Remove ${esc(item.name)} from your order">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
+            </button>
           </div>
 
           ${hasCustomizations ? `
             <div class="cart-addon-popover" id="popover-${esc(cleanKey)}" style="display: none;">
-              <div class="cart-addon-popover-header">Drink Customizations &amp; Add-ons</div>
+              <div class="cart-addon-popover-header">Add-ons</div>
               <div class="cart-addon-popover-items">
                 ${availableAddOns.map(addon => {
                   const hasIt = addOnsList.some(a => a.id === addon.id);
@@ -578,7 +583,7 @@ export function initCartDrawer() {
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'checkout-modal';
-      modal.className = 'modal-backdrop';
+      modal.className = 'modal-backdrop checkout-backdrop';
       modal.setAttribute('role', 'dialog');
       modal.setAttribute('aria-modal', 'true');
       modal.setAttribute('aria-labelledby', 'checkout-modal-title');
@@ -599,99 +604,73 @@ export function initCartDrawer() {
     const delDirections = (cartStore.delivery.directions || '').trim();
     const delLocation = delLandmark ? `Near ${delLandmark} — ${delDirections}` : delDirections;
 
+    const row = (label, value) => `
+      <div class="cm-row"><span class="cm-row-label">${esc(label)}</span><span class="cm-row-value">${esc(value)}</span></div>`;
+
     modal.innerHTML = `
       <div class="modal-dialog-card checkout-modal-card">
-        <div class="modal-header">
-          <h3 id="checkout-modal-title" class="checkout-modal-title">
-            Send Order to BAIA Cafe
-          </h3>
-          <button type="button" class="btn-archive-close modal-dialog-close-btn" id="modal-top-close-btn" aria-label="Close checkout modal">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <div class="cm-grabber" aria-hidden="true"></div>
+        <div class="cm-header">
+          <h3 id="checkout-modal-title" class="cm-title">Review &amp; send</h3>
+          <button type="button" class="cm-close" id="modal-top-close-btn" aria-label="Close checkout modal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
 
-        <div class="modal-body-content">
-          <div class="order-summary-box">
-            <div class="summary-spot-line">
-              <span>Order Type:</span>
-              <strong>${esc(cartStore.orderType)}</strong>
-            </div>
-            <div class="summary-items-list">
-              ${cartStore.items.map(i => {
-                const meta = [];
-                if (i.temp) meta.push(i.temp);
-                if (i.size) meta.push(`Size ${i.size}`);
-                if (i.addOns && i.addOns.length > 0) {
-                  i.addOns.forEach(a => meta.push(`+${a.name}`));
-                }
-                const metaStr = meta.length > 0 ? meta.join(', ') : '';
-                return `
-                  <div class="summary-item-row">
-                    <div>
-                      <span>${Number(i.quantity) || 0}x ${esc(i.name)}</span>
-                      ${metaStr ? `<div class="summary-item-meta">${esc(metaStr)}</div>` : ''}
-                    </div>
-                    <span>${esc(cartStore.formatCurrency(i.unitPrice * i.quantity))}</span>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-            ${totals.savings > 0 ? `
-              <div class="summary-savings-row">
-                <span>Bundle Savings:</span>
-                <span>-${cartStore.formatCurrency(totals.savings)}</span>
-              </div>
-            ` : ''}
-            ${isDelOrder ? `
-              <div class="summary-delivery-row">
-                <span>Delivery Fee (${esc(delZoneName)}):</span>
-                <span>${esc(cartStore.formatCurrency(totals.deliveryFee))}</span>
-              </div>
-              <div class="summary-delivery-row">
-                <span>Delivery Zone:</span>
-                <span>${esc(delZoneName)}</span>
-              </div>
-              <div class="summary-delivery-row">
-                <span>Delivery Location:</span>
-                <span>${esc(delLocation)}</span>
-              </div>
-            ` : ''}
-            <div class="summary-total-row">
-              <span>Estimated Total:</span>
-              <strong>${cartStore.formatCurrency(totals.grandTotal)}</strong>
-            </div>
-          </div>
-
-          <div class="order-copy-notice">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            <span>Order is automatically copied — just paste &amp; send!</span>
-          </div>
-
-          <div class="modal-action-buttons">
-            <button 
-              type="button"
-              class="btn-primary-glow modal-btn send-fb-btn" 
-              id="modal-send-fb-btn"
-            >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" style="display:inline-block; vertical-align: -2px; flex-shrink: 0;">
-                <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
-              </svg>
-              <span id="modal-fb-btn-label">Send Order on Messenger</span>
-              <span aria-hidden="true">↗</span>
-            </button>
-
-            <button 
-              type="button"
-              class="btn-copy-order-subtle" 
-              id="modal-copy-order-btn"
-            >
-              <span>Copy Order Text Only</span>
-            </button>
-          </div>
+        <div class="cm-group">
+          ${row('Order type', cartStore.orderType)}
+          ${isDelOrder ? `
+            ${row('Delivery zone', delZoneName)}
+            ${row('Location', delLocation)}
+          ` : ''}
         </div>
+
+        <div class="cm-group">
+          ${cartStore.items.map(i => {
+            const meta = [];
+            if (i.temp) meta.push(i.temp);
+            if (i.size) meta.push(`Size ${i.size}`);
+            if (i.addOns && i.addOns.length > 0) {
+              i.addOns.forEach(a => meta.push(`+ ${a.name}`));
+            }
+            return `
+              <div class="cm-item">
+                <span class="cm-qty">${Number(i.quantity) || 0}&times;</span>
+                <div class="cm-item-text">
+                  <span class="cm-item-name">${esc(i.name)}</span>
+                  ${meta.length > 0 ? `<span class="cm-item-meta">${esc(meta.join(' · '))}</span>` : ''}
+                </div>
+                <span class="cm-item-price">${esc(cartStore.formatCurrency(i.unitPrice * i.quantity))}</span>
+              </div>
+            `;
+          }).join('')}
+          ${totals.savings > 0 ? `<div class="cm-row cm-row--savings"><span class="cm-row-label">Bundle savings</span><span class="cm-row-value">-${esc(cartStore.formatCurrency(totals.savings))}</span></div>` : ''}
+          ${isDelOrder ? row('Delivery fee', cartStore.formatCurrency(totals.deliveryFee)) : ''}
+        </div>
+
+        <div class="cm-total">
+          <span>Total</span>
+          <strong>${esc(cartStore.formatCurrency(totals.grandTotal))}</strong>
+        </div>
+
+        <p class="cm-note">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span>We copy your order when you tap Send, so you can paste it straight into the chat.</span>
+        </p>
+
+        <button type="button" class="cm-send" id="modal-send-fb-btn">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+            <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
+          </svg>
+          <span id="modal-fb-btn-label">Send on Messenger</span>
+        </button>
+
+        <button type="button" class="cm-copy" id="modal-copy-order-btn">
+          <span>Copy order text instead</span>
+        </button>
       </div>
     `;
 
@@ -732,9 +711,9 @@ export function initCartDrawer() {
     sendFbBtn?.addEventListener('click', () => {
       copyOrderToClipboard();
       if (fbBtnLabel) {
-        fbBtnLabel.textContent = '✓ Copied! Opening Messenger...';
+        fbBtnLabel.textContent = 'Copied, opening Messenger…';
         setTimeout(() => {
-          fbBtnLabel.textContent = 'Send Order on Messenger';
+          fbBtnLabel.textContent = 'Send on Messenger';
         }, 4000);
       }
       cartStore.showToast('Order Copied to Clipboard!', 'Opening Messenger — paste and send.', '✓');
@@ -747,10 +726,10 @@ export function initCartDrawer() {
       copyOrderToClipboard();
       const labelSpan = copyBtn.querySelector('span');
       if (labelSpan) {
-        labelSpan.textContent = '✓ Order Copied to Clipboard!';
+        labelSpan.textContent = 'Copied to clipboard';
         copyBtn.style.color = '#15803D';
         setTimeout(() => {
-          labelSpan.textContent = 'Copy Order Text Only';
+          labelSpan.textContent = 'Copy order text instead';
           copyBtn.style.color = '';
         }, 3000);
       }
@@ -777,4 +756,52 @@ export function initCartDrawer() {
       }
     };
   }
+}
+
+/**
+ * On phones the order drawer is a bottom sheet: drag it down by the grab
+ * handle or the header to close it, as with iOS sheets. A short drag springs
+ * back.
+ */
+function initSheetDrag(panel, onClose) {
+  const handles = [panel?.querySelector('.drawer-grabber'), panel?.querySelector('.drawer-header')].filter(Boolean);
+  if (!panel || !handles.length) return;
+
+  const CLOSE_DISTANCE = 110;
+  const isSheet = () => window.matchMedia('(max-width: 640px)').matches;
+  let startY = 0;
+  let distance = 0;
+  let dragging = false;
+
+  const start = (e) => {
+    if (!isSheet() || e.target.closest('button')) return;
+    dragging = true;
+    startY = e.clientY;
+    distance = 0;
+    panel.classList.add('is-dragging');
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+
+  const move = (e) => {
+    if (!dragging) return;
+    distance = Math.max(0, e.clientY - startY);
+    panel.style.transform = `translateY(${distance}px)`;
+  };
+
+  const end = () => {
+    if (!dragging) return;
+    dragging = false;
+    panel.classList.remove('is-dragging');
+    // Clearing the drag offset lets the CSS transition take over: back to
+    // open, or on down to closed
+    panel.style.transform = '';
+    if (distance > CLOSE_DISTANCE) onClose();
+  };
+
+  handles.forEach((el) => {
+    el.addEventListener('pointerdown', start);
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+  });
 }

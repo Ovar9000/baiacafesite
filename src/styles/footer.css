@@ -40,7 +40,6 @@
   border-radius: 10px;
   object-fit: cover;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
 }
 
@@ -71,7 +70,7 @@
   border: 1.5px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--radius-xl);
   padding: 22px 24px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -102,7 +101,7 @@
   color: var(--cream);
   background: rgba(255, 255, 255, 0.1);
   padding: 4px 10px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
 }
 
 .visit-hours-list {
@@ -195,12 +194,15 @@
   gap: 10px;
 }
 
-.footer-social-btn {
+.footer-buttons-stack .footer-social-btn {
   justify-content: center;
+  min-height: 50px;
   padding: 12px 18px;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 800;
   text-align: center;
+  text-transform: none;
+  letter-spacing: 0;
   border-radius: var(--radius-pill);
   text-decoration: none;
 }
@@ -308,4 +310,22 @@
   .footer-social-links {
     gap: 6px 14px;
   }
+}
+
+/* One quiet line for returning guests (the card itself lives at /card/) */
+.footer-loyalty-link {
+  display: inline-block;
+  margin-top: 16px;
+  color: var(--cream);
+  opacity: 0.75;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-decoration-color: rgba(245, 233, 214, 0.35);
+  text-underline-offset: 4px;
+  transition: opacity var(--duration-fast), text-decoration-color var(--duration-fast);
+}
+
+.footer-loyalty-link:hover {
+  opacity: 1;
+  text-decoration-color: var(--golden-amber);
 }

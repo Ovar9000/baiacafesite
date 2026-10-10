@@ -1,6 +1,5 @@
 import './styles/main.css';
 import { motionSystem } from './utils/motionSystem.js';
-import { initHero3D } from './components/hero3D.js';
 import { initMenuExplorer } from './components/menuExplorer.js';
 import { initBoardsRental } from './components/boardsRental.js';
 import { initLiquidFloaties } from './components/liquidFloaties.js';
@@ -8,6 +7,9 @@ import { initCartDrawer } from './components/cartDrawer.js';
 import { initNewDrops } from './components/newDrops.js';
 import { initCommunityWall } from './components/communityWall.js';
 import { initOpenStatus } from './components/openStatus.js';
+import { initGlassNav } from './components/glassNav.js';
+import { initNavDrawer } from './components/navDrawer.js';
+import { cartStore } from './components/cartStore.js';
 import { injectSpeedInsights } from '@vercel/speed-insights';
 import { inject } from '@vercel/analytics';
 
@@ -37,20 +39,6 @@ function initSeasonalPromosToggle() {
     section.hidden = true;
     section.classList.add('is-hidden');
   }
-}
-
-function initHeroLoyaltyCta() {
-  const ctaText = document.getElementById('hero-loyalty-cta-text');
-  if (!ctaText) return;
-
-  try {
-    const hasAuth = Object.keys(localStorage).some(
-      (k) => k.includes('auth-token') || k.startsWith('sb-')
-    );
-    if (hasAuth) {
-      ctaText.textContent = 'View Loyalty Card';
-    }
-  } catch (e) {}
 }
 
 function handleRootAuthCallback() {
@@ -100,9 +88,9 @@ function initApp() {
 
   safeInit('rootAuth', handleRootAuthCallback);
   safeInit('openStatus', initOpenStatus);
-  safeInit('heroLoyaltyCta', initHeroLoyaltyCta);
+  safeInit('glassNav', initGlassNav);
+  safeInit('navDrawer', initNavDrawer);
   safeInit('loyaltyPrefetch', initLoyaltyPrefetch);
-  safeInit('hero3D', initHero3D);
   safeInit('newDrops', initNewDrops);
   safeInit('menuExplorer', initMenuExplorer);
   safeInit('boardsRental', initBoardsRental);
@@ -135,47 +123,35 @@ function initApp() {
     }
   }, { passive: true });
 
-  // Scroll-Aware Mobile Sticky Order Bar (IntersectionObserver on Hero Section)
+  // Phone order bar: hidden over the story, photos and shore; it appears once
+  // the menu comes into view (and stays below it), or anywhere once the order
+  // has an item.
   function initScrollAwareStickyBar() {
     const stickyBar = document.getElementById('mobile-sticky-bar');
-    const heroSection = document.getElementById('hero') || document.querySelector('.hero-section');
-    if (!stickyBar || !heroSection) return;
+    const menuSection = document.getElementById('menu');
+    if (!stickyBar || !menuSection) return;
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        // Hide sticky bar when hero is visible in viewport
-        if (entry.isIntersecting) {
-          const rect = heroSection.getBoundingClientRect();
-          // If top of hero is near top of viewport, hide bar
-          if (rect.top >= -80) {
-            stickyBar.classList.remove('is-visible');
-          }
-        } else {
-          // Show once user has scrolled past the hero section
-          const rect = heroSection.getBoundingClientRect();
-          if (rect.bottom < 150) {
-            stickyBar.classList.add('is-visible');
-          } else {
-            stickyBar.classList.remove('is-visible');
-          }
-        }
-      });
-    }, {
-      root: null,
-      threshold: [0, 0.1, 0.5, 1.0]
-    });
+    let reachedMenu = false;
+    let hasItems = cartStore.items.length > 0;
+    const update = () => stickyBar.classList.toggle('is-visible', reachedMenu || hasItems);
 
-    observer.observe(heroSection);
-
-    // Fast scroll fallback listener
+    let ticking = false;
+    const check = () => {
+      ticking = false;
+      reachedMenu = menuSection.getBoundingClientRect().top < window.innerHeight * 0.8;
+      update();
+    };
     window.addEventListener('scroll', () => {
-      const rect = heroSection.getBoundingClientRect();
-      if (rect.bottom < 100) {
-        stickyBar.classList.add('is-visible');
-      } else {
-        stickyBar.classList.remove('is-visible');
-      }
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(check);
     }, { passive: true });
+
+    cartStore.subscribe((store) => {
+      hasItems = store.items.length > 0;
+      update();
+    });
+    check();
   }
 
   initScrollAwareStickyBar();

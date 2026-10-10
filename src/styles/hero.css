@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BAIA CAFE — 3D Hero Showcase Section & Shoreline Snapshot (Mary Grace Pacing)
+   BAIA CAFE — Hero: the shore photo with the brand headline over it
    ========================================================================== */
 
 .hero-section {
@@ -17,172 +17,6 @@
   width: 100%;
   max-width: 100vw;
   box-sizing: border-box;
-}
-
-/* Constellation of Floating Background Glyphs */
-.floating-glyphs-layer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 1;
-}
-
-.floating-glyph {
-  position: absolute;
-  pointer-events: none;
-  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-  will-change: transform;
-}
-
-.floating-glyph svg,
-.floating-glyph img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
-
-/* Individual Glyphs Positioning & Floating Keyframes */
-.glyph-1 {
-  top: 14%;
-  left: 5%;
-  width: 48px;
-  height: 48px;
-  opacity: 0.35;
-  animation: floatAnim1 7s ease-in-out infinite alternate;
-}
-
-.glyph-2 {
-  top: 28%;
-  left: 18%;
-  width: 32px;
-  height: 32px;
-  opacity: 0.25;
-  animation: floatAnim2 6s ease-in-out infinite alternate -1s;
-}
-
-.glyph-3 {
-  top: 72%;
-  left: 4%;
-  width: 44px;
-  height: 44px;
-  opacity: 0.3;
-  animation: floatAnim1 8s ease-in-out infinite alternate -3s;
-}
-
-.glyph-4 {
-  top: 84%;
-  left: 22%;
-  width: 36px;
-  height: 36px;
-  opacity: 0.22;
-  animation: floatAnim3 5.5s ease-in-out infinite alternate -2s;
-}
-
-.glyph-5 {
-  top: 12%;
-  left: 46%;
-  width: 40px;
-  height: 40px;
-  opacity: 0.28;
-  animation: floatAnim2 7.5s ease-in-out infinite alternate -4s;
-}
-
-.glyph-6 {
-  top: 20%;
-  right: 12%;
-  width: 52px;
-  height: 52px;
-  opacity: 0.35;
-  animation: floatAnim1 6.5s ease-in-out infinite alternate -0.5s;
-}
-
-.glyph-7 {
-  top: 42%;
-  right: 4%;
-  width: 38px;
-  height: 38px;
-  opacity: 0.28;
-  animation: floatAnim3 8s ease-in-out infinite alternate -2.5s;
-}
-
-.glyph-8 {
-  top: 65%;
-  right: 18%;
-  width: 46px;
-  height: 46px;
-  opacity: 0.3;
-  animation: floatAnim2 7s ease-in-out infinite alternate -1.5s;
-}
-
-.glyph-9 {
-  bottom: 8%;
-  right: 32%;
-  width: 34px;
-  height: 34px;
-  opacity: 0.25;
-  animation: floatAnim1 5.8s ease-in-out infinite alternate -3.5s;
-}
-
-.glyph-10 {
-  top: 48%;
-  left: 36%;
-  width: 28px;
-  height: 28px;
-  opacity: 0.2;
-  animation: floatAnim3 6.8s ease-in-out infinite alternate -1.2s;
-}
-
-.glyph-11 {
-  bottom: 16%;
-  left: 48%;
-  width: 42px;
-  height: 42px;
-  opacity: 0.26;
-  animation: floatAnim2 8.2s ease-in-out infinite alternate -2.8s;
-}
-
-.glyph-12 {
-  top: 8%;
-  right: 30%;
-  width: 30px;
-  height: 30px;
-  opacity: 0.28;
-  animation: floatAnim1 6.2s ease-in-out infinite alternate -4.2s;
-}
-
-.glyph-13 {
-  top: 78%;
-  right: 6%;
-  width: 32px;
-  height: 32px;
-  opacity: 0.24;
-  animation: floatAnim3 7.4s ease-in-out infinite alternate -0.8s;
-}
-
-.glyph-14 {
-  top: 36%;
-  left: 8%;
-  width: 26px;
-  height: 26px;
-  opacity: 0.22;
-  animation: floatAnim2 5.2s ease-in-out infinite alternate -2.1s;
-}
-
-@keyframes floatAnim1 {
-  0% { transform: translateY(0px) rotate(0deg); }
-  100% { transform: translateY(-20px) rotate(12deg); }
-}
-
-@keyframes floatAnim2 {
-  0% { transform: translateY(0px) rotate(0deg); }
-  100% { transform: translateY(-14px) rotate(-10deg); }
-}
-
-@keyframes floatAnim3 {
-  0% { transform: translateY(0px) rotate(0deg) scale(1); }
-  100% { transform: translateY(-18px) rotate(8deg) scale(1.08); }
 }
 
 /* Hero Layout Grid */
@@ -237,13 +71,12 @@
   -webkit-backdrop-filter: blur(12px);
   border: 1.2px solid rgba(255, 255, 255, 0.22);
   padding: 6px 16px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   font-family: var(--font-mono);
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--white);
   margin-bottom: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   align-self: flex-start;
 }
 
@@ -291,7 +124,6 @@
   font-size: clamp(3.0rem, min(8.5vw, 9.5vh), 5.4rem);
   text-transform: uppercase;
   color: var(--white);
-  text-shadow: 0 4px 24px rgba(10, 20, 60, 0.45);
 }
 
 .row-coffee .letter-chunky {
@@ -308,13 +140,11 @@
   font-size: clamp(2.8rem, min(8.0vw, 9.0vh), 5.0rem);
   color: var(--golden-amber);
   margin-left: 2px;
-  text-shadow: 0 4px 18px rgba(245, 166, 35, 0.4);
 }
 
 .row-vibes .letter-chunky {
   color: var(--amber-contrast);
-  letter-spacing: -0.04em;
-  text-shadow: 0 4px 24px rgba(245, 166, 35, 0.35);
+  letter-spacing: -0.01em;
 }
 
 .row-crafted-bay {
@@ -334,7 +164,6 @@
   transform: rotate(-4deg);
   display: inline-block;
   line-height: 0.82;
-  text-shadow: 0 4px 18px rgba(232, 35, 122, 0.45);
 }
 
 .bay-chunky {
@@ -343,8 +172,7 @@
   font-size: clamp(2.4rem, min(6.8vw, 7.8vh), 4.4rem);
   text-transform: uppercase;
   color: var(--white);
-  letter-spacing: -0.03em;
-  text-shadow: 0 4px 24px rgba(10, 20, 60, 0.45);
+  letter-spacing: -0.01em;
 }
 
 /* Whimsical Hand-Drawn SVG Doodles */
@@ -355,7 +183,6 @@
   justify-content: center;
   flex-shrink: 0;
   vertical-align: middle;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
   animation: doodleBob 4s ease-in-out infinite alternate;
 }
 
@@ -386,108 +213,6 @@
   max-width: 540px;
   position: relative;
   z-index: 1;
-}
-
-/* Hero Right: 3D Card Visual Frame */
-.hero-visual-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  perspective: 1200px;
-  position: relative;
-  width: 100%;
-  min-height: 0;
-  box-sizing: border-box;
-}
-
-.hero-3d-card {
-  position: relative;
-  width: 100%;
-  max-width: min(440px, calc((100dvh - var(--header-height) - 80px) * 0.92));
-  height: auto;
-  aspect-ratio: 11 / 12;
-  max-height: min(480px, calc(100dvh - var(--header-height) - 80px));
-  min-height: 280px;
-  transform-style: preserve-3d;
-  cursor: default;
-}
-
-.hero-image-frame {
-  width: 100%;
-  height: 100%;
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  position: relative;
-  transform: rotate(-3deg);
-  box-shadow: 0 24px 50px -8px rgba(10, 20, 60, 0.65), 0 12px 28px -6px rgba(0, 0, 0, 0.4);
-  border: 4px solid var(--white);
-  background: #0f172a;
-  transition: transform 0.3s var(--ease-spring), box-shadow 0.3s ease;
-}
-
-.js-tilt-glare {
-  display: none !important;
-}
-
-.hero-image-frame:hover {
-  transform: rotate(-1deg) scale(1.02);
-  box-shadow: 0 30px 60px -8px rgba(10, 20, 60, 0.75), 0 16px 32px -6px rgba(0, 0, 0, 0.45);
-}
-
-.hero-image-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 65%;
-  display: block;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-.hero-image-frame img.showcase-fading {
-  opacity: 0.15;
-  transform: scale(1.02);
-}
-
-.floating-flavor-pill {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  background: rgba(16, 28, 75, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: var(--white);
-  padding: 8px 16px;
-  border-radius: var(--radius-pill);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 8px 24px rgba(10, 20, 60, 0.5);
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  z-index: 10;
-  font-weight: 800;
-  font-size: 0.825rem;
-  transform: translateZ(40px) rotate(3deg);
-  pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.floating-flavor-pill.pill-fading {
-  opacity: 0.2;
-  transform: translateZ(30px) rotate(1deg) scale(0.96);
-}
-
-.floating-flavor-pill .flavor-tag {
-  background: var(--hot-pink);
-  color: var(--white);
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-  font-size: 0.68rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: background 0.3s ease;
 }
 
 /* ==========================================================================
@@ -578,34 +303,6 @@
     gap: clamp(8px, 1.8vw, 12px);
     margin-top: 0px;
     white-space: nowrap;
-  }
-
-  /* Sibling 2: Spacer hidden */
-  .hero-spacer {
-    display: none;
-  }
-
-  /* Sibling 3: Photo Card — centered in column */
-  .hero-visual-container {
-    order: 2;
-    width: 100%;
-    margin: 0 auto;
-    flex: 0 0 auto;
-    min-height: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-  }
-
-  .hero-3d-card {
-    aspect-ratio: 1 / 1;
-    width: 100%;
-    height: auto;
-    min-height: 0;
-    max-width: min(340px, 86vw, calc(100dvh - var(--header-height) - 290px));
-    flex: 0 0 auto;
-    margin: 0 auto;
   }
 }
 
@@ -704,40 +401,6 @@
     height: clamp(18px, 5.0vw, 24px);
     position: relative !important;
   }
-
-  .hero-visual-container {
-    width: 100%;
-    margin: 0 auto;
-    flex: 0 0 auto;
-    min-height: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-  }
-
-  .hero-3d-card {
-    aspect-ratio: 1 / 1;
-    width: 100%;
-    height: auto;
-    min-height: 0;
-    max-width: min(320px, 84vw, calc(100dvh - var(--header-height) - 290px));
-    flex: 0 0 auto;
-    margin: 0 auto;
-  }
-
-  .floating-flavor-pill {
-    bottom: 10px;
-    left: 10px;
-    padding: 5px 12px;
-    font-size: 0.74rem;
-    transform: translateZ(40px) rotate(3deg);
-  }
-
-  .floating-flavor-pill .flavor-tag {
-    font-size: 0.62rem;
-    padding: 2px 6px;
-  }
 }
 
 @media (max-height: 700px) and (max-width: 640px) {
@@ -770,13 +433,6 @@
     font-size: clamp(1.45rem, 6.4vw, 1.95rem);
   }
 
-  .hero-3d-card {
-    height: auto;
-    flex: 1 1 auto;
-    min-height: 150px;
-    max-height: clamp(180px, 35vh, 260px);
-  }
-
   .tagline-stack {
     gap: 3px;
   }
@@ -800,10 +456,6 @@
     height: auto;
   }
 
-  .hero-spacer {
-    display: none;
-  }
-
   .hero-content.headline-block {
     margin-bottom: 0;
   }
@@ -823,42 +475,114 @@
   .bay-chunky {
     font-size: clamp(1.2rem, 3.5vw, 1.55rem);
   }
+}
 
-  .hero-visual-container {
-    max-width: 280px;
-    margin: 0 auto;
-  }
+/* ==========================================================================
+   TIME OF DAY HERO
+   public/hero-daypart.js sets <html data-daypart> from Manila time before the
+   page paints; only the matching photo is ever downloaded. Without the script
+   the daytime photo shows.
+   ========================================================================== */
+:root,
+[data-daypart="day"] {
+  --hero-photo-portrait: url("/images/hero/day-portrait.webp");
+  --hero-photo-wide: url("/images/hero/day-wide.webp");
+  /* Focal points: what has to stay in frame whatever the screen shape */
+  --hero-focus-portrait: 20% center;   /* the outrigger boat */
+  --hero-focus-wide: 35% 70%;
+}
 
-  .hero-3d-card {
-    height: clamp(170px, 45vh, 220px);
-    min-height: 160px;
+[data-daypart="sunrise"] {
+  --hero-photo-portrait: url("/images/hero/sunrise-portrait.webp");
+  --hero-photo-wide: url("/images/hero/sunrise-wide.webp");
+  --hero-focus-portrait: 55% center;   /* the sun and its reflection */
+  --hero-focus-wide: 55% 30%;
+}
+
+[data-daypart="sunset"] {
+  --hero-photo-portrait: url("/images/hero/sunset-portrait.webp");
+  --hero-photo-wide: url("/images/hero/sunset-wide.webp");
+  --hero-focus-portrait: 50% center;   /* the four silhouettes on the flats */
+  --hero-focus-wide: 45% 85%;
+}
+
+[data-daypart="night"] {
+  --hero-photo-portrait: url("/images/hero/night-portrait.webp");
+  --hero-photo-wide: url("/images/hero/night-wide.webp");
+  --hero-focus-portrait: 60% center;   /* the lanterns and the tables under them */
+  --hero-focus-wide: 60% 90%;
+}
+
+.hero-section {
+  background: var(--deep-navy-dark);
+}
+
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  background: var(--deep-navy-dark) var(--hero-photo-portrait) var(--hero-focus-portrait) / cover no-repeat;
+  /* A slow settle as the page opens */
+  animation: heroPhotoSettle 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Landscape screens get the wide crops, portrait ones (phones, upright
+   tablets) the tall ones; hero-daypart.js preloads by the same test */
+@media (min-aspect-ratio: 1/1) {
+  .hero-photo {
+    background-image: var(--hero-photo-wide);
+    background-position: var(--hero-focus-wide);
   }
 }
 
-/* Ambient Mobile 3D Floating Presence for Touch Devices (where mouse hover is absent) */
-@media (hover: none) and (pointer: coarse) {
-  @keyframes heroCardMobileBreath {
-    0% {
-      transform: perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0px);
-    }
-    50% {
-      transform: perspective(1200px) rotateX(3deg) rotateY(-2deg) translateY(-6px);
-    }
-    100% {
-      transform: perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0px);
-    }
+@keyframes heroPhotoSettle {
+  from { transform: scale(1.06); opacity: 0.6; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Shade behind the headline (left on wide screens) and a fade into the wave */
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(14, 26, 69, 0.62) 0%, rgba(14, 26, 69, 0.38) 38%, rgba(14, 26, 69, 0) 64%),
+    linear-gradient(180deg, rgba(14, 26, 69, 0) 72%, rgba(14, 26, 69, 0.55) 100%);
+}
+
+.hero-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.tagline-stack {
+  text-shadow: 0 2px 24px rgba(14, 26, 69, 0.45);
+}
+
+/* Phones and tablets: headline over the sky at the top, the scene below */
+@media (max-width: 1024px) {
+  .hero-section {
+    justify-content: flex-start;
   }
 
-  .hero-3d-card {
-    animation: heroCardMobileBreath 6s ease-in-out infinite;
-    will-change: transform;
+  /* Keep the headline up in the sky rather than centred on the photo */
+  .hero-grid {
+    flex: 0 0 auto;
+    align-items: center;
+    padding-top: clamp(8px, 3vh, 32px);
+  }
+
+  .hero-scrim {
+    background:
+      linear-gradient(180deg, rgba(14, 26, 69, 0.62) 0%, rgba(14, 26, 69, 0.34) 30%, rgba(14, 26, 69, 0) 52%),
+      linear-gradient(180deg, rgba(14, 26, 69, 0) 76%, rgba(14, 26, 69, 0.5) 100%);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero-3d-card {
-    animation: none !important;
+/* Landscape phones: one column, headline left like the desktop */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero-grid {
+    display: flex;
+    align-items: flex-start;
   }
 }
-
-

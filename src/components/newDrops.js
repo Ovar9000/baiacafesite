@@ -1,9 +1,9 @@
 /**
- * BAIA Cafe — New Drops & Fresh Releases Component
- * 
- * Renders latest food & drink drops and upcoming beach events synced from Facebook.
+ * BAIA Cafe — "What's New" strip
+ *
+ * Shows the latest few food & drink drops and beach events synced from
+ * Facebook, near the end of the homepage. The full feed lives on Facebook.
  * Features:
- * - Dynamic category filtering (All, Food, Drinks, Events)
  * - Relative time stamps ("2 days ago", "Yesterday")
  * - 1-Click "Add to Order" integration with cartStore & Messenger
  * - Direct "View on Facebook ↗" links to original post
@@ -19,7 +19,8 @@ export function initNewDrops() {
   const container = document.getElementById('new-drops-root');
   if (!container) return;
 
-  let activeCategory = 'all';
+  // The homepage shows only the newest few; the rest are a tap away on Facebook.
+  const LATEST_COUNT = 3;
 
   // Time-sensitive cards stop showing once they're stale, so a one-day
   // closure notice can't linger on the homepage for weeks.
@@ -97,64 +98,27 @@ export function initNewDrops() {
   }
 
   function render() {
-    const items = currentItems;
-    const filteredItems = activeCategory === 'all' 
-      ? items 
-      : items.filter(item => item.category === activeCategory);
-
-    const counts = {
-      all: items.length,
-      food: items.filter(i => i.category === 'food').length,
-      drink: items.filter(i => i.category === 'drink').length,
-      event: items.filter(i => i.category === 'event').length
-    };
+    const publishedAt = (item) => parseDate(item.published_at)?.getTime() || 0;
+    const filteredItems = [...currentItems]
+      .sort((a, b) => publishedAt(b) - publishedAt(a))
+      .slice(0, LATEST_COUNT);
 
     container.innerHTML = `
       <div class="drops-header-block">
-        <div class="drops-title-wrap">
-          <span class="drops-script-accent">Fresh Out The Kitchen</span>
-          <h2 class="drops-headline">
-            <span class="wordmark">NEW DROPS</span>
-            <span class="drops-amp">&amp;</span>
-            <span class="wordmark">EVENTS</span>
-          </h2>
-          <p class="drops-subtitle">
-            Artisanal flavor drops, limited kitchen specials, giveaways, and beachside happenings at BAIA Cafe.
-          </p>
-        </div>
-
-        <!-- Interactive Category Filter Tabs -->
-        <div class="drops-filter-tabs" role="tablist" aria-label="Filter drops by category">
-          <button class="drops-tab-btn ${activeCategory === 'all' ? 'is-active' : ''}" data-cat="all" role="tab" aria-selected="${activeCategory === 'all'}">
-            <span>All Releases</span>
-            <span class="tab-count-pill">${counts.all}</span>
-          </button>
-          <button class="drops-tab-btn ${activeCategory === 'food' ? 'is-active' : ''}" data-cat="food" role="tab" aria-selected="${activeCategory === 'food'}">
-            <span>Food</span>
-            <span class="tab-count-pill">${counts.food}</span>
-          </button>
-          <button class="drops-tab-btn ${activeCategory === 'drink' ? 'is-active' : ''}" data-cat="drink" role="tab" aria-selected="${activeCategory === 'drink'}">
-            <span>Drinks</span>
-            <span class="tab-count-pill">${counts.drink}</span>
-          </button>
-          <button class="drops-tab-btn ${activeCategory === 'event' ? 'is-active' : ''}" data-cat="event" role="tab" aria-selected="${activeCategory === 'event'}">
-            <span>Events &amp; Giveaways</span>
-            <span class="tab-count-pill">${counts.event}</span>
-          </button>
-        </div>
+        <h2 class="drops-headline">What's new</h2>
+        <p class="drops-subtitle">
+          The latest from the kitchen and the shore.
+          <a href="https://www.facebook.com/thebaiacafe" target="_blank" rel="noopener" class="drops-more-link">More on Facebook <span aria-hidden="true">&#8599;</span></a>
+        </p>
       </div>
 
       <!-- Drops Cards Carousel Reel Wrapper -->
       <div class="drops-reel-wrapper">
-        <button type="button" class="drops-reel-nav drops-reel-prev" id="drops-reel-prev" aria-label="Previous releases">
-          <span aria-hidden="true">‹</span>
-        </button>
-
         <div class="drops-cards-grid" id="drops-cards-track">
           ${filteredItems.length === 0 ? `
           <div class="drops-empty-state">
-            <h3>No drops in this category right now</h3>
-            <p>Check back soon or follow our Facebook page for the next flavor drop.</p>
+            <h3>Nothing new this week</h3>
+            <p>Follow our Facebook page for the next drop.</p>
           </div>
         ` : filteredItems.map((item, index) => {
           const isFood = item.category === 'food';
@@ -258,23 +222,23 @@ export function initNewDrops() {
                 <div class="drop-card-actions">
                   ${!isEvent && priceNum > 0 ? `
                     <button class="btn-drop-order" data-order-drop="${escapeHtml(item.id)}" data-title="${encodeURIComponent(item.title)}" data-price="${priceNum}">
-                      <span>Add to Order (${escapeHtml(item.price)})</span>
+                      <span>Add to order (${escapeHtml(item.price)})</span>
                     </button>
                   ` : (isGiveaway ? `
                     ${isGiveawayConcluded ? `
                       <a href="${sanitizeUrl(item.permalink || 'https://facebook.com/thebaiacafe', 'https://facebook.com/thebaiacafe')}" target="_blank" rel="noopener" class="btn-drop-order btn-drop-winner">
-                        <span>View Winner</span>
+                        <span>View winner</span>
                         <span aria-hidden="true">↗</span>
                       </a>
                     ` : `
                       <a href="${sanitizeUrl(item.permalink || 'https://facebook.com/thebaiacafe', 'https://facebook.com/thebaiacafe')}" target="_blank" rel="noopener" class="btn-drop-order btn-drop-giveaway">
-                        <span>Enter Giveaway</span>
+                        <span>Enter giveaway</span>
                         <span aria-hidden="true">→</span>
                       </a>
                     `}
                   ` : (/baia\.cafe\/card/i.test(item.description || '') ? `
                     <a href="/card/" class="btn-drop-order">
-                      <span>Get Your Card</span>
+                      <span>Get your card</span>
                       <span aria-hidden="true">→</span>
                     </a>
                   ` : (isUpcomingEvent && !isAdvisory ? `
@@ -284,7 +248,7 @@ export function initNewDrops() {
                     </a>
                   ` : `
                     <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-drop-order">
-                      <span>Message Us</span>
+                      <span>Message us</span>
                     </a>
                   `)))}
 
@@ -302,68 +266,8 @@ export function initNewDrops() {
           `;
         }).join('')}
         </div>
-
-        <button type="button" class="drops-reel-nav drops-reel-next" id="drops-reel-next" aria-label="Next releases">
-          <span aria-hidden="true">›</span>
-        </button>
-      </div>
-
-      <!-- Bottom Facebook Live Anchor -->
-      <div class="drops-footer-banner">
-        <div class="footer-banner-text">
-          <strong>Got a craving for something custom?</strong>
-          <span>Message the BAIA kitchen directly on Facebook Messenger for custom orders, catering, and beach table holds.</span>
-        </div>
-        <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-banner-messenger">
-          <span>Chat on Messenger</span>
-          <span aria-hidden="true">→</span>
-        </a>
       </div>
     `;
-
-    // Attach Category Tab Listeners & Scroll Reset
-    container.querySelectorAll('.drops-tab-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const cat = e.currentTarget.dataset.cat;
-        if (cat && cat !== activeCategory) {
-          activeCategory = cat;
-          render();
-          const track = container.querySelector('#drops-cards-track');
-          if (track) track.scrollTo({ left: 0, behavior: 'smooth' });
-        }
-      });
-    });
-
-    // Reel Carousel Navigation Controls
-    const track = container.querySelector('#drops-cards-track');
-    const prevBtn = container.querySelector('#drops-reel-prev');
-    const nextBtn = container.querySelector('#drops-reel-next');
-
-    if (track && prevBtn && nextBtn) {
-      const updateNavButtons = () => {
-        const atStart = track.scrollLeft <= 8;
-        const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 12;
-        prevBtn.disabled = atStart;
-        nextBtn.disabled = atEnd;
-        prevBtn.style.opacity = atStart ? '0.35' : '1';
-        nextBtn.style.opacity = atEnd ? '0.35' : '1';
-        prevBtn.style.pointerEvents = atStart ? 'none' : 'auto';
-        nextBtn.style.pointerEvents = atEnd ? 'none' : 'auto';
-      };
-
-      prevBtn.addEventListener('click', () => {
-        const scrollAmount = Math.max(280, Math.floor(track.clientWidth * 0.75));
-        track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-      });
-
-      nextBtn.addEventListener('click', () => {
-        const scrollAmount = Math.max(280, Math.floor(track.clientWidth * 0.75));
-        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      });
-
-      track.addEventListener('scroll', updateNavButtons, { passive: true });
-      updateNavButtons();
-    }
 
     // CSP-safe image fallback (no inline onerror)
     container.querySelectorAll('img[data-fallback-src]').forEach((img) => {

@@ -643,7 +643,8 @@ describe('image pipeline', async () => {
     for (const f of fs.readdirSync(path.join(ROOT, 'public', 'images'))) {
       if (!/\.(webp|jpe?g|png)$/i.test(f) || /^(baia-|Logo)/.test(f)) continue;
       const { width, height } = await sharp(fs.readFileSync(path.join(ROOT, 'public', 'images', f))).metadata();
-      const limit = f.startsWith('Cottage rental') ? 1200 : 960;
+      // Link-preview images (og-*) use Facebook's recommended 1200x630
+      const limit = f.startsWith('Cottage rental') || f.startsWith('og-') ? 1200 : 960;
       assert.ok(Math.max(width, height) <= limit, `${f} is ${width}x${height}`);
     }
   });
