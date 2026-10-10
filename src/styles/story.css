@@ -124,7 +124,6 @@
   padding: 14px 28px;
   border-radius: var(--radius-pill);
   text-decoration: none;
-  box-shadow: 0 8px 20px rgba(22, 37, 92, 0.2);
   transition: all var(--duration-fast) var(--ease-spring);
 }
 
@@ -132,7 +131,6 @@
   background: var(--electric-blue);
   color: var(--white);
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 14px 28px rgba(31, 58, 224, 0.3);
 }
 
 /* Right: Scattered Interactive Polaroid Gallery */
@@ -150,7 +148,7 @@
   background: #FFFFFF;
   padding: 12px 12px 24px 12px;
   border-radius: 6px;
-  box-shadow: 0 16px 36px rgba(22, 37, 92, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-md);
   cursor: default;
   transform-style: preserve-3d;
   transition: transform 0.4s var(--ease-spring), box-shadow 0.4s ease, z-index 0s;
@@ -160,7 +158,6 @@
 .polaroid-card:hover {
   z-index: 20 !important;
   transform: scale(1.08) rotate(0deg) translateZ(40px) !important;
-  box-shadow: 0 28px 56px rgba(22, 37, 92, 0.28);
 }
 
 .polaroid-3:hover {
@@ -234,7 +231,6 @@
   text-transform: uppercase;
   transform: rotate(14deg);
   z-index: 5;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
 }
 
 /* Responsive */
@@ -466,7 +462,7 @@
 
 .story-atmosphere .atmosphere-card {
   border-color: rgba(22, 37, 92, 0.12);
-  box-shadow: 0 12px 28px rgba(22, 37, 92, 0.18);
+  box-shadow: var(--shadow-md);
 }
 
 .story-atmosphere .atmosphere-overlay {
