@@ -114,6 +114,9 @@ export async function hydrateCommunityWall() {
     cup.insertBefore(cards[i], cup.firstChild);
   }
   applyWallLayout(cup);
+  // On phones the wall is a swipeable row; scroll snapping would otherwise
+  // follow the old first card and leave the row scrolled past the new photos
+  cup.scrollLeft = 0;
   return { added: fresh.length, reason: 'hydrated-supabase' };
 }
 

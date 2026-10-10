@@ -498,3 +498,67 @@
   
   
 }
+
+/* ==========================================================================
+   What's New cards in the shared card style (House Signatures, gear, menu):
+   a white card, the photo inset with concentric corners, navy text and
+   sentence-case pill buttons
+   ========================================================================== */
+.drop-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  padding: 8px;
+  box-shadow: 0 1px 2px rgba(22, 37, 92, 0.06), var(--shadow-sm);
+}
+
+.drop-media-frame {
+  border-radius: calc(var(--radius-lg) - 8px);
+  overflow: hidden;
+}
+
+.drop-content-body {
+  padding: 14px 10px 8px;
+}
+
+.drop-category-label {
+  color: var(--electric-blue);
+}
+
+.drop-card-title {
+  font-family: var(--font-display);
+  color: var(--deep-navy);
+}
+
+.drop-card-desc {
+  color: #4B5876;
+}
+
+.btn-drop-order {
+  height: 40px;
+  min-height: 40px;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.btn-drop-rsvp,
+.btn-drop-rsvp:hover {
+  color: var(--deep-navy);
+}
+
+.btn-drop-fb {
+  height: 40px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: rgba(120, 120, 128, 0.12);
+  color: var(--deep-navy);
+  font-size: 0.85rem;
+}
+
+.btn-drop-fb:hover {
+  background: rgba(24, 119, 242, 0.12);
+  border-color: transparent;
+  color: #1877F2;
+}

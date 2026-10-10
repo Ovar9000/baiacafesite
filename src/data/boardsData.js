@@ -3,6 +3,7 @@ import { HOURS, HOURS_TEXT, formatTime } from './siteInfo.js';
 export const boardsData = [
   {
     id: "board-skimboard",
+    blurb: "Our custom BAIA board, free for cafe guests to ride on the shore.",
     name: "BAIA Cafe Skimboard",
     type: "Recreational Gear",
     image: "./images/skimboard.webp",
@@ -21,6 +22,7 @@ export const boardsData = [
   },
   {
     id: "gear-sea-mask",
+    blurb: "Anti-fog tempered glass with a wide view, for the reef off the shore.",
     name: "HD Tempered Glass Snorkeling Mask",
     type: "Recreational Gear",
     image: "./images/SeaMask.webp",
@@ -40,6 +42,7 @@ export const boardsData = [
   },
   {
     id: "board-surfboard-9",
+    blurb: "A 9'0\" cruiser shaped for Laurente's bay swells. In production now.",
     name: "Classic Shore Cruiser 9'0\"",
     type: "Surfboard",
     image: "./images/surfboard-blueprint.svg",

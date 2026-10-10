@@ -34,89 +34,32 @@ export function initBoardsRental() {
     `;
   }
 
-  // Render Gear & Boards Cards (Free Skimboard, ₱50 Mask, Soon Surfboard) if empty
+  // Gear: the same compact cards as House Signatures (a swipeable row on phones)
   if (container && container.children.length === 0) {
-    container.innerHTML = boardsData.map(item => {
-    let actionBtnHtml = '';
-    let pricingBoxHtml = '';
-
-    if (item.isFree) {
-      pricingBoxHtml = `
-        <div class="gear-price-row free-row">
-          <div class="price-val-free">FREE</div>
-          <span class="price-sub-free">Complimentary for Cafe Guests</span>
-        </div>
-      `;
-      actionBtnHtml = `
-        <button type="button" class="btn-primary-glow" style="width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.9rem;" data-board-alert="skim">
-          Grab at Cafe Counter
-        </button>
-      `;
-    } else if (item.status === 'soon') {
-      pricingBoxHtml = `
-        <div class="board-soon-box">
-          <span class="soon-badge">Arriving Soon</span>
-          <p class="soon-subtext">${escBoards(item.priceSubtext)}</p>
-        </div>
-      `;
-      actionBtnHtml = `
-        <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill" style="width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.9rem;">
-          Inquire via Facebook Messenger
-        </a>
-      `;
-    } else {
-      pricingBoxHtml = `
-        <div class="gear-price-row">
-          <div class="price-val">₱${escBoards(item.ratePrice)}</div>
-          <span class="price-sub">${escBoards(item.priceSubtext)}</span>
-        </div>
-      `;
-      actionBtnHtml = `
-        <button type="button" class="btn-primary-glow" style="width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.9rem;" data-board-alert="mask">
-          Rent at Counter (₱50)
-        </button>
-      `;
-    }
-
-    return `
-      <div class="board-card" data-board-id="${escBoards(item.id)}">
-        <div>
-          <div class="board-photo-frame">
+    container.innerHTML = boardsData.map((item) => {
+      const soon = item.status === 'soon';
+      const price = item.isFree ? 'Free for guests' : soon ? 'Coming soon' : `₱${escBoards(item.ratePrice)} a day`;
+      const action = soon
+        ? '<a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="signature-btn">Ask us</a>'
+        : '<span class="gear-note">Ask at the counter</span>';
+      return `
+        <article class="signature-card${soon ? ' is-soon' : ''}" data-board-id="${escBoards(item.id)}">
+          <div class="signature-photo">
             <img src="${safeImgBoards(item.image)}" alt="${escBoards(item.name)}" width="900" height="1200" loading="lazy" decoding="async" />
           </div>
-          <div class="board-top-row">
-            <span class="board-type-tag">${escBoards(item.type)}</span>
-            <span class="board-badge" style="${item.isFree ? 'background: #064e3b; color: #6ee7b7; border: 1px solid #059669;' : (item.status === 'soon' ? 'background: #78350f; color: #fde68a; border: 1px solid #d97706;' : 'background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6;')}">${escBoards(item.tag)}</span>
+          <div class="signature-body">
+            <span class="signature-kicker">${escBoards(item.tag)}</span>
+            <h3 class="signature-title">${escBoards(item.name)}</h3>
+            <p class="signature-text">${escBoards(item.blurb || '')}</p>
+            <div class="signature-foot">
+              <span class="signature-price">${price}</span>
+              ${action}
+            </div>
           </div>
-          <h4 class="board-name">${escBoards(item.name)}</h4>
-          <p class="board-level">Specification: <strong>${escBoards(item.level)}</strong></p>
-
-          <ul class="board-specs-list">
-            <li>Length / Fit: <strong>${escBoards(item.length)}</strong></li>
-            ${item.features.map(f => `<li>${escBoards(f)}</li>`).join('')}
-          </ul>
-        </div>
-
-        <div>
-          ${pricingBoxHtml}
-          ${actionBtnHtml}
-        </div>
-      </div>
-    `;
-  }).join('');
+        </article>
+      `;
+    }).join('');
   }
-
-  // CSP-safe click handlers (no inline onclick)
-  container.querySelectorAll('[data-board-alert]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const kind = btn.getAttribute('data-board-alert');
-      alert(
-        kind === 'mask'
-          ? 'Snorkeling masks are available for rent at ₱50 at the BAIA Cafe counter.'
-          : 'Skimboards are complimentary and free to use for all BAIA cafe guests! Grab one at the cafe counter.'
-      );
-    });
-  });
 }
 
 /**

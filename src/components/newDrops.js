@@ -105,7 +105,7 @@ export function initNewDrops() {
 
     container.innerHTML = `
       <div class="drops-header-block">
-        <h2 class="drops-headline"><span class="wordmark">What's New</span></h2>
+        <h2 class="drops-headline">What's new</h2>
         <p class="drops-subtitle">
           The latest from the kitchen and the shore.
           <a href="https://www.facebook.com/thebaiacafe" target="_blank" rel="noopener" class="drops-more-link">More on Facebook <span aria-hidden="true">&#8599;</span></a>
@@ -222,23 +222,23 @@ export function initNewDrops() {
                 <div class="drop-card-actions">
                   ${!isEvent && priceNum > 0 ? `
                     <button class="btn-drop-order" data-order-drop="${escapeHtml(item.id)}" data-title="${encodeURIComponent(item.title)}" data-price="${priceNum}">
-                      <span>Add to Order (${escapeHtml(item.price)})</span>
+                      <span>Add to order (${escapeHtml(item.price)})</span>
                     </button>
                   ` : (isGiveaway ? `
                     ${isGiveawayConcluded ? `
                       <a href="${sanitizeUrl(item.permalink || 'https://facebook.com/thebaiacafe', 'https://facebook.com/thebaiacafe')}" target="_blank" rel="noopener" class="btn-drop-order btn-drop-winner">
-                        <span>View Winner</span>
+                        <span>View winner</span>
                         <span aria-hidden="true">↗</span>
                       </a>
                     ` : `
                       <a href="${sanitizeUrl(item.permalink || 'https://facebook.com/thebaiacafe', 'https://facebook.com/thebaiacafe')}" target="_blank" rel="noopener" class="btn-drop-order btn-drop-giveaway">
-                        <span>Enter Giveaway</span>
+                        <span>Enter giveaway</span>
                         <span aria-hidden="true">→</span>
                       </a>
                     `}
                   ` : (/baia\.cafe\/card/i.test(item.description || '') ? `
                     <a href="/card/" class="btn-drop-order">
-                      <span>Get Your Card</span>
+                      <span>Get your card</span>
                       <span aria-hidden="true">→</span>
                     </a>
                   ` : (isUpcomingEvent && !isAdvisory ? `
@@ -248,7 +248,7 @@ export function initNewDrops() {
                     </a>
                   ` : `
                     <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-drop-order">
-                      <span>Message Us</span>
+                      <span>Message us</span>
                     </a>
                   `)))}
 

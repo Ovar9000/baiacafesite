@@ -88,6 +88,24 @@ instead of competing for attention. The look and feel follow iPhone (iOS 26/27
 - Earlier on this branch: glows replaced by one shared shadow scale, and more
   liquid-glass floaties across sections.
 
+### Finishing pass
+- Section titles share one calm style: sentence case, a smaller display
+  size, and a plain small label above (the hero keeps its poster headline).
+  The Shore title now says what's there: "Skimboards, snorkels & the
+  floating cottage".
+- The Shore gear cards, What's New cards and footer buttons now use the same
+  card and button style as the rest of the site (white cards, sentence-case
+  pill buttons). The gear "Grab at counter" pop-ups became a plain "Ask at
+  the counter" note.
+- The Shore info card was removed: it repeated the gear cards and the
+  cottage teaser. Golden hour moved into the section's intro.
+- Floaties cut from 26 to 5.
+- On phones, the photo wall is a swipeable row of full-size polaroids signed
+  with each guest's name (laptops keep the coffee-cup collage). Tapping a
+  photo still opens its story.
+- The footer's "View my order" button was removed (My Order is always in the
+  header or the tab bar).
+
 ### Behind the scenes
 - New photos are compressed for the web; the full-size originals are not
   shipped. The images folder is about 4 MB.

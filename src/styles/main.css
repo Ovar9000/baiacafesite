@@ -1304,6 +1304,57 @@ body:has(dialog.nav-drawer[open]) {
   }
 }
 
+/* Phones: the cup shape is too small to read on a narrow screen, so the
+   wall becomes a swipeable row of full-size polaroids (same cards, same
+   newest-first order), each signed with the guest's name. Tapping still
+   opens the photo and its story. */
+@media (max-width: 640px) {
+  .baia-coffee-cup {
+    display: flex;
+    /* The desktop cup centres its grid; a scrolling row must start at the left */
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    margin: 0 calc(-1 * var(--container-padding));
+    padding: 14px var(--container-padding) 28px;
+    scroll-padding-inline: var(--container-padding);
+  }
+
+  .baia-coffee-cup::-webkit-scrollbar {
+    display: none;
+  }
+
+  .baia-coffee-cup .mosaic-photo-card,
+  .baia-coffee-cup .mosaic-photo-card.is-steam,
+  .baia-coffee-cup .mosaic-photo-card.is-steam-m {
+    flex: 0 0 min(64vw, 260px);
+    width: auto;
+    aspect-ratio: 4 / 5;
+    padding: 8px 8px 34px;
+    position: relative;
+    scroll-snap-align: start;
+    box-shadow: var(--shadow-md);
+  }
+
+  .baia-coffee-cup .mosaic-photo-card::after {
+    content: attr(data-author);
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 6px;
+    font-family: var(--font-script);
+    font-size: 1.15rem;
+    color: var(--deep-navy);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 /* ==========================================================================
    ANIMATED POST DETAIL LIGHTBOX MODAL
    ========================================================================== */
@@ -2382,4 +2433,57 @@ body:has(dialog.nav-drawer[open]) {
 .reviews-section .reviews-subtitle {
   color: #38466b;
   opacity: 1;
+}
+
+/* ==========================================================================
+   SECTION HEADINGS: one calm style for every section title (the hero keeps
+   its poster headline). Sentence case, display face, a size that leads the
+   section without shouting; the small label above it is plain text.
+   ========================================================================== */
+.story-headline .headline-primary,
+.reviews-title,
+.boards-title,
+.promo-illustrated-title,
+.menu-main-title,
+.drops-headline {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.9rem, 4.2vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.story-headline .headline-script-line .script-accent {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  font-weight: 600;
+  transform: none;
+}
+
+.story-badge,
+.boards-tag,
+.reviews-tag {
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--electric-blue);
+}
+
+.boards-tag {
+  color: var(--amber-contrast);
+}
+
+.visit-card-title,
+.footer-col-title {
+  text-transform: none;
+  letter-spacing: -0.01em;
 }

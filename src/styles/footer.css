@@ -194,12 +194,15 @@
   gap: 10px;
 }
 
-.footer-social-btn {
+.footer-buttons-stack .footer-social-btn {
   justify-content: center;
+  min-height: 50px;
   padding: 12px 18px;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 800;
   text-align: center;
+  text-transform: none;
+  letter-spacing: 0;
   border-radius: var(--radius-pill);
   text-decoration: none;
 }
