@@ -2,7 +2,13 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabaseClient';
-import { calculateLoyaltyStatus, formatManilaDateTime } from '../lib/loyaltyHelpers';
+import {
+  calculateLoyaltyStatus,
+  formatManilaDateTime,
+  HEAD_START_STAMPS,
+  CARD_SLOTS,
+  ALMOST_THERE_THRESHOLD
+} from '../lib/loyaltyHelpers';
 import AuthModal from '../components/AuthModal';
 import QrScanner from '../components/QrScanner';
 import RedemptionCountdown from '../components/RedemptionCountdown';
@@ -23,7 +29,8 @@ import {
   Check,
   HelpCircle,
   Trash2,
-  CheckCircle2
+  CheckCircle2,
+  Sparkles
 } from 'lucide-react';
 import '../styles/loyalty.css';
 
@@ -336,6 +343,10 @@ export default function CardApp() {
   // Active cycle progress: 10 if completed, else totalStamps % 10 (e.g. 1 to 9, or 0)
   const displayProgress = isCompletedCard ? 10 : (loyaltyStatus.totalStamps % 10);
 
+  // What the 12-space card shows: the 2 head-start stamps plus the real ones
+  const displayFilledSlots = HEAD_START_STAMPS + displayProgress;
+  const isAlmostThere = !isCompletedCard && loyaltyStatus.stampsUntilNextMilestone <= ALMOST_THERE_THRESHOLD;
+
   // Active cycle number
   const activeCycleNumber = isCompletedCard
     ? Math.floor(loyaltyStatus.totalStamps / 10)
@@ -598,25 +609,34 @@ export default function CardApp() {
                 </button>
               </div>
 
-              {/* 10-Stamp Visual Grid */}
+              {/* 12-Space Stamp Grid: 2 head-start stamps on us + 10 earned */}
               <div className="stamp-grid-container">
                 <div className="stamp-grid-title">
-                  <span>{isCompletedCard ? '10/10 Stamps Completed' : 'Current Stamp Cycle'}</span>
-                  <span>{displayProgress} / 10 Stamps</span>
+                  <span>{isCompletedCard ? 'Card Complete' : 'Current Stamp Card'}</span>
+                  <span>{displayFilledSlots} / {CARD_SLOTS} Stamps</span>
                 </div>
 
                 <div className="stamp-grid-slots">
-                  {Array.from({ length: 10 }).map((_, idx) => {
+                  {Array.from({ length: CARD_SLOTS }).map((_, idx) => {
                     const slotNum = idx + 1;
-                    const isFilled = slotNum <= displayProgress;
-                    const isRewardSlot = slotNum === 10;
+                    const isHeadStart = slotNum <= HEAD_START_STAMPS;
+                    const isFilled = slotNum <= displayFilledSlots;
+                    const isRewardSlot = slotNum === CARD_SLOTS;
+                    const earnedNum = slotNum - HEAD_START_STAMPS;
+                    const stateClass = isHeadStart
+                      ? (isCompletedCard ? 'filled full-gold head-start' : 'filled head-start')
+                      : isFilled ? (isCompletedCard ? 'filled full-gold' : 'filled') : 'empty';
                     return (
-                      <div 
-                        key={idx} 
-                        className={`stamp-slot ${isFilled ? (isCompletedCard ? 'filled full-gold' : 'filled') : 'empty'} ${isRewardSlot ? 'milestone-target' : ''}`}
-                        title={isFilled ? `Stamp #${slotNum} earned` : `Stamp #${slotNum}`}
+                      <div
+                        key={idx}
+                        className={`stamp-slot ${stateClass} ${isRewardSlot ? 'milestone-target' : ''}`}
+                        title={isHeadStart
+                          ? 'Head-start stamp, on us'
+                          : isFilled ? `Stamp #${earnedNum} earned` : `Stamp #${earnedNum}`}
                       >
-                        {isFilled ? (
+                        {isHeadStart ? (
+                          <Gift />
+                        ) : isFilled ? (
                           <Coffee />
                         ) : isRewardSlot ? (
                           <Award size={18} style={{ color: '#F5A623' }} />
@@ -627,6 +647,11 @@ export default function CardApp() {
                     );
                   })}
                 </div>
+
+                <div className="stamp-grid-note">
+                  <Gift size={12} aria-hidden="true" />
+                  <span>First {HEAD_START_STAMPS} stamps on every card are on us</span>
+                </div>
               </div>
 
               {/* Progress to Next Reward */}
@@ -635,10 +660,12 @@ export default function CardApp() {
                   <span>
                     {isCompletedCard 
                       ? <strong style={{ color: '#FFE699' }}>Reward Ready at Counter</strong>
-                      : <>Next Reward: <strong>Free Specialty Coffee</strong></>}
+                      : <>{isAlmostThere ? 'Almost there: ' : 'Next Reward: '}<strong>Free Specialty Coffee</strong></>}
                   </span>
-                  <span style={{ color: '#FFE699', fontWeight: 700 }}>
-                    {isCompletedCard ? 'Completed' : `${loyaltyStatus.stampsUntilNextMilestone} drinks left`}
+                  <span style={{ color: '#FFE699', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                    {isCompletedCard
+                      ? 'Completed'
+                      : `${loyaltyStatus.stampsUntilNextMilestone} ${loyaltyStatus.stampsUntilNextMilestone === 1 ? 'drink' : 'drinks'} left`}
                   </span>
                 </div>
                 <div style={{ height: '6px', background: 'rgba(255, 255, 255, 0.15)', borderRadius: '9999px', overflow: 'hidden' }}>
@@ -646,7 +673,7 @@ export default function CardApp() {
                     style={{ 
                       height: '100%', 
                       background: isCompletedCard ? 'linear-gradient(90deg, #F5A623, #FCD34D)' : 'linear-gradient(90deg, #FB923C, #F5A623)', 
-                      width: isCompletedCard ? '100%' : `${(loyaltyStatus.currentCycleProgress / 10) * 100}%`,
+                      width: isCompletedCard ? '100%' : `${(displayFilledSlots / CARD_SLOTS) * 100}%`,
                       transition: 'width 0.4s ease'
                     }}
                   />
@@ -995,9 +1022,9 @@ export default function CardApp() {
                       </span>
                     </div>
 
-                    {/* Mini 10 Golden Cups Row */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '4px', marginBottom: '12px' }}>
-                      {Array.from({ length: 10 }).map((_, idx) => (
+                    {/* Mini 12 Golden Cups Row (first 2 are the head-start stamps) */}
+                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${CARD_SLOTS}, 1fr)`, gap: '4px', marginBottom: '12px' }}>
+                      {Array.from({ length: CARD_SLOTS }).map((_, idx) => (
                         <div
                           key={idx}
                           style={{
@@ -1011,7 +1038,7 @@ export default function CardApp() {
                             border: '1px solid #FFE699'
                           }}
                         >
-                          <Coffee size={9} />
+                          {idx < HEAD_START_STAMPS ? <Gift size={9} /> : <Coffee size={9} />}
                         </div>
                       ))}
                     </div>
@@ -1054,11 +1081,11 @@ export default function CardApp() {
                     CURRENT CYCLE #{activeCycleNumber}
                   </span>
                   <span style={{ fontSize: '0.75rem', color: '#FB923C', fontWeight: 700 }}>
-                    {isCompletedCard ? '10/10 Ready to Redeem' : `${displayProgress}/10 Stamps`}
+                    {isCompletedCard ? `${CARD_SLOTS}/${CARD_SLOTS} Ready to Redeem` : `${displayFilledSlots}/${CARD_SLOTS} Stamps`}
                   </span>
                 </div>
                 <div style={{ height: '5px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '9999px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', background: '#FB923C', width: `${(displayProgress / 10) * 100}%` }} />
+                  <div style={{ height: '100%', background: '#FB923C', width: `${(displayFilledSlots / CARD_SLOTS) * 100}%` }} />
                 </div>
               </div>
             </div>
@@ -1197,7 +1224,7 @@ export default function CardApp() {
                     Free Coffee Every 10 Stamps
                   </h5>
                   <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
-                    Complete 10 stamps to unlock your reward. Activate it when ordering and show your screen to the barista to redeem.
+                    Every card starts with {HEAD_START_STAMPS} stamps on us. Collect 10 more to fill it and unlock your reward. Activate it when ordering and show your screen to the barista to redeem.
                   </p>
                 </div>
               </div>

@@ -232,7 +232,7 @@ body {
   letter-spacing: 0.3px;
 }
 
-/* 10-Stamp Visual Grid */
+/* 12-Space Stamp Grid (2 head-start + 10 earned) */
 .stamp-grid-container {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -252,8 +252,8 @@ body {
 
 .stamp-grid-slots {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
 }
 
 .stamp-slot {
@@ -292,6 +292,30 @@ body {
 .stamp-slot.filled svg {
   width: 20px;
   height: 20px;
+}
+
+/* Head-start stamps: given, not earned, so they read softer than earned ones */
+.stamp-slot.filled.head-start {
+  background: rgba(255, 230, 153, 0.18);
+  color: #FFE699;
+  border: 1.5px solid rgba(255, 230, 153, 0.7);
+  box-shadow: none;
+  transform: none;
+}
+
+.stamp-slot.filled.full-gold.head-start {
+  background: linear-gradient(135deg, #F5A623 0%, #D97706 100%);
+  color: #FFFFFF;
+  border: 2px solid #FFFBEB;
+}
+
+.stamp-grid-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 0.72rem;
+  color: rgba(255, 230, 153, 0.9);
 }
 
 .stamp-slot.milestone-target {

@@ -52,6 +52,7 @@ export default function TermsApp() {
               <li><strong>Daily Claim Limit:</strong> A maximum of 1 stamp may be earned per registered account per calendar day (Asia/Manila timezone).</li>
               <li><strong>In-Store Standee Verification:</strong> To guarantee fair play, stamp claiming requires scanning the physical daily counter standee at Baia Café. Each code is cryptographically signed and changes daily at midnight.</li>
               <li><strong>Complimentary Beach Wi-Fi:</strong> Each daily stamp scan dispenses a 1-hour access voucher for the <em>"BAIA Free Wifi"</em> hotspot, valid for up to 2 devices (phone + laptop).</li>
+              <li><strong>Head-Start Stamps:</strong> Every stamp card has 12 spaces and starts with 2 complimentary head-start stamps, so 10 collected stamps complete a card. Head-start stamps have no cash value and are not counted as purchases.</li>
               <li><strong>Reward Redemption:</strong> Every 10 collected stamps earns 1 complimentary specialty coffee. Rewards must be activated and redeemed in-person at our counter with our barista staff. Rewards cannot be exchanged for cash.</li>
             </ul>
           </section>

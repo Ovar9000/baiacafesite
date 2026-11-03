@@ -121,6 +121,7 @@ export default function LegalModal({ type, onClose }) {
                   <li><strong>Daily Limit:</strong> Maximum of 1 stamp per account per calendar day (Asia/Manila timezone).</li>
                   <li><strong>Physical Standee QR:</strong> Stamp claims require scanning the physical daily counter standee at BAIA Café. Codes rotate daily at midnight.</li>
                   <li><strong>Beach Wi-Fi Voucher:</strong> Each daily stamp scan dispenses a 1-hour access voucher for the <em>"BAIA Free Wifi"</em> hotspot, valid for up to 2 devices.</li>
+                  <li><strong>Head-Start Stamps:</strong> Every 12-space card starts with 2 complimentary stamps, so 10 collected stamps complete a card.</li>
                   <li><strong>Reward Redemption:</strong> Every 10 stamps earns 1 complimentary specialty coffee. Rewards must be redeemed in-person with our counter barista.</li>
                 </ul>
               </section>

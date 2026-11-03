@@ -2,6 +2,19 @@
 
 What changed on baia.cafe, newest first, in plain words.
 
+## 2026-11-03: Loyalty card head start
+
+- The stamp card now has 12 spaces, and the first 2 are stamped "on us" on
+  every card. It's still 10 drinks for a free coffee, but a card that starts
+  partly filled feels closer, so people finish it faster (the goal-gradient
+  effect). Every new card gets the head start too, which softens the usual
+  slowdown right after a free coffee.
+- The given stamps look different from earned ones (outlined gift icons) and a
+  note under the card says so. Terms and the in-app legal summary explain it.
+- In the last 3 drinks the card says "Almost there".
+- Fixed: the card page went blank whenever a free coffee was waiting, so
+  guests couldn't see or redeem it (a missing icon import).
+
 ## 2026-10-10: Experience-first redesign
 
 The homepage now leads with the place itself (the shore, the photos, the

@@ -2,6 +2,22 @@
  * Baia Café Loyalty Calculation Helpers
  */
 
+/** Real stamps (bought drinks) needed for one free coffee. Matches api/claim-stamp.js. */
+export const STAMPS_PER_REWARD = 10;
+
+/**
+ * Goal-gradient head start: every card is shown as 12 spaces with the first 2
+ * already stamped "on us". It's still 10 drinks per free coffee, but a card that
+ * starts partly filled feels closer and gets finished faster (Kivetz et al. 2006).
+ * Because every new card starts with the head start, it also softens the slowdown
+ * that normally follows a reward. Display only: the backend doesn't know about it.
+ */
+export const HEAD_START_STAMPS = 2;
+export const CARD_SLOTS = STAMPS_PER_REWARD + HEAD_START_STAMPS;
+
+/** Drinks left at or below which the card says "almost there". */
+export const ALMOST_THERE_THRESHOLD = 3;
+
 /**
  * Derives current milestone progress and reward eligibility
  * Every 10 stamps unlocks a Free Specialty Coffee.
