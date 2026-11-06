@@ -71,11 +71,14 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Server database configuration error.' });
     }
 
-    const [profilesRes, stampsRes, redemptionsRes, totalStampsCountRes] = await Promise.all([
+    // stamps: '*' so this works before and after the first-card bonus migration
+    // (it adds stamps.kind; selecting the column by name would fail before it runs)
+    const [profilesRes, stampsRes, redemptionsRes, totalStampsCountRes, bonusStampsCountRes] = await Promise.all([
       supabaseAdmin.from('profiles').select('id, email, display_name, avatar_url, created_at').order('created_at', { ascending: false }).limit(1000),
-      supabaseAdmin.from('stamps').select('id, user_id, awarded_at, distance_meters, staff_note').order('awarded_at', { ascending: false }).limit(5000),
+      supabaseAdmin.from('stamps').select('*').order('awarded_at', { ascending: false }).limit(5000),
       supabaseAdmin.from('redemptions').select('id, user_id, redeemed_at, reward_type, milestone_number').order('redeemed_at', { ascending: false }).limit(2000),
-      supabaseAdmin.from('stamps').select('*', { count: 'exact', head: true })
+      supabaseAdmin.from('stamps').select('*', { count: 'exact', head: true }),
+      supabaseAdmin.from('stamps').select('*', { count: 'exact', head: true }).eq('kind', 'bonus')
     ]);
 
     if (profilesRes.error) throw profilesRes.error;
@@ -85,7 +88,11 @@ export default async function handler(req, res) {
     const profiles = profilesRes.data || [];
     const stamps = stampsRes.data || [];
     const redemptions = redemptionsRes.data || [];
-    const totalVisitsCount = totalStampsCountRes.count ?? stamps.length;
+    // Bonus stamps are gifts, not visits: keep them in reward math, leave them out of visit stats
+    const isBonus = (s) => s.kind === 'bonus';
+    const visitStamps = stamps.filter(s => !isBonus(s));
+    const bonusStampsCount = bonusStampsCountRes.error ? 0 : (bonusStampsCountRes.count ?? 0);
+    const totalVisitsCount = Math.max(0, (totalStampsCountRes.count ?? stamps.length) - bonusStampsCount);
 
     const profileMap = new Map();
     profiles.forEach(p => profileMap.set(p.id, p));
@@ -104,7 +111,7 @@ export default async function handler(req, res) {
 
     const hourlyCounts = Array(24).fill(0);
 
-    stamps.forEach(s => {
+    visitStamps.forEach(s => {
       const stampTimeMs = new Date(s.awarded_at).getTime();
       const stampManilaDate = getManilaDateString(new Date(s.awarded_at));
 
@@ -150,7 +157,7 @@ export default async function handler(req, res) {
       night: { label: 'Night Waves (7 PM – 11 PM)', count: 0 }
     };
 
-    stamps.forEach(s => {
+    visitStamps.forEach(s => {
       const h = getManilaHour(s.awarded_at);
       if (h >= 6 && h < 11) rushWindows.morning.count++;
       else if (h >= 11 && h < 15) rushWindows.lunch.count++;
@@ -214,7 +221,8 @@ export default async function handler(req, res) {
         customerEmail: profile?.email || '',
         timestamp: s.awarded_at,
         distanceMeters: s.distance_meters,
-        staffNote: s.staff_note || null
+        staffNote: s.staff_note || null,
+        isBonus: isBonus(s)
       });
     });
 
@@ -261,7 +269,7 @@ export default async function handler(req, res) {
         returningMembers,
         retentionRate,
         nearingRewardCount,
-        avgVisitsPerMember: totalMembers > 0 ? (stamps.length / totalMembers).toFixed(1) : '0',
+        avgVisitsPerMember: totalMembers > 0 ? (visitStamps.length / totalMembers).toFixed(1) : '0',
         tiers: {
           firstTimer: tier1,
           occasional: tier2,

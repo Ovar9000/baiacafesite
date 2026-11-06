@@ -93,8 +93,11 @@ begin
 end $$;
 
 -- 5. Extra guardrails: unique constraints (skip if already created by schema.sql)
+-- (earned stamps only, so the first-card bonus can share a day with the 10th stamp)
+alter table public.stamps add column if not exists kind text not null default 'earned';
 create unique index if not exists stamps_user_single_daily_stamp_idx
-  on public.stamps (user_id, (timezone('Asia/Manila', awarded_at)::date));
+  on public.stamps (user_id, (timezone('Asia/Manila', awarded_at)::date))
+  where kind = 'earned';
 
 create unique index if not exists redemptions_user_milestone_idx
   on public.redemptions (user_id, milestone_number);

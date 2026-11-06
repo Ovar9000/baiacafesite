@@ -23,19 +23,27 @@ create table if not exists public.stamps (
   staff_note text
 );
 
+-- 'earned' = a bought drink, 'bonus' = given by us. The first-card bonus trigger
+-- lives in 2026-11-06-first-card-bonus.sql (run it after this file).
+alter table public.stamps add column if not exists kind text not null default 'earned';
+
 -- Optimized index for user stamp history and daily limit lookups
 create index if not exists stamps_user_day_idx on public.stamps (user_id, awarded_at desc);
 
--- Pre-clean any accidental duplicates before creating unique index (keeps the earliest stamp)
+-- Pre-clean any accidental duplicates before creating unique index (keeps the earliest stamp).
+-- Earned stamps only: the first-card bonus shares a day with the 10th stamp on purpose.
 delete from public.stamps a
 using public.stamps b
 where a.id > b.id
   and a.user_id = b.user_id
+  and a.kind = 'earned'
+  and b.kind = 'earned'
   and (timezone('Asia/Manila', a.awarded_at)::date) = (timezone('Asia/Manila', b.awarded_at)::date);
 
--- Enforce maximum 1 stamp per user per Asia/Manila calendar date at the database engine level
-create unique index if not exists stamps_user_single_daily_stamp_idx 
-  on public.stamps (user_id, (timezone('Asia/Manila', awarded_at)::date));
+-- Enforce maximum 1 earned stamp per user per Asia/Manila calendar date at the database engine level
+create unique index if not exists stamps_user_single_daily_stamp_idx
+  on public.stamps (user_id, (timezone('Asia/Manila', awarded_at)::date))
+  where kind = 'earned';
 
 -- 3. Redemptions Table (One row per claimed reward)
 create table if not exists public.redemptions (

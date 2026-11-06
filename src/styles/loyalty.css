@@ -299,6 +299,50 @@ body {
   box-shadow: 0 0 10px rgba(245, 166, 35, 0.4);
 }
 
+/* First-card bonus stamp: a gift, so it reads differently from a bought drink */
+.stamp-slot.filled.bonus {
+  background: linear-gradient(135deg, #FFE699 0%, #F5A623 100%);
+  color: #78350F;
+  border: 2px dashed #FFFBEB;
+  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.4);
+}
+
+.stamp-slot-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background: #131314;
+  color: #FFE699;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+
+.stamp-grid-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 0.74rem;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.stamp-grid-note svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #FFE699;
+}
+
+.stamp-grid-note strong {
+  color: #FFE699;
+}
+
 .card-stats-bottom {
   display: flex;
   justify-content: space-between;

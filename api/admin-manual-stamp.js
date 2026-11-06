@@ -118,6 +118,14 @@ export default async function handler(req, res) {
     const rawNote = typeof staffNote === 'string' ? staffNote.trim().slice(0, 200) : '';
     const safeNote = rawNote.replace(/[\u0000-\u001F\u007F]/g, '');
     const note = safeNote ? `Manual Grant: ${safeNote}` : 'Manual Barista Override (Edge Case / GPS)';
+
+    // Count first so we can tell staff when this stamp also triggered the
+    // first-card bonus (added by a database trigger on the 10th stamp)
+    const { count: stampsBefore } = await supabaseAdmin
+      .from('stamps')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId);
+
     const { error: insertErr } = await supabaseAdmin
       .from('stamps')
       .insert({
@@ -142,15 +150,21 @@ export default async function handler(req, res) {
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId);
 
+    const currentTotal = totalStamps || 1;
+    const bonusAwarded = Number.isInteger(stampsBefore) && currentTotal - stampsBefore > 1;
+
     return res.status(200).json({
       success: true,
-      message: `Successfully granted 1 stamp to ${displayName}!`,
+      message: bonusAwarded
+        ? `Granted 1 stamp to ${displayName}. That finished their first card, so they also got the +1 first-card bonus stamp.`
+        : `Successfully granted 1 stamp to ${displayName}!`,
       user: {
         id: userId,
         email: cleanEmail,
         displayName
       },
-      totalStamps: totalStamps || 1
+      totalStamps: currentTotal,
+      bonusAwarded
     });
 
   } catch (err) {

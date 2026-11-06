@@ -368,6 +368,7 @@ export default function CustomerActivityView({ password, data, setData, loading,
                   const isStamp = act.type === 'stamp';
                   const isSignup = act.type === 'signup';
                   const isRedemption = act.type === 'redemption';
+                  const isBonusStamp = isStamp && act.isBonus;
 
                   return (
                     <div
@@ -395,10 +396,10 @@ export default function CustomerActivityView({ password, data, setData, loading,
                           alignItems: 'center',
                           justifyContent: 'center',
                           flexShrink: 0,
-                          background: isStamp ? '#EFF6FF' : isSignup ? '#FDF4FF' : '#ECFDF5',
-                          color: isStamp ? '#1E4AFF' : isSignup ? '#A855F7' : '#10B981'
+                          background: isBonusStamp ? '#FFFBEB' : isStamp ? '#EFF6FF' : isSignup ? '#FDF4FF' : '#ECFDF5',
+                          color: isBonusStamp ? '#D97706' : isStamp ? '#1E4AFF' : isSignup ? '#A855F7' : '#10B981'
                         }}>
-                          {isStamp ? <QrCode size={18} /> : isSignup ? <UserCheck size={18} /> : <Award size={18} />}
+                          {isBonusStamp ? <Gift size={18} /> : isStamp ? <QrCode size={18} /> : isSignup ? <UserCheck size={18} /> : <Award size={18} />}
                         </div>
 
                         <div style={{ minWidth: 0, flex: 1 }}>
@@ -412,12 +413,12 @@ export default function CustomerActivityView({ password, data, setData, loading,
                               padding: '2px 8px',
                               borderRadius: '9999px',
                               textTransform: 'uppercase',
-                              background: isStamp ? '#DBEAFE' : isSignup ? '#F3E8FF' : '#D1FAE5',
-                              color: isStamp ? '#1E40AF' : isSignup ? '#6B21A8' : '#065F46',
+                              background: isBonusStamp ? '#FEF3C7' : isStamp ? '#DBEAFE' : isSignup ? '#F3E8FF' : '#D1FAE5',
+                              color: isBonusStamp ? '#92400E' : isStamp ? '#1E40AF' : isSignup ? '#6B21A8' : '#065F46',
                               whiteSpace: 'nowrap',
                               flexShrink: 0
                             }}>
-                              {isStamp ? 'QR Stamp Scan' : isSignup ? 'New Registration' : 'Reward Redemption'}
+                              {isBonusStamp ? '+1 First-Card Bonus' : isStamp ? 'QR Stamp Scan' : isSignup ? 'New Registration' : 'Reward Redemption'}
                             </span>
                           </div>
 

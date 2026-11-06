@@ -53,6 +53,7 @@ export default function TermsApp() {
               <li><strong>In-Store Standee Verification:</strong> To guarantee fair play, stamp claiming requires scanning the physical daily counter standee at Baia Café. Each code is cryptographically signed and changes daily at midnight.</li>
               <li><strong>Complimentary Beach Wi-Fi:</strong> Each daily stamp scan dispenses a 1-hour access voucher for the <em>"BAIA Free Wifi"</em> hotspot, valid for up to 2 devices (phone + laptop).</li>
               <li><strong>Reward Redemption:</strong> Every 10 collected stamps earns 1 complimentary specialty coffee. Rewards must be activated and redeemed in-person at our counter with our barista staff. Rewards cannot be exchanged for cash.</li>
+              <li><strong>First-Card Bonus:</strong> When you collect your 10th stamp for the first time, we add 1 bonus stamp to your next card. One bonus per account; it has no cash value.</li>
             </ul>
           </section>
 
