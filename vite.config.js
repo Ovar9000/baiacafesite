@@ -147,7 +147,7 @@ export default defineConfig({
       injectRegister: 'script-defer',
       includeAssets: ['favicon.ico', 'icons/icon-192.png', 'images/Logo.webp', 'images/Logo-black.webp'],
       workbox: {
-        navigateFallbackDenylist: [/^\/admin/, /^\/api/],
+        navigateFallback: null,
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
@@ -158,7 +158,20 @@ export default defineConfig({
           '**/adminRewards*.js',
           '**/adminActivity*.js',
           '**/admin-*.js',
-          '**/QrScanner*.js'
+          '**/QrScanner*.js',
+          '**/three*.js',
+          '**/GLTFLoader*.js',
+          '**/meshopt*.js',
+          '**/BufferGeometryUtils*.js',
+          '**/RoundedBoxGeometry*.js',
+          '**/RoomEnvironment*.js',
+          '**/heroScene*.js',
+          'floating-cottage/**',
+          '**/floatingCottage*.js',
+          'terms/**',
+          '**/terms*.js',
+          'privacy/**',
+          '**/privacy*.js'
         ]
       },
       manifest: {

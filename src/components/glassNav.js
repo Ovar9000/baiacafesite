@@ -141,5 +141,5 @@ export function initGlassNav() {
   window.addEventListener('scroll', onScroll, { passive: true });
   // Re-measure when the nav reflows (web fonts arriving, window resizing).
   new ResizeObserver(() => moveTo(hovered || current)).observe(nav);
-  update();
+  requestAnimationFrame(update);
 }

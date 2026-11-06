@@ -17,10 +17,10 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* 1. Seamless Checkerboard Pattern Row */
+/* 1. Seamless Checkerboard Pattern Row (GPU-composited transform, 28px tile) */
 .checker-row {
   height: 28px;
-  width: 100%;
+  width: calc(100% + 56px);
   background-image: 
     linear-gradient(45deg, var(--white) 25%, transparent 25%), 
     linear-gradient(-45deg, var(--white) 25%, transparent 25%), 
@@ -29,35 +29,37 @@
   background-size: 28px 28px;
   background-position: 0 0, 0 14px, 14px -14px, -14px 0px;
   background-color: var(--electric-blue);
-  animation: checkerBgScroll 25s linear infinite;
+  will-change: transform;
+  animation: checkerBgScroll 2.5s linear infinite;
 }
 
 @keyframes checkerBgScroll {
   from {
-    background-position: 0 0, 0 14px, 14px -14px, -14px 0px;
+    transform: translate3d(0, 0, 0);
   }
   to {
-    background-position: -560px 0, -560px 14px, -546px -14px, -574px 0px;
+    transform: translate3d(-56px, 0, 0);
   }
 }
 
-/* 2. Seamless Continuous SVG Wave Pattern Row */
+/* 2. Seamless Continuous SVG Wave Pattern Row (GPU-composited transform, 60px tile) */
 .wave-svg-row {
   height: 26px;
-  width: 100%;
+  width: calc(100% + 60px);
   background-color: var(--deep-navy);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 26' width='60' height='26'%3E%3Cpath d='M0 13 Q15 4 30 13 T60 13' fill='none' stroke='%23F5E9D6' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: repeat-x;
   background-size: 60px 26px;
   background-position: 0 0;
-  animation: waveBgScroll 18s linear infinite;
+  will-change: transform;
+  animation: waveBgScroll 1.8s linear infinite;
 }
 
 @keyframes waveBgScroll {
   from {
-    background-position: 0 0;
+    transform: translate3d(0, 0, 0);
   }
   to {
-    background-position: -600px 0;
+    transform: translate3d(-60px, 0, 0);
   }
 }

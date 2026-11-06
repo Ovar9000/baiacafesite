@@ -26,10 +26,24 @@ const DIR = path.join(ROOT, 'public', 'images');
 
 const MAX_SIDE = 960;
 const QUALITY = 76;
-// Wide banners shown larger than a card.
-const SIDE_OVERRIDES = { 'Cottage rental': 1200 };
+// Per-slot 2x bounds: wide banners (1200), signature/gear cards (720), atmosphere & cottage teaser (680), polaroids (600).
+const SIDE_OVERRIDES = {
+  'Cottage rental': 1200,
+  skimboard: 720,
+  SeaMask: 720,
+  Tripleorder: 720,
+  smashburger: 720,
+  Cottage: 680,
+  eveningmood: 680,
+  'stars-over-the-tree': 680,
+  afterdusk: 680,
+  'evening-walk': 680,
+  beachandchill: 600,
+  twilight: 600,
+  crew: 600,
+};
 // Logos, icons and brand glyphs are already tiny; never touch them.
-const SKIP = /^(baia-|Logo|favicon)/i;
+const SKIP = /^(baia-|Logo|favicon|og-)/i;
 const INPUT = /\.(webp|jpe?g|png)$/i;
 
 const ORIGINAL_EXT = ['.jpg', '.jpeg', '.png'];

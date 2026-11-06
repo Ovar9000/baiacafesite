@@ -2,6 +2,7 @@
    BAIA CAFE — Core Design System, Accessibility & Master Stylesheet
    ========================================================================== */
 
+@import './fonts.css';
 @import './hero.css';
 @import './floaties.css';
 @import './divider.css';

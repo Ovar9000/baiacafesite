@@ -152,7 +152,7 @@
   inset: 0;
   z-index: 3;
   opacity: 0;
-  transition: opacity 0.8s ease;
+  transition: opacity 0.35s ease;
 }
 
 .hero-section.is-3d .hero-scene {
@@ -168,7 +168,7 @@
    so it can't peek out as the drinks float */
 .hero-section.is-3d .hero-drinks {
   visibility: hidden;
-  transition: visibility 0s linear 0.8s;
+  transition: visibility 0s linear 0.35s;
 }
 
 /* BAIA, huge, over the photo and behind the drinks, running off both edges */
@@ -202,8 +202,8 @@
 }
 
 @keyframes heroWordIn {
-  from { opacity: 0; letter-spacing: 0.02em; }
-  to { opacity: 1; letter-spacing: -0.04em; }
+  from { opacity: 0.35; transform: translate(-50%, -50%) scaleX(1.05); }
+  to { opacity: 1; transform: translate(-50%, -50%) scaleX(1); }
 }
 
 /* ==========================================================================

@@ -33,11 +33,11 @@ const OUT = path.join(ROOT, 'public', 'models', 'hero');
 // Triangles to aim for: enough for the silhouette and the cream's curls at
 // the size the hero shows them
 const MODELS = {
-  'iced-mocha': { triangles: 70_000 },
-  'cloudtop-latte': { triangles: 60_000 },
+  'iced-mocha': { triangles: 28_000 },
+  'cloudtop-latte': { triangles: 24_000 },
 };
 
-const BUDGET = 1_600_000; // bytes per model
+const BUDGET = 600_000; // bytes per model
 
 const kb = (n) => `${(n / 1024).toFixed(0)} KB`;
 
@@ -60,10 +60,10 @@ async function build(name, opts, io) {
   await doc.transform(
     dedup(),
     weld(),
-    simplify({ simplifier: MeshoptSimplifier, ratio: Math.min(1, opts.triangles / before), error: 0.002 }),
-    textureCompress({ encoder: sharp, targetFormat: 'webp', slots: /^baseColor/, resize: [2048, 2048], quality: 82 }),
-    textureCompress({ encoder: sharp, targetFormat: 'webp', slots: /^normal/, resize: [1024, 1024], quality: 88 }),
-    textureCompress({ encoder: sharp, targetFormat: 'webp', slots: /^metallicRoughness/, resize: [512, 512], quality: 85 }),
+    simplify({ simplifier: MeshoptSimplifier, ratio: Math.min(1, opts.triangles / before), error: 0.003 }),
+    textureCompress({ encoder: sharp, targetFormat: 'webp', slots: /^baseColor/, resize: [1024, 1024], quality: 80 }),
+    textureCompress({ encoder: sharp, targetFormat: 'webp', slots: /^normal/, resize: [512, 512], quality: 82 }),
+    textureCompress({ encoder: sharp, targetFormat: 'webp', slots: /^metallicRoughness/, resize: [256, 256], quality: 80 }),
     prune(),
     reorder({ encoder: MeshoptEncoder }),
     quantize(),

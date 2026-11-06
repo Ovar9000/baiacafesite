@@ -54,14 +54,8 @@ export const HOURS_TEXT = {
 
 /** Minutes since midnight in Manila, regardless of the visitor's own time zone. */
 function manilaMinutesNow(now = new Date()) {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: TIME_ZONE,
-    hour: 'numeric',
-    minute: 'numeric',
-    hourCycle: 'h23'
-  }).formatToParts(now);
-  const get = (type) => Number(parts.find((p) => p.type === type)?.value || 0);
-  return get('hour') * 60 + get('minute');
+  // Manila is UTC+8 year-round (no DST)
+  return ((Math.floor(now.getTime() / 60000) + 480) % 1440 + 1440) % 1440;
 }
 
 /**

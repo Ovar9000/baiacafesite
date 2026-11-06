@@ -2,6 +2,8 @@
    BAIA CAFÉ — DIGITAL LOYALTY CARD & ADMIN DESIGN SYSTEM
    ========================================================================== */
 
+@import './fonts.css';
+
 :root {
   --loyalty-navy: #131314;
   --loyalty-navy-card: #131314;

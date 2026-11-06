@@ -1,11 +1,7 @@
 /*
  * Shows the beach as it looks right now: picks the hero photo for the time of
  * day in Manila (sunrise, day, sunset, night) before the page paints, and
- * preloads only that one image. The photos themselves are set per daypart in
- * CSS (src/styles/hero.css, "TIME OF DAY").
- *
- * A plain blocking script in <head> rather than part of the app bundle, so the
- * right photo starts loading immediately instead of after main.js.
+ * preloads both that photo and the matching 3D drinks poster.
  */
 (function () {
   // Manila is UTC+8 all year (no daylight saving)
@@ -19,10 +15,24 @@
   document.documentElement.setAttribute('data-daypart', part);
 
   var wide = window.matchMedia('(min-aspect-ratio: 1/1)').matches;
-  var link = document.createElement('link');
-  link.rel = 'preload';
-  link.as = 'image';
-  link.href = '/images/hero/' + part + (wide ? '-wide' : '-portrait') + '.webp';
-  link.setAttribute('fetchpriority', 'high');
-  document.head.appendChild(link);
+  var small = window.matchMedia('(max-width: 640px)').matches;
+  var photoUrl = '/images/hero/' + part + (wide ? '-wide' : '-portrait') + '.webp';
+
+  function preload(href) {
+    var link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = href;
+    link.setAttribute('fetchpriority', 'high');
+    document.head.appendChild(link);
+  }
+
+  preload(photoUrl);
+  preload('/images/hero-3d/drinks-' + (small ? 'sm' : 'lg') + '.webp');
+
+  // Keep a live Image handle so heroScene's ice backdrop reuses it without re-fetching
+  var img = new Image();
+  img.decoding = 'async';
+  img.src = photoUrl;
+  window.__heroPhoto = img;
 })();

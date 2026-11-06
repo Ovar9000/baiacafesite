@@ -1,5 +1,4 @@
 import './styles/main.css';
-import { motionSystem } from './utils/motionSystem.js';
 import { initMenuExplorer } from './components/menuExplorer.js';
 import { initBoardsRental } from './components/boardsRental.js';
 import { initLiquidFloaties } from './components/liquidFloaties.js';
@@ -9,8 +8,8 @@ import { initCommunityWall } from './components/communityWall.js';
 import { initOpenStatus } from './components/openStatus.js';
 import { initGlassNav } from './components/glassNav.js';
 import { initNavDrawer } from './components/navDrawer.js';
-import { initHeroScene } from './components/heroScene.js';
 import { cartStore } from './components/cartStore.js';
+import { whenNear } from './utils/whenNear.js';
 import { injectSpeedInsights } from '@vercel/speed-insights';
 import { inject } from '@vercel/analytics';
 
@@ -65,12 +64,12 @@ function initLoyaltyPrefetch() {
     document.head.appendChild(link);
   };
 
-  // Trigger prefetch immediately so first-time click is already warm
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    prefetchCard();
-  } else {
-    window.addEventListener('DOMContentLoaded', prefetchCard, { once: true });
-  }
+  const schedulePrefetch = () => {
+    if ('requestIdleCallback' in window) requestIdleCallback(prefetchCard, { timeout: 4000 });
+    else setTimeout(prefetchCard, 2000);
+  };
+  if (document.readyState === 'complete') schedulePrefetch();
+  else window.addEventListener('load', schedulePrefetch, { once: true });
 
   cardLinks.forEach(link => {
     link.addEventListener('mouseenter', prefetchCard, { passive: true });
@@ -91,19 +90,37 @@ function initApp() {
   safeInit('openStatus', initOpenStatus);
   safeInit('glassNav', initGlassNav);
   safeInit('navDrawer', initNavDrawer);
-  // Waits for page load + idle itself before loading three.js and the models
-  safeInit('heroScene', initHeroScene);
+  // Split 3D scene code out of main.js; load after page load + idle
+  const posterMode = new URLSearchParams(window.location.search).has('hero-poster');
+  const conn = navigator.connection;
+  const lite = !!(conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '')));
+  if (posterMode) {
+    import('./components/heroScene.js').then((m) => m.initHeroScene());
+  } else if (!lite) {
+    const loadHero = () => import('./components/heroScene.js').then((m) => m.initHeroScene()).catch(() => {});
+    // Start loading the 3D scene as soon as the hero drinks poster paints (don't wait on full window.load)
+    const afterPaint = () => requestAnimationFrame(() => requestAnimationFrame(loadHero));
+    const posterImg = document.querySelector('.hero-drinks img');
+    if (!posterImg || posterImg.complete) afterPaint();
+    else posterImg.addEventListener('load', afterPaint, { once: true });
+  }
   safeInit('loyaltyPrefetch', initLoyaltyPrefetch);
-  safeInit('newDrops', initNewDrops);
-  safeInit('menuExplorer', initMenuExplorer);
-  safeInit('boardsRental', initBoardsRental);
   safeInit('cartDrawer', initCartDrawer);
   safeInit('seasonalPromos', initSeasonalPromosToggle);
-  // Lays out the cup now; fetches fresh photos only once the wall is near
-  // (that pulls in the Supabase client). The lightbox uses delegated clicks,
-  // so cards prepended later still open in the modal.
-  safeInit('communityWall', initCommunityWall);
   safeInit('polaroidWall', initPolaroidWall);
+
+  // Let the hero paint first, then hydrate below-the-fold sections on the next frame
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      safeInit('menuExplorer', initMenuExplorer);
+      whenNear(document.getElementById('shore'), () => safeInit('boardsRental', initBoardsRental), '900px');
+      safeInit('newDrops', initNewDrops);
+      safeInit('communityWall', initCommunityWall);
+      if (window.location.hash) {
+        document.querySelector(window.location.hash)?.scrollIntoView();
+      }
+    }, 0);
+  });
 
   // Defer non-critical ambient features to idle time
   const initAmbientFeatures = () => {
@@ -127,7 +144,7 @@ function initApp() {
     }
   };
   window.addEventListener('scroll', updateHeader, { passive: true });
-  updateHeader();
+  requestAnimationFrame(updateHeader);
 
   // Phone order bar: hidden over the story, photos and shore; it appears once
   // the menu comes into view (and stays below it), or anywhere once the order
@@ -157,7 +174,7 @@ function initApp() {
       hasItems = store.items.length > 0;
       update();
     });
-    check();
+    requestAnimationFrame(check);
   }
 
   initScrollAwareStickyBar();

@@ -88,14 +88,17 @@ export function initHeroScene() {
     run(section, stage, { still: reduce || posterMode, posterMode }).catch((e) => {
       console.warn('[BAIA] hero 3D skipped:', e);
     });
-  if (posterMode) return void start();
-  const whenIdle = (fn) =>
-    'requestIdleCallback' in window ? requestIdleCallback(fn, { timeout: 2500 }) : setTimeout(fn, 1000);
-  if (document.readyState === 'complete') whenIdle(start);
-  else window.addEventListener('load', () => whenIdle(start), { once: true });
+  start();
 }
 
+const nextTask = () => new Promise((r) => setTimeout(r, 0));
+
 async function run(section, stage, { still, posterMode }) {
+  // Fetch GLB binaries in parallel with Three.js chunks instead of waiting for them sequentially
+  const glbBuffers = DRINKS.map((d) => fetch(`${MODELS}/${d.file}`).then((r) => {
+    if (!r.ok) throw new Error(`${d.file}: ${r.status}`);
+    return r.arrayBuffer();
+  }));
   const [THREE, { GLTFLoader }, { MeshoptDecoder }, { RoomEnvironment }, { RoundedBoxGeometry }, { mergeVertices }] =
     await Promise.all([
       import('three'),
@@ -105,6 +108,7 @@ async function run(section, stage, { still, posterMode }) {
       import('three/addons/geometries/RoundedBoxGeometry.js'),
       import('three/addons/utils/BufferGeometryUtils.js'),
     ]);
+  const backdropPromise = posterMode ? null : makeBackdrop(THREE, section);
 
   const canvas = document.createElement('canvas');
   canvas.className = 'hero-scene';
@@ -118,6 +122,8 @@ async function run(section, stage, { still, posterMode }) {
     powerPreference: 'high-performance',
   });
   renderer.setClearColor(0x000000, 0);
+  // Error checks wait on each shader compile, blocking the page
+  renderer.debug.checkShaderErrors = posterMode;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
 
@@ -129,6 +135,7 @@ async function run(section, stage, { still, posterMode }) {
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   scene.environmentIntensity = 0.8;
   pmrem.dispose();
+  if (!posterMode) await nextTask();
 
   const key = new THREE.DirectionalLight(0xffffff, 1.5);
   key.position.set(-3, 3, 5);
@@ -139,15 +146,14 @@ async function run(section, stage, { still, posterMode }) {
   scene.add(key, rimLeft, rimRight, new THREE.HemisphereLight(0xffffff, 0x1a2a6b, 0.4));
 
   // The drinks
+  // The packed textures decode off the main thread (GLTFLoader's
+  // ImageBitmapLoader fetches their blob: URLs; the CSP's connect-src allows blob:)
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-  // The textures packed in the models load as plain images (the site's CSP
-  // allows blob: images) rather than by fetch (its connect-src doesn't)
-  loader.register((parser) => {
-    parser.textureLoader = new THREE.TextureLoader(parser.options.manager);
-    parser.textureLoader.setCrossOrigin(parser.options.crossOrigin);
-    return { name: 'baia_image_textures' };
-  });
-  const gltfs = await Promise.all(DRINKS.map((d) => loader.loadAsync(`${MODELS}/${d.file}`)));
+  const [gltfs, backdrop] = await Promise.all([
+    Promise.all(glbBuffers.map((p) => p.then((buf) => loader.parseAsync(buf, '')))),
+    backdropPromise,
+  ]);
+  if (!posterMode) await nextTask();
   const shadowTex = makeShadowTexture(THREE);
   const world = new THREE.Group();     // drinks: rises a little as the hero scrolls away
   scene.add(world);
@@ -186,8 +192,9 @@ async function run(section, stage, { still, posterMode }) {
 
   // Coffee beans and liquid-glass ice, around the drinks (not in the poster).
   // The ice needs a copy of the hero behind the canvas to bend
-  const backdrop = posterMode ? null : await makeBackdrop(THREE, section);
+
   const bits = posterMode ? null : makeBits(THREE, makeIce(THREE, RoundedBoxGeometry, mergeVertices, backdrop));
+  if (!posterMode) await nextTask();
   if (bits) scene.add(bits.group);
 
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 100);
@@ -199,10 +206,12 @@ async function run(section, stage, { still, posterMode }) {
   // keeping the stage exactly where it is on the page
   const base = { position: new THREE.Vector3(), target: new THREE.Vector3() };
   let layoutName = '';
+  let heroHeight = 1;
   const layout = () => {
     const s = stage.getBoundingClientRect();
     const h = posterMode ? s : section.getBoundingClientRect();
     if (!s.width || !s.height) return;
+    heroHeight = h.height || 1;
     renderer.setPixelRatio(posterMode ? 2 : Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(Math.round(h.width), Math.round(h.height), false);
     const aspect = s.width / s.height;
@@ -308,11 +317,7 @@ async function run(section, stage, { still, posterMode }) {
     });
 
     // Scrolling away: the drinks rise a little, the beans faster
-    let scroll = 0;
-    if (!still) {
-      const r = section.getBoundingClientRect();
-      scroll = Math.min(1, Math.max(0, -r.top / r.height));
-    }
+    const scroll = still ? 0 : Math.min(1, Math.max(0, window.scrollY / heroHeight));
     world.position.y = scroll * 0.35;
     if (bits) bits.update(still ? Infinity : t, scroll);
 
@@ -333,13 +338,14 @@ async function run(section, stage, { still, posterMode }) {
     if (running && !raf) raf = requestAnimationFrame(loop);
   };
 
+  // Shaders compile in the background first. Drawing before they're done
+  // (as the observer's first call would) compiles them on the main thread
+  layout();
+  await renderer.compileAsync?.(scene, camera);
   new ResizeObserver(() => {
     layout();
     if (!running) render(performance.now());
   }).observe(section);
-
-  // Shaders compile on the first frame: draw it before showing anything
-  await renderer.compileAsync?.(scene, camera);
   render(t0);
   if (posterMode) {
     canvas.dataset.ready = 'true';
@@ -436,7 +442,7 @@ function makeBits(THREE, ice) {
       home: new THREE.Vector3(),
       from: new THREE.Vector3(),
       size: 1,
-      delay: 0.15 + rand() * 0.45,
+      delay: rand() * 0.12,
       spin: new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).multiplyScalar(kind.spin),
       tumble: new THREE.Euler(rand() * 6.3, rand() * 6.3, rand() * 6.3),
       drift: rand() * 6.3,
@@ -451,8 +457,8 @@ function makeBits(THREE, ice) {
       if (!p) return;
       it.home.set(p[0], p[1], p[2]);
       it.size = p[3] * it.kind.size;
-      // they burst out from behind the middle of the drinks
-      it.from.set(p[0] * 0.15, 1.0, -0.6);
+      // burst right past the drinks' shoulders so they appear immediately with the cups
+      it.from.set(p[0] * 0.38, 0.85 + p[1] * 0.15, -0.35);
     });
   };
 
@@ -466,10 +472,10 @@ function makeBits(THREE, ice) {
     for (const it of items) {
       if (!it.mesh.visible) continue;
       const still = t === Infinity;
-      const k = still ? 1 : Math.min(1, Math.max(0, (t - it.delay) / 1.3));
+      const k = still ? 1 : Math.min(1, Math.max(0, (t - it.delay) / 0.95));
       const e = backOut(k);
       it.mesh.position.lerpVectors(it.from, it.home, e);
-      it.mesh.scale.setScalar(it.size * Math.min(1, k * 2.5));
+      it.mesh.scale.setScalar(it.size * Math.min(1, 0.25 + k * 2.4));
       if (!still) {
         const d = t * it.speed + it.drift;
         it.mesh.position.x += Math.sin(d) * 0.05 * k;
@@ -498,8 +504,9 @@ function makeBits(THREE, ice) {
 async function makeBackdrop(THREE, section) {
   const photo = section.querySelector('.hero-photo');
   const word = section.querySelector('.hero-backword');
+  const preloaded = window.__heroPhoto;
   const url = photo && /url\(["']?(.*?)["']?\)/.exec(getComputedStyle(photo).backgroundImage)?.[1];
-  const img = url ? await loadImage(url).catch(() => null) : null;
+  const img = preloaded?.src ? await waitImage(preloaded) : (url ? await loadImage(url).catch(() => null) : null);
   await document.fonts?.ready;
 
   const canvas = document.createElement('canvas');
@@ -518,7 +525,8 @@ async function makeBackdrop(THREE, section) {
     const W = box.width;
     const H = box.height;
     if (!W || !H) return;
-    const k = Math.min(1, 1400 / W);    // it's blurred and bent: no need for more
+    // ponytail: 256px max width; LinearFilter upscale gives ~5px blur in GPU hardware instead of a 1s CPU ctx.filter blur
+    const k = Math.min(0.25, 256 / W);
     const cw = Math.round(W * k);
     const ch = Math.round(H * k);
     // A new size needs new GPU storage, not an update in place
@@ -542,9 +550,6 @@ async function makeBackdrop(THREE, section) {
       ctx.translate(W / 2, H / 2);
       ctx.scale(zoom, zoom);
       ctx.translate(-W / 2, -H / 2);
-      if ('filter' in ctx && cs.filter !== 'none') {
-        ctx.filter = cs.filter.replace(/blur\(([\d.]+)px\)/, (_, r) => `blur(${r * k}px)`);
-      }
       ctx.drawImage(img, (W - dw) * px, (H - dh) * py, dw, dh);
       ctx.restore();
     }
@@ -597,6 +602,14 @@ async function makeBackdrop(THREE, section) {
   };
 }
 
+function waitImage(img) {
+  if (img.complete) return Promise.resolve(img.naturalWidth ? img : null);
+  return new Promise((res) => {
+    img.addEventListener('load', () => res(img), { once: true });
+    img.addEventListener('error', () => res(null), { once: true });
+  });
+}
+
 function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -608,65 +621,192 @@ function loadImage(src) {
 }
 
 /**
- * Liquid-glass ice: a slightly lumpy rounded cube. The faces show the hero
- * behind it (the backdrop texture, at this pixel), bent sideways by the
- * surface (most at the curved edges, like a lens), the three colours bent a
- * little differently (a hint of rainbow), cooled a touch, with a frosty glow
- * where it turns away from us. Reflections and highlights go on top.
+ * Café ice: irregular, softly melted cubes with wavy wet faces (clearcoat over
+ * rippled frosted ice), wide frosted backdrop refraction, internal cleavage
+ * fractures, trapped micro-bubbles, and a feathery milky frozen-air heart so
+ * they read as cold solid ice rather than clear glass or opaque stone.
  */
 function makeIce(THREE, RoundedBoxGeometry, mergeVertices, backdrop) {
-  // A few different cubes, so no two look stamped from one mould
+  // Four distinct melted shapes so neighbouring cubes never look cloned
   const geometry = [11, 23, 37, 51].map((seed) => iceShape(THREE, RoundedBoxGeometry, mergeVertices, seed));
 
   const material = new THREE.MeshPhysicalMaterial({
-    color: 0x000000,          // no body colour: what it shows is the backdrop
-    roughness: 0.05,
+    color: 0x000000,          // body transmission & internal frost are composited in the shader
+    roughness: 0.25,          // softly frosted ice body
     metalness: 0,
     ior: 1.31,
-    specularIntensity: 1,
-    envMapIntensity: 0.06,    // the studio's grey room would grey the faces over; the rim and glints draw the shape
+    clearcoat: 1.0,           // wet melt film catching softbox glints on all faces
+    clearcoatRoughness: 0.06,
+    specularIntensity: 1.0,
+    envMapIntensity: 0.42,    // studio softbox reflections across every face, not just the key-lit side
   });
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, backdrop.uniforms);
-    // The cube's middle on screen (0..1 across the canvas), for the lens
     shader.vertexShader = shader.vertexShader
       .replace('void main() {', 'varying vec2 vIceCenter;\nvarying vec3 vIcePos;\nvarying vec2 vIceCore;\nvoid main() {')
       .replace('#include <project_vertex>', `#include <project_vertex>
         vec4 iceMid = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );
         vec4 iceCenter = projectionMatrix * iceMid;
         vIceCenter = iceCenter.xy / iceCenter.w * 0.5 + 0.5;
-        // where on the cube (-1..1), and how far from its middle as we see it
         vIcePos = transformed / 0.135;
         vIceCore = ( mvPosition.xy - iceMid.xy ) / ( length( modelMatrix[ 0 ].xyz ) * 0.135 );`);
     shader.fragmentShader = shader.fragmentShader
-      .replace('void main() {', 'uniform sampler2D uBackdrop;\nuniform vec2 uBackdropRes;\nvarying vec2 vIceCenter;\nvarying vec3 vIcePos;\nvarying vec2 vIceCore;\nvoid main() {')
+      .replace('void main() {', `uniform sampler2D uBackdrop;
+uniform vec2 uBackdropRes;
+varying vec2 vIceCenter;
+varying vec3 vIcePos;
+varying vec2 vIceCore;
+
+float iceHash( vec3 p ) {
+  p = fract( p * vec3( 0.1031, 0.1030, 0.0973 ) );
+  p += dot( p, p.yxz + 33.33 );
+  return fract( ( p.x + p.y ) * p.z );
+}
+
+float iceNoise( vec3 p ) {
+  vec3 i = floor( p );
+  vec3 f = fract( p );
+  f = f * f * ( 3.0 - 2.0 * f );
+  return mix(
+    mix( mix( iceHash( i ), iceHash( i + vec3( 1.0, 0.0, 0.0 ) ), f.x ),
+         mix( iceHash( i + vec3( 0.0, 1.0, 0.0 ) ), iceHash( i + vec3( 1.0, 1.0, 0.0 ) ), f.x ), f.y ),
+    mix( mix( iceHash( i + vec3( 0.0, 0.0, 1.0 ) ), iceHash( i + vec3( 1.0, 0.0, 1.0 ) ), f.x ),
+         mix( iceHash( i + vec3( 0.0, 1.0, 1.0 ) ), iceHash( i + vec3( 1.0, 1.0, 1.0 ) ), f.x ), f.y ),
+    f.z );
+}
+
+float iceFbm( vec3 p ) {
+  float v = 0.52 * iceNoise( p );
+  p = p * 2.05 + vec3( 13.1, 7.7, 5.3 );
+  v += 0.32 * iceNoise( p );
+  p = p * 2.09 + vec3( 3.7, 17.3, 11.9 );
+  v += 0.16 * iceNoise( p );
+  return v;
+}
+
+float iceBubbles( vec3 p ) {
+  vec3 i = floor( p );
+  vec3 f = fract( p ) - 0.5;
+  float h = iceHash( i );
+  if ( h < 0.72 ) return 0.0;
+  vec3 off = vec3( iceHash( i + 1.7 ), iceHash( i + 4.3 ), iceHash( i + 8.9 ) ) - 0.5;
+  float d = length( f - off * 0.48 );
+  float rad = 0.06 + 0.11 * fract( h * 17.3 );
+  return smoothstep( rad, rad * 0.2, d );
+}
+
+vec3 iceBumpNormal( vec3 surfNorm, float h, float scale ) {
+  vec3 dPosX = dFdx( -vViewPosition );
+  vec3 dPosY = dFdy( -vViewPosition );
+  vec3 r1 = cross( dPosY, surfNorm );
+  vec3 r2 = cross( surfNorm, dPosX );
+  float det = dot( dPosX, r1 );
+  vec3 grad = sign( det ) * ( dFdx( h ) * r1 + dFdy( h ) * r2 );
+  return normalize( ( abs( det ) + 1e-6 ) * surfNorm - scale * grad );
+}
+
+void main() {`)
+      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
+        // Wavy liquid-melt ripples + subtle frost dimples on every face
+        float iceRipple = iceFbm( vIcePos * 2.5 );
+        float iceDimple = iceNoise( vIcePos * 6.8 ) * 0.7 + iceNoise( vIcePos * 14.0 ) * 0.3;
+        normal = iceBumpNormal( normal, iceRipple * 0.78 + iceDimple * 0.22, 0.0068 );`)
+      .replace('#include <clearcoat_normal_fragment_maps>', `#include <clearcoat_normal_fragment_maps>
+        clearcoatNormal = iceBumpNormal( clearcoatNormal, iceFbm( vIcePos * 2.1 + 4.1 ), 0.0046 );`)
       .replace('#include <colorspace_fragment>', `{
         vec3 n = normalize( normal );
         float edge = 1.0 - clamp( n.z, 0.0, 1.0 );
-        // ice is never a perfect mirror: a gentle melt-wobble in the surface
-        n.xy += 0.12 * vec2(
-          sin( vIcePos.y * 5.1 + vIcePos.z * 2.3 ) * sin( vIcePos.x * 3.7 ),
-          sin( vIcePos.x * 4.6 - vIcePos.z * 2.9 ) * sin( vIcePos.y * 3.3 + 1.0 ) );
+        vec3 p = vIcePos;
+
+        // Sample 3D coordinates shifted inward toward the cube's heart along the surface normal
+        vec3 pIn = p * 0.58;
+        float screenDist = length( vIceCore );
+        float warp = iceFbm( pIn * 3.4 + vec3( 1.9, -2.4, 3.1 ) );
+        float wisps = iceFbm( pIn * 7.2 + warp * 2.6 );
+
+        // Feathery cloudy frozen-air core in the middle of the cube (visible from any angle)
+        float coreMask = 1.0 - smoothstep( 0.06, 0.78, screenDist + ( warp - 0.5 ) * 0.34 );
+        float plumes = 0.38 + 0.62 * smoothstep( 0.28, 0.76, wisps );
+        float heart = clamp( coreMask * plumes * 1.15, 0.0, 1.0 );
+
+        // Internal cleavage / thermal-shock fracture veins twisting through the interior
+        float planeA = dot( p, vec3( 0.74, 0.49, -0.46 ) ) + ( warp - 0.5 ) * 0.62;
+        float planeB = dot( p, vec3( -0.48, 0.76, 0.43 ) ) + ( iceFbm( p * 3.1 + 9.2 ) - 0.5 ) * 0.54;
+        float inShell = 1.0 - smoothstep( 0.62, 0.98, screenDist );
+        float crackA = ( 1.0 - smoothstep( 0.006, 0.045, abs( planeA ) ) ) * smoothstep( 0.28, 0.68, wisps );
+        float crackB = ( 1.0 - smoothstep( 0.005, 0.036, abs( planeB ) ) ) * smoothstep( 0.34, 0.72, warp );
+        float crack = clamp( crackA + crackB * 0.9, 0.0, 1.0 ) * ( 0.25 + 0.75 * inShell );
+
+        // Tiny trapped frozen air micro-bubbles clustered around the core
+        float bubbles = ( iceBubbles( p * 7.5 + warp * 0.6 ) + 0.8 * iceBubbles( p * 14.0 - 3.3 ) )
+          * ( 1.0 - smoothstep( 0.12, 0.82, screenDist ) );
+
+        // Surface condensation frost patches + frozen bevel rime
+        float frostPatch = smoothstep( 0.32, 0.78, iceFbm( p * 4.2 - 2.1 ) );
+        float rime = clamp( 0.14 + 0.22 * frostPatch + pow( edge, 1.7 ) * ( 0.38 + 0.28 * frostPatch ), 0.0, 0.78 );
+
+        // Wide 8-tap frosted refraction so bold BAIA letters diffuse into soft icy glow (no hard cutout!)
+        vec2 aspect = vec2( uBackdropRes.y / uBackdropRes.x, 1.0 );
         vec2 uv = gl_FragCoord.xy / uBackdropRes;
-        // a solid block of ice flips what's behind it upside down and shrinks
-        // it, like a thick lens; that flip is what makes it read as ice
-        uv = vIceCenter - ( uv - vIceCenter ) * 0.6;
-        // and the rounded edges throw it further out
-        vec2 bend = -n.xy * 0.14 * edge * edge;
-        bend.x *= uBackdropRes.y / uBackdropRes.x;
-        vec3 seen = vec3(
-          texture2D( uBackdrop, uv + bend * 0.97 ).r,
+        uv = vIceCenter - ( uv - vIceCenter ) * 0.52;
+        vec2 rippleShift = vec2( warp - 0.5, wisps - 0.5 ) * 0.058;
+        vec2 crackShift = vec2( sign( planeA ), sign( planeB ) ) * 0.016 * inShell;
+        vec2 bend = ( -n.xy * ( 0.10 + 0.15 * edge * edge ) + rippleShift + crackShift ) * aspect;
+
+        float spread = 0.015 + 0.024 * heart + 0.018 * rime;
+        vec2 d1 = vec2( 0.92, 0.39 ) * spread * aspect;
+        vec2 d2 = vec2( -0.39, 0.92 ) * spread * aspect;
+        vec2 d3 = vec2( 0.38, -0.92 ) * 0.55 * spread * aspect;
+        vec2 d4 = vec2( -0.92, -0.38 ) * 0.55 * spread * aspect;
+
+        vec3 seen = 0.18 * vec3(
+          texture2D( uBackdrop, uv + bend * 0.95 ).r,
           texture2D( uBackdrop, uv + bend ).g,
-          texture2D( uBackdrop, uv + bend * 1.035 ).b );
-        // deeper in, a glacier-blue tint and a cloudy white heart (the frozen
-        // air), streaky rather than even
-        float core = 1.0 - smoothstep( 0.1, 0.95, length( vIceCore ) );
-        float cloud = 0.55 + 0.45 * sin( vIcePos.x * 5.0 + 2.0 * sin( vIcePos.y * 4.0 ) ) * sin( vIcePos.z * 4.5 + vIcePos.y * 2.0 );
-        seen *= mix( vec3( 1.0 ), vec3( 0.88, 0.96, 1.05 ), core );
-        seen = mix( seen, vec3( 0.8, 0.88, 0.95 ), 0.035 * core * cloud );
-        // a bright rim right at the silhouette
-        seen += vec3( 0.9, 0.95, 1.0 ) * 0.45 * pow( edge, 7.0 );
-        gl_FragColor = vec4( seen + gl_FragColor.rgb, 1.0 );
+          texture2D( uBackdrop, uv + bend * 1.05 ).b );
+        seen += 0.13 * (
+          texture2D( uBackdrop, uv + bend + d1 ).rgb +
+          texture2D( uBackdrop, uv + bend - d1 ).rgb +
+          texture2D( uBackdrop, uv + bend + d2 ).rgb +
+          texture2D( uBackdrop, uv + bend - d2 ).rgb );
+        seen += 0.075 * (
+          texture2D( uBackdrop, uv + bend + d3 ).rgb +
+          texture2D( uBackdrop, uv + bend - d3 ).rgb +
+          texture2D( uBackdrop, uv + bend + d4 ).rgb +
+          texture2D( uBackdrop, uv + bend - d4 ).rgb );
+
+        // Compress extreme backdrop contrast slightly (keeps cream BAIA soft inside the ice)
+        seen = seen / ( 1.0 + seen * 0.35 );
+        float backLuma = dot( seen, vec3( 0.2126, 0.7152, 0.0722 ) );
+
+        // Cool glacier-cyan body absorption
+        seen *= mix( vec3( 0.88, 0.97, 1.05 ), vec3( 0.72, 0.90, 1.06 ), 0.4 + 0.6 * coreMask );
+
+        // Studio key wrap + forward-transmitted light exiting opposite faces so shadow sides glow icy, never flat
+        float keyLight = dot( n, normalize( vec3( -0.48, 0.56, 0.67 ) ) ) * 0.5 + 0.5;
+        float transLight = pow( clamp( dot( n, normalize( vec3( 0.55, -0.30, 0.78 ) ) ), 0.0, 1.0 ), 1.4 );
+        float iceIllum = 0.42 + 0.42 * keyLight + 0.32 * transLight;
+
+        // Translucent surface frost veil (lifts dark night backdrops into cool misty ice)
+        vec3 frostCol = vec3( 0.24, 0.36, 0.48 ) * iceIllum + seen * 0.42;
+        seen = mix( seen, frostCol, rime * 0.58 );
+
+        // Cloudy milky-white frozen-air core in the center of the cube
+        vec3 heartCol = vec3( 0.48, 0.62, 0.74 ) * ( 0.65 + 0.45 * iceIllum ) + vec3( 0.14 ) * backLuma;
+        seen = mix( seen, heartCol, heart * 0.74 );
+
+        // Sparkling internal cleavage cracks & tiny air micro-bubbles
+        float facetGlint = 0.55 + 0.45 * pow( abs( dot( n, normalize( vec3( 0.52, 0.48, 0.70 ) ) ) ), 2.0 );
+        seen = mix( seen, vec3( 0.62, 0.77, 0.90 ) * facetGlint + seen * 0.2, crack * 0.72 );
+        seen = mix( seen, vec3( 0.74, 0.85, 0.96 ), clamp( bubbles, 0.0, 0.82 ) );
+
+        // Soft thick-bevel frosted Fresnel glow (organic & rippled, replacing the razor glass wireframe)
+        float bevel = pow( edge, 2.3 ) * ( 0.52 + 0.48 * frostPatch );
+        vec3 rimCol = vec3( 0.44, 0.58, 0.72 ) * ( 0.6 + 0.5 * iceIllum );
+        seen = mix( seen, rimCol, clamp( bevel * 0.62, 0.0, 0.64 ) );
+
+        // Wet clearcoat & bumpy frost specular glints, gently tamed over bright backdrops
+        vec3 spec = gl_FragColor.rgb * ( 0.88 - 0.32 * smoothstep( 0.30, 0.80, backLuma ) );
+        gl_FragColor = vec4( seen + spec, 1.0 );
       }
       #include <colorspace_fragment>`);
   };
@@ -674,46 +814,53 @@ function makeIce(THREE, RoundedBoxGeometry, mergeVertices, backdrop) {
 }
 
 /**
- * One ice cube, irregular the way real ones are: out of a tray (a little
- * narrower at the top, not quite square), edges softened unevenly by melting,
- * a corner chipped off flat, a shallow dip on top. 0.27 across.
+ * One ice cube, irregular and softly melted the way real café cubes are:
+ * generous rounded bevels from thawing, tapered from the mould, faces gently
+ * dished, organic melt waves, and an asymmetric melted corner. ~0.27 across.
  */
 function iceShape(THREE, RoundedBoxGeometry, mergeVertices, seed) {
   const rand = mulberry32(seed);
   const between = (a, b) => a + rand() * (b - a);
-  let geo = new RoundedBoxGeometry(1, 1, 1, 8, between(0.07, 0.13));
+  let geo = new RoundedBoxGeometry(1, 1, 1, 14, between(0.16, 0.22));
   geo.deleteAttribute('normal');
   geo.deleteAttribute('uv');
   geo = mergeVertices(geo);
 
-  const w = between(0.92, 1.08);
-  const h = between(0.82, 0.97);
-  const d = between(0.9, 1.05);
-  const taper = between(0.08, 0.16);
-  const lean = between(-0.05, 0.05);
-  // the melt: slow waves across the faces, a different set for each cube
-  const waves = Array.from({ length: 3 }, () => ({
-    f: [between(2, 5), between(2, 5), between(2, 5)],
+  const w = between(0.9, 1.08);
+  const h = between(0.82, 0.98);
+  const d = between(0.88, 1.06);
+  const taper = between(0.1, 0.18);
+  const lean = between(-0.06, 0.06);
+  const dish = between(0.03, 0.055);
+  const waves = Array.from({ length: 4 }, (_, idx) => ({
+    f: [between(2.0, 4.2 + idx * 1.6), between(2.0, 4.2 + idx * 1.6), between(2.0, 4.2 + idx * 1.6)],
     p: between(0, 6.3),
-    a: between(0.015, 0.035),
+    a: between(0.018, 0.038) / (1 + idx * 0.4),
   }));
-  // the chip: a plane across one corner
   const chip = new THREE.Vector3(rand() < 0.5 ? -1 : 1, rand() < 0.5 ? -1 : 1, rand() < 0.5 ? -1 : 1).normalize();
-  const chipAt = between(0.66, 0.74);
-  const dip = between(0.02, 0.05);
+  const chipAt = between(0.62, 0.72);
+  const dip = between(0.03, 0.06);
 
   const pos = geo.attributes.position;
   const v = new THREE.Vector3();
   for (let i = 0; i < pos.count; i++) {
     v.fromBufferAttribute(pos, i);
     const over = v.dot(chip) - chipAt;
-    if (over > 0) v.addScaledVector(chip, -over * 0.92);
+    if (over > 0) v.addScaledVector(chip, -over * 0.78);
+    // gently dish the flat faces inward where melting pools
+    const fx = Math.max(0, 1 - (v.y * v.y + v.z * v.z) * 3.2);
+    const fy = Math.max(0, 1 - (v.x * v.x + v.z * v.z) * 3.2);
+    const fz = Math.max(0, 1 - (v.x * v.x + v.y * v.y) * 3.2);
+    v.x -= Math.sign(v.x) * dish * fx * Math.abs(v.x);
+    v.y -= Math.sign(v.y) * dish * fy * Math.abs(v.y);
+    v.z -= Math.sign(v.z) * dish * fz * Math.abs(v.z);
+
     let melt = 1;
     for (const wv of waves) melt += wv.a * Math.sin(v.x * wv.f[0] + wv.p) * Math.sin(v.y * wv.f[1] - v.z * wv.f[2] + wv.p * 0.7);
-    const up = v.y + 0.5;                        // 0 at the bottom, 1 at the top
+    const up = v.y + 0.5;
     const narrow = 1 - taper * up;
     let y = v.y * h;
-    if (v.y > 0.42) y -= dip * Math.max(0, 1 - (v.x * v.x + v.z * v.z) * 4);
+    if (v.y > 0.36) y -= dip * Math.max(0, 1 - (v.x * v.x + v.z * v.z) * 3.4);
     pos.setXYZ(i, (v.x * narrow * w + lean * up) * melt * 0.27, y * melt * 0.27, v.z * narrow * d * melt * 0.27);
   }
   geo.computeVertexNormals();
