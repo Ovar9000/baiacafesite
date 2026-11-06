@@ -157,6 +157,10 @@
 
 .hero-section.is-3d .hero-scene {
   opacity: 1;
+  /* the drinks can be spun sideways; up and down still scrolls the page */
+  pointer-events: auto;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* The poster stays solid under the canvas while it fades in (two half-faded

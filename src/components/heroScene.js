@@ -11,7 +11,9 @@
  *     liquid glass: it bends the hero behind it (the beach, the shade, the
  *     giant BAIA) through its curved edges, with a hint of rainbow
  *   - the drinks float: each rises and settles on its own slow breath,
- *     leaning a touch, its shadow tightening as it lifts
+ *     leaning a touch, its shadow tightening as it lifts. A sideways drag
+ *     spins one (it carries on, then turns back to face us); a tap flicks
+ *     it once round
  *   - the light: a neutral studio light keeps the drinks their true colours
  *     (glossy, cold), and a rim of light behind them takes the time of day's
  *     colour, gold at sunrise, orange at sunset, lantern-warm at night
@@ -64,6 +66,12 @@ const RIMS = {
 
 const FOV = 20;            // a long lens: product-shot perspective
 const TILT = -0.04;        // looking up a touch: the drinks loom (radians)
+
+// A drink spun by hand. perPixel: how far a drag turns it (radians per CSS
+// px); friction: how fast a let-go spin slows (per second); below settleBelow
+// (rad/s) it eases back to face us at `settle`; flick: a tap's spin, enough
+// to go once round with that friction (2π × friction)
+const SPIN = { perPixel: 0.012, friction: 2.4, settleBelow: 1.2, settle: 2.2, flick: 2 * Math.PI * 2.4, maxVel: 30 };
 
 export function initHeroScene() {
   const section = document.querySelector('.hero-section');
@@ -173,7 +181,7 @@ async function run(section, stage, { still, posterMode }) {
     const spot = new THREE.Group();
     spot.add(turner, shadow);
     world.add(spot);
-    return { spot, turner, shadow, size, phase: DRINKS[i].phase };
+    return { spot, turner, model, shadow, size, phase: DRINKS[i].phase, turn: DRINKS[i].turn, spin: 0, vel: 0, held: false };
   });
 
   // Coffee beans and liquid-glass ice, around the drinks (not in the poster).
@@ -217,12 +225,74 @@ async function run(section, stage, { still, posterMode }) {
   const lean = { x: 0, y: 0, tx: 0, ty: 0 };
   if (!still) watchTilt(section, lean);
 
+  // Spin a drink with a finger (or the mouse): drag sideways and it turns,
+  // let go and it carries on, then settles back to face us; a tap flicks it
+  // round once. Up and down stays the page's, for scrolling
+  if (!still) {
+    const ray = new THREE.Raycaster();
+    const ndc = new THREE.Vector2();
+    let grab = null;   // { d, id, x, lastX, lastT, moved }
+    const drinkAt = (e) => {
+      const r = canvas.getBoundingClientRect();
+      ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      const hit = ray.intersectObjects(drinks.map((d) => d.model), true)[0];
+      return hit && drinks.find((d) => d.model === hit.object || d.model.getObjectById(hit.object.id));
+    };
+    canvas.addEventListener('pointerdown', (e) => {
+      if (grab || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      const d = drinkAt(e);
+      if (!d) return;
+      grab = { d, id: e.pointerId, x: e.clientX, lastX: e.clientX, lastT: e.timeStamp, moved: false };
+      d.held = true;
+      d.vel = 0;
+      try { canvas.setPointerCapture(e.pointerId); } catch { /* not a live pointer */ }
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!grab || e.pointerId !== grab.id) return;
+      const dx = e.clientX - grab.lastX;
+      const dt = Math.max(1, e.timeStamp - grab.lastT) / 1000;
+      if (Math.abs(e.clientX - grab.x) > 6) grab.moved = true;
+      grab.d.spin += dx * SPIN.perPixel;
+      grab.d.vel = grab.d.vel * 0.6 + ((dx * SPIN.perPixel) / dt) * 0.4;
+      grab.lastX = e.clientX;
+      grab.lastT = e.timeStamp;
+    });
+    const release = (e) => {
+      if (!grab || e.pointerId !== grab.id) return;
+      const { d } = grab;
+      d.held = false;
+      if (e.type === 'pointercancel') d.vel = 0;   // the page took it (a scroll)
+      else if (!grab.moved) d.vel = SPIN.flick;    // a tap: once round
+      else if (e.timeStamp - grab.lastT > 80) d.vel = 0;   // held still, then let go
+      d.vel = Math.max(-SPIN.maxVel, Math.min(SPIN.maxVel, d.vel));
+      grab = null;
+    };
+    canvas.addEventListener('pointerup', release);
+    canvas.addEventListener('pointercancel', release);
+  }
+
   // Motion. At t = 0 the drinks are at rest: the poster's pose
   let t0 = performance.now();
   let running = false;
   let raf = 0;
+  let last = 0;
   const render = (now) => {
     const t = still ? 0 : (now - t0) / 1000;
+    const dt = Math.min(0.05, Math.max(0, (now - (last || now)) / 1000));
+    last = now;
+    drinks.forEach((d) => {
+      if (d.held) return;
+      // carry on spinning, slowing; then ease back round to the nearest full turn
+      d.spin += d.vel * dt;
+      d.vel *= Math.exp(-SPIN.friction * dt);
+      if (Math.abs(d.vel) < SPIN.settleBelow) {
+        const home = Math.round(d.spin / (2 * Math.PI)) * 2 * Math.PI;
+        d.spin += (home - d.spin) * (1 - Math.exp(-SPIN.settle * dt));
+        if (Math.abs(home - d.spin) < 1e-4) d.spin = d.vel = 0;
+      }
+      d.turner.rotation.y = d.turn + d.spin;
+    });
     const ease = Math.min(1, t / FLOAT.easeIn);
     const amount = ease * ease * (3 - 2 * ease);
     const w = (2 * Math.PI) / FLOAT.seconds;
