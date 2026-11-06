@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabaseClient';
-import { calculateLoyaltyStatus, formatManilaDateTime } from '../lib/loyaltyHelpers';
+import { calculateLoyaltyStatus, formatManilaDateTime, isBonusStamp, sortStampsAsc } from '../lib/loyaltyHelpers';
 import AuthModal from '../components/AuthModal';
 import QrScanner from '../components/QrScanner';
 import RedemptionCountdown from '../components/RedemptionCountdown';
@@ -23,7 +23,8 @@ import {
   Check,
   HelpCircle,
   Trash2,
-  CheckCircle2
+  CheckCircle2,
+  Sparkles
 } from 'lucide-react';
 import '../styles/loyalty.css';
 
@@ -330,8 +331,21 @@ export default function CardApp() {
     }
   });
 
-  // A card is in completed 10/10 state ONLY when totalStamps is a multiple of 10 (>0) AND there is an unredeemed reward
-  const isCompletedCard = loyaltyStatus.totalStamps > 0 && (loyaltyStatus.totalStamps % 10 === 0) && loyaltyStatus.hasPendingReward;
+  const sortedAscStamps = sortStampsAsc(stamps);
+
+  // Stamps on the card being filled now (the first-card bonus sits in slot 1 of card 2)
+  const currentCycleStamps = sortedAscStamps.slice(Math.floor(loyaltyStatus.totalStamps / 10) * 10);
+  const onlyBonusOnNextCard = currentCycleStamps.length > 0 && currentCycleStamps.every(isBonusStamp);
+
+  // A card shows the completed 10/10 state while its reward is unredeemed and nothing
+  // has been earned on the next card yet (the free bonus stamp doesn't count as starting it)
+  const isCompletedCard = loyaltyStatus.totalStamps > 0
+    && loyaltyStatus.hasPendingReward
+    && (loyaltyStatus.totalStamps % 10 === 0 || onlyBonusOnNextCard);
+  const bonusWaitingOnNextCard = isCompletedCard && onlyBonusOnNextCard;
+  const currentCardHasBonus = !isCompletedCard && currentCycleStamps.some(isBonusStamp);
+  // Before the first card is done, tell people what finishing it gets them
+  const showFirstCardBonusTeaser = !isCompletedCard && loyaltyStatus.milestoneNumber === 0 && !loyaltyStatus.hasFirstCardBonus;
 
   // Active cycle progress: 10 if completed, else totalStamps % 10 (e.g. 1 to 9, or 0)
   const displayProgress = isCompletedCard ? 10 : (loyaltyStatus.totalStamps % 10);
@@ -343,7 +357,6 @@ export default function CardApp() {
 
   // Group historical stamps into completed cycle cards
   const numCompletedCycles = Math.floor(stamps.length / 10);
-  const sortedAscStamps = [...stamps].sort((a, b) => new Date(a.awarded_at) - new Date(b.awarded_at));
 
   const completedCycleCards = [];
   for (let c = 1; c <= numCompletedCycles; c++) {
@@ -610,13 +623,19 @@ export default function CardApp() {
                     const slotNum = idx + 1;
                     const isFilled = slotNum <= displayProgress;
                     const isRewardSlot = slotNum === 10;
+                    const isBonusSlot = isFilled && !isCompletedCard && isBonusStamp(currentCycleStamps[idx]);
                     return (
-                      <div 
-                        key={idx} 
-                        className={`stamp-slot ${isFilled ? (isCompletedCard ? 'filled full-gold' : 'filled') : 'empty'} ${isRewardSlot ? 'milestone-target' : ''}`}
-                        title={isFilled ? `Stamp #${slotNum} earned` : `Stamp #${slotNum}`}
+                      <div
+                        key={idx}
+                        className={`stamp-slot ${isFilled ? (isCompletedCard ? 'filled full-gold' : 'filled') : 'empty'} ${isBonusSlot ? 'bonus' : ''} ${isRewardSlot ? 'milestone-target' : ''}`}
+                        title={isBonusSlot ? 'First-card bonus stamp, on us' : isFilled ? `Stamp #${slotNum} earned` : `Stamp #${slotNum}`}
                       >
-                        {isFilled ? (
+                        {isBonusSlot ? (
+                          <>
+                            <Gift />
+                            <span className="stamp-slot-badge">+1</span>
+                          </>
+                        ) : isFilled ? (
                           <Coffee />
                         ) : isRewardSlot ? (
                           <Award size={18} style={{ color: '#F5A623' }} />
@@ -627,6 +646,19 @@ export default function CardApp() {
                     );
                   })}
                 </div>
+
+                {(bonusWaitingOnNextCard || currentCardHasBonus || showFirstCardBonusTeaser) && (
+                  <div className="stamp-grid-note">
+                    <Gift size={13} aria-hidden="true" />
+                    <span>
+                      {bonusWaitingOnNextCard
+                        ? <><strong>+1 bonus stamp</strong> for finishing your first card. It's already on your next card.</>
+                        : currentCardHasBonus
+                          ? <><strong>+1 bonus stamp</strong> on us for finishing your first card.</>
+                          : <>Finish this card and your next one starts with <strong>1 stamp on us</strong>.</>}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Progress to Next Reward */}
@@ -1011,7 +1043,7 @@ export default function CardApp() {
                             border: '1px solid #FFE699'
                           }}
                         >
-                          <Coffee size={9} />
+                          {isBonusStamp(card.stamps[idx]) ? <Gift size={9} /> : <Coffee size={9} />}
                         </div>
                       ))}
                     </div>
@@ -1197,7 +1229,7 @@ export default function CardApp() {
                     Free Coffee Every 10 Stamps
                   </h5>
                   <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
-                    Complete 10 stamps to unlock your reward. Activate it when ordering and show your screen to the barista to redeem.
+                    Complete 10 stamps to unlock your reward. Activate it when ordering and show your screen to the barista to redeem. Finish your first card and we add 1 bonus stamp to your next one.
                   </p>
                 </div>
               </div>

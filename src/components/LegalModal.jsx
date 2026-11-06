@@ -122,6 +122,7 @@ export default function LegalModal({ type, onClose }) {
                   <li><strong>Physical Standee QR:</strong> Stamp claims require scanning the physical daily counter standee at BAIA Café. Codes rotate daily at midnight.</li>
                   <li><strong>Beach Wi-Fi Voucher:</strong> Each daily stamp scan dispenses a 1-hour access voucher for the <em>"BAIA Free Wifi"</em> hotspot, valid for up to 2 devices.</li>
                   <li><strong>Reward Redemption:</strong> Every 10 stamps earns 1 complimentary specialty coffee. Rewards must be redeemed in-person with our counter barista.</li>
+                  <li><strong>First-Card Bonus:</strong> Finish your first card and we add 1 bonus stamp to your next one. One per account.</li>
                 </ul>
               </section>
 

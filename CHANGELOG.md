@@ -2,6 +2,21 @@
 
 What changed on baia.cafe, newest first, in plain words.
 
+## 2026-11-06: First-card bonus stamp
+
+- Finish your first loyalty card (10 stamps) and we add 1 bonus stamp to your
+  next card, so card 2 takes 9 drinks. It's still 10 stamps per free coffee;
+  the card and its numbers don't change.
+- The database awards it the moment the 10th stamp lands (QR scan, staff
+  manual stamp or tap card), once per account, so it can't be given twice.
+- The card shows the bonus as a gold "+1" gift stamp with a note. Before the
+  first card is done, a line under the stamps says what finishing it gets you.
+- Staff see it in the activity feed as "+1 First-Card Bonus". It doesn't count
+  as a visit in the stats.
+- Fixed: the card page went blank whenever a free coffee was waiting (a
+  missing icon import).
+- Needs `supabase/2026-11-06-first-card-bonus.sql` run once in Supabase.
+
 ## 2026-10-10: Experience-first redesign
 
 The homepage now leads with the place itself (the shore, the photos, the

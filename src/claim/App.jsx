@@ -306,6 +306,11 @@ export default function ClaimApp() {
                       <p style={{ color: '#92400E', fontSize: '0.8rem', margin: 0 }}>
                         You now have a free coffee reward ready to redeem at the counter!
                       </p>
+                      {claimResult?.bonusAwarded && (
+                        <p style={{ color: '#92400E', fontSize: '0.8rem', margin: '6px 0 0', fontWeight: 700 }}>
+                          Plus 1 bonus stamp on us: your next card already has its first stamp.
+                        </p>
+                      )}
                     </div>
                   </div>
                 )}

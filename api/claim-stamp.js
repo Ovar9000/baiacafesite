@@ -185,6 +185,14 @@ export default async function handler(req, res) {
       });
     }
 
+    // Count before inserting: the 10th stamp also adds a first-card bonus stamp
+    // (database trigger), so the total can jump by 2 and "% 10 === 0" is no
+    // longer a reliable "card just completed" test.
+    const { count: stampsBefore } = await supabaseAdmin
+      .from('stamps')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+
     // 5. Insert new stamp record
     const { error: insertError } = await supabaseAdmin
       .from('stamps')
@@ -216,8 +224,10 @@ export default async function handler(req, res) {
       .eq('user_id', user.id);
 
     const currentTotal = totalStamps || 1;
+    const previousTotal = Number.isInteger(stampsBefore) ? stampsBefore : currentTotal - 1;
     const milestoneNumber = Math.floor(currentTotal / 10);
-    const rewardUnlockedNow = (currentTotal % 10 === 0);
+    const rewardUnlockedNow = milestoneNumber > Math.floor(previousTotal / 10);
+    const bonusAwarded = currentTotal - previousTotal > 1;
     const pendingRewards = Math.max(0, milestoneNumber - (redemptionsCount || 0));
 
     // 7. Dispense Omada Wi-Fi Voucher (gracefully fails safe if pool not seeded yet)
@@ -257,12 +267,15 @@ export default async function handler(req, res) {
       totalStamps: currentTotal,
       distanceMeters: distanceRecorded,
       rewardUnlockedNow,
+      bonusAwarded,
       pendingRewards,
       milestoneNumber,
       wifiVoucher,
-      message: rewardUnlockedNow
-        ? `Milestone Reached! You unlocked a Free Specialty Coffee!`
-        : `Stamp recorded! You now have ${currentTotal} ${currentTotal === 1 ? 'stamp' : 'stamps'}.`
+      message: bonusAwarded
+        ? `First card done! You unlocked a Free Specialty Coffee, and your next card starts with 1 stamp on us.`
+        : rewardUnlockedNow
+          ? `Milestone Reached! You unlocked a Free Specialty Coffee!`
+          : `Stamp recorded! You now have ${currentTotal} ${currentTotal === 1 ? 'stamp' : 'stamps'}.`
     });
 
   } catch (err) {
