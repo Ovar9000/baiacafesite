@@ -421,5 +421,11 @@ two of them: the iced mocha with whipped cream and the cloud-top iced latte.
   use). The tab bar (Menu, What's new, My Order) stops short of it. The
   section drawer grows out of that corner as a sheet with every link in
   thumb reach, and its close button lands where the menu button sits.
-- Ice cubes dropped: on a transparent canvas real refraction can't see the
-  photo behind, so they read as frosted blocks.
+- Ice, take two: liquid glass. WebGL can't see the page under the
+  transparent canvas, so heroScene.js draws a copy of the hero behind it
+  (photo, shade, giant BAIA) into a texture, and the ice samples it per
+  pixel: flipped and shrunk like a solid block, thrown out at the curved
+  edges, a hint of rainbow, a cool tint and cloudy heart, bright rim. Four
+  irregular shapes (tray taper, uneven melt, a chipped corner, a dip on
+  top). It shows only the background, so it never sits in front of a
+  glass. Mostly low, filling the sand and sea under the drinks.

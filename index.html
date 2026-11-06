@@ -1033,25 +1033,12 @@ dialog.nav-drawer:not([open]) { display: none; }
   </main>
 
   <!-- 9. SITE FOOTER & TRUST ANCHORS -->
+  <!-- Short on purpose: the visit card (open now? hours, directions),
+       Messenger and Instagram, and one line with the mark and the legal
+       links. (footer.css) -->
   <footer class="site-footer" id="location" data-theme="midnight" role="contentinfo">
-    <div class="section-floaties-layer" aria-hidden="true">
-      <div class="glass-floatie frost-white anim-2 size-md" style="top: 12%; right: 4%;">
-        <img src="./images/baia-palm-white.webp" alt="" class="floatie-icon-img" width="28" height="28" loading="lazy" decoding="async" />
-      </div>
-    </div>
     <div class="container">
       <div class="footer-top-grid">
-        <!-- Col 1: Brand & Operating Hours -->
-        <div class="footer-col-brand">
-          <div class="footer-brand-lockup">
-            <img src="./images/Logo.webp" alt="BAIA Cafe Logo" width="44" height="44" class="footer-logo-img" />
-            <span class="footer-brand-name wordmark">BAIA CAFE</span>
-          </div>
-          <p class="footer-brand-desc">
-            Artisanal Bohol Asin Tibuok lattes, handcrafted double smash burgers & shore recreation on Laurente beachfront.
-          </p>
-        </div>
-
         <!-- Col 2: Visit — hours & directions (values filled from src/data/siteInfo.js) -->
         <div class="footer-col-vibe">
           <div class="visit-card">
@@ -1068,8 +1055,7 @@ dialog.nav-drawer:not([open]) { display: none; }
               <div><dt>Floating Cottage</dt><dd><span data-hours="cottage">11 AM – 6 PM</span></dd></div>
             </dl>
             <p class="visit-address">
-              Barangay Laurente, San Pascual, Burias Island, Masbate
-              <span class="visit-pluscode">Plus Code 42PF+G8</span>
+              Barangay Laurente, San Pascual, Burias Island, Masbate&nbsp;<span class="visit-pluscode">· 42PF+G8</span>
             </p>
             <a href="https://maps.app.goo.gl/vNYohzy8UWbM4d5P6" target="_blank" rel="noopener" class="visit-directions-btn">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -1080,29 +1066,24 @@ dialog.nav-drawer:not([open]) { display: none; }
 
         <!-- Col 3: Community & Social Links -->
         <div class="footer-col-newsletter">
-          <h3 class="footer-col-title">Team BAIA community</h3>
-          <p class="footer-newsletter-p">
-            Build your order on the menu and send it on Messenger, or follow our daily beach life and fresh kitchen releases on Instagram.
-          </p>
+          <h3 class="footer-col-title">Message or follow us</h3>
           <div class="footer-buttons-stack">
-            <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow footer-social-btn" style="background: #0084FF; color: #fff;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="footer-social-btn is-messenger" aria-label="Message us on Messenger (opens in a new tab)">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
                 <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
               </svg>
-              <span>Message us on Messenger</span>
-              <span aria-hidden="true">↗</span>
+              <span>Messenger</span>
             </a>
-            <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="btn-secondary-pill footer-social-btn">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <a href="https://instagram.com/thebaiacafe" target="_blank" rel="noopener" class="footer-social-btn is-instagram" aria-label="Follow @thebaiacafe on Instagram (opens in a new tab)">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
               </svg>
-              <span>Follow @thebaiacafe on Instagram</span>
-              <span aria-hidden="true">↗</span>
+              <span>Instagram</span>
             </a>
           </div>
-          <a href="/card/" class="footer-loyalty-link">Coming back? Collect stamps on your BAIA loyalty card <span aria-hidden="true">&rarr;</span></a>
+          <a href="/card/" class="footer-loyalty-link">Coming back? Collect stamps on your loyalty card&nbsp;<span aria-hidden="true">&rarr;</span></a>
         </div>
       </div>
     </div>
@@ -1111,7 +1092,8 @@ dialog.nav-drawer:not([open]) { display: none; }
     <div class="footer-bottom-strip">
       <div class="container footer-bottom-row">
         <p class="footer-copy-text">
-          © 2026 BAIA Cafe. All rights reserved. Coffee by the Bay.
+          <img src="./images/Logo.webp" alt="" width="24" height="24" class="footer-logo-img" loading="lazy" decoding="async" />
+          <span>© 2026 BAIA Cafe · Coffee by the Bay</span>
         </p>
         <div class="footer-social-links">
           <a href="/privacy/" class="social-link">Privacy Policy</a>

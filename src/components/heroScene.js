@@ -6,18 +6,20 @@
  * poster of the two drinks (the scene's resting frame). Once the page is idle
  * this loads three.js and the models and fades a transparent WebGL canvas
  * (the whole hero's size) in over the poster, lined up with it. Then:
- *   - coffee beans burst out from behind the drinks and keep
- *     drifting around them, some behind, some close to us
+ *   - coffee beans and ice cubes burst out from behind the drinks and
+ *     keep drifting around them, some behind, some close to us. The ice is
+ *     liquid glass: it bends the hero behind it (the beach, the shade, the
+ *     giant BAIA) through its curved edges, with a hint of rainbow
  *   - the drinks float: each rises and settles on its own slow breath,
  *     leaning a touch, its shadow tightening as it lifts
  *   - the light: a neutral studio light keeps the drinks their true colours
  *     (glossy, cold), and a rim of light behind them takes the time of day's
  *     colour, gold at sunrise, orange at sunset, lantern-warm at night
  *   - the camera sits a little low (the drinks loom), leans with the pointer
- *     on desktops, and as the hero scrolls away the beans rise past
+ *     on desktops, and as the hero scrolls away the beans and ice rise past
  *     faster than the drinks
  *
- * Reduced motion: everything stands still (beans at rest). Save-Data
+ * Reduced motion: everything stands still (beans and ice at rest). Save-Data
  * or 2G, or no WebGL: the poster stays.
  *
  * Models: public/models/hero, from `npm run hero:models`. The poster:
@@ -85,12 +87,15 @@ export function initHeroScene() {
 }
 
 async function run(section, stage, { still, posterMode }) {
-  const [THREE, { GLTFLoader }, { MeshoptDecoder }, { RoomEnvironment }] = await Promise.all([
-    import('three'),
-    import('three/addons/loaders/GLTFLoader.js'),
-    import('three/addons/libs/meshopt_decoder.module.js'),
-    import('three/addons/environments/RoomEnvironment.js'),
-  ]);
+  const [THREE, { GLTFLoader }, { MeshoptDecoder }, { RoomEnvironment }, { RoundedBoxGeometry }, { mergeVertices }] =
+    await Promise.all([
+      import('three'),
+      import('three/addons/loaders/GLTFLoader.js'),
+      import('three/addons/libs/meshopt_decoder.module.js'),
+      import('three/addons/environments/RoomEnvironment.js'),
+      import('three/addons/geometries/RoundedBoxGeometry.js'),
+      import('three/addons/utils/BufferGeometryUtils.js'),
+    ]);
 
   const canvas = document.createElement('canvas');
   canvas.className = 'hero-scene';
@@ -163,8 +168,10 @@ async function run(section, stage, { still, posterMode }) {
     return { spot, turner, shadow, size, phase: DRINKS[i].phase };
   });
 
-  // Coffee beans, around the drinks (not in the poster)
-  const bits = posterMode ? null : makeBits(THREE);
+  // Coffee beans and liquid-glass ice, around the drinks (not in the poster).
+  // The ice needs a copy of the hero behind the canvas to bend
+  const backdrop = posterMode ? null : await makeBackdrop(THREE, section);
+  const bits = posterMode ? null : makeBits(THREE, makeIce(THREE, RoundedBoxGeometry, mergeVertices, backdrop));
   if (bits) scene.add(bits.group);
 
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 100);
@@ -194,6 +201,7 @@ async function run(section, stage, { still, posterMode }) {
     base.position.copy(camera.position);
     base.target.copy(camera.userData.target);
     if (bits) bits.place(layoutName);
+    if (backdrop) backdrop.resize(renderer.getDrawingBufferSize(new THREE.Vector2()));
   };
   layout();
 
@@ -293,14 +301,11 @@ function glossy(THREE, m) {
 }
 
 /**
- * Coffee beans. Each has a resting place round the drinks (for wide or phone
- * stages), bursts out to it from behind the drinks when the scene arrives,
- * then drifts and tumbles slowly there.
- *
- * (Ice cubes were tried and dropped: on a transparent canvas real refraction
- * can't see the photo behind it, so they read as frosted blocks.)
+ * Coffee beans and ice cubes. Each has a resting place round the drinks (for
+ * wide or phone stages), bursts out to it from behind the drinks when the
+ * scene arrives, then drifts and tumbles slowly there.
  */
-function makeBits(THREE) {
+function makeBits(THREE, ice) {
   const rand = mulberry32(7);
   const group = new THREE.Group();
   const beanGeo = beanGeometry(THREE);
@@ -310,7 +315,7 @@ function makeBits(THREE) {
 
   // Resting places: (x, y, z, size). Behind (z < 0) and round the edges; the
   // few in front stay clear of the glasses
-  const PLACES = {
+  const BEANS = {
     row: [
       [-2.1, 1.55, -0.6, 1], [-1.65, 0.35, 0.7, 1.3], [-1.35, 2.05, -1.1, 0.9], [2.05, 1.7, -0.7, 1],
       [2.6, 1.0, -1.3, 0.8], [1.3, 2.1, -1.0, 0.9], [-0.2, 0.15, 1.5, 1.4], [0.15, 1.25, -1.6, 0.8],
@@ -323,33 +328,57 @@ function makeBits(THREE) {
       [0.5, -0.4, 1.0, 1.2], [-0.05, -0.75, 1.2, 1.25], [0.8, 0.55, 1.0, 1.0], [0.3, 3.3, -1.3, 0.8],
     ],
   };
+  // The ice: mostly low, in the open sand and sea below and beside the
+  // drinks, never in front of a glass (it shows what's behind the canvas,
+  // not the drinks); one high up, bending the giant BAIA
+  const ICE = {
+    row: [
+      [1.7, 0.4, 0.8, 1.25], [1.0, -0.02, 1.3, 1.1], [-1.9, -0.2, 0.9, 1.15], [2.45, -0.15, 0.4, 1.0],
+      [-2.55, 0.85, -1.2, 0.85], [0, 2.25, -1.5, 0.9], [2.3, 2.3, 0.4, 1.0],
+    ],
+    cluster: [
+      [-0.45, -0.35, 0.9, 1.1], [0.2, -0.62, 0.7, 1.0], [0.95, -0.15, 0.3, 0.95], [0.05, 3.05, -1.0, 0.9],
+    ],
+  };
 
   const items = [];
-  const maxCount = Math.max(...Object.values(PLACES).map((p) => p.length));
-  for (let i = 0; i < maxCount; i++) {
-    const mesh = new THREE.Mesh(beanGeo, beanMat);
-    group.add(mesh);
-    items.push({
+  const kinds = [
+    { places: BEANS, geo: beanGeo, mat: beanMat, size: 1.25, spin: 0.9 },
+    { places: ICE, geo: ice.geometry, mat: ice.material, size: 1, spin: 0.45 },
+  ];
+  for (const kind of kinds) {
+    const count = Math.max(...Object.values(kind.places).map((p) => p.length));
+    for (let i = 0; i < count; i++) {
+      const geo = Array.isArray(kind.geo) ? kind.geo[i % kind.geo.length] : kind.geo;
+      const mesh = new THREE.Mesh(geo, kind.mat);
+      group.add(mesh);
+      items.push(makeItem(mesh, kind, i));
+    }
+  }
+
+  function makeItem(mesh, kind, index) {
+    return {
       mesh,
+      kind,
+      index,
       home: new THREE.Vector3(),
       from: new THREE.Vector3(),
       size: 1,
       delay: 0.15 + rand() * 0.45,
-      spin: new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).multiplyScalar(0.9),
+      spin: new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).multiplyScalar(kind.spin),
       tumble: new THREE.Euler(rand() * 6.3, rand() * 6.3, rand() * 6.3),
       drift: rand() * 6.3,
       speed: 0.25 + rand() * 0.2,
-    });
+    };
   }
 
   const place = (layout) => {
-    const spots = PLACES[layout];
-    items.forEach((it, i) => {
-      const p = spots[i];
+    items.forEach((it) => {
+      const p = it.kind.places[layout][it.index];
       it.mesh.visible = !!p;
       if (!p) return;
       it.home.set(p[0], p[1], p[2]);
-      it.size = p[3] * 1.25;
+      it.size = p[3] * it.kind.size;
       // they burst out from behind the middle of the drinks
       it.from.set(p[0] * 0.15, 1.0, -0.6);
     });
@@ -385,6 +414,238 @@ function makeBits(THREE) {
   };
 
   return { group, place, update };
+}
+
+/**
+ * A copy of what sits behind the canvas (the hero's background colour, the
+ * beach photo as CSS shows it, the navy shade and the giant BAIA), drawn into
+ * a texture the canvas's size, for the ice to bend. Real refraction can't
+ * do this: the canvas is transparent and WebGL never sees the page under it.
+ * Keep the shade in step with hero.css (.hero-scrim).
+ */
+async function makeBackdrop(THREE, section) {
+  const photo = section.querySelector('.hero-photo');
+  const word = section.querySelector('.hero-backword');
+  const url = photo && /url\(["']?(.*?)["']?\)/.exec(getComputedStyle(photo).backgroundImage)?.[1];
+  const img = url ? await loadImage(url).catch(() => null) : null;
+  await document.fonts?.ready;
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.generateMipmaps = false;
+  texture.minFilter = THREE.LinearFilter;
+  const uniforms = {
+    uBackdrop: { value: texture },
+    uBackdropRes: { value: new THREE.Vector2(1, 1) },
+  };
+
+  const draw = () => {
+    const box = section.getBoundingClientRect();
+    const W = box.width;
+    const H = box.height;
+    if (!W || !H) return;
+    const k = Math.min(1, 1400 / W);    // it's blurred and bent: no need for more
+    const cw = Math.round(W * k);
+    const ch = Math.round(H * k);
+    // A new size needs new GPU storage, not an update in place
+    if (canvas.width && (cw !== canvas.width || ch !== canvas.height)) texture.dispose();
+    canvas.width = cw;
+    canvas.height = ch;
+    ctx.setTransform(k, 0, 0, k, 0, 0);
+    ctx.fillStyle = getComputedStyle(section).backgroundColor;
+    ctx.fillRect(0, 0, W, H);
+
+    // The photo: background-size cover at its background-position, scaled
+    // about its middle and blurred as the CSS does
+    if (img) {
+      const cs = getComputedStyle(photo);
+      const fit = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+      const dw = img.naturalWidth * fit;
+      const dh = img.naturalHeight * fit;
+      const [px, py] = cs.backgroundPosition.split(' ').map((v) => (v.endsWith('%') ? parseFloat(v) / 100 : 0.5));
+      const zoom = cs.transform && cs.transform !== 'none' ? new DOMMatrix(cs.transform).a : 1;
+      ctx.save();
+      ctx.translate(W / 2, H / 2);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-W / 2, -H / 2);
+      if ('filter' in ctx && cs.filter !== 'none') {
+        ctx.filter = cs.filter.replace(/blur\(([\d.]+)px\)/, (_, r) => `blur(${r * k}px)`);
+      }
+      ctx.drawImage(img, (W - dw) * px, (H - dh) * py, dw, dh);
+      ctx.restore();
+    }
+
+    // The shade (hero.css .hero-scrim)
+    ctx.save();
+    ctx.translate(W / 2, H);
+    ctx.scale(1.2 * W, 0.7 * H);
+    const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+    glow.addColorStop(0, 'rgba(14, 26, 69, 0.55)');
+    glow.addColorStop(0.7, 'rgba(14, 26, 69, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(-1, -2, 2, 2);
+    ctx.restore();
+    const fade = ctx.createLinearGradient(0, 0, 0, H);
+    fade.addColorStop(0, 'rgba(14, 26, 69, 0.28)');
+    fade.addColorStop(0.45, 'rgba(14, 26, 69, 0.12)');
+    fade.addColorStop(1, 'rgba(14, 26, 69, 0.4)');
+    ctx.fillStyle = fade;
+    ctx.fillRect(0, 0, W, H);
+
+    // The giant BAIA, where it stands on the page
+    if (word) {
+      const cs = getComputedStyle(word);
+      const r = word.getBoundingClientRect();
+      ctx.save();
+      ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      if ('letterSpacing' in ctx) ctx.letterSpacing = cs.letterSpacing;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillStyle = cs.color;
+      const m = ctx.measureText(word.textContent);
+      const cy = r.top - box.top + r.height / 2;
+      ctx.fillText(word.textContent, r.left - box.left + r.width / 2, cy + (m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) / 2);
+      ctx.restore();
+    }
+    texture.needsUpdate = true;
+  };
+
+  let timer = 0;
+  return {
+    uniforms,
+    // The canvas's size in device pixels; redraws (settled) after a resize
+    resize(size) {
+      uniforms.uBackdropRes.value.copy(size);
+      clearTimeout(timer);
+      if (!canvas.width) draw();
+      else timer = setTimeout(draw, 150);
+    },
+  };
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+/**
+ * Liquid-glass ice: a slightly lumpy rounded cube. The faces show the hero
+ * behind it (the backdrop texture, at this pixel), bent sideways by the
+ * surface (most at the curved edges, like a lens), the three colours bent a
+ * little differently (a hint of rainbow), cooled a touch, with a frosty glow
+ * where it turns away from us. Reflections and highlights go on top.
+ */
+function makeIce(THREE, RoundedBoxGeometry, mergeVertices, backdrop) {
+  // A few different cubes, so no two look stamped from one mould
+  const geometry = [11, 23, 37, 51].map((seed) => iceShape(THREE, RoundedBoxGeometry, mergeVertices, seed));
+
+  const material = new THREE.MeshPhysicalMaterial({
+    color: 0x000000,          // no body colour: what it shows is the backdrop
+    roughness: 0.05,
+    metalness: 0,
+    ior: 1.31,
+    specularIntensity: 1,
+    envMapIntensity: 0.06,    // the studio's grey room would grey the faces over; the rim and glints draw the shape
+  });
+  material.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, backdrop.uniforms);
+    // The cube's middle on screen (0..1 across the canvas), for the lens
+    shader.vertexShader = shader.vertexShader
+      .replace('void main() {', 'varying vec2 vIceCenter;\nvarying vec3 vIcePos;\nvarying vec2 vIceCore;\nvoid main() {')
+      .replace('#include <project_vertex>', `#include <project_vertex>
+        vec4 iceMid = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );
+        vec4 iceCenter = projectionMatrix * iceMid;
+        vIceCenter = iceCenter.xy / iceCenter.w * 0.5 + 0.5;
+        // where on the cube (-1..1), and how far from its middle as we see it
+        vIcePos = transformed / 0.135;
+        vIceCore = ( mvPosition.xy - iceMid.xy ) / ( length( modelMatrix[ 0 ].xyz ) * 0.135 );`);
+    shader.fragmentShader = shader.fragmentShader
+      .replace('void main() {', 'uniform sampler2D uBackdrop;\nuniform vec2 uBackdropRes;\nvarying vec2 vIceCenter;\nvarying vec3 vIcePos;\nvarying vec2 vIceCore;\nvoid main() {')
+      .replace('#include <colorspace_fragment>', `{
+        vec3 n = normalize( normal );
+        float edge = 1.0 - clamp( n.z, 0.0, 1.0 );
+        // ice is never a perfect mirror: a gentle melt-wobble in the surface
+        n.xy += 0.12 * vec2(
+          sin( vIcePos.y * 5.1 + vIcePos.z * 2.3 ) * sin( vIcePos.x * 3.7 ),
+          sin( vIcePos.x * 4.6 - vIcePos.z * 2.9 ) * sin( vIcePos.y * 3.3 + 1.0 ) );
+        vec2 uv = gl_FragCoord.xy / uBackdropRes;
+        // a solid block of ice flips what's behind it upside down and shrinks
+        // it, like a thick lens; that flip is what makes it read as ice
+        uv = vIceCenter - ( uv - vIceCenter ) * 0.6;
+        // and the rounded edges throw it further out
+        vec2 bend = -n.xy * 0.14 * edge * edge;
+        bend.x *= uBackdropRes.y / uBackdropRes.x;
+        vec3 seen = vec3(
+          texture2D( uBackdrop, uv + bend * 0.97 ).r,
+          texture2D( uBackdrop, uv + bend ).g,
+          texture2D( uBackdrop, uv + bend * 1.035 ).b );
+        // deeper in, a glacier-blue tint and a cloudy white heart (the frozen
+        // air), streaky rather than even
+        float core = 1.0 - smoothstep( 0.1, 0.95, length( vIceCore ) );
+        float cloud = 0.55 + 0.45 * sin( vIcePos.x * 5.0 + 2.0 * sin( vIcePos.y * 4.0 ) ) * sin( vIcePos.z * 4.5 + vIcePos.y * 2.0 );
+        seen *= mix( vec3( 1.0 ), vec3( 0.88, 0.96, 1.05 ), core );
+        seen = mix( seen, vec3( 0.8, 0.88, 0.95 ), 0.035 * core * cloud );
+        // a bright rim right at the silhouette
+        seen += vec3( 0.9, 0.95, 1.0 ) * 0.45 * pow( edge, 7.0 );
+        gl_FragColor = vec4( seen + gl_FragColor.rgb, 1.0 );
+      }
+      #include <colorspace_fragment>`);
+  };
+  return { geometry, material };
+}
+
+/**
+ * One ice cube, irregular the way real ones are: out of a tray (a little
+ * narrower at the top, not quite square), edges softened unevenly by melting,
+ * a corner chipped off flat, a shallow dip on top. 0.27 across.
+ */
+function iceShape(THREE, RoundedBoxGeometry, mergeVertices, seed) {
+  const rand = mulberry32(seed);
+  const between = (a, b) => a + rand() * (b - a);
+  let geo = new RoundedBoxGeometry(1, 1, 1, 8, between(0.07, 0.13));
+  geo.deleteAttribute('normal');
+  geo.deleteAttribute('uv');
+  geo = mergeVertices(geo);
+
+  const w = between(0.92, 1.08);
+  const h = between(0.82, 0.97);
+  const d = between(0.9, 1.05);
+  const taper = between(0.08, 0.16);
+  const lean = between(-0.05, 0.05);
+  // the melt: slow waves across the faces, a different set for each cube
+  const waves = Array.from({ length: 3 }, () => ({
+    f: [between(2, 5), between(2, 5), between(2, 5)],
+    p: between(0, 6.3),
+    a: between(0.015, 0.035),
+  }));
+  // the chip: a plane across one corner
+  const chip = new THREE.Vector3(rand() < 0.5 ? -1 : 1, rand() < 0.5 ? -1 : 1, rand() < 0.5 ? -1 : 1).normalize();
+  const chipAt = between(0.66, 0.74);
+  const dip = between(0.02, 0.05);
+
+  const pos = geo.attributes.position;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const over = v.dot(chip) - chipAt;
+    if (over > 0) v.addScaledVector(chip, -over * 0.92);
+    let melt = 1;
+    for (const wv of waves) melt += wv.a * Math.sin(v.x * wv.f[0] + wv.p) * Math.sin(v.y * wv.f[1] - v.z * wv.f[2] + wv.p * 0.7);
+    const up = v.y + 0.5;                        // 0 at the bottom, 1 at the top
+    const narrow = 1 - taper * up;
+    let y = v.y * h;
+    if (v.y > 0.42) y -= dip * Math.max(0, 1 - (v.x * v.x + v.z * v.z) * 4);
+    pos.setXYZ(i, (v.x * narrow * w + lean * up) * melt * 0.27, y * melt * 0.27, v.z * narrow * d * melt * 0.27);
+  }
+  geo.computeVertexNormals();
+  return geo;
 }
 
 /** A roasted coffee bean: a squashed egg with the crease down its flat side */
