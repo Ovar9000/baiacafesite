@@ -463,7 +463,9 @@ main,
 
 /* The name: hidden over the hero (its giant BAIA is the name there), it
    slides out from behind the mark once the hero has scrolled away (main.js
-   sets .past-hero), and tucks back in on the way up */
+   sets .past-hero), and tucks back in on the way up. Its space is always
+   kept, so nothing else in the bar moves: only the reveal (a wipe from the
+   mark's edge) and a short slide */
 .brand-wordmark {
   display: block;
   padding-right: 0.06em;   /* the tight tracking would clip the last A */
@@ -471,30 +473,30 @@ main,
   line-height: 1;
   color: var(--white);
   white-space: nowrap;
-  max-width: 0;
-  margin-left: -10px;      /* cancels the link's gap while hidden */
   opacity: 0;
-  overflow: hidden;
   transform: translateX(-10px);
-  transition: max-width 0.5s var(--ease-smooth),
-              margin-left 0.5s var(--ease-smooth),
+  clip-path: inset(-0.2em 100% -0.2em 0);
+  transition: clip-path 0.5s var(--ease-smooth),
               transform 0.5s var(--ease-smooth),
               opacity 0.3s ease;
 }
 
 .site-header.past-hero .brand-wordmark {
-  max-width: 4em;
-  margin-left: 0;
   opacity: 1;
   transform: none;
-  transition-delay: 0s, 0s, 0s, 0.08s;
+  clip-path: inset(-0.2em -0.2em -0.2em 0);
 }
 
-/* Center: Nav Menu Links */
+/* Center: the links sit at the bar's true centre, whatever the widths on
+   either side (so the name appearing never nudges them) */
 .main-nav-wrapper {
   display: flex;
   align-items: center;
-  position: relative;
+  position: absolute;
+  inset: 0;
+  width: max-content;
+  height: max-content;
+  margin: auto;
 }
 
 .main-nav-links {

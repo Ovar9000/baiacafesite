@@ -131,6 +131,13 @@ async function run(section, stage, { still, posterMode }) {
 
   // The drinks
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+  // The textures packed in the models load as plain images (the site's CSP
+  // allows blob: images) rather than by fetch (its connect-src doesn't)
+  loader.register((parser) => {
+    parser.textureLoader = new THREE.TextureLoader(parser.options.manager);
+    parser.textureLoader.setCrossOrigin(parser.options.crossOrigin);
+    return { name: 'baia_image_textures' };
+  });
   const gltfs = await Promise.all(DRINKS.map((d) => loader.loadAsync(`${MODELS}/${d.file}`)));
   const shadowTex = makeShadowTexture(THREE);
   const world = new THREE.Group();     // drinks: rises a little as the hero scrolls away
