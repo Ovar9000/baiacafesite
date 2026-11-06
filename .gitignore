@@ -52,3 +52,9 @@ blender/out/
 # Hero drink models as they came from Meshy (8K textures, ~40 MB each).
 # `npm run hero:models` makes the light ones in public/models/hero.
 models/hero/*.raw.glb
+
+# Local tooling and media (not part of the site)
+.claude/
+.shoot-full.mjs
+social/
+
