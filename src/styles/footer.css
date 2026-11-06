@@ -1,11 +1,22 @@
 /* ==========================================================================
-   BAIA CAFE — Location, Visit Card & Unified Footer
+   BAIA CAFE — Footer: short on purpose
+     1. the visit card: open now?, the hours, the address, directions
+     2. Messenger and Instagram, side by side (and the loyalty card line)
+     3. one strip: the mark, the copyright, the legal links
+   One surface (the night-navy footer), one glass for the card and the
+   secondary buttons, one amber action (directions). Side by side on wide
+   screens, stacked on phones; the strip clears the phone's floating tab bar.
    ========================================================================== */
 
 .site-footer {
+  --footer-glass: rgba(255, 255, 255, 0.06);
+  --footer-glass-edge: rgba(255, 255, 255, 0.14);
+  --footer-muted: rgba(245, 233, 214, 0.78);
+  --footer-pad: 22px;              /* the card's inner padding */
+
   background: var(--depth-midnight-abyss, #0E1A45);
   color: var(--white);
-  padding: 72px 0 0 0;
+  padding: 48px 0 0;
   border-top: 4px solid var(--golden-amber);
   position: relative;
   overflow: hidden;
@@ -13,67 +24,35 @@
 
 .footer-top-grid {
   display: grid;
-  grid-template-columns: 1.15fr 1.05fr 0.9fr;
-  gap: 36px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 24px 48px;
   align-items: start;
-  margin-bottom: 52px;
+  max-width: 920px;
+  margin: 0 auto 40px;
 }
 
-/* Column 1: Brand */
-.footer-col-brand {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.footer-brand-lockup {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.footer-logo-img {
-  width: 44px !important;
-  height: 44px !important;
-  min-width: 44px !important;
-  min-height: 44px !important;
-  border-radius: 10px;
-  object-fit: cover;
-  flex-shrink: 0;
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
-}
-
-.footer-brand-name {
+/* Headings: the same in both columns */
+.visit-card-title,
+.footer-col-title {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.5rem;
+  font-size: 1.1rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
   color: var(--white);
-  line-height: 1;
+  margin: 0;
 }
 
-.footer-brand-desc {
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: var(--cream);
-  opacity: 0.92;
-  max-width: 380px;
-}
-
-/* Column 2: Visit card — hours, live status, directions */
-.footer-col-vibe {
-  display: flex;
-  flex-direction: column;
-}
-
+/* ----------------------------------------------------------- Visit card */
 .visit-card {
-  background: linear-gradient(145deg, #182e75 0%, #0d1a42 100%);
-  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  background: var(--footer-glass);
+  border: 1px solid var(--footer-glass-edge);
   border-radius: var(--radius-xl);
-  padding: 22px 24px;
-  box-shadow: var(--shadow-md);
+  padding: var(--footer-pad);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .visit-card-header {
@@ -84,30 +63,22 @@
   gap: 8px;
 }
 
-.visit-card-title {
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 1.15rem;
-  text-transform: uppercase;
-  color: var(--white);
-}
-
 .visit-status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
+  margin: 0;
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--cream);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   padding: 4px 10px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
 }
 
 .visit-hours-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
   margin: 0;
 }
 
@@ -116,13 +87,13 @@
   justify-content: space-between;
   gap: 12px;
   font-size: 0.9rem;
-  padding-bottom: 6px;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+  line-height: 1.35;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .visit-hours-list dt {
-  color: var(--cream);
-  opacity: 0.85;
+  color: var(--footer-muted);
 }
 
 .visit-hours-list dd {
@@ -133,15 +104,15 @@
 }
 
 .visit-address {
+  margin: 0;
   font-size: 0.875rem;
   line-height: 1.45;
   color: var(--cream);
 }
 
 .visit-pluscode {
-  display: block;
-  font-size: 0.8rem;
-  opacity: 0.7;
+  color: var(--footer-muted);
+  white-space: nowrap;
 }
 
 .visit-directions-btn {
@@ -149,92 +120,122 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 44px;
-  padding: 0 18px;
+  min-height: 46px;
+  padding: 0 20px;
   border-radius: var(--radius-pill);
   background: var(--golden-amber);
-  color: var(--deep-navy);
+  color: #1E1511;
   font-weight: 800;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   text-decoration: none;
-  transition: transform var(--duration-fast);
+  transition: transform var(--duration-fast), filter var(--duration-fast);
 }
 
 .visit-directions-btn:hover {
   transform: translateY(-1px);
+  filter: brightness(1.05);
 }
 
-/* Column 3: Community & Social Links */
+/* ---------------------------------------- Messenger, Instagram, loyalty */
 .footer-col-newsletter {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  padding-top: var(--footer-pad);   /* its heading level with "Visit us" */
 }
 
-.footer-col-title {
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 1.15rem;
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  color: var(--white);
-  margin-bottom: 6px;
-}
-
-.footer-newsletter-p {
-  font-size: 0.875rem;
-  color: var(--cream);
-  opacity: 0.88;
-  margin-bottom: 16px;
-  line-height: 1.4;
-}
-
+/* The same glass button twice; only the icons carry their colours */
 .footer-buttons-stack {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
-.footer-buttons-stack .footer-social-btn {
+.footer-social-btn {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  min-height: 50px;
-  padding: 12px 18px;
-  font-size: 0.95rem;
-  font-weight: 800;
-  text-align: center;
-  text-transform: none;
-  letter-spacing: 0;
+  gap: 9px;
+  min-height: 46px;
+  padding: 0 14px;
   border-radius: var(--radius-pill);
+  background: var(--footer-glass);
+  border: 1px solid var(--footer-glass-edge);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
   text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--duration-fast), border-color var(--duration-fast), transform var(--duration-fast);
 }
 
-/* Edge-to-Edge Full Width Footer Bottom Strip */
+.footer-social-btn:hover {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateY(-1px);
+}
+
+.footer-social-btn.is-messenger svg { color: #2E9BFF; }
+.footer-social-btn.is-instagram svg { color: #FF5C93; }
+
+/* One quiet line for returning guests (the card itself lives at /card/) */
+.footer-loyalty-link {
+  align-self: flex-start;
+  color: var(--footer-muted);
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-decoration-color: rgba(245, 233, 214, 0.3);
+  text-underline-offset: 4px;
+  transition: color var(--duration-fast), text-decoration-color var(--duration-fast);
+}
+
+.footer-loyalty-link:hover {
+  color: var(--cream);
+  text-decoration-color: var(--golden-amber);
+}
+
+/* ----------------------------------------- The strip: mark, ©, legal */
 .footer-bottom-strip {
   width: 100%;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 24px 0 28px 0;
-  background: rgba(0, 0, 0, 0.25);
-  margin-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px 0 18px;
+  background: rgba(0, 0, 0, 0.2);
 }
 
-.footer-bottom-row {
+/* The same width as the card and buttons above it */
+.footer-bottom-strip .footer-bottom-row {
+  max-width: calc(920px + 2 * var(--container-padding));
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 8px 16px;
 }
 
 .footer-copy-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.65);
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.66);
+  line-height: 1.4;
+}
+
+.footer-logo-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 .footer-social-links {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px 14px;
+  gap: 4px 10px;
 }
 
 .social-link {
@@ -244,9 +245,9 @@
   font-size: 0.8rem;
   font-weight: 700;
   white-space: nowrap;
-  padding: 2px 4px;
+  padding: 6px 4px;
   border-radius: var(--radius-sm);
-  transition: color var(--duration-fast), background-color var(--duration-fast);
+  transition: color var(--duration-fast);
 }
 
 .social-link:hover {
@@ -254,78 +255,43 @@
 }
 
 .footer-sep {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.28);
   user-select: none;
   font-size: 0.8rem;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
+/* ---------------------------------------------------------------- Phones */
+@media (max-width: 768px) {
+  .site-footer {
+    --footer-pad: 18px;
+    padding-top: 32px;
+  }
+
   .footer-top-grid {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 22px;
+    margin-bottom: 28px;
   }
-  .visit-card {
-    max-width: 480px;
-  }
-}
 
-@media (max-width: 768px) {
+  .footer-col-newsletter {
+    padding-top: 0;
+    gap: 10px;
+  }
+
   .footer-bottom-strip {
-    /* Provide comfortable bottom breathing room to clear fixed mobile sticky bar */
-    padding: 24px 0 calc(28px + 72px) 0;
+    /* Clears the floating tab bar and menu button (54px, 12px off the edge) */
+    padding: 14px 0 calc(16px + 66px + env(safe-area-inset-bottom));
   }
 
   .footer-bottom-row {
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 14px;
-  }
-
-  .footer-copy-text {
-    text-align: center;
-    font-size: 0.775rem;
-    max-width: 320px;
-    margin: 0 auto;
-  }
-
-  .footer-social-links {
-    justify-content: center;
-    gap: 8px 12px;
-  }
-
-  .social-link {
-    font-size: 0.78rem;
-    padding: 4px 6px;
+    gap: 4px;
   }
 }
 
 @media (max-width: 480px) {
-  /* Hide bullet dots on narrow mobile so orphan dots never hang between wrapped lines */
+  /* No bullet dots on narrow phones, so none hangs between wrapped lines */
   .footer-sep {
     display: none;
   }
-
-  .footer-social-links {
-    gap: 6px 14px;
-  }
-}
-
-/* One quiet line for returning guests (the card itself lives at /card/) */
-.footer-loyalty-link {
-  display: inline-block;
-  margin-top: 16px;
-  color: var(--cream);
-  opacity: 0.75;
-  font-size: 0.9rem;
-  text-decoration: underline;
-  text-decoration-color: rgba(245, 233, 214, 0.35);
-  text-underline-offset: 4px;
-  transition: opacity var(--duration-fast), text-decoration-color var(--duration-fast);
-}
-
-.footer-loyalty-link:hover {
-  opacity: 1;
-  text-decoration-color: var(--golden-amber);
 }

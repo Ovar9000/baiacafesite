@@ -45,3 +45,10 @@ trace-audit.js
 audit-*.json
 lighthouse-*.json
 
+
+# Blender renders (raw frames; the shipped WebP frames live in public/)
+blender/out/
+
+# Hero drink models as they came from Meshy (8K textures, ~40 MB each).
+# `npm run hero:models` makes the light ones in public/models/hero.
+models/hero/*.raw.glb
