@@ -15,8 +15,9 @@
  *   - the light: a neutral studio light keeps the drinks their true colours
  *     (glossy, cold), and a rim of light behind them takes the time of day's
  *     colour, gold at sunrise, orange at sunset, lantern-warm at night
- *   - the camera sits a little low (the drinks loom), leans with the pointer
- *     on desktops, and as the hero scrolls away the beans and ice rise past
+ *   - the camera sits a little low (the drinks loom), leans as a phone tilts
+ *     (its gyroscope; iPhones ask once, on the first tap in the hero; the
+ *     mouse moves nothing), and as the hero scrolls away the beans and ice rise past
  *     faster than the drinks
  *
  * Reduced motion: everything stands still (beans and ice at rest). Save-Data
@@ -212,16 +213,9 @@ async function run(section, stage, { still, posterMode }) {
   };
   layout();
 
-  // The pointer, eased (desktop only: -1..1 across the hero)
-  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
-  if (!still && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    section.addEventListener('pointermove', (e) => {
-      const r = section.getBoundingClientRect();
-      pointer.tx = ((e.clientX - r.left) / r.width) * 2 - 1;
-      pointer.ty = ((e.clientY - r.top) / r.height) * 2 - 1;
-    });
-    section.addEventListener('pointerleave', () => { pointer.tx = 0; pointer.ty = 0; });
-  }
+  // The phone's tilt, eased (-1..1 each way). Desktops: no lean at all
+  const lean = { x: 0, y: 0, tx: 0, ty: 0 };
+  if (!still) watchTilt(section, lean);
 
   // Motion. At t = 0 the drinks are at rest: the poster's pose
   let t0 = performance.now();
@@ -252,10 +246,11 @@ async function run(section, stage, { still, posterMode }) {
     world.position.y = scroll * 0.35;
     if (bits) bits.update(still ? Infinity : t, scroll);
 
-    // Lean the camera with the pointer, round the drinks
-    pointer.x += (pointer.tx - pointer.x) * 0.05;
-    pointer.y += (pointer.ty - pointer.y) * 0.05;
-    camera.position.set(base.position.x + pointer.x * 0.22, base.position.y - pointer.y * 0.12, base.position.z);
+    // Lean the camera with the phone, round the drinks: tilt it and you look
+    // past their sides, the beans and ice sliding by at their own depths
+    lean.x += (lean.tx - lean.x) * 0.08;
+    lean.y += (lean.ty - lean.y) * 0.08;
+    camera.position.set(base.position.x + lean.x * 0.3, base.position.y - lean.y * 0.18, base.position.z);
     camera.lookAt(base.target);
     renderer.render(scene, camera);
   };
@@ -725,6 +720,47 @@ function makeShadowTexture(THREE) {
 }
 
 /** Pause while the hero is off screen or the tab is hidden */
+/**
+ * The phone's tilt, as -1..1 left/right (`tx`) and up/down (`ty`), measured
+ * from however the phone is being held: that rest pose drifts along behind
+ * it over a few seconds, so lying in bed or standing up both start centred
+ * and a tilt always reads as a tilt. ±18° is the full lean. Landscape swaps
+ * the axes. iPhones only send motion after asking: if none has come, the
+ * first tap in the hero (not on a link or button) asks, once.
+ */
+function watchTilt(section, lean) {
+  if (typeof DeviceOrientationEvent === 'undefined') return;
+  if (!window.matchMedia('(pointer: coarse)').matches) return;
+  const FULL = 18;
+  let rest = null;
+  const clamp = (v) => Math.max(-1, Math.min(1, v));
+  const onTilt = (e) => {
+    if (e.beta == null || e.gamma == null) return;
+    const angle = (screen.orientation?.angle ?? window.orientation ?? 0) % 360;
+    // side to side and towards/away, as the viewer sees the screen
+    let x = e.gamma;
+    let y = e.beta;
+    if (angle === 90 || angle === -270) { x = e.beta; y = -e.gamma; }
+    else if (angle === 270 || angle === -90) { x = -e.beta; y = e.gamma; }
+    else if (angle === 180 || angle === -180) { x = -e.gamma; y = -e.beta; }
+    if (!rest) rest = { x, y };
+    rest.x += (x - rest.x) * 0.012;
+    rest.y += (y - rest.y) * 0.012;
+    lean.tx = clamp((x - rest.x) / FULL);
+    lean.ty = clamp((y - rest.y) / FULL);
+  };
+  // Android sends motion straight away; an iPhone sends nothing until asked
+  window.addEventListener('deviceorientation', onTilt);
+  if (typeof DeviceOrientationEvent.requestPermission !== 'function') return;
+  const ask = (e) => {
+    if (rest) { section.removeEventListener('click', ask); return; }   // already moving
+    if (e.target.closest?.('a, button, input, select, textarea, label')) return;
+    section.removeEventListener('click', ask);
+    DeviceOrientationEvent.requestPermission().catch(() => {});
+  };
+  section.addEventListener('click', ask);
+}
+
 function watchVisible(el, onChange) {
   let inView = true;
   const report = () => onChange(inView && document.visibilityState === 'visible');
