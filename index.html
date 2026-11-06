@@ -39,8 +39,6 @@
   <meta name="twitter:image" content="https://www.baia.cafe/images/og-shore.jpg" />
 
   <!-- Preload Critical Hero Asset & Google Fonts -->
-  <!-- Picks the hero photo for the time of day at the beach and preloads it (public/hero-daypart.js) -->
-  <script src="/hero-daypart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- Plain stylesheet: the media="print" + onload swap is an inline handler the CSP blocks -->
@@ -49,6 +47,8 @@
     href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;600;800;900&family=Space+Grotesk:wght@700;900&display=swap" />
 
   <!-- Critical Above-The-Fold CSS -->
+  <!-- Picks the beach photo for the time of day and preloads it (public/hero-daypart.js) -->
+  <script src="/hero-daypart.js"></script>
   <style id="critical-hero-css">
 :root {
   --royal-blue: #1E4AFF;
@@ -102,9 +102,10 @@ svg { display: block; max-width: 100%; }
 .site-header { position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height); z-index: 100; display: flex; align-items: center; pointer-events: none; }
 .nav-container { position: relative; height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 8px; border-radius: 9999px; pointer-events: auto; background: rgba(22, 37, 92, 0.42); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 0 0 0.5px rgba(255, 255, 255, 0.2); }
 .nav-menu-toggle { display: none; }
-@media (max-width: 900px) { .main-nav-wrapper { display: none; } .nav-container { justify-content: flex-start; gap: 10px; padding: 0 7px; } .nav-menu-toggle { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border: none; border-radius: 50%; background: rgba(255, 255, 255, 0.14); color: #fff; } .nav-actions { margin-left: auto; } }
+@media (max-width: 900px) { .main-nav-wrapper { display: none; } .nav-container { justify-content: flex-start; gap: 10px; padding: 0 7px; } .nav-menu-toggle { display: inline-flex; align-items: center; justify-content: center; position: fixed; right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); z-index: 991; width: 54px; height: 54px; border: none; border-radius: 50%; background: rgba(42, 27, 20, 0.72); color: #fff; } .nav-actions { margin-left: auto; } }
 dialog.nav-drawer:not([open]) { display: none; }
 .brand-logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--white); }
+.brand-wordmark { font-size: 1.4rem; line-height: 1; max-width: 0; margin-left: -10px; opacity: 0; overflow: hidden; }
 .brand-logo-img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; view-transition-name: baia-brand-logo; contain: paint; transform: translateZ(0); will-change: transform; }
 :root { --motion-duration-logo: 1.1s; --motion-duration-page: 0.9s; --motion-duration-fade: 0.6s; --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1); }
 @media (max-width: 768px) { :root { --motion-duration-logo: 0.75s; --motion-duration-page: 0.70s; --motion-duration-fade: 0.55s; --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1); } }
@@ -119,9 +120,6 @@ dialog.nav-drawer:not([open]) { display: none; }
 ::view-transition-new(baia-brand-logo) { animation: logoFadeIn var(--motion-duration-logo, 0.75s) var(--motion-ease-logo, cubic-bezier(0.4, 0, 0.2, 1)) both; mix-blend-mode: normal !important; }
 @keyframes logoFadeOut { from { opacity: 1; } to { opacity: 0; } }
 @keyframes logoFadeIn { from { opacity: 0; } to { opacity: 1; } }
-.brand-text-block { display: flex; flex-direction: column; }
-.brand-title { font-size: 1.4rem; line-height: 1; color: var(--white); }
-.brand-subtitle { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; color: var(--amber-contrast); text-transform: uppercase; }
 .main-nav-links { display: flex; align-items: center; gap: 2px; list-style: none; }
 .nav-link { display: inline-flex; align-items: center; color: var(--cream); text-decoration: none; font-family: var(--font-display); font-weight: 700; font-size: 0.86rem; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; padding: 9px 14px; border-radius: 9999px; }
 .nav-lens { position: absolute; opacity: 0; pointer-events: none; }
@@ -129,25 +127,9 @@ dialog.nav-drawer:not([open]) { display: none; }
 .nav-icon-link { display: inline-flex; align-items: center; gap: 6px; color: var(--cream); text-decoration: none; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; padding: 0 12px; height: 38px; border-radius: var(--radius-pill); border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.15); }
 .nav-cart-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--golden-amber); color: var(--deep-navy); border: none; font-family: var(--font-display); font-weight: 900; font-size: 0.85rem; text-transform: uppercase; padding: 0 16px; height: 38px; border-radius: var(--radius-pill); cursor: pointer; }
 .cart-count-badge { background: var(--hot-pink); color: var(--white); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 900; width: 20px; height: 20px; min-width: 20px; min-height: 20px; max-width: 20px; max-height: 20px; aspect-ratio: 1 / 1; flex-shrink: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; line-height: 1; padding: 0; box-sizing: border-box; }
-.hero-section { position: relative; min-height: calc(100vh - 28px); min-height: calc(100dvh - 28px); height: auto; padding-top: calc(var(--header-height) + clamp(16px, 2.5vh, 32px)); padding-bottom: clamp(16px, 2.5vh, 32px); background: radial-gradient(120% 90% at 50% 25%, #2a52ff 0%, #1a3fe8 55%, #142eb8 100%); overflow: hidden; display: flex; flex-direction: column; justify-content: center; width: 100%; box-sizing: border-box; }
-.hero-grid { display: grid; grid-template-columns: 1.15fr 0.95fr; align-items: center; gap: clamp(24px, 4vw, var(--space-2xl)); position: relative; z-index: 2; width: 100%; }
-.hero-content { display: flex; flex-direction: column; align-items: flex-start; max-width: 640px; width: 100%; }
-.hero-trust-pill { display: inline-flex; align-items: center; gap: 8px 10px; background: rgba(22, 37, 92, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1.2px solid rgba(255, 255, 255, 0.22); padding: 6px 16px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--white); margin-bottom: 16px; align-self: flex-start; }
-.hero-headline.hero-vertical-focus { margin-bottom: 16px; position: relative; z-index: 1; width: 100%; }
-.tagline-stack { display: flex; flex-direction: column; gap: 0px; width: 100%; }
-.tagline-row { display: flex; align-items: center; gap: 14px; line-height: 0.90; letter-spacing: -0.035em; white-space: nowrap; }
-.tagline-row .letter-chunky { font-family: var(--font-headline); font-weight: 900; font-size: clamp(3.0rem, min(8.5vw, 9.5vh), 5.4rem); text-transform: uppercase; color: var(--white); }
-.ampersand-chunky { font-family: var(--font-headline); font-weight: 900; font-size: clamp(2.8rem, min(8.0vw, 9.0vh), 5.0rem); color: var(--golden-amber); margin-left: 2px; }
-.row-vibes .letter-chunky { color: var(--amber-contrast); }
-.row-crafted-bay { display: flex; align-items: baseline; gap: 12px; flex-wrap: nowrap; white-space: nowrap; margin-top: 0px; }
-.script-crafted-fatseed { font-family: var(--font-script); font-weight: 700; font-size: clamp(3.2rem, min(9.0vw, 10.2vh), 5.8rem); color: #ff6b9d; transform: rotate(-4deg); display: inline-block; line-height: 0.82; }
-.bay-chunky { font-family: var(--font-headline); font-weight: 900; font-size: clamp(2.4rem, min(6.8vw, 7.8vh), 4.4rem); text-transform: uppercase; color: var(--white); }
-.hero-subtitle { font-size: clamp(1.02rem, 2vw, 1.15rem); line-height: 1.6; color: var(--cream); margin-bottom: 0; max-width: 540px; position: relative; z-index: 1; }
-.mobile-sticky-bar { display: none; position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 990; transform: translateY(calc(100% + 24px)); opacity: 0; pointer-events: none; }
+.mobile-sticky-bar { display: none; position: fixed; left: 12px; right: 76px; bottom: 12px; z-index: 990; transform: translateY(calc(100% + 24px)); opacity: 0; pointer-events: none; }
 .mobile-sticky-bar.is-visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
 @media (max-width: 1024px) {
-  .brand-title { font-size: 1.25rem; }
-  .brand-subtitle { font-size: 0.58rem; letter-spacing: 0.08em; }
   .main-nav-links { gap: 6px; }
   .nav-link { font-size: 0.76rem; padding: 4px 6px; letter-spacing: 0.01em; }
   .nav-actions { gap: 6px; }
@@ -155,50 +137,30 @@ dialog.nav-drawer:not([open]) { display: none; }
   .nav-icon-text { display: none; }
   .nav-cart-btn { padding: 0 10px; height: 36px; font-size: 0.76rem; gap: 6px; }
   .cart-count-badge { width: 18px; height: 18px; min-width: 18px; min-height: 18px; font-size: 0.68rem; }
-  .hero-section { min-height: calc(100dvh - 28px); height: auto; display: flex; flex-direction: column; justify-content: center; padding-top: calc(var(--header-height) + clamp(16px, 2.8vh, 28px)); padding-bottom: clamp(20px, 3.5vh, 32px); }
-  .hero-grid { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(28px, 4.5vh, 44px); width: 100%; flex: 1 1 auto; min-height: 0; }
-  .hero-content.headline-block { display: flex; flex-direction: column; align-items: center; width: 100%; flex: 0 0 auto; margin-bottom: 0; text-align: center; }
-  .hero-headline.hero-vertical-focus { margin-top: 0; margin-bottom: 0; width: 100%; text-align: center; }
-  .tagline-stack { display: flex; flex-direction: column; gap: clamp(4px, 0.8vh, 8px); align-items: center; width: fit-content; margin: 0 auto; }
-  .tagline-row { justify-content: center; align-items: center; line-height: 0.95; gap: clamp(8px, 2vw, 12px); white-space: nowrap; }
-  .tagline-row .letter-chunky { font-size: clamp(2.8rem, 8.5vw, 4.2rem); }
-  .ampersand-chunky { font-size: clamp(2.6rem, 8.0vw, 3.8rem); }
-  .script-crafted-fatseed { font-size: clamp(3.2rem, 9.8vw, 4.6rem); }
-  .bay-chunky { font-size: clamp(2.3rem, 7.0vw, 3.4rem); }
-  .row-crafted-bay { justify-content: center; align-items: baseline; gap: clamp(8px, 1.8vw, 12px); margin-top: 0px; white-space: nowrap; }
 }
 @media (max-width: 640px) {
   .nav-container { height: 54px; }
-  .nav-menu-toggle { width: 40px; height: 40px; }
   :root {
     --header-height: 70px;
   }
-  .hero-section { min-height: calc(100dvh - 28px); height: auto; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; padding-top: calc(var(--header-height) + clamp(12px, 2.2vh, 22px)); padding-bottom: clamp(16px, 3vh, 26px); padding-left: clamp(1rem, 4vw, 1.5rem); padding-right: clamp(1rem, 4vw, 1.5rem); }
-  .hero-grid { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(22px, 4vh, 36px); width: 100%; }
-  .hero-content.headline-block { display: flex; flex-direction: column; align-items: center; width: 100%; text-align: center; }
-  .hero-headline.hero-vertical-focus { margin-top: 0; margin-bottom: 0; width: 100%; text-align: center; }
-  .tagline-stack { display: flex; flex-direction: column; gap: clamp(4px, 0.8vh, 7px); align-items: center; width: fit-content; margin: 0 auto; }
-  .tagline-row { line-height: 0.95; gap: clamp(6px, 1.8vw, 10px); white-space: nowrap; justify-content: center; align-items: center; }
-  .tagline-row .letter-chunky { font-size: clamp(2.45rem, 9.6vw, 3.25rem); }
-  .ampersand-chunky { font-size: clamp(2.35rem, 9.0vw, 3.0rem); }
-  .script-crafted-fatseed { font-size: clamp(2.85rem, 11.4vw, 3.8rem); }
-  .bay-chunky { font-size: clamp(2.05rem, 8.0vw, 2.75rem); }
-  .row-crafted-bay { justify-content: center; align-items: baseline; gap: clamp(6px, 1.6vw, 10px); flex-wrap: nowrap; white-space: nowrap; margin-top: 0px; }
-  .hero-doodle.doodle-mug { width: clamp(28px, 7.5vw, 36px); height: clamp(28px, 7.5vw, 36px); }
-  .hero-doodle.doodle-food { width: clamp(28px, 7.5vw, 36px); height: clamp(28px, 7.5vw, 36px); }
-  .hero-doodle.doodle-sparkle { width: clamp(18px, 5.0vw, 24px); height: clamp(18px, 5.0vw, 24px); position: relative !important; }
 }
-  
+/* Hero: two drinks in 3D, BAIA huge behind them, on the beach photo for the
+   time of day (full rules in src/styles/hero.css; keep them in step) */
 :root, [data-daypart="day"] { --hero-photo-portrait: url("/images/hero/day-portrait.webp"); --hero-photo-wide: url("/images/hero/day-wide.webp"); --hero-focus-portrait: 20% center; --hero-focus-wide: 35% 70%; }
 [data-daypart="sunrise"] { --hero-photo-portrait: url("/images/hero/sunrise-portrait.webp"); --hero-photo-wide: url("/images/hero/sunrise-wide.webp"); --hero-focus-portrait: 55% center; --hero-focus-wide: 55% 30%; }
 [data-daypart="sunset"] { --hero-photo-portrait: url("/images/hero/sunset-portrait.webp"); --hero-photo-wide: url("/images/hero/sunset-wide.webp"); --hero-focus-portrait: 50% center; --hero-focus-wide: 45% 85%; }
 [data-daypart="night"] { --hero-photo-portrait: url("/images/hero/night-portrait.webp"); --hero-photo-wide: url("/images/hero/night-wide.webp"); --hero-focus-portrait: 60% center; --hero-focus-wide: 60% 90%; }
-.hero-section { background: #0E1A45; }
-.hero-photo { position: absolute; inset: 0; background: #0E1A45 var(--hero-photo-portrait) var(--hero-focus-portrait) / cover no-repeat; }
+.hero-section { --hero-word: rgba(255, 246, 234, 0.92); --stage-aspect: 1.45; position: relative; min-height: calc(100vh - 28px); min-height: calc(100dvh - 28px); padding: calc(var(--header-height) + 8px) 12px clamp(20px, 4vh, 40px); background: #0E1A45; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; }
+.hero-photo { position: absolute; inset: 0; background: #0E1A45 var(--hero-photo-portrait) var(--hero-focus-portrait) / cover no-repeat; filter: blur(5px) saturate(1.08); transform: scale(1.05); }
 @media (min-aspect-ratio: 1/1) { .hero-photo { background-image: var(--hero-photo-wide); background-position: var(--hero-focus-wide); } }
-.hero-scrim { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(14, 26, 69, 0.62) 0%, rgba(14, 26, 69, 0.38) 38%, rgba(14, 26, 69, 0) 64%), linear-gradient(180deg, rgba(14, 26, 69, 0) 72%, rgba(14, 26, 69, 0.55) 100%); }
-.hero-grid { display: flex; flex-direction: column; align-items: flex-start; }
-@media (max-width: 1024px) { .hero-section { justify-content: flex-start; } .hero-grid { flex: 0 0 auto; align-items: center; padding-top: clamp(8px, 3vh, 32px); } .hero-scrim { background: linear-gradient(180deg, rgba(14, 26, 69, 0.62) 0%, rgba(14, 26, 69, 0.34) 30%, rgba(14, 26, 69, 0) 52%), linear-gradient(180deg, rgba(14, 26, 69, 0) 76%, rgba(14, 26, 69, 0.5) 100%); } }
+.hero-scrim { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 70% at 50% 100%, rgba(14, 26, 69, 0.55) 0%, rgba(14, 26, 69, 0) 70%), linear-gradient(180deg, rgba(14, 26, 69, 0.28) 0%, rgba(14, 26, 69, 0.12) 45%, rgba(14, 26, 69, 0.4) 100%); }
+.hero-title { position: relative; z-index: 2; margin: 0; width: min(96vw, 1320px, calc((100dvh - var(--header-height) - 48px) * var(--stage-aspect))); }
+.hero-stage { position: relative; display: block; width: 100%; aspect-ratio: var(--stage-aspect); }
+.hero-drinks, .hero-drinks img { display: block; width: 100%; height: 100%; }
+.hero-drinks img { object-fit: contain; }
+.hero-backword { position: absolute; z-index: 1; left: 50%; top: 47%; transform: translate(-50%, -50%); font-family: var(--font-headline); font-weight: 900; font-size: clamp(9rem, 47vw, 44rem); line-height: 0.8; letter-spacing: -0.04em; white-space: nowrap; color: var(--hero-word); }
+@media (max-width: 640px) { .hero-section { --stage-aspect: 0.82; padding-bottom: clamp(40px, 8vh, 80px); } .hero-title { width: min(112vw, calc((100dvh - var(--header-height) - 56px) * var(--stage-aspect))); flex-shrink: 0; } .hero-backword { top: 23%; } }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 </style>
 
   <!-- Master Stylesheet and Main Entry Module -->
@@ -285,22 +247,12 @@ dialog.nav-drawer:not([open]) { display: none; }
   <header class="site-header" id="site-header" role="banner">
     <div class="container">
     <div class="nav-container">
-      <!-- Phones and tablets: opens the section drawer (src/components/navDrawer.js) -->
-      <button type="button" class="nav-menu-toggle" aria-label="Open navigation menu" aria-haspopup="dialog" aria-controls="nav-drawer" aria-expanded="false">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
-          <line x1="4" y1="7" x2="20" y2="7"></line>
-          <line x1="4" y1="12" x2="20" y2="12"></line>
-          <line x1="4" y1="17" x2="20" y2="17"></line>
-        </svg>
-      </button>
-
-      <!-- Left: Brand Logo Lockup -->
-      <a href="#hero" class="brand-logo-link">
-        <img src="./images/Logo.webp" alt="BAIA Cafe logo" width="42" height="42" class="brand-logo-img" />
-        <div class="brand-text-block">
-          <span class="brand-title wordmark">BAIA</span>
-          <span class="brand-subtitle">COFFEE • FOOD • SHORE</span>
-        </div>
+      <!-- Left: the BAIA mark. Over the hero it stands alone (the hero says
+           BAIA big enough); past it, the name slides out beside it (main.js
+           sets .past-hero on the header) -->
+      <a href="#hero" class="brand-logo-link" aria-label="BAIA Cafe, back to the top">
+        <img src="./images/Logo.webp" alt="" width="42" height="42" class="brand-logo-img" />
+        <span class="brand-wordmark wordmark" aria-hidden="true">BAIA</span>
       </a>
 
       <!-- Center Nav Links -->
@@ -346,6 +298,17 @@ dialog.nav-drawer:not([open]) { display: none; }
 
   <!-- Section drawer for phones and tablets: a modal dialog that slides in from the left
        as a floating glass sheet. Escape and backdrop clicks close it. -->
+  <!-- Phones and tablets: the menu button floats at the bottom right, under
+       the thumb, and opens the section drawer out of the same corner
+       (src/components/navDrawer.js; main.css "MENU BUTTON", "NAV DRAWER") -->
+  <button type="button" class="nav-menu-toggle" aria-label="Open navigation menu" aria-haspopup="dialog" aria-controls="nav-drawer" aria-expanded="false">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+      <line x1="4" y1="7" x2="20" y2="7"></line>
+      <line x1="4" y1="12" x2="20" y2="12"></line>
+      <line x1="4" y1="17" x2="20" y2="17"></line>
+    </svg>
+  </button>
+
   <dialog class="nav-drawer" id="nav-drawer" aria-label="Site navigation">
     <div class="nav-drawer-header">
       <a href="#hero" class="nav-drawer-brand" data-close-drawer>
@@ -385,60 +348,30 @@ dialog.nav-drawer:not([open]) { display: none; }
 
   <!-- MAIN CONTENT CONTAINER -->
   <main id="main-content" tabindex="-1">
-  <!-- 1. HERO: the shore itself, with the brand headline over it -->
+  <!-- 1. HERO: BAIA's iced mocha and cloud-top iced latte in 3D, standing
+       side by side and floating gently, in front of BAIA in huge cream
+       letters, on the beach photo for the time of day (hero.css "TIME OF
+       DAY", public/hero-daypart.js). The poster is the scene's first frame;
+       once the page is idle heroScene.js fades the live scene in over it.
+       No other words. -->
   <section class="hero-section" id="hero" data-theme="surface-blue" aria-label="Welcome to BAIA Cafe">
     <!-- The beach right now: sunrise, day, sunset or night (hero.css "TIME OF DAY") -->
     <div class="hero-photo" role="img" aria-label="Laurente Beach at BAIA Cafe, as it looks at this time of day"></div>
-    <!-- A soft navy shade behind the headline; the rest of the photo keeps its colour -->
     <div class="hero-scrim" aria-hidden="true"></div>
+    <span class="hero-backword" aria-hidden="true">BAIA</span>
+    <!-- Flat shapes along the bottom, cut from the logo's curves -->
+    <div class="hero-shapes" aria-hidden="true"></div>
 
-    <div class="container hero-grid">
-      <div class="hero-content headline-block">
-        <h1 class="hero-headline hero-vertical-focus">
-          <span class="tagline-stack">
-            <span class="tagline-row row-coffee">
-              <span class="letter-chunky">COFFEE,</span>
-              <svg class="hero-doodle doodle-mug" viewBox="0 0 40 40" width="38" height="38" aria-hidden="true">
-                <path d="M6 14 h22 v14 a6 6 0 0 1 -6 6 h-10 a6 6 0 0 1 -6 -6 Z" fill="#F5E9D6" stroke="#16255C" stroke-width="2.5" />
-                <path d="M28 17 h4 a4 4 0 0 1 4 4 v2 a4 4 0 0 1 -4 4 h-4" fill="none" stroke="#16255C" stroke-width="2.5" stroke-linecap="round" />
-                <path d="M12 9 Q14 5 12 2 M18 9 Q20 5 18 2 M24 9 Q26 5 24 2" fill="none" stroke="#FFE699" stroke-width="2" stroke-linecap="round" />
-              </svg>
-            </span>
-            <span class="tagline-row row-food">
-              <span class="letter-chunky">FOOD</span>
-              <span class="ampersand-chunky">&amp;</span>
-              <svg class="hero-doodle doodle-food doodle-inasal" viewBox="0 0 40 40" width="38" height="38" aria-label="Authentic Bacolod Chicken Inasal Grilled Skewer" role="img">
-                <!-- Sizzle & Charcoal Smoke lines -->
-                <path d="M26 6 Q29 2 27 0 M32 9 Q35 5 33 2" fill="none" stroke="#FFE699" stroke-width="2" stroke-linecap="round" />
-                <!-- Bamboo Skewer -->
-                <line x1="6" y1="36" x2="35" y2="7" stroke="#E5BE8A" stroke-width="3" stroke-linecap="round" />
-                <line x1="31" y1="11" x2="35" y2="7" stroke="#16255C" stroke-width="2.5" stroke-linecap="round" />
-                <!-- Inasal Piece 1 (Bottom cut) -->
-                <ellipse cx="14" cy="28" rx="5.5" ry="4.5" transform="rotate(-45 14 28)" fill="#E8611A" stroke="#16255C" stroke-width="2.3" />
-                <line x1="11" y1="27" x2="14" y2="24" stroke="#16255C" stroke-width="1.8" stroke-linecap="round" />
-                <!-- Inasal Piece 2 (Middle cut - thick juicy inasal) -->
-                <ellipse cx="21" cy="21" rx="6.5" ry="5" transform="rotate(-45 21 21)" fill="#F57C00" stroke="#16255C" stroke-width="2.3" />
-                <line x1="18" y1="20" x2="22" y2="16" stroke="#16255C" stroke-width="1.8" stroke-linecap="round" />
-                <line x1="21" y1="24" x2="25" y2="20" stroke="#16255C" stroke-width="1.8" stroke-linecap="round" />
-                <!-- Inasal Piece 3 (Top cut) -->
-                <ellipse cx="28" cy="14" rx="5.5" ry="4.2" transform="rotate(-45 28 14)" fill="#E8611A" stroke="#16255C" stroke-width="2.3" />
-                <line x1="26" y1="14" x2="29" y2="11" stroke="#16255C" stroke-width="1.8" stroke-linecap="round" />
-              </svg>
-            </span>
-            <span class="tagline-row row-vibes">
-              <span class="letter-chunky">GOOD VIBES</span>
-              <svg class="hero-doodle doodle-sparkle" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-                <path d="M12 2 L14 9 L21 12 L14 15 L12 22 L10 15 L3 12 L10 9 Z" fill="#F5A623" stroke="#16255C" stroke-width="1.5" />
-              </svg>
-            </span>
-            <span class="tagline-row row-crafted-bay">
-              <span class="script-crafted-fatseed">Crafted</span>
-              <span class="bay-chunky">BY THE BAY</span>
-            </span>
-          </span>
-        </h1>
-      </div>
-    </div>
+    <h1 class="hero-title">
+      <span class="visually-hidden">BAIA Cafe: an iced mocha and a cloud-top iced latte, crafted by the bay on Laurente Beach, Burias Island</span>
+      <span class="hero-stage" data-hero-scene>
+        <picture class="hero-drinks">
+          <source media="(max-width: 640px)" srcset="/images/hero-3d/drinks-sm.webp" width="870" height="1062" />
+          <img src="/images/hero-3d/drinks-lg.webp" width="1600" height="1104"
+               alt="" aria-hidden="true" fetchpriority="high" draggable="false" />
+        </picture>
+      </span>
+    </h1>
   </section>
 
   <!-- 3. SEAMLESS CONTINUOUS WAVE DIVIDER STRIP -->

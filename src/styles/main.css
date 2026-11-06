@@ -388,19 +388,34 @@ main,
   }
 }
 
-/* Menu button: phones and tablets only (opens the section drawer) */
+/* ==========================================================================
+   MENU BUTTON (phones and tablets; opens the section drawer)
+   A round glass button fixed at the bottom right, where the thumb rests,
+   the same glass and height as the phone tab bar beside it. The drawer
+   grows out of this corner and its close button lands on the same spot.
+   ========================================================================== */
 .nav-menu-toggle {
+  --menu-button: 54px;
   display: none;
+  position: fixed;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  z-index: 991;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  width: 42px;
-  height: 42px;
+  width: var(--menu-button);
+  height: var(--menu-button);
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(42, 27, 20, 0.72);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22),
+              inset 0 0 0 0.5px rgba(255, 255, 255, 0.2),
+              var(--shadow-md);
   color: var(--white);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition: transform 0.2s var(--ease-smooth), background-color 0.15s ease;
 }
 
@@ -412,7 +427,12 @@ main,
   transform: scale(0.92);
 }
 
-/* Left: Brand Logo Lockup */
+.nav-menu-toggle:focus-visible {
+  outline: 2px solid var(--golden-amber);
+  outline-offset: 3px;
+}
+
+/* Left: the BAIA mark on its own */
 .brand-logo-link {
   display: flex;
   align-items: center;
@@ -441,24 +461,33 @@ main,
   transform: scale(1.06);
 }
 
-.brand-text-block {
-  display: flex;
-  flex-direction: column;
-}
-
-.brand-title {
+/* The name: hidden over the hero (its giant BAIA is the name there), it
+   slides out from behind the mark once the hero has scrolled away (main.js
+   sets .past-hero), and tucks back in on the way up */
+.brand-wordmark {
+  display: block;
+  padding-right: 0.06em;   /* the tight tracking would clip the last A */
   font-size: 1.4rem;
   line-height: 1;
   color: var(--white);
+  white-space: nowrap;
+  max-width: 0;
+  margin-left: -10px;      /* cancels the link's gap while hidden */
+  opacity: 0;
+  overflow: hidden;
+  transform: translateX(-10px);
+  transition: max-width 0.5s var(--ease-smooth),
+              margin-left 0.5s var(--ease-smooth),
+              transform 0.5s var(--ease-smooth),
+              opacity 0.3s ease;
 }
 
-.brand-subtitle {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  color: var(--amber-contrast);
-  text-transform: uppercase;
+.site-header.past-hero .brand-wordmark {
+  max-width: 4em;
+  margin-left: 0;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s, 0s, 0s, 0.08s;
 }
 
 /* Center: Nav Menu Links */
@@ -590,9 +619,11 @@ main,
 
 /* ==========================================================================
    NAV DRAWER (phones and tablets; src/components/navDrawer.js)
-   A floating glass sheet inset from the screen edge that slides in from the
-   left. It is a modal <dialog>: `display` and `overlay` transition discretely
-   so the exit plays before it leaves the top layer, where supported.
+   A floating glass sheet at the bottom right that grows out of the menu
+   button, so every link is in reach of the thumb; its close button sits
+   where the menu button was. It is a modal <dialog>: `display` and
+   `overlay` transition discretely so the exit plays before it leaves the
+   top layer, where supported.
    ========================================================================== */
 body:has(dialog.nav-drawer[open]) {
   overflow: hidden;
@@ -600,11 +631,11 @@ body:has(dialog.nav-drawer[open]) {
 
 .nav-drawer {
   position: fixed;
-  inset: 10px auto 10px 10px;
-  width: min(85vw, 360px);
+  inset: auto max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) auto;
+  width: min(calc(100vw - 24px), 380px);
   max-width: none;
-  height: calc(100dvh - 20px);
-  max-height: none;
+  height: auto;
+  max-height: calc(100dvh - 24px);
   margin: 0;
   padding: 0;
   border: none;
@@ -614,9 +645,13 @@ body:has(dialog.nav-drawer[open]) {
   backdrop-filter: blur(28px) saturate(180%);
   color: var(--deep-navy);
   flex-direction: column;
-  transform: translateX(calc(-100% - 16px));
+  /* Grows from the centre of the menu button (27px in from the corner) */
+  transform-origin: calc(100% - 27px) calc(100% - 27px);
+  transform: scale(0.14);
+  opacity: 0;
   box-shadow: none;
-  transition: transform 0.4s var(--ease-smooth),
+  transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+              opacity 0.2s ease,
               box-shadow 0.4s ease,
               overlay 0.4s allow-discrete,
               display 0.4s allow-discrete;
@@ -625,7 +660,8 @@ body:has(dialog.nav-drawer[open]) {
 /* display is only set while open, so the UA's dialog:not([open]) { display: none } still applies */
 .nav-drawer[open] {
   display: flex;
-  transform: translateX(0);
+  transform: none;
+  opacity: 1;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85),
               inset 0 0 0 0.5px rgba(255, 255, 255, 0.6),
               var(--shadow-xl);
@@ -646,13 +682,14 @@ body:has(dialog.nav-drawer[open]) {
 /* Entry start points (the dialog goes from display: none to flex) */
 @starting-style {
   .nav-drawer[open] {
-    transform: translateX(calc(-100% - 16px));
+    transform: scale(0.14);
+    opacity: 0;
   }
   .nav-drawer[open]::backdrop {
     opacity: 0;
   }
   .nav-drawer[open] .nav-drawer-brand {
-    transform: translateX(-14px) scale(0.92);
+    transform: translateY(8px) scale(0.92);
     opacity: 0;
   }
   .nav-drawer[open] .nav-drawer-cta {
@@ -661,11 +698,14 @@ body:has(dialog.nav-drawer[open]) {
   }
 }
 
+/* The brand and the close button are the sheet's bottom row, so the close
+   button's centre lands on the menu button's (5px + 22px = 27px in) */
 .nav-drawer-header {
+  order: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 14px 6px 20px;
+  padding: 4px 5px 5px 18px;
 }
 
 /* Brand springs in a beat after the sheet */
@@ -677,7 +717,7 @@ body:has(dialog.nav-drawer[open]) {
   text-decoration: none;
   font-size: 1.3rem;
   user-select: none;
-  transform: translateX(-14px) scale(0.92);
+  transform: translateY(8px) scale(0.92);
   opacity: 0;
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s,
               opacity 0.3s ease 0.08s;
@@ -699,8 +739,8 @@ body:has(dialog.nav-drawer[open]) {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: 50%;
   background: rgba(120, 120, 128, 0.14);
@@ -718,11 +758,12 @@ body:has(dialog.nav-drawer[open]) {
 }
 
 .nav-drawer-body {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 14px 14px 18px;
+  gap: 16px;
+  padding: 14px 14px 8px;
   overflow-y: auto;
 }
 
@@ -2160,13 +2201,6 @@ body:has(dialog.nav-drawer[open]) {
 
 /* iPad Pro Portrait & Medium Tablets (<= 1024px) */
 @media (max-width: 1024px) {
-  .brand-title {
-    font-size: 1.25rem;
-  }
-  .brand-subtitle {
-    font-size: 0.58rem;
-    letter-spacing: 0.08em;
-  }
   .nav-link {
     font-size: 0.74rem;
     padding: 7px 8px;
@@ -2204,7 +2238,8 @@ body:has(dialog.nav-drawer[open]) {
 
 /* Tablets (<= 900px) */
 @media (max-width: 900px) {
-  /* Menu button, then the brand, with the actions pushed to the right */
+  /* The mark on the left, the actions on the right; the menu button
+     floats at the bottom right */
   .nav-container {
     justify-content: flex-start;
     gap: 10px;
@@ -2216,7 +2251,7 @@ body:has(dialog.nav-drawer[open]) {
   .nav-actions {
     margin-left: auto;
   }
-  /* The loyalty card stays as a round icon button beside the brand */
+  /* The loyalty card stays as a round icon button at the right */
   .nav-icon-link {
     width: 40px;
     height: 40px;
@@ -2235,8 +2270,10 @@ body:has(dialog.nav-drawer[open]) {
 }
 
 @media (max-width: 768px) {
+  /* The tab bar stops short of the menu button at the bottom right */
   .mobile-sticky-bar {
     display: flex;
+    right: calc(max(12px, env(safe-area-inset-right)) + 54px + 10px);
   }
   .site-header .nav-cart-btn {
     display: none;
@@ -2251,21 +2288,14 @@ body:has(dialog.nav-drawer[open]) {
   .nav-container {
     height: 54px;
   }
-  .nav-menu-toggle {
+  .brand-logo-img {
     width: 40px;
     height: 40px;
+    min-width: 40px;
+    min-height: 40px;
   }
-  .brand-title {
-    font-size: 1.2rem;
-  }
-  .brand-subtitle {
-    display: none;
-  }
-  .brand-logo-img {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
+  .brand-wordmark {
+    font-size: 1.25rem;
   }
   .nav-cart-btn {
     padding: 0 12px;
@@ -2375,7 +2405,7 @@ body:has(dialog.nav-drawer[open]) {
 
 /* ==========================================================================
    TYPE DISCIPLINE
-   The handwritten script (Caveat) is reserved for the hero "Crafted" and the
+   The handwritten script (Caveat) is reserved for the
    polaroid photo captions. Every other headline accent uses the main type
    with a single accent colour, so sections read as one site.
    ========================================================================== */

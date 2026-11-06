@@ -14,12 +14,19 @@
     "sync:community": "node scripts/sync-guest-photos.js",
     "test:fb": "node --test \"tests/*.test.js\"",
     "thumbs:wall": "node scripts/make-wall-thumbs.js",
-    "images:optimize": "node scripts/optimize-images.js"
+    "images:optimize": "node scripts/optimize-images.js",
+    "hero:models": "node scripts/build-hero-models.js",
+    "hero:poster": "node scripts/build-hero-poster.js"
   },
   "devDependencies": {
+    "@gltf-transform/core": "^4.1.1",
+    "@gltf-transform/extensions": "^4.1.1",
+    "@gltf-transform/functions": "^4.1.1",
     "@vitejs/plugin-basic-ssl": "^1.2.0",
     "@vitejs/plugin-react": "^4.7.0",
     "lighthouse": "^12.8.2",
+    "meshoptimizer": "^0.22.0",
+    "puppeteer-core": "^24.43.1",
     "sharp": "^0.35.5",
     "vite": "^5.4.2",
     "vite-plugin-pwa": "^0.20.5"
@@ -35,6 +42,7 @@
     "qrcode.react": "^4.2.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "three": "^0.170.0",
     "vanilla-tilt": "^1.8.1"
   }
 }

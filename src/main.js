@@ -9,6 +9,7 @@ import { initCommunityWall } from './components/communityWall.js';
 import { initOpenStatus } from './components/openStatus.js';
 import { initGlassNav } from './components/glassNav.js';
 import { initNavDrawer } from './components/navDrawer.js';
+import { initHeroScene } from './components/heroScene.js';
 import { cartStore } from './components/cartStore.js';
 import { injectSpeedInsights } from '@vercel/speed-insights';
 import { inject } from '@vercel/analytics';
@@ -90,6 +91,8 @@ function initApp() {
   safeInit('openStatus', initOpenStatus);
   safeInit('glassNav', initGlassNav);
   safeInit('navDrawer', initNavDrawer);
+  // Waits for page load + idle itself before loading three.js and the models
+  safeInit('heroScene', initHeroScene);
   safeInit('loyaltyPrefetch', initLoyaltyPrefetch);
   safeInit('newDrops', initNewDrops);
   safeInit('menuExplorer', initMenuExplorer);
@@ -113,15 +116,18 @@ function initApp() {
     setTimeout(initAmbientFeatures, 1000);
   }
 
-  // Scroll Header Glassmorphism Effect
+  // Scroll Header Glassmorphism Effect, and the BAIA name beside the mark
+  // once the hero (with its giant BAIA) has gone up under the header
   const header = document.getElementById('site-header');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 30) {
-      header?.classList.add('scrolled');
-    } else {
-      header?.classList.remove('scrolled');
+  const hero = document.getElementById('hero');
+  const updateHeader = () => {
+    header?.classList.toggle('scrolled', window.scrollY > 30);
+    if (header && hero) {
+      header.classList.toggle('past-hero', hero.getBoundingClientRect().bottom < header.offsetHeight);
     }
-  }, { passive: true });
+  };
+  window.addEventListener('scroll', updateHeader, { passive: true });
+  updateHeader();
 
   // Phone order bar: hidden over the story, photos and shore; it appears once
   // the menu comes into view (and stays below it), or anywhere once the order
