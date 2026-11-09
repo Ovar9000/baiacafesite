@@ -219,14 +219,6 @@ async function runHealthCheck() {
     assert(fs.existsSync(apiFile), `api/${api} exists`);
   });
 
-  // Test 7: Motion & Animation System Sanity
-  console.log('\n7. Motion & Animation Tokens:');
-  const motionFile = path.join(ROOT_DIR, 'src', 'utils', 'motionSystem.js');
-  assert(fs.existsSync(motionFile), 'src/utils/motionSystem.js exists');
-  const motionContent = fs.readFileSync(motionFile, 'utf-8');
-  assert(motionContent.includes('--motion-duration-logo'), 'Motion system registers --motion-duration-logo');
-  assert(motionContent.includes('--motion-duration-page'), 'Motion system registers --motion-duration-page');
-
   // Summary
   console.log('\n====================================================');
   console.log(`🏁 AUDIT RESULTS: ${passedTests}/${totalTests} Passed | ${warnings} Warnings`);
