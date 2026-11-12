@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!-- data-hero-3d: public/hero-daypart.js also preloads the drinks poster here -->
+<html lang="en" data-hero-3d>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BAIA in 3D — Iced Mocha &amp; Cloud-Top Iced Latte | BAIA Cafe</title>
+  <meta name="description" content="BAIA's iced mocha and cloud-top iced latte in 3D, on Laurente Beach as it looks right now. Drag a glass to spin it." />
+  <meta name="theme-color" content="#0E1A45" />
+  <link rel="canonical" href="https://www.baia.cafe/3d/" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.baia.cafe/3d/" />
+  <meta property="og:title" content="BAIA in 3D — BAIA Cafe" />
+  <meta property="og:description" content="Our iced mocha and cloud-top iced latte in 3D, on Laurente Beach as it looks right now." />
+  <meta property="og:image" content="https://www.baia.cafe/images/og-shore.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- The giant BAIA (Outfit) starts downloading at once -->
+  <link rel="preload" href="/fonts/Outfit-latin-QGYvz_MVcBeNP4NJtEtq.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- Picks the beach photo for the time of day; preloads it and the poster -->
+  <script src="/hero-daypart.js"></script>
+  <link rel="stylesheet" href="/src/styles/drinks3d.css" />
+  <script type="module" src="/src/drinks3d/main.js"></script>
+</head>
+<body>
+  <a href="/" class="drinks3d-back" aria-label="Back to BAIA Cafe home">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    <img src="/images/Logo.webp" alt="" width="42" height="42" />
+    <span class="wordmark" aria-hidden="true">BAIA</span>
+  </a>
+
+  <main>
+    <!-- BAIA's iced mocha and cloud-top iced latte in 3D, standing side by
+         side and floating gently, in front of BAIA in huge cream letters, on
+         the beach photo for the time of day (drinks3d.css "TIME OF DAY").
+         The poster is the scene's first frame; src/components/heroScene.js
+         fades the live scene in over it. It stays as it is on reduced data,
+         or where there is no graphics chip to draw the scene with. -->
+    <section class="hero-section" id="hero" aria-label="BAIA's drinks in 3D">
+      <div class="hero-photo" role="img" aria-label="Laurente Beach at BAIA Cafe, as it looks at this time of day"></div>
+      <div class="hero-scrim" aria-hidden="true"></div>
+      <span class="hero-backword" aria-hidden="true">BAIA</span>
+
+      <h1 class="hero-title">
+        <span class="visually-hidden">BAIA Cafe in 3D: an iced mocha and a cloud-top iced latte, crafted by the bay on Laurente Beach, Burias Island</span>
+        <span class="hero-stage" data-hero-scene>
+          <picture class="hero-drinks">
+            <source media="(max-width: 640px)" srcset="/images/hero-3d/drinks-sm.webp" width="870" height="1062" />
+            <img src="/images/hero-3d/drinks-lg.webp" width="1600" height="1104"
+                 alt="" aria-hidden="true" fetchpriority="high" draggable="false" />
+          </picture>
+        </span>
+      </h1>
+
+      <p class="drinks3d-hint" aria-hidden="true">Drag a glass to spin it</p>
+    </section>
+  </main>
+</body>
+</html>

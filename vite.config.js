@@ -43,7 +43,7 @@ function devApiPlugin() {
           res.writeHead(302, { Location: '/#location' });
           return res.end();
         }
-        const multiPages = ['/claim', '/card', '/admin', '/admin/rewards', '/admin/activity', '/privacy', '/terms', '/floating-cottage'];
+        const multiPages = ['/claim', '/card', '/admin', '/admin/rewards', '/admin/activity', '/privacy', '/terms', '/floating-cottage', '/3d'];
         if (multiPages.includes(pathname)) {
           req.url = `${pathname}/` + (parsedUrl.search || '') + (parsedUrl.hash || '');
         }
@@ -166,6 +166,8 @@ export default defineConfig({
           '**/RoundedBoxGeometry*.js',
           '**/RoomEnvironment*.js',
           '**/heroScene*.js',
+          '3d/**',
+          '**/drinks3d*',
           'floating-cottage/**',
           '**/floatingCottage*.js',
           'terms/**',
@@ -210,7 +212,8 @@ export default defineConfig({
         adminActivity: resolve(__dirname, 'admin/activity/index.html'),
         privacy: resolve(__dirname, 'privacy/index.html'),
         terms: resolve(__dirname, 'terms/index.html'),
-        floatingCottage: resolve(__dirname, 'floating-cottage/index.html')
+        floatingCottage: resolve(__dirname, 'floating-cottage/index.html'),
+        drinks3d: resolve(__dirname, '3d/index.html')
       }
     }
   },

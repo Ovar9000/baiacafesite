@@ -2,6 +2,19 @@
 
 What changed on baia.cafe, newest first, in plain words.
 
+## 2026-11-12: Tagline hero back, the 3D drinks get their own page
+
+- The homepage opens with the headline again ("Coffee, food & good vibes,
+  crafted by the bay") over the beach photo for the time of day.
+- The 3D drinks moved to their own page, /3d/, linked from the footer ("Our
+  drinks in 3D"). The homepage no longer downloads the 3D code or the models.
+- Why: the 3D froze the homepage for seconds on phones, and Google's speed
+  test crashed on it. Tested as a mid-range phone, the homepage with the 3D
+  scored 52 out of 100; with the 3D blocked, 88.
+- On /3d/, phones and computers without a graphics chip keep the still
+  picture of the drinks instead of trying to draw the scene.
+- The header shows the BAIA name beside the logo all the time again.
+
 ## 2026-11-06: First-card bonus stamp
 
 - Finish your first loyalty card (10 stamps) and we add 1 bonus stamp to your

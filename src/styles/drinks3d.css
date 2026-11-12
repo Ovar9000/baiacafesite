@@ -1,0 +1,389 @@
+/* ==========================================================================
+   BAIA CAFE — /3d/: two drinks in 3D, BAIA huge behind them, on the beach as
+   it looks right now. A page of its own, so the homepage never downloads
+   three.js or the models.
+   Front to back:
+     1. BAIA's iced mocha and cloud-top iced latte, standing side by side,
+        floating gently, beans and ice round them (src/components/heroScene.js,
+        models from `npm run hero:models`). Until they load, a poster of the
+        same first frame.
+     2. BAIA, huge, in cream, running off both edges
+     3. a soft navy shade, deeper at the bottom, so the drinks stand out
+     4. the beach photo for the time of day (sunrise, day, sunset, night),
+        softly out of focus
+   Once the 3D is ready, a transparent canvas over the whole stage fades in
+   over the poster: the drinks float, coffee beans and ice cubes burst out
+   round them, and the light follows the time of day.
+   This sheet stands alone (it does not load main.css): the few tokens it
+   needs are repeated below.
+   Plan: plans/hero-3d-baia.md
+   ========================================================================== */
+
+@import './fonts.css';
+
+:root {
+  --deep-navy-dark: #0E1A45;
+  --cream: #F5E9D6;
+  --white: #FFFFFF;
+  --font-headline: 'Outfit', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --font-display: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --header-height: 80px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-headline);
+  background: var(--deep-navy-dark);
+  color: var(--white);
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* The homepage's page-to-page fade, and the logo gliding into place */
+@view-transition { navigation: auto; }
+
+/* ==========================================================================
+   WAY BACK
+   The same glass capsule as the homepage's header, holding only the mark and
+   the name: one tap home.
+   ========================================================================== */
+.drinks3d-back {
+  position: fixed;
+  top: 11px;
+  left: max(12px, env(safe-area-inset-left));
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 58px;
+  padding: 0 18px 0 10px;
+  border-radius: 9999px;
+  color: var(--white);
+  text-decoration: none;
+  background: rgba(22, 37, 92, 0.42);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 0 0 0.5px rgba(255, 255, 255, 0.2);
+}
+
+.drinks3d-back:focus-visible {
+  outline: 3px solid var(--cream);
+  outline-offset: 3px;
+}
+
+.drinks3d-back img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  view-transition-name: baia-brand-logo;
+}
+
+.drinks3d-back .wordmark {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.4rem;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   TIME OF DAY
+   public/hero-daypart.js sets <html data-daypart> from Manila time before the
+   page paints and preloads only the matching photo. Without the script the
+   daytime photo shows.
+   ========================================================================== */
+:root,
+[data-daypart="day"] {
+  --hero-photo-portrait: url("/images/hero/day-portrait.webp");
+  --hero-photo-wide: url("/images/hero/day-wide.webp");
+  /* Focal points: what has to stay in frame whatever the screen shape */
+  --hero-focus-portrait: 20% center;   /* the outrigger boat */
+  --hero-focus-wide: 35% 70%;
+}
+
+[data-daypart="sunrise"] {
+  --hero-photo-portrait: url("/images/hero/sunrise-portrait.webp");
+  --hero-photo-wide: url("/images/hero/sunrise-wide.webp");
+  --hero-focus-portrait: 55% center;   /* the sun and its reflection */
+  --hero-focus-wide: 55% 30%;
+}
+
+[data-daypart="sunset"] {
+  --hero-photo-portrait: url("/images/hero/sunset-portrait.webp");
+  --hero-photo-wide: url("/images/hero/sunset-wide.webp");
+  --hero-focus-portrait: 50% center;   /* the four silhouettes on the flats */
+  --hero-focus-wide: 45% 85%;
+}
+
+[data-daypart="night"] {
+  --hero-photo-portrait: url("/images/hero/night-portrait.webp");
+  --hero-photo-wide: url("/images/hero/night-wide.webp");
+  --hero-focus-portrait: 60% center;   /* the lanterns and the tables under them */
+  --hero-focus-wide: 60% 90%;
+}
+
+.hero-section {
+  --hero-word: rgba(255, 246, 234, 0.92);   /* the back word: cream */
+
+  /* The stage is where the drinks stand: wide on wide screens (side by
+     side), taller on phones (the latte a step in front of the mocha) */
+  --stage-aspect: 1.45;
+}
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: calc(var(--header-height) + 8px) 12px clamp(20px, 4vh, 40px);
+  background: var(--deep-navy-dark);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* The beach right now, a little out of focus behind the drinks, the way a
+   long lens sees it (scaled up a touch so the blur's edge stays off screen) */
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  background: var(--deep-navy-dark) var(--hero-photo-portrait) var(--hero-focus-portrait) / cover no-repeat;
+  filter: blur(5px) saturate(1.08);
+  transform: scale(1.05);
+  /* A slow settle as the page opens */
+  animation: heroPhotoSettle 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Landscape screens get the wide crops, portrait ones (phones, upright
+   tablets) the tall ones; hero-daypart.js preloads by the same test */
+@media (min-aspect-ratio: 1/1) {
+  .hero-photo {
+    background-image: var(--hero-photo-wide);
+    background-position: var(--hero-focus-wide);
+  }
+}
+
+/* A light navy shade all over, deeper at the bottom where the drinks stand.
+   Keep in step with heroScene.js (makeBackdrop draws the same shade) */
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 70% at 50% 100%, rgba(14, 26, 69, 0.55) 0%, rgba(14, 26, 69, 0) 70%),
+    linear-gradient(180deg, rgba(14, 26, 69, 0.28) 0%, rgba(14, 26, 69, 0.12) 45%, rgba(14, 26, 69, 0.4) 100%);
+}
+
+/* As big as the screen allows, never so tall it crowds the way back */
+.hero-title {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  width: min(96vw, 1320px, calc((100dvh - var(--header-height) - 48px) * var(--stage-aspect)));
+}
+
+.hero-stage {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--stage-aspect);
+  animation: heroIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-drinks,
+.hero-drinks img,
+.hero-scene {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.hero-drinks img {
+  object-fit: contain;
+}
+
+/* The live scene covers the whole stage (so beans and ice can fly
+   anywhere), drawn so the drinks sit exactly where the poster's do; the two
+   cross-fade */
+.hero-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.hero-section.is-3d .hero-scene {
+  opacity: 1;
+  /* the drinks can be spun sideways; up and down still scrolls the page */
+  pointer-events: auto;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The poster stays solid under the canvas while it fades in (two half-faded
+   pictures would let the photo show through the drinks), then steps aside
+   so it can't peek out as the drinks float */
+.hero-section.is-3d .hero-drinks {
+  visibility: hidden;
+  transition: visibility 0s linear 0.35s;
+}
+
+/* BAIA, huge, over the photo and behind the drinks, running off both edges */
+.hero-backword {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 47%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-headline);
+  font-weight: 900;
+  font-size: clamp(9rem, 47vw, 44rem);
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  color: var(--hero-word);
+  text-shadow: 0 0.04em 0.18em rgba(14, 26, 69, 0.18);
+  pointer-events: none;
+  user-select: none;
+  animation: heroWordIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* One quiet line, only once the drinks are live and can be spun */
+.drinks3d-hint {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cream);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease 1.2s;
+}
+
+.hero-section.is-3d .drinks3d-hint {
+  opacity: 0.8;
+}
+
+@keyframes heroIn {
+  from { transform: translateY(18px) scale(0.97); }
+  to { transform: none; }
+}
+
+@keyframes heroPhotoSettle {
+  from { transform: scale(1.12); opacity: 0.6; }
+  to { transform: scale(1.05); opacity: 1; }
+}
+
+@keyframes heroWordIn {
+  from { opacity: 0.35; transform: translate(-50%, -50%) scaleX(1.05); }
+  to { opacity: 1; transform: translate(-50%, -50%) scaleX(1); }
+}
+
+/* ==========================================================================
+   SCREEN SIZES
+   ========================================================================== */
+/* Phones: the two close together, the latte a step in front; the word sits
+   higher, behind their tops */
+@media (max-width: 640px) {
+  :root {
+    --header-height: 70px;
+  }
+
+  .drinks3d-back {
+    top: 8px;
+    height: 54px;
+    padding: 0 16px 0 7px;
+  }
+
+  .drinks3d-back img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .drinks3d-back .wordmark {
+    font-size: 1.25rem;
+  }
+
+  .hero-section {
+    --stage-aspect: 0.82;
+    padding-bottom: clamp(40px, 8vh, 80px);
+  }
+
+  /* The stage runs a little past the screen's edges, so the drinks fill
+     the width */
+  .hero-title {
+    width: min(112vw, calc((100dvh - var(--header-height) - 56px) * var(--stage-aspect)));
+    flex-shrink: 0;
+  }
+
+  .hero-backword {
+    top: 23%;
+  }
+}
+
+/* Landscape phones: short screens, so the stage follows the height */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero-section {
+    padding-bottom: 16px;
+  }
+}
+
+/* Standing still: nothing to spin, so no hint */
+@media (prefers-reduced-motion: reduce) {
+  .hero-stage,
+  .hero-photo,
+  .hero-backword { animation: none; }
+  .hero-scene { transition: none; }
+  .drinks3d-hint { display: none; }
+}
+
+/* Text for screen readers and search only */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

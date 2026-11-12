@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * The hero's poster: the 3D scene's first frame, as a still.
+ * The 3D page's poster (/3d/): the scene's first frame, as a still.
  *
  *   npm run hero:poster        (after `npm run hero:models`; needs Chrome)
  *
- * Starts the dev server, opens the page with `?hero-poster` (heroScene.js
+ * Starts the dev server, opens /3d/ with `?hero-poster` (heroScene.js
  * then renders the first frame at 2x on a transparent canvas, still, and
  * marks it ready) at a desktop and a phone size, and saves the canvas:
  *
@@ -14,7 +14,7 @@
  * The poster is what paints first, and what reduced data or no WebGL keep.
  * The stage's shape fixes the framing, so the poster lines up with the live
  * scene at any screen size. If the sizes printed change, update the <picture>
- * width/height in index.html.
+ * width/height in 3d/index.html.
  *
  * Chrome: CHROME_PATH, or the usual Windows / macOS / Linux install.
  */
@@ -63,7 +63,7 @@ async function main() {
       const page = await browser.newPage();
       page.on('pageerror', (e) => console.warn(shot.name, e.message));
       await page.setViewport(shot.viewport);
-      await page.goto(`${url}?hero-poster`, { waitUntil: 'load' });
+      await page.goto(`${url}3d/?hero-poster`, { waitUntil: 'load' });
       await page.waitForSelector('canvas.hero-scene[data-ready]', { timeout: 120000 });
       const png = await page.$eval('canvas.hero-scene', (c) => c.toDataURL('image/png'));
       const file = path.join(OUT, `drinks-${shot.name}.webp`);

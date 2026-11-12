@@ -179,6 +179,7 @@
 .anim-4 { animation: floatGentle4 9s ease-in-out infinite -1.5s; }
 
 /* Ensure All Section Main Contents Always Stay Above Floaties */
+.hero-grid,
 .new-drops-section .container,
 .snapshot-container,
 .story-container,

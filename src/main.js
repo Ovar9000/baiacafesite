@@ -90,20 +90,6 @@ function initApp() {
   safeInit('openStatus', initOpenStatus);
   safeInit('glassNav', initGlassNav);
   safeInit('navDrawer', initNavDrawer);
-  // Split 3D scene code out of main.js; load after page load + idle
-  const posterMode = new URLSearchParams(window.location.search).has('hero-poster');
-  const conn = navigator.connection;
-  const lite = !!(conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '')));
-  if (posterMode) {
-    import('./components/heroScene.js').then((m) => m.initHeroScene());
-  } else if (!lite) {
-    const loadHero = () => import('./components/heroScene.js').then((m) => m.initHeroScene()).catch(() => {});
-    // Start loading the 3D scene as soon as the hero drinks poster paints (don't wait on full window.load)
-    const afterPaint = () => requestAnimationFrame(() => requestAnimationFrame(loadHero));
-    const posterImg = document.querySelector('.hero-drinks img');
-    if (!posterImg || posterImg.complete) afterPaint();
-    else posterImg.addEventListener('load', afterPaint, { once: true });
-  }
   safeInit('loyaltyPrefetch', initLoyaltyPrefetch);
   safeInit('cartDrawer', initCartDrawer);
   safeInit('seasonalPromos', initSeasonalPromosToggle);
@@ -133,15 +119,10 @@ function initApp() {
     setTimeout(initAmbientFeatures, 1000);
   }
 
-  // Scroll Header Glassmorphism Effect, and the BAIA name beside the mark
-  // once the hero (with its giant BAIA) has gone up under the header
+  // Scroll Header Glassmorphism Effect
   const header = document.getElementById('site-header');
-  const hero = document.getElementById('hero');
   const updateHeader = () => {
     header?.classList.toggle('scrolled', window.scrollY > 30);
-    if (header && hero) {
-      header.classList.toggle('past-hero', hero.getBoundingClientRect().bottom < header.offsetHeight);
-    }
   };
   window.addEventListener('scroll', updateHeader, { passive: true });
   requestAnimationFrame(updateHeader);
