@@ -1,7 +1,8 @@
 /*
- * Shows the beach as it looks right now: picks the hero photo for the time of
- * day in Manila (sunrise, day, sunset, night) before the page paints, and
- * preloads both that photo and the matching 3D drinks poster.
+ * Shows the beach as it looks right now: picks the photo for the time of day
+ * in Manila (sunrise, day, sunset, night) before the page paints, and preloads
+ * it. Used by the homepage's hero and by /3d/ (<html data-hero-3d>), which
+ * also preloads its drinks poster.
  */
 (function () {
   // Manila is UTC+8 all year (no daylight saving)
@@ -12,10 +13,10 @@
     hour >= 16 && hour < 18.5 ? 'sunset' :
     'night';
 
-  document.documentElement.setAttribute('data-daypart', part);
+  var root = document.documentElement;
+  root.setAttribute('data-daypart', part);
 
   var wide = window.matchMedia('(min-aspect-ratio: 1/1)').matches;
-  var small = window.matchMedia('(max-width: 640px)').matches;
   var photoUrl = '/images/hero/' + part + (wide ? '-wide' : '-portrait') + '.webp';
 
   function preload(href) {
@@ -28,6 +29,10 @@
   }
 
   preload(photoUrl);
+
+  if (!root.hasAttribute('data-hero-3d')) return;
+
+  var small = window.matchMedia('(max-width: 640px)').matches;
   preload('/images/hero-3d/drinks-' + (small ? 'sm' : 'lg') + '.webp');
 
   // Keep a live Image handle so heroScene's ice backdrop reuses it without re-fetching

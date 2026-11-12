@@ -1,11 +1,13 @@
 /**
- * Hero: BAIA's iced mocha and cloud-top iced latte in 3D, side by side in
- * front of the giant BAIA, on the beach as it looks right now.
+ * /3d/ (3d/index.html, src/styles/drinks3d.css): BAIA's iced mocha and
+ * cloud-top iced latte in 3D, side by side in front of the giant BAIA, on
+ * the beach as it looks right now. It was the homepage's hero until
+ * 2026-11-12; it cost phones seconds of frozen page, so it has its own page.
  *
  * The page paints at once: the beach photo, BAIA in huge letters, and a
- * poster of the two drinks (the scene's resting frame). Once the page is idle
- * this loads three.js and the models and fades a transparent WebGL canvas
- * (the whole hero's size) in over the poster, lined up with it. Then:
+ * poster of the two drinks (the scene's resting frame). Once the poster has
+ * painted this loads three.js and the models and fades a transparent WebGL
+ * canvas (the whole stage's size) in over the poster, lined up with it. Then:
  *   - coffee beans and ice cubes burst out from behind the drinks and
  *     keep drifting around them, some behind, some close to us. The ice is
  *     liquid glass: it bends the hero behind it (the beach, the shade, the
@@ -23,7 +25,7 @@
  *     faster than the drinks
  *
  * Reduced motion: everything stands still (beans and ice at rest). Save-Data
- * or 2G, or no WebGL: the poster stays.
+ * or 2G, no WebGL, or WebGL without a graphics chip: the poster stays.
  *
  * Models: public/models/hero, from `npm run hero:models`. The poster:
  * `?hero-poster` renders the drinks alone at rest, the stage's size, at 2x,
@@ -83,12 +85,34 @@ export function initHeroScene() {
   const conn = navigator.connection;
   const lite = !!(conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '')));
   if (lite && !posterMode) return;
+  // Asked before three.js and the models are fetched, so a device that can't
+  // draw the scene doesn't download it either
+  if (!posterMode && !hasGraphicsChip()) return;
 
   const start = () =>
     run(section, stage, { still: reduce || posterMode, posterMode }).catch((e) => {
       console.warn('[BAIA] hero 3D skipped:', e);
     });
   start();
+}
+
+/**
+ * False where there is no WebGL, or where the processor would draw it
+ * (SwiftShader, llvmpipe and the like: test servers, virtual machines,
+ * blocked drivers). There the scene freezes the page for seconds, and it has
+ * killed the tab on Google's speed test, so the poster stays instead.
+ */
+function hasGraphicsChip() {
+  try {
+    const gl = document.createElement('canvas').getContext('webgl2', { failIfMajorPerformanceCaveat: true });
+    if (!gl) return false;
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    const name = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    return !/swiftshader|llvmpipe|softpipe|software|basic render/i.test(name);
+  } catch {
+    return false;
+  }
 }
 
 const nextTask = () => new Promise((r) => setTimeout(r, 0));
@@ -120,6 +144,9 @@ async function run(section, stage, { still, posterMode }) {
     premultipliedAlpha: true,
     preserveDrawingBuffer: posterMode,
     powerPreference: 'high-performance',
+    // As hasGraphicsChip asked: never on the processor (the poster build may
+    // run without a chip, so not there)
+    failIfMajorPerformanceCaveat: !posterMode,
   });
   renderer.setClearColor(0x000000, 0);
   // Error checks wait on each shader compile, blocking the page
@@ -499,7 +526,7 @@ function makeBits(THREE, ice) {
  * beach photo as CSS shows it, the navy shade and the giant BAIA), drawn into
  * a texture the canvas's size, for the ice to bend. Real refraction can't
  * do this: the canvas is transparent and WebGL never sees the page under it.
- * Keep the shade in step with hero.css (.hero-scrim).
+ * Keep the shade in step with drinks3d.css (.hero-scrim).
  */
 async function makeBackdrop(THREE, section) {
   const photo = section.querySelector('.hero-photo');
@@ -554,7 +581,7 @@ async function makeBackdrop(THREE, section) {
       ctx.restore();
     }
 
-    // The shade (hero.css .hero-scrim)
+    // The shade (drinks3d.css .hero-scrim)
     ctx.save();
     ctx.translate(W / 2, H);
     ctx.scale(1.2 * W, 0.7 * H);

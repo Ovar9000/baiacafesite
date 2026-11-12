@@ -462,11 +462,7 @@ main,
   transform: scale(1.06);
 }
 
-/* The name: hidden over the hero (its giant BAIA is the name there), it
-   slides out from behind the mark once the hero has scrolled away (main.js
-   sets .past-hero), and tucks back in on the way up. Its space is always
-   kept, so nothing else in the bar moves: only the reveal (a wipe from the
-   mark's edge) and a short slide */
+/* The name, beside the mark */
 .brand-wordmark {
   display: block;
   padding-right: 0.06em;   /* the tight tracking would clip the last A */
@@ -474,18 +470,6 @@ main,
   line-height: 1;
   color: var(--white);
   white-space: nowrap;
-  opacity: 0;
-  transform: translateX(-10px);
-  clip-path: inset(-0.2em 100% -0.2em 0);
-  transition: clip-path 0.5s var(--ease-smooth),
-              transform 0.5s var(--ease-smooth),
-              opacity 0.3s ease;
-}
-
-.site-header.past-hero .brand-wordmark {
-  opacity: 1;
-  transform: none;
-  clip-path: inset(-0.2em -0.2em -0.2em 0);
 }
 
 /* Center: the links sit at the bar's true centre, whatever the widths on
