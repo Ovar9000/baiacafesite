@@ -17,6 +17,7 @@ import { createHash } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import { THUMB_SIDE, fetchImage, isCachedWebp, safeName, storageName, toWebp, uploadWebp } from './image-cache.js';
 import { failInCi, requireCiSecrets } from './ci-guard.js';
+import { fetchWithRetry } from './fetch-retry.js';
 import {
   buildCommunityEntries,
   buildPostsUrl,
@@ -74,23 +75,23 @@ async function queryFacebookForGuestPhotos(pageId, token) {
   const taggedEndpoint = (t) => buildTaggedUrl(pageId, t, 60);
   
   try {
-    let res = await fetch(postsEndpoint(effectiveToken));
+    let res = await fetchWithRetry(postsEndpoint(effectiveToken));
     let data = await res.json();
 
     // Auto-resolve page token if user token provided
     if (data.error && (data.error.error_subcode === 2069032 || data.error.message?.includes('Page access token'))) {
-      const directRes = await fetch(`https://graph.facebook.com/v19.0/${encodeURIComponent(pageId)}?fields=id,name,access_token&access_token=${encodeURIComponent(token)}`);
+      const directRes = await fetchWithRetry(`https://graph.facebook.com/v19.0/${encodeURIComponent(pageId)}?fields=id,name,access_token&access_token=${encodeURIComponent(token)}`);
       const directData = await directRes.json();
       if (directData?.access_token) {
         effectiveToken = directData.access_token;
-        res = await fetch(postsEndpoint(effectiveToken));
+        res = await fetchWithRetry(postsEndpoint(effectiveToken));
         data = await res.json();
       }
     }
 
     let taggedData = { data: [] };
     try {
-      const taggedRes = await fetch(taggedEndpoint(effectiveToken));
+      const taggedRes = await fetchWithRetry(taggedEndpoint(effectiveToken));
       if (taggedRes.ok) {
         taggedData = await taggedRes.json();
         if (taggedData?.data?.length) {
