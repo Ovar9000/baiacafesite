@@ -28,6 +28,7 @@ import {
   classifyDropPost,
 } from './fb-post-utils.js';
 import { failInCi, requireCiSecrets } from './ci-guard.js';
+import { fetchWithRetry } from './fetch-retry.js';
 import { fetchImage, firstImage, freshPostImageUrl, isCachedWebp, safeName, storageName, toWebp, uploadWebp } from './image-cache.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -146,7 +147,7 @@ async function fetchFacebookPosts(pageId, token, sinceId = null) {
   const endpoint = postsEndpoint;
   
   console.log(`📡 [Fetch] Querying Facebook Graph API for page: ${pageId} (/posts + /tagged)...`);
-  let response = await fetch(postsEndpoint(effectiveToken));
+  let response = await fetchWithRetry(postsEndpoint(effectiveToken));
   let responseText = await response.text();
   
   if (!response.ok) {
@@ -162,24 +163,24 @@ async function fetchFacebookPosts(pageId, token, sinceId = null) {
       console.log('🔄 [Auth] Detected User Token. Resolving Page Access Token from Facebook Graph API...');
       try {
         // Direct page query with user token
-        const directRes = await fetch(`https://graph.facebook.com/v19.0/${encodeURIComponent(pageId)}?fields=id,name,access_token&access_token=${encodeURIComponent(token)}`);
+        const directRes = await fetchWithRetry(`https://graph.facebook.com/v19.0/${encodeURIComponent(pageId)}?fields=id,name,access_token&access_token=${encodeURIComponent(token)}`);
         const directData = await directRes.json().catch(() => null);
         
         if (directData && directData.access_token) {
           console.log(`🔑 [Auth Success] Retrieved Page Access Token for "${directData.name}" (ID: ${directData.id})!`);
           effectiveToken = directData.access_token;
-          response = await fetch(postsEndpoint(effectiveToken));
+          response = await fetchWithRetry(postsEndpoint(effectiveToken));
           responseText = await response.text();
         } else {
           // Fallback to /me/accounts
-          const accountsRes = await fetch(`https://graph.facebook.com/v19.0/me/accounts?access_token=${encodeURIComponent(token)}`);
+          const accountsRes = await fetchWithRetry(`https://graph.facebook.com/v19.0/me/accounts?access_token=${encodeURIComponent(token)}`);
           if (accountsRes.ok) {
             const accountsData = await accountsRes.json();
             const pageObj = accountsData.data?.find(p => String(p.id) === String(pageId) || String(p.id) === '640323492494372') || accountsData.data?.[0];
             if (pageObj && pageObj.access_token) {
               console.log(`🔑 [Auth Success] Found Page Access Token for "${pageObj.name}" via accounts list!`);
               effectiveToken = pageObj.access_token;
-              response = await fetch(postsEndpoint(effectiveToken));
+              response = await fetchWithRetry(postsEndpoint(effectiveToken));
               responseText = await response.text();
             }
           }
@@ -210,7 +211,7 @@ async function fetchFacebookPosts(pageId, token, sinceId = null) {
   // Failure here must not fail the whole sync — drops still update from /posts.
   let taggedPosts = [];
   try {
-    const taggedRes = await fetch(taggedEndpoint(effectiveToken));
+    const taggedRes = await fetchWithRetry(taggedEndpoint(effectiveToken));
     if (taggedRes.ok) {
       const taggedData = await taggedRes.json().catch(() => null);
       taggedPosts = markSource(taggedData?.data || [], 'tagged');
