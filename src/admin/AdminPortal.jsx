@@ -407,6 +407,9 @@ export default function AdminPortal({ initialTab }) {
             <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <input
                 type="password"
+                name="password"
+                autoComplete="current-password"
+                aria-label="Admin password"
                 placeholder="Enter admin password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

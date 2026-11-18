@@ -1,7 +1,6 @@
 import './styles/main.css';
 import { initMenuExplorer } from './components/menuExplorer.js';
 import { initBoardsRental } from './components/boardsRental.js';
-import { initLiquidFloaties } from './components/liquidFloaties.js';
 import { initCartDrawer } from './components/cartDrawer.js';
 import { initNewDrops } from './components/newDrops.js';
 import { initCommunityWall } from './components/communityWall.js';
@@ -107,17 +106,6 @@ function initApp() {
       }
     }, 0);
   });
-
-  // Defer non-critical ambient features to idle time
-  const initAmbientFeatures = () => {
-    safeInit('liquidFloaties', initLiquidFloaties);
-  };
-
-  if ('requestIdleCallback' in window) {
-    requestIdleCallback(initAmbientFeatures, { timeout: 2000 });
-  } else {
-    setTimeout(initAmbientFeatures, 1000);
-  }
 
   // Scroll Header Glassmorphism Effect
   const header = document.getElementById('site-header');

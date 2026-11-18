@@ -15,7 +15,7 @@ export const isBonusStamp = (stamp) => stamp?.kind === 'bonus';
 
 /** Oldest first; id breaks ties so the bonus always follows the 10th stamp. */
 export function sortStampsAsc(stamps = []) {
-  return [...stamps].sort((a, b) =>
+  return stamps.toSorted((a, b) =>
     (new Date(a.awarded_at) - new Date(b.awarded_at)) || ((a.id ?? 0) - (b.id ?? 0))
   );
 }

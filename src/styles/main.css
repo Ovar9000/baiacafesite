@@ -4,7 +4,6 @@
 
 @import './fonts.css';
 @import './hero.css';
-@import './floaties.css';
 @import './divider.css';
 @import './story.css';
 @import './promo-grid.css';
@@ -362,9 +361,10 @@ main,
               box-shadow var(--duration-normal) var(--ease-smooth);
 }
 
-/* Denser glass and a little lift once content is moving under the bar */
+/* Near-solid navy and a little lift once content is moving under the bar.
+   Thinner glass let the cream sections bleed through as a grey-lavender. */
 .site-header.scrolled .nav-container {
-  background: rgba(22, 37, 92, 0.74);
+  background: rgba(22, 37, 92, 0.92);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22),
               inset 0 0 0 0.5px rgba(255, 255, 255, 0.2),
               var(--shadow-md);
@@ -614,6 +614,15 @@ main,
    ========================================================================== */
 body:has(dialog.nav-drawer[open]) {
   overflow: hidden;
+}
+
+/* Stop scroll gestures on the sheet or backdrop chaining to the page */
+.nav-drawer:modal {
+  overscroll-behavior: contain;
+}
+.nav-drawer::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 .nav-drawer {
@@ -1610,7 +1619,7 @@ body:has(dialog.nav-drawer[open]) {
   display: flex;
   padding: 4px;
   border-radius: var(--radius-pill);
-  background: rgba(22, 37, 92, 0.72);
+  background: rgba(22, 37, 92, 0.92);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   backdrop-filter: blur(24px) saturate(180%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22),
@@ -2299,7 +2308,7 @@ body:has(dialog.nav-drawer[open]) {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .glass-floatie, .toast-item {
+  .toast-item {
     animation: none !important;
     transform: none !important;
   }

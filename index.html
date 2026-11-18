@@ -342,7 +342,7 @@ dialog.nav-drawer:not([open]) { display: none; }
     </svg>
   </button>
 
-  <dialog class="nav-drawer" id="nav-drawer" aria-label="Site navigation">
+  <dialog class="nav-drawer" id="nav-drawer" aria-label="Site navigation" closedby="any">
     <div class="nav-drawer-header">
       <a href="#hero" class="nav-drawer-brand" data-close-drawer>
         <img src="./images/Logo.webp" alt="" width="36" height="36" />
@@ -446,15 +446,6 @@ dialog.nav-drawer:not([open]) { display: none; }
 
   <!-- 4. STORY & "TEAM BAIA" POLAROID SECTION -->
   <section class="story-section" id="about" data-theme="sand" aria-label="About BAIA Cafe">
-    <div class="section-floaties-layer" aria-hidden="true">
-      <div class="glass-floatie frost-blue anim-1 size-lg shape-flower" style="top: 6%; left: 3%;">
-        <img src="./images/baia-flower-icon.webp" alt="BAIA Flower Icon" class="floatie-icon-img" width="34" height="34" />
-      </div>
-      <div class="glass-floatie frost-blue anim-3 size-xl" style="top: 8%; right: 4%;">
-        <img src="./images/baia-palm-icon.webp" alt="BAIA Palm Tree Icon" class="floatie-icon-img" width="40" height="40" />
-      </div>
-    </div>
-
     <div class="container story-container">
       <!-- Story Text -->
       <div class="story-text-block">
@@ -924,11 +915,6 @@ dialog.nav-drawer:not([open]) { display: none; }
 
   <!-- 6. HOUSE SIGNATURES SHOWCASE TILES (Fat Seed Illustrated Creative Direction) -->
   <section class="promo-grid-section" id="promos" data-nav-link="#menu" data-theme="sand-deck" aria-label="House Signatures and Specialties">
-    <div class="section-floaties-layer" aria-hidden="true">
-      <div class="glass-floatie frost-blue anim-2 size-lg" style="top: 5%; right: 3%;">
-        <img src="./images/baia-palm-icon.webp" alt="" class="floatie-icon-img" width="34" height="34" loading="lazy" decoding="async" />
-      </div>
-    </div>
     <div class="container">
       <!-- Illustrated Header with Scattered Brand Doodles -->
       <div class="promo-header-block">
@@ -1045,12 +1031,7 @@ dialog.nav-drawer:not([open]) { display: none; }
     <!-- ==========================================================================
          NEW RELEASES & FACEBOOK DROPS SHOWCASE (Auto-Synced from Facebook)
          ========================================================================== -->
-    <section class="new-drops-section" id="drops" data-theme="bay-blue" aria-label="What's new at BAIA">
-      <div class="section-floaties-layer" aria-hidden="true">
-        <div class="glass-floatie frost-white anim-1 size-lg shape-flower" style="top: 8%; left: 2%;">
-          <img src="./images/baia-flower-white.webp" alt="" class="floatie-icon-img" width="34" height="34" loading="lazy" decoding="async" />
-        </div>
-      </div>
+    <section class="new-drops-section" id="drops" data-theme="sand" aria-label="What's new at BAIA">
       <div class="container" id="new-drops-root">
         <!-- Injected dynamically by src/components/newDrops.js -->
       </div>

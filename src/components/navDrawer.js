@@ -24,11 +24,22 @@ export function initNavDrawer() {
     toggle.setAttribute('aria-expanded', 'false');
   });
 
+  // Close button, brand and section links
   drawer.addEventListener('click', (e) => {
-    // The sheet's children cover its whole box, so a click whose target is
-    // the dialog itself landed on the ::backdrop.
-    if (e.target === drawer || e.target.closest('[data-close-drawer]')) close();
+    if (e.target.closest('[data-close-drawer]')) close();
   });
+
+  // Backdrop clicks: <dialog closedby="any"> handles them natively. Safari has
+  // no closedby yet, so fall back to a press-and-release outside the sheet.
+  if (!('closedBy' in HTMLDialogElement.prototype)) {
+    const outside = (e) => {
+      const r = drawer.getBoundingClientRect();
+      return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+    };
+    let pressedOutside = false;
+    drawer.addEventListener('pointerdown', (e) => { pressedOutside = outside(e); });
+    drawer.addEventListener('pointerup', (e) => { if (pressedOutside && outside(e)) close(); });
+  }
 
   // The drawer only exists in the phone and tablet layout; close it if the
   // viewport grows past it.

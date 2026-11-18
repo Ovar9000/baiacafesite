@@ -2,6 +2,22 @@
 
 What changed on baia.cafe, newest first, in plain words.
 
+## 2026-11-18: Calmer homepage, modern browser features
+
+- The floating glass bubbles (flower and palm icons) are gone. On phones
+  they covered the About heading.
+- The header bar stays navy when you scroll over the cream sections; it used
+  to turn a muddy grey-lavender.
+- What's New is cream instead of bright blue, so it no longer outshouts the
+  rest of the page. Same-day notices ("sold out", "full house", "closing
+  early") drop off after 3 days, so an old one can't make it look like the
+  café is sold out now. Post titles show in normal case instead of all caps,
+  the excerpt no longer repeats the title, and plain news posts have one
+  "Read the post" button.
+- On phones, the menu drawer closes when you tap outside it using the
+  browser's own support, with a fallback for Safari.
+- The admin sign-in lets password managers fill in the password.
+
 ## 2026-11-12: Tagline hero back, the 3D drinks get their own page
 
 - The homepage opens with the headline again ("Coffee, food & good vibes,

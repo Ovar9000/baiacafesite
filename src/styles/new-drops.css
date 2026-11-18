@@ -2,7 +2,9 @@
 
 .new-drops-section {
   position: relative;
-  background: radial-gradient(120% 80% at 50% 10%, #173ce8 0%, #1532be 60%, #10258d 100%);
+  /* Quiet cream between the navy menu and the navy footer: What's New is a
+     supporting section, so it shouldn't be the loudest colour on the page. */
+  background: var(--depth-sand-cream);
   padding: 56px 0 64px 0;
   overflow: hidden;
 }
@@ -17,16 +19,16 @@
 }
 
 .drops-more-link {
-  color: var(--amber-contrast);
+  color: var(--electric-blue-dark);
   font-weight: 700;
   white-space: nowrap;
   text-decoration: underline;
-  text-decoration-color: rgba(255, 230, 153, 0.4);
+  text-decoration-color: rgba(21, 56, 212, 0.35);
   text-underline-offset: 4px;
 }
 
 .drops-more-link:hover {
-  text-decoration-color: var(--amber-contrast);
+  text-decoration-color: var(--electric-blue-dark);
 }
 
 .drops-headline {
@@ -36,13 +38,13 @@
   line-height: 1.05;
   text-transform: uppercase;
   letter-spacing: -0.035em;
-  color: var(--white);
+  color: var(--deep-navy);
 }
 
 .drops-subtitle {
   font-size: clamp(1rem, 1.8vw, 1.15rem);
   line-height: 1.6;
-  color: var(--cream);
+  color: var(--deep-navy);
   max-width: 640px;
   margin: 14px auto 0 auto;
 }

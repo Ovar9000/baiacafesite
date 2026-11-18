@@ -232,7 +232,7 @@ export function initCartDrawer() {
     if (!deliveryRoot) return;
     if (!store.isDelivery()) {
       deliveryRoot.style.display = 'none';
-      deliveryRoot.innerHTML = '';
+      deliveryRoot.replaceChildren();
       return;
     }
     deliveryRoot.style.display = 'block';

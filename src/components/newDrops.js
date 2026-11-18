@@ -39,9 +39,33 @@ export function initNewDrops() {
       (item.badge === '1-Day Advisory' || /\b(advisory|closure|weather)\b/i.test(item.title || ''));
   }
 
-  // Same-day café news ("Full house today") from the sync: shown briefly, never as a drop.
+  // Same-day café news ("Full house today", "Sold out for today") is shown
+  // briefly, never as a drop. The sync doesn't always label these as Cafe
+  // Update, so the wording is checked too: a week-old "sold out" must not
+  // read as if the café is sold out now.
+  const SAME_DAY_STATUS = /\b(sold out|full house|fully booked|closing early|closed today|no deliver(y|ies))\b/i;
   function isUpdateItem(item) {
-    return item.badge === 'Cafe Update';
+    return item.badge === 'Cafe Update' || SAME_DAY_STATUS.test(item.title || '');
+  }
+
+  // Facebook titles are often in all caps; show them in sentence case,
+  // keeping the BAIA name in capitals.
+  function tidyTitle(title = '') {
+    const letters = title.replace(/[^A-Za-z]/g, '');
+    if (letters.length < 4 || letters !== letters.toUpperCase()) return title;
+    const lower = title.toLowerCase();
+    return (lower.charAt(0).toUpperCase() + lower.slice(1)).replace(/\bbaia\b/gi, 'BAIA');
+  }
+
+  // Posts usually open by repeating their title; drop that so the excerpt
+  // starts with something new.
+  function tidyDescription(description = '', title = '') {
+    const t = title.trim();
+    if (t && description.toLowerCase().startsWith(t.toLowerCase())) {
+      const rest = description.slice(t.length).replace(/^[^\p{L}\p{N}]+/u, '');
+      if (rest) return rest;
+    }
+    return description;
   }
 
   function isGiveawayItem(item) {
@@ -99,8 +123,8 @@ export function initNewDrops() {
 
   function render() {
     const publishedAt = (item) => parseDate(item.published_at)?.getTime() || 0;
-    const filteredItems = [...currentItems]
-      .sort((a, b) => publishedAt(b) - publishedAt(a))
+    const filteredItems = currentItems
+      .toSorted((a, b) => publishedAt(b) - publishedAt(a))
       .slice(0, LATEST_COUNT);
 
     container.innerHTML = `
@@ -135,6 +159,12 @@ export function initNewDrops() {
           const isUpcomingEvent = Boolean(eventDate && !isDatePast);
           const isGiveawayConcluded = isGiveaway && (item.status === 'concluded' || Boolean(item.winner) || item.badge === 'Winner Awarded' || isDatePast);
           const isAdvisory = !isGiveaway && isAdvisoryItem(item);
+          const title = tidyTitle(item.title);
+          const description = tidyDescription(item.description, item.title);
+          const postUrl = item.permalink ? sanitizeUrl(item.permalink, 'https://facebook.com/thebaiacafe') : '';
+          // Plain news has no action of its own: its one button opens the post.
+          const isPlainNews = !(!isEvent && priceNum > 0) && !isGiveaway &&
+            !/baia\.cafe\/card/i.test(item.description || '') && !(isUpcomingEvent && !isAdvisory);
 
           let badgeClass = 'badge-drop';
           let badgeLabel = item.badge || (isFood ? 'Fresh Drop' : (isDrink ? 'Drink Drop' : 'New Drop'));
@@ -184,7 +214,7 @@ export function initNewDrops() {
               <div class="drop-media-frame">
                 <img 
                   src="${sanitizeImageUrl(item.image_url)}" 
-                  alt="${escapeHtml(item.title)}" 
+                  alt="${escapeHtml(title)}"
                   loading="lazy" 
                   decoding="async" 
                   class="drop-image"
@@ -215,13 +245,13 @@ export function initNewDrops() {
                   ${(isGiveaway && isGiveawayConcluded) ? `<span class="drop-date-label status-winner">${item.winner ? `Winner: ${escapeHtml(item.winner)}` : 'Winner announced'}</span>` : (item.winner ? `<span class="drop-date-label status-winner">Winner: ${escapeHtml(item.winner)}</span>` : (item.event_date ? `<span class="drop-date-label">${escapeHtml(formatEventDate(item.event_date))}</span>` : (isAdvisory ? `<span class="drop-date-label status-open">Open Regular Hours</span>` : '')))}
                 </div>
 
-                <h3 class="drop-card-title">${escapeHtml(item.title)}</h3>
-                <p class="drop-card-desc">${escapeHtml(item.description)}</p>
+                <h3 class="drop-card-title">${escapeHtml(title)}</h3>
+                <p class="drop-card-desc">${escapeHtml(description)}</p>
 
                 <!-- Actions Footer -->
                 <div class="drop-card-actions">
                   ${!isEvent && priceNum > 0 ? `
-                    <button class="btn-drop-order" data-order-drop="${escapeHtml(item.id)}" data-title="${encodeURIComponent(item.title)}" data-price="${priceNum}">
+                    <button class="btn-drop-order" data-order-drop="${escapeHtml(item.id)}" data-title="${encodeURIComponent(title)}" data-price="${priceNum}">
                       <span>Add to order (${escapeHtml(item.price)})</span>
                     </button>
                   ` : (isGiveaway ? `
@@ -246,13 +276,18 @@ export function initNewDrops() {
                       <span>RSVP on Messenger</span>
                       <span aria-hidden="true">→</span>
                     </a>
+                  ` : (postUrl ? `
+                    <a href="${postUrl}" target="_blank" rel="noopener" class="btn-drop-order">
+                      <span>Read the post</span>
+                      <span aria-hidden="true">↗</span>
+                    </a>
                   ` : `
                     <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-drop-order">
                       <span>Message us</span>
                     </a>
-                  `)))}
+                  `))))}
 
-                  ${item.permalink ? `
+                  ${postUrl && !isPlainNews ? `
                     <a href="${sanitizeUrl(item.permalink, 'https://facebook.com/thebaiacafe')}" target="_blank" rel="noopener" class="btn-drop-fb" title="View original post on Facebook" aria-label="View original Facebook post">
                       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>

@@ -71,27 +71,13 @@ export default async function handler(req, res) {
       .limit(2000);
 
     // Group stamps and redemptions by user_id
-    const userStampsMap = {};
-    const userRedemptionsMap = {};
-
-    (stamps || []).forEach((s) => {
-      if (!userStampsMap[s.user_id]) {
-        userStampsMap[s.user_id] = [];
-      }
-      userStampsMap[s.user_id].push(s);
-    });
-
-    (redemptions || []).forEach((r) => {
-      if (!userRedemptionsMap[r.user_id]) {
-        userRedemptionsMap[r.user_id] = [];
-      }
-      userRedemptionsMap[r.user_id].push(r);
-    });
+    const userStampsMap = Object.groupBy(stamps || [], (s) => s.user_id);
+    const userRedemptionsMap = Object.groupBy(redemptions || [], (r) => r.user_id);
 
     // 3. Process each real Supabase member
     const processedMembers = (profiles || []).map((p) => {
-      const userStamps = userStampsMap[p.id] || [];
-      const userRedemptions = userRedemptionsMap[p.id] || [];
+      const userStamps = userStampsMap[p.id] ?? [];
+      const userRedemptions = userRedemptionsMap[p.id] ?? [];
 
       const totalStamps = userStamps.length;
       const redemptionsCount = userRedemptions.length;
