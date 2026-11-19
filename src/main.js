@@ -9,6 +9,7 @@ import { initGlassNav } from './components/glassNav.js';
 import { initNavDrawer } from './components/navDrawer.js';
 import { cartStore } from './components/cartStore.js';
 import { whenNear } from './utils/whenNear.js';
+import { openModal, closeModal, wireModal } from './utils/modalDialog.js';
 import { injectSpeedInsights } from '@vercel/speed-insights';
 import { inject } from '@vercel/analytics';
 
@@ -50,7 +51,10 @@ function handleRootAuthCallback() {
   }
 }
 
+// Fallback for browsers without speculation rules (index.html prefetches
+// /card/ there); elsewhere this would fetch the card a second time.
 function initLoyaltyPrefetch() {
+  if (HTMLScriptElement.supports?.('speculationrules')) return;
   const cardLinks = document.querySelectorAll('a[href*="/card"]');
   let prefetched = false;
 
@@ -170,8 +174,9 @@ function initPolaroidWall() {
   if (!modal) return;
   if (!document.querySelector('.mosaic-photo-card')) return;
 
-  const openModal = (card) => {
-    card.blur();
+  wireModal(modal);
+
+  const openPhoto = (card) => {
     const photo = card.dataset.photo || card.querySelector('img')?.src;
     const quote = card.dataset.quote || card.querySelector('.polaroid-quote')?.textContent?.trim();
     const author = card.dataset.author || card.querySelector('.polaroid-author-name')?.textContent?.trim();
@@ -187,46 +192,20 @@ function initPolaroidWall() {
     if (modalMeta) modalMeta.textContent = meta || 'Shared Community Moment';
     if (modalFbBtn) modalFbBtn.href = permalink;
 
-    modal.classList.add('is-active');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => closeBtn?.focus(), 40);
-  };
-
-  const closeModal = () => {
-    modal.classList.remove('is-active');
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
+    modal.setAttribute('aria-label', author ? `Photo by ${author}` : 'Community photo');
+    openModal(modal);
   };
 
   // Delegated binding so runtime-hydrated community cards
-  // (prepended by initCommunityWall after fetch) also open the modal.
+  // (prepended by initCommunityWall after fetch) also open the lightbox.
+  // The cards are <button>s, so Enter and Space arrive here as clicks.
   document.addEventListener('click', (e) => {
     const card = e.target?.closest?.('.mosaic-photo-card');
     if (!card || !document.contains(card)) return;
     e.preventDefault();
-    openModal(card);
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    const card = e.target?.closest?.('.mosaic-photo-card');
-    if (!card) return;
-    e.preventDefault();
-    openModal(card);
+    openPhoto(card);
   });
 
-  closeBtn?.addEventListener('click', closeModal);
-
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      closeModal();
-    }
-  });
-
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('is-active')) {
-      closeModal();
-    }
-  });
+  closeBtn?.addEventListener('click', () => closeModal(modal));
 }
 

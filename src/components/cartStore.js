@@ -294,13 +294,24 @@ class CartStore {
       message,
       icon: safeIcon
     };
+    // Not while a modal dialog is up: the page behind it is inert, so the
+    // banner would be missed. Show it once that dialog closes (e.g. "Added to
+    // your order" after the drink options sheet).
+    const openDialog = document.querySelector('dialog:modal');
+    if (openDialog) {
+      openDialog.addEventListener('close', () => this.showToast(title, message, icon, action), { once: true });
+      return;
+    }
+
     this.toasts.push(toast);
 
+    // The container is a popover="manual" region (index.html): top layer,
+    // no light dismiss, one place for every banner
     const toastContainer = document.getElementById('toast-container');
     if (toastContainer) {
+      const returnFocus = document.activeElement;
       const toastEl = document.createElement('div');
       toastEl.className = safeIcon === '✓' ? 'toast-item' : 'toast-item is-warning';
-      toastEl.setAttribute('role', 'alert');
       toastEl.innerHTML = `
         <div class="toast-icon" aria-hidden="true">${esc(safeIcon)}</div>
         <div class="toast-content">
@@ -308,27 +319,72 @@ class CartStore {
           <p>${esc(message)}</p>
         </div>
         ${action ? `<button type="button" class="toast-action">${esc(action.label)}</button>` : ''}
+        <button type="button" class="toast-close" aria-label="Dismiss">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       `;
+
+      let timer = 0;
+      const dismiss = ({ moveFocus = false } = {}) => {
+        clearTimeout(timer);
+        if (!toastEl.isConnected) return;
+        // Dismissed from the keyboard: focus goes to the next banner, or back
+        if (moveFocus) {
+          const next = [...toastContainer.children].find((el) => el !== toastEl);
+          (next?.querySelector('.toast-close') || (returnFocus?.isConnected ? returnFocus : null))?.focus();
+        }
+        toastEl.classList.add('is-leaving');
+        const done = () => {
+          toastEl.remove();
+          this.toasts = this.toasts.filter(t => t.id !== toast.id);
+          if (!toastContainer.children.length && toastContainer.matches(':popover-open')) {
+            toastContainer.hidePopover();
+          }
+        };
+        const leaving = toastEl.getAnimations();
+        if (leaving.length) Promise.allSettled(leaving.map((a) => a.finished)).then(done);
+        else done();
+      };
+      // Time out, but never while focus is on one of its buttons
+      const schedule = () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          if (toastEl.contains(document.activeElement)) return;
+          dismiss();
+        }, 4000);
+      };
+      toastEl.addEventListener('focusout', (e) => {
+        if (!toastEl.contains(e.relatedTarget)) schedule();
+      });
+
+      toastEl.querySelector('.toast-close').addEventListener('click', () => dismiss({ moveFocus: true }));
       if (action) {
         toastEl.querySelector('.toast-action').addEventListener('click', () => {
           action.onClick();
-          toastEl.remove();
+          dismiss();
         });
       }
+
       // Adding several things in a row: keep at most two banners on screen
       while (toastContainer.children.length >= 2) toastContainer.firstElementChild.remove();
       toastContainer.appendChild(toastEl);
+      if (toastContainer.popover && !toastContainer.matches(':popover-open')) {
+        toastContainer.showPopover();
+      }
+      schedule();
 
-      setTimeout(() => {
-        toastEl.style.opacity = '0';
-        toastEl.style.transform = 'translateY(-12px)';
-        setTimeout(() => toastEl.remove(), 400);
-      }, 3500);
+      // Read it out: the visible text only, plus a hint when there's a button
+      const spoken = `${title}. ${message}${action ? '. Actions available.' : ''}`;
+      if (typeof document.ariaNotify === 'function') {
+        document.ariaNotify(spoken);
+      } else {
+        const announcer = document.getElementById('toast-announcer');
+        if (announcer) {
+          announcer.textContent = '';
+          requestAnimationFrame(() => { announcer.textContent = spoken; });
+        }
+      }
     }
-
-    setTimeout(() => {
-      this.toasts = this.toasts.filter(t => t.id !== toast.id);
-    }, 3500);
   }
 }
 

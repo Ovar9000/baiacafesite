@@ -205,10 +205,11 @@ export default function ClaimApp() {
                     <input
                       type="text"
                       placeholder="Paste daily QR token here"
+                      aria-label="Daily QR token"
+                      autoComplete="off"
                       className="input-email"
                       value={manualInputToken}
                       onChange={(e) => setManualInputToken(e.target.value)}
-                      style={{ fontSize: '0.82rem' }}
                     />
                     <button type="submit" className="btn-submit-otp" style={{ padding: '10px' }}>
                       Verify & Claim Stamp →

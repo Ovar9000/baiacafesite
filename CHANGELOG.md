@@ -2,6 +2,33 @@
 
 What changed on baia.cafe, newest first, in plain words.
 
+## 2026-11-18: Built-in browser parts for the order sheet and pop-ups
+
+- The order sheet, the checkout review, the drink options and the photo
+  viewer now use the browser's own pop-up window. Screen readers and
+  keyboards get them right, Esc and the phone's back gesture close them,
+  tapping outside closes them, and the page behind no longer jumps when one
+  opens.
+- Dine-In / Takeout / Delivery, Iced / Hot, sizes and add-ons are real
+  radio buttons and checkboxes underneath, so arrow keys work. They look
+  the same.
+- If delivery details are missing when you press Send, the reason shows in
+  the sheet itself instead of a banner hidden behind it. An empty order no
+  longer shows a Send button.
+- "Added to your order" banners wait until a pop-up closes, have a close
+  button, and are read out by screen readers.
+- The wave strip and the little doodles move as you scroll instead of
+  looping forever. With "reduce motion" switched on in the phone's
+  settings, nothing slides, bobs or zooms, and page changes don't animate.
+- Phones that use a larger text size now get larger text on the site. The
+  loyalty, privacy and terms pages allow pinch-zoom again.
+- Chrome loads the loyalty card page ahead of time, and the other pages
+  when you hover or press a link, so they open faster.
+- Long headings break into even lines; sections far down the page are
+  drawn only when you get near them.
+- Sign-in fields let the phone fill in your email and the emailed code.
+- Copying the order uses the modern clipboard and says when it fails.
+
 ## 2026-11-18: Calmer homepage, modern browser features
 
 - The floating glass bubbles (flower and palm icons) are gone. On phones

@@ -672,7 +672,9 @@ body {
   padding: 0 16px;
   border-radius: 14px;
   border: 1.5px solid #E2E8F0;
-  font-size: 0.92rem;
+  /* 1rem: iOS zooms into any field smaller than 16px when it gets focus,
+     now that pinch-zoom is no longer blocked */
+  font-size: 1rem;
   outline: none;
   font-family: inherit;
   box-sizing: border-box;

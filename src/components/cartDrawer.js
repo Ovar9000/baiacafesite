@@ -6,11 +6,11 @@ import {
   validateDeliveryDetails,
   DELIVERY_MIN_DIRECTIONS_LENGTH
 } from '../data/deliveryZones.js';
+import { openModal, closeModal, wireModal } from '../utils/modalDialog.js';
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
 export function initCartDrawer() {
-  const backdrop = document.getElementById('cart-drawer-backdrop');
   const panel = document.getElementById('cart-drawer-panel');
   const itemsContainer = document.getElementById('drawer-items-list');
   const countTags = document.querySelectorAll('.cart-count-badge, .drawer-count-tag');
@@ -29,6 +29,8 @@ export function initCartDrawer() {
 
   // Field-level validation flags for the Delivery Details section (cleared on fix)
   let deliveryErrors = {};
+  // The message shown above the fields after a failed Send
+  let deliveryErrorMsg = '';
   // Collapsed once the section first becomes valid, so the items list stays visible
   let deliveryCollapsed = false;
   let wasDeliveryValid = false;
@@ -52,27 +54,26 @@ export function initCartDrawer() {
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && openMenu && deliveryRoot?.contains(document.activeElement)) {
+      // Esc closes the dropdown only; preventDefault stops it also closing the sheet
+      e.preventDefault();
       openMenu = null;
       renderDeliverySection(cartStore);
     }
   });
 
-  // Ensure initial inert state
-  if (panel && !cartStore.isDrawerOpen) {
-    panel.setAttribute('inert', '');
-  }
-
-  // Open / Close Handlers
-  closeBtn?.addEventListener('click', () => cartStore.closeDrawer());
-  backdrop?.addEventListener('click', () => cartStore.closeDrawer());
-  initSheetDrag(panel, () => cartStore.closeDrawer());
-
-  // Escape key closes drawer
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && cartStore.isDrawerOpen) {
-      cartStore.closeDrawer();
-    }
+  // Open / Close: the sheet is a native modal <dialog>. Esc, the back
+  // gesture and tapping the dimmed page close it (modalDialog.js); the store
+  // stays the source of truth for open/closed.
+  wireModal(panel, { canClose: () => !openMenu });
+  panel?.addEventListener('cancel', () => {
+    if (!openMenu) cartStore.closeDrawer();
   });
+  // A close the store didn't ask for (a second Esc can't be intercepted)
+  panel?.addEventListener('close', () => {
+    if (cartStore.isDrawerOpen) cartStore.closeDrawer();
+  });
+  closeBtn?.addEventListener('click', () => cartStore.closeDrawer());
+  initSheetDrag(panel, () => cartStore.closeDrawer());
 
   // Global triggers for opening cart drawer
   document.querySelectorAll('[data-open-cart]').forEach(el => {
@@ -110,16 +111,12 @@ export function initCartDrawer() {
     });
   });
 
-  // Order type options (Dine-in, Takeout, Cottage)
-  spotButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      spotButtons.forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-      cartStore.orderType = btn.dataset.spot || 'Dine-In at Cafe';
+  // Order type (Dine-in, Takeout, Delivery): native radios
+  spotButtons.forEach(label => {
+    const input = label.querySelector('input');
+    input?.addEventListener('change', () => {
+      spotButtons.forEach(l => l.classList.toggle('active', l === label));
+      cartStore.orderType = input.value || 'Dine-In at Cafe';
       // Notify so the Delivery Details section + fee rows render immediately
       cartStore.notify();
     });
@@ -135,20 +132,20 @@ export function initCartDrawer() {
   // Checkout / Message Order Button
   checkoutBtn?.addEventListener('click', () => {
     const totals = cartStore.getTotals();
-    if (totals.itemCount === 0) {
-      cartStore.showToast('Your Order is Empty', 'Add your favorite coffee or smash burger first.');
-      return;
-    }
+    // An empty order hides this button (drawer.css); this is a safety net
+    if (totals.itemCount === 0) return;
     if (cartStore.isDelivery()) {
       const v = validateDeliveryDetails(cartStore.delivery);
       if (!v.valid) {
+        // Said in the sheet itself: a toast would sit behind this modal
         deliveryErrors = flagDeliveryErrors(cartStore.delivery);
+        deliveryErrorMsg = v.error;
         renderDeliverySection(cartStore);
-        cartStore.showToast('Delivery Details Incomplete', v.error, '!');
         document.getElementById('delivery-zone-btn')?.focus();
         return;
       }
       deliveryErrors = {};
+      deliveryErrorMsg = '';
     }
     showCheckoutModal(totals);
   });
@@ -156,16 +153,8 @@ export function initCartDrawer() {
   // Re-render when store updates
   let lastCount = cartStore.getItemCount();
   cartStore.subscribe((store) => {
-    if (store.isDrawerOpen) {
-      backdrop?.classList.add('active');
-      panel?.classList.add('open');
-      panel?.removeAttribute('inert');
-      setTimeout(() => closeBtn?.focus(), 50);
-    } else {
-      backdrop?.classList.remove('active');
-      panel?.classList.remove('open');
-      panel?.setAttribute('inert', '');
-    }
+    if (store.isDrawerOpen) openModal(panel);
+    else closeModal(panel);
 
     const totalCount = store.getItemCount();
     // Something was added: bump the My Order buttons instead of opening the sheet
@@ -247,6 +236,10 @@ export function initCartDrawer() {
     // otherwise a manual collapse always wins, even on an incomplete form.
     const nowValid = validateDeliveryDetails(d).valid;
     const hasFieldErrors = Object.keys(deliveryErrors).length > 0;
+    if (!hasFieldErrors) deliveryErrorMsg = '';
+    const errorNote = hasFieldErrors && deliveryErrorMsg
+      ? `<p class="delivery-error" id="delivery-error" role="alert">${esc(deliveryErrorMsg)}</p>`
+      : '';
     if (!nowValid) {
       wasDeliveryValid = false;
       if (hasFieldErrors) deliveryCollapsed = false;
@@ -305,10 +298,11 @@ export function initCartDrawer() {
         ${deliveryCollapsed ? '' : `
         <div class="delivery-collapse-body">
         <div class="delivery-collapse-inner">
+        ${errorNote}
         <div class="delivery-field${deliveryErrors.zone ? ' field-error' : ''}">
           <span class="delivery-label" id="delivery-zone-label">Delivery Zone *</span>
           <div class="dd-wrap${openMenu === 'zone' ? ' open' : ''}">
-            <button type="button" class="dd-btn" id="delivery-zone-btn" aria-labelledby="delivery-zone-label delivery-zone-btn" aria-haspopup="listbox" aria-expanded="${openMenu === 'zone'}">
+            <button type="button" class="dd-btn" id="delivery-zone-btn" aria-labelledby="delivery-zone-label delivery-zone-btn" aria-haspopup="listbox" aria-expanded="${openMenu === 'zone'}"${errorNote ? ' aria-describedby="delivery-error"' : ''}>
               <span class="dd-value${d.zoneId ? '' : ' is-placeholder'}">${esc(zone ? zone.fullName : 'Choose delivery zone')}</span>
               <span class="dd-chevron" aria-hidden="true">▾</span>
             </button>
@@ -581,13 +575,14 @@ export function initCartDrawer() {
   function showCheckoutModal(totals) {
     let modal = document.getElementById('checkout-modal');
     if (!modal) {
-      modal = document.createElement('div');
+      // A native modal <dialog> over the order sheet (modalDialog.js)
+      modal = document.createElement('dialog');
       modal.id = 'checkout-modal';
-      modal.className = 'modal-backdrop checkout-backdrop';
-      modal.setAttribute('role', 'dialog');
-      modal.setAttribute('aria-modal', 'true');
+      modal.className = 'modal-dialog-card checkout-modal-card';
       modal.setAttribute('aria-labelledby', 'checkout-modal-title');
+      modal.setAttribute('closedby', 'any');
       document.body.appendChild(modal);
+      wireModal(modal);
     }
 
     const orderMsg = cartStore.generateOrderMessage();
@@ -608,7 +603,6 @@ export function initCartDrawer() {
       <div class="cm-row"><span class="cm-row-label">${esc(label)}</span><span class="cm-row-value">${esc(value)}</span></div>`;
 
     modal.innerHTML = `
-      <div class="modal-dialog-card checkout-modal-card">
         <div class="cm-grabber" aria-hidden="true"></div>
         <div class="cm-header">
           <h3 id="checkout-modal-title" class="cm-title">Review &amp; send</h3>
@@ -661,7 +655,9 @@ export function initCartDrawer() {
           <span>We copy your order when you tap Send, so you can paste it straight into the chat.</span>
         </p>
 
-        <button type="button" class="cm-send" id="modal-send-fb-btn">
+        <p class="visually-hidden" role="status" id="cm-status"></p>
+
+        <button type="button" class="cm-send" id="modal-send-fb-btn" autofocus>
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
             <path d="M12 2C6.48 2 2 6.03 2 11C2 13.84 3.46 16.34 5.75 17.89V21.5L9.13 19.64C10.04 19.88 11 20 12 20C17.52 20 22 15.97 22 11C22 6.03 17.52 2 12 2ZM13.06 14.5L10.75 12.03L6.25 14.5L11.19 9.25L13.5 11.72L17.75 9.25L13.06 14.5Z" />
           </svg>
@@ -671,90 +667,66 @@ export function initCartDrawer() {
         <button type="button" class="cm-copy" id="modal-copy-order-btn">
           <span>Copy order text instead</span>
         </button>
-      </div>
     `;
 
-    modal.classList.add('active');
+    openModal(modal);
 
-    // Rock-solid Synchronous Clipboard Copy Helper
+    // Clipboard API. The old execCommand('copy') path is kept only for
+    // webviews with no navigator.clipboard at all (an old in-app browser over
+    // plain http); it has to run synchronously inside the tap.
     const copyOrderToClipboard = () => {
-      let copied = false;
-      try {
-        const textarea = document.createElement('textarea');
-        textarea.value = orderMsg;
-        textarea.style.position = 'fixed';
-        textarea.style.left = '-9999px';
-        textarea.style.top = '0';
-        textarea.setAttribute('readonly', '');
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        textarea.setSelectionRange(0, 99999);
-        copied = document.execCommand('copy');
-        document.body.removeChild(textarea);
-      } catch (e) {
-        copied = false;
+      if (navigator.clipboard?.writeText) {
+        return navigator.clipboard.writeText(orderMsg).then(() => true, () => false);
       }
-
-      if (navigator.clipboard && window.isSecureContext) {
-        try {
-          navigator.clipboard.writeText(orderMsg).catch(() => {});
-          copied = true;
-        } catch (e) {}
-      }
-      return copied;
+      const field = document.createElement('textarea');
+      field.value = orderMsg;
+      field.setAttribute('readonly', '');
+      field.style.cssText = 'position:fixed;top:0;left:-9999px;';
+      modal.append(field);
+      field.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch { ok = false; } finally { field.remove(); }
+      return Promise.resolve(ok);
     };
 
-    // Send via FB button handler
+    // Toasts stay away while this modal is up, so the result is shown on the
+    // button and read out from this status line
+    const statusEl = modal.querySelector('#cm-status');
+    const timers = new WeakMap();
+    const report = (labelEl, text, resetText, ms) => {
+      if (!labelEl) return;
+      clearTimeout(timers.get(labelEl));
+      labelEl.textContent = text;
+      if (statusEl) statusEl.textContent = text;
+      timers.set(labelEl, setTimeout(() => {
+        labelEl.textContent = resetText;
+        if (statusEl) statusEl.textContent = '';
+      }, ms));
+    };
+
+    // Send: copy as a backup (the Messenger link already carries the text),
+    // then open Messenger in the same tap so popup blockers allow it
     const sendFbBtn = modal.querySelector('#modal-send-fb-btn');
     const fbBtnLabel = modal.querySelector('#modal-fb-btn-label');
     sendFbBtn?.addEventListener('click', () => {
-      copyOrderToClipboard();
-      if (fbBtnLabel) {
-        fbBtnLabel.textContent = 'Copied, opening Messenger…';
-        setTimeout(() => {
-          fbBtnLabel.textContent = 'Send on Messenger';
-        }, 4000);
-      }
-      cartStore.showToast('Order Copied to Clipboard!', 'Opening Messenger — paste and send.', '✓');
+      copyOrderToClipboard().then((ok) => {
+        report(fbBtnLabel, ok ? 'Copied, opening Messenger…' : 'Opening Messenger…', 'Send on Messenger', 4000);
+      });
       window.open(messengerUrl, '_blank', 'noopener,noreferrer');
     });
 
-    // Copy Order Text Only button handler
+    // Copy the order text only
     const copyBtn = modal.querySelector('#modal-copy-order-btn');
     copyBtn?.addEventListener('click', () => {
-      copyOrderToClipboard();
       const labelSpan = copyBtn.querySelector('span');
-      if (labelSpan) {
-        labelSpan.textContent = 'Copied to clipboard';
-        copyBtn.style.color = '#15803D';
-        setTimeout(() => {
-          labelSpan.textContent = 'Copy order text instead';
-          copyBtn.style.color = '';
-        }, 3000);
-      }
-      cartStore.showToast('Order Copied!', 'Paste into Messenger or WhatsApp to order.', '✓');
+      copyOrderToClipboard().then((ok) => {
+        copyBtn.toggleAttribute('data-copied', ok);
+        report(labelSpan, ok ? 'Copied to clipboard' : 'Copy failed: tap Send on Messenger instead', 'Copy order text instead', 3000);
+        setTimeout(() => copyBtn.removeAttribute('data-copied'), 3000);
+      });
     });
 
-    // Optional click preview box if present
-    const previewBox = modal.querySelector('#order-msg-preview-box');
-    previewBox?.addEventListener('click', () => {
-      copyOrderToClipboard();
-      cartStore.showToast('Order Copied!', 'Order message copied to clipboard.', '✓');
-    });
-
-    // Close handlers with smooth exit
-    const closeModal = () => {
-      modal.classList.remove('active');
-    };
-
-    modal.querySelector('#modal-top-close-btn')?.addEventListener('click', closeModal);
-
-    modal.onclick = (e) => {
-      if (e.target === modal) {
-        closeModal();
-      }
-    };
+    modal.querySelector('#modal-top-close-btn')?.addEventListener('click', () => closeModal(modal));
   }
 }
 

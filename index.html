@@ -4,7 +4,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
+  <!-- Follow the phone's own text size setting (Dynamic Type, Android font
+       size). Works because no stylesheet sets a root font-size -->
+  <meta name="text-scale" content="scale" />
+  <!-- Arriving from /card/ or /3d/: hold the first frame of the page
+       transition until the hero is parsed, so it never fades in half-built -->
+  <link rel="expect" href="#hero" blocking="render" />
+
   <!-- Primary SEO Meta Tags -->
   <title>BAIA Cafe | Beachfront Specialty Coffee in Burias Island, Masbate</title>
   <meta name="description"
@@ -91,7 +97,8 @@
   --duration-normal: 0.35s;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; scroll-padding-top: var(--header-height, 80px); font-size: 16px; -webkit-font-smoothing: antialiased; overflow-x: hidden; max-width: 100vw; }
+html { scroll-padding-top: var(--header-height, 80px); -webkit-font-smoothing: antialiased; overflow-x: hidden; max-width: 100vw; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body { font-family: var(--font-body); background-color: var(--electric-blue); color: var(--white); line-height: 1.5; overflow-x: hidden; overflow-x: clip; max-width: 100vw; position: relative; }
 .skip-link { position: absolute; top: -120px; left: 16px; background: var(--golden-amber); color: var(--deep-navy); font-weight: 800; padding: 12px 20px; border-radius: var(--radius-sm); z-index: 9999; text-decoration: none; }
 .skip-link:focus { top: 16px !important; }
@@ -113,6 +120,7 @@ dialog.nav-drawer:not([open]) { display: none; }
 :root { --motion-duration-logo: 1.1s; --motion-duration-page: 0.9s; --motion-duration-fade: 0.6s; --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1); }
 @media (max-width: 768px) { :root { --motion-duration-logo: 0.75s; --motion-duration-page: 0.70s; --motion-duration-fade: 0.55s; --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1); } }
 @view-transition { navigation: auto; }
+@media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
 ::view-transition { background-color: #FAF4EB; }
 ::view-transition-old(root) { animation: pageOldFadeOut var(--motion-duration-fade, 0.55s) cubic-bezier(0.4, 0, 0.2, 1) both !important; z-index: 1; }
 ::view-transition-new(root) { animation: pageNewSlideIn var(--motion-duration-page, 0.70s) cubic-bezier(0.4, 0, 0.2, 1) both !important; z-index: 2; mix-blend-mode: normal; }
@@ -202,6 +210,30 @@ dialog.nav-drawer:not([open]) { display: none; }
   <link rel="stylesheet" href="/src/styles/main.css" />
   <script type="module" src="/src/main.js"></script>
 
+  <!-- Next-page loading (Chrome, Edge): fetch the loyalty card once the page
+       is idle, since regulars go there most; fetch the other pages when a
+       link is hovered or pressed. Prefetch only, never prerender: /card/
+       signs people in. Other browsers get the <link rel="prefetch"> in
+       main.js instead. CSP allows this through 'inline-speculation-rules' -->
+  <script type="speculationrules">
+  {
+    "prefetch": [
+      { "urls": ["/card/"], "eagerness": "eager" },
+      {
+        "where": {
+          "and": [
+            { "href_matches": "/*" },
+            { "not": { "href_matches": "/admin/*" } },
+            { "not": { "href_matches": "/card/*" } },
+            { "not": { "href_matches": "/api/*" } }
+          ]
+        },
+        "eagerness": "moderate"
+      }
+    ]
+  }
+  </script>
+
   <!-- Schema.org JSON-LD Structured Data -->
   <script type="application/ld+json">
   {
@@ -274,12 +306,17 @@ dialog.nav-drawer:not([open]) { display: none; }
   <!-- Grain Noise Overlay -->
   <div class="grain-overlay" aria-hidden="true"></div>
 
-  <!-- Live Toast Notification Container -->
-  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+  <!-- Banners ("Added to your order"): a popover="manual" region so they sit
+       in the top layer and only close by timeout or their own button
+       (cartStore.showToast). They're read out with document.ariaNotify();
+       browsers without it use the live region under it -->
+  <div class="toast-container" id="toast-container" role="region" aria-label="Notifications" popover="manual"></div>
+  <p class="visually-hidden">Notifications</p>
+  <div class="visually-hidden" id="toast-announcer" aria-live="polite"></div>
 
   <!-- Site Navigation Header -->
   <!-- Floating liquid-glass capsule: the page scrolls underneath it -->
-  <header class="site-header" id="site-header" role="banner">
+  <header class="site-header" id="site-header">
     <div class="container">
     <div class="nav-container">
       <!-- Left: the BAIA mark and name -->
@@ -405,7 +442,7 @@ dialog.nav-drawer:not([open]) { display: none; }
             <span class="tagline-row row-food">
               <span class="letter-chunky">FOOD</span>
               <span class="ampersand-chunky">&amp;</span>
-              <svg class="hero-doodle doodle-food doodle-inasal" viewBox="0 0 40 40" width="38" height="38" aria-label="Authentic Bacolod Chicken Inasal Grilled Skewer" role="img">
+              <svg class="hero-doodle doodle-food doodle-inasal" viewBox="0 0 40 40" width="38" height="38" aria-hidden="true">
                 <!-- Sizzle & Charcoal Smoke lines -->
                 <path d="M26 6 Q29 2 27 0 M32 9 Q35 5 33 2" fill="none" stroke="#FFE699" stroke-width="2" stroke-linecap="round" />
                 <!-- Bamboo Skewer -->
@@ -1082,7 +1119,7 @@ dialog.nav-drawer:not([open]) { display: none; }
   <!-- Short on purpose: the visit card (open now? hours, directions),
        Messenger and Instagram, and one line with the mark and the legal
        links. (footer.css) -->
-  <footer class="site-footer" id="location" data-theme="midnight" role="contentinfo">
+  <footer class="site-footer" id="location" data-theme="midnight">
     <div class="container">
       <div class="footer-top-grid">
         <!-- Col 2: Visit — hours & directions (values filled from src/data/siteInfo.js) -->
@@ -1154,17 +1191,9 @@ dialog.nav-drawer:not([open]) { display: none; }
     </div>
   </footer>
 
-  <!-- 10. SLIDE-OVER ORDER DRAWER (Accessible Messaging Dispatch Panel) -->
-  <div class="drawer-backdrop" id="cart-drawer-backdrop" aria-hidden="true"></div>
-  
-  <aside 
-    class="cart-drawer-panel" 
-    id="cart-drawer-panel" 
-    role="dialog" 
-    aria-modal="true" 
-    aria-labelledby="drawer-heading"
-    inert
-  >
+  <!-- 10. ORDER SHEET: a native modal dialog (src/utils/modalDialog.js).
+       Tapping the dimmed page, Esc or the back gesture closes it -->
+  <dialog class="cart-drawer-panel" id="cart-drawer-panel" aria-labelledby="drawer-heading" closedby="any">
     <!-- Grab handle: drag the sheet down to close it on phones (cartDrawer.js) -->
     <div class="drawer-grabber" aria-hidden="true"></div>
 
@@ -1176,25 +1205,20 @@ dialog.nav-drawer:not([open]) { display: none; }
       </div>
       <div class="drawer-header-actions">
         <button class="btn-clear-cart" id="drawer-clear-btn" aria-label="Clear all items in order">Clear</button>
-        <button class="btn-close-drawer" id="drawer-close-btn" aria-label="Close order drawer">
+        <button type="button" class="btn-close-drawer" id="drawer-close-btn" aria-label="Close order drawer" autofocus>
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
     </div>
 
-    <!-- Order Type Picker: an iOS-style segmented control -->
+    <!-- Order Type Picker: an iOS-style segmented control built on native
+         radios (arrow keys move between them); the label carries .active -->
     <div class="order-type-picker">
-      <span class="spot-picker-label">Order type</span>
-      <div class="spot-options-grid" role="radiogroup" aria-label="Select order type">
-        <button class="spot-btn active" data-spot="Dine-In at Cafe" aria-pressed="true">
-          Dine-In
-        </button>
-        <button class="spot-btn" data-spot="Beach Takeout" aria-pressed="false">
-          Takeout
-        </button>
-        <button class="spot-btn" data-spot="Delivery" aria-pressed="false">
-          Delivery
-        </button>
+      <span class="spot-picker-label" id="order-type-label">Order type</span>
+      <div class="spot-options-grid" role="radiogroup" aria-labelledby="order-type-label">
+        <label class="spot-btn active"><input type="radio" class="seg-input" name="order-type" value="Dine-In at Cafe" checked />Dine-In</label>
+        <label class="spot-btn"><input type="radio" class="seg-input" name="order-type" value="Beach Takeout" />Takeout</label>
+        <label class="spot-btn"><input type="radio" class="seg-input" name="order-type" value="Delivery" />Delivery</label>
       </div>
     </div>
 
@@ -1236,7 +1260,7 @@ dialog.nav-drawer:not([open]) { display: none; }
         </button>
       </div>
     </div>
-  </aside>
+  </dialog>
 
   <!-- 11. PHONE TAB BAR: a floating glass capsule with two tabs, and the order as
        its own button beside it (iOS 26/27 style). Shown from the Menu on (main.js). -->
@@ -1260,13 +1284,13 @@ dialog.nav-drawer:not([open]) { display: none; }
     </button>
   </nav>
 
-  <!-- Animated Detail Lightbox Modal (Clean, No fake badges/ratings) -->
-        <div id="polaroid-modal" class="polaroid-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-          <div class="polaroid-modal-content">
-            <button type="button" class="polaroid-modal-close" id="polaroid-modal-close" aria-label="Close photo preview">✕</button>
+  <!-- Photo lightbox for the BAIA Family wall: a native modal dialog
+       (main.js initPolaroidWall, src/utils/modalDialog.js) -->
+        <dialog id="polaroid-modal" class="polaroid-modal-content" aria-label="Community photo" closedby="any">
+            <button type="button" class="polaroid-modal-close" id="polaroid-modal-close" aria-label="Close photo preview" autofocus>✕</button>
             <div class="polaroid-modal-card">
               <div class="polaroid-modal-photo-frame">
-                <img id="polaroid-modal-img" src="" alt="Enlarged community photo" />
+                <img id="polaroid-modal-img" alt="" decoding="async" />
               </div>
               <div class="polaroid-modal-detail-body">
                 <p class="modal-quote-text" id="polaroid-modal-quote"></p>
@@ -1281,7 +1305,6 @@ dialog.nav-drawer:not([open]) { display: none; }
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+        </dialog>
 </body>
 </html>

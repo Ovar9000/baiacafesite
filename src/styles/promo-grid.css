@@ -32,45 +32,44 @@
 }
 
 .doodle-flower {
+  --rot: -12deg;
   top: -16px;
   left: -28px;
   width: 52px;
   height: 52px;
-  transform: rotate(-12deg);
-  animation: doodleBob 4.5s ease-in-out infinite alternate;
+  transform: rotate(var(--rot));
 }
 
 .doodle-cup {
+  --rot: 10deg;
   top: -24px;
   right: -24px;
   width: 56px;
   height: 50px;
-  transform: rotate(10deg);
-  animation: doodleBob 5s ease-in-out infinite alternate -1.5s;
+  transform: rotate(var(--rot));
 }
 
 .doodle-palm {
+  --rot: 18deg;
   bottom: 0px;
   left: -36px;
   width: 48px;
   height: 48px;
-  transform: rotate(18deg);
-  animation: doodleBob 6s ease-in-out infinite alternate -2s;
+  transform: rotate(var(--rot));
 }
 
 .doodle-wave {
+  --rot: -6deg;
   bottom: -16px;
   right: -20px;
   width: 68px;
   height: 28px;
-  transform: rotate(-6deg);
-  animation: doodleBob 4s ease-in-out infinite alternate -0.8s;
+  transform: rotate(var(--rot));
 }
 
 .promo-doodle-container .doodle-sparkle {
   position: absolute;
   pointer-events: none;
-  animation: sparkleTwinkle 3s ease-in-out infinite alternate;
 }
 
 .doodle-sparkle-1 {
@@ -78,7 +77,6 @@
   right: 28%;
   width: 22px;
   height: 22px;
-  animation-delay: -0.5s;
 }
 
 .doodle-sparkle-2 {
@@ -86,7 +84,6 @@
   left: 24%;
   width: 18px;
   height: 18px;
-  animation-delay: -1.8s;
 }
 
 .doodle-sparkle-3 {
@@ -94,7 +91,28 @@
   left: -6px;
   width: 16px;
   height: 16px;
-  animation-delay: -2.4s;
+}
+
+/* The doodles bob as the header scrolls through view instead of looping
+   forever (WCAG 2.2.2): each a different number of times so they stay out
+   of step. Still for reduced motion and without scroll timelines; their
+   tilt (--rot) is kept either way */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .doodle-accent,
+    .promo-doodle-container .doodle-sparkle {
+      animation: doodleBob ease-in-out 5 alternate both;
+      animation-timeline: view();
+    }
+
+    .doodle-cup { animation-iteration-count: 6; }
+    .doodle-palm { animation-iteration-count: 4; }
+    .doodle-wave { animation-iteration-count: 7; }
+
+    .promo-doodle-container .doodle-sparkle {
+      animation-name: sparkleTwinkle;
+    }
+  }
 }
 
 @keyframes doodleBob {

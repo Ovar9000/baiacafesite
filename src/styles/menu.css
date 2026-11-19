@@ -531,8 +531,10 @@
   transform: scale(0.9);
 }
 
-.mx-add.is-added {
-  animation: mxAddPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+@media (prefers-reduced-motion: no-preference) {
+  .mx-add.is-added {
+    animation: mxAddPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
 }
 
 @keyframes mxAddPop {
@@ -687,6 +689,25 @@
   font-weight: 700;
 }
 
+/* The real radio / checkbox sits invisibly over its label, so taps, arrow
+   keys and screen readers all reach a native control; the ring shows on the
+   label */
+.seg-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+:is(.cz-seg-btn, .cz-addon, .spot-btn):has(.seg-input:focus-visible) {
+  outline: 3px solid var(--golden-amber);
+  outline-offset: -3px;
+  border-radius: 8px;
+}
+
 .cz-seg-btn small {
   font-size: 0.78rem;
   font-weight: 500;
@@ -716,6 +737,7 @@
 }
 
 .cz-addon {
+  position: relative;
   width: 100%;
   display: flex;
   align-items: center;
@@ -818,24 +840,24 @@
 }
 
 @media (max-width: 640px) {
-  .modal-backdrop.drink-customizer-backdrop {
-    padding: 0;
-    align-items: flex-end;
-  }
-
-  .modal-dialog-card.drink-customizer-card {
+  /* A bottom sheet that slides up (no fade). The selectors outrank the
+     shared dialog.modal-dialog-card rules in main.css, which load after this */
+  dialog.modal-dialog-card.drink-customizer-card {
+    --modal-off: translateY(100%);
+    width: 100%;
     max-width: none;
-    margin: 0;
+    margin: auto 0 0;
     border-radius: 24px 24px 0 0;
     padding: 0 16px max(16px, env(safe-area-inset-bottom));
     max-height: calc(100dvh - 44px);
-    transform: translateY(100%);
     opacity: 1;
     transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .modal-backdrop.active .modal-dialog-card.drink-customizer-card {
-    transform: translateY(0);
+  @starting-style {
+    dialog.modal-dialog-card.drink-customizer-card[open] {
+      opacity: 1;
+    }
   }
 
   .cz-grabber {

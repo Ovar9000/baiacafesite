@@ -209,6 +209,9 @@ export default function AuthModal({
           <form onSubmit={handleSendEmailLink} className="email-otp-form">
             <input
               type="email"
+              name="email"
+              autoComplete="email"
+              aria-label="Email address"
               placeholder="Enter your email address"
               className="input-email"
               value={email}
@@ -270,6 +273,8 @@ export default function AuthModal({
               inputMode="numeric" 
               pattern="[0-9]*" 
               maxLength={6} 
+              autoComplete="one-time-code"
+              aria-label="6-digit verification code"
               placeholder="123456" 
               value={otpCode} 
               onChange={(e) => setOtpCode(e.target.value.trim())}

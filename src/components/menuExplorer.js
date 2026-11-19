@@ -1,5 +1,6 @@
 import { menuData, getAvailableDrinkAddOns, shouldOpenDrinkCustomizer } from '../data/menuData.js';
 import { cartStore } from './cartStore.js';
+import { openModal, closeModal, wireModal } from '../utils/modalDialog.js';
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -346,13 +347,14 @@ export function initMenuExplorer() {
   function openDrinkCustomizer(itemData) {
     let modal = document.getElementById('drink-customizer-modal');
     if (!modal) {
-      modal = document.createElement('div');
+      // A native modal <dialog> (src/utils/modalDialog.js)
+      modal = document.createElement('dialog');
       modal.id = 'drink-customizer-modal';
-      modal.className = 'modal-backdrop drink-customizer-backdrop';
-      modal.setAttribute('role', 'dialog');
-      modal.setAttribute('aria-modal', 'true');
+      modal.className = 'modal-dialog-card drink-customizer-card';
       modal.setAttribute('aria-labelledby', 'drink-customizer-title');
+      modal.setAttribute('closedby', 'any');
       document.body.appendChild(modal);
+      wireModal(modal);
     }
 
     const hasHotCold = itemData.hasHotCold;
@@ -371,18 +373,20 @@ export function initMenuExplorer() {
       return base + addOnsList.filter((a) => selectedAddOns.has(a.id)).reduce((sum, a) => sum + (Number(a.price) || 0), 0);
     };
 
+    // Native radios: arrow keys, one tab stop and checked state come free.
+    // The label carries .active so the sliding thumb CSS keeps working.
     const segmented = (name, options, selected) => `
-      <div class="cz-seg" role="radiogroup" data-seg="${name}">
+      <div class="cz-seg" role="radiogroup" aria-labelledby="cz-label-${name}" data-seg="${name}">
         ${options.map((o) => `
-          <button type="button" role="radio" class="cz-seg-btn ${o.value === selected ? 'active' : ''}" data-value="${o.value}" aria-checked="${o.value === selected}">
+          <label class="cz-seg-btn ${o.value === selected ? 'active' : ''}">
+            <input type="radio" class="seg-input" name="cz-${name}" value="${o.value}" ${o.value === selected ? 'checked' : ''} />
             <span>${o.label}</span>${o.sub ? `<small>${o.sub}</small>` : ''}
-          </button>
+          </label>
         `).join('')}
       </div>
     `;
 
     modal.innerHTML = `
-      <div class="modal-dialog-card drink-customizer-card">
         <div class="cz-grabber" aria-hidden="true"></div>
         <div class="cz-head">
           <div>
@@ -395,12 +399,12 @@ export function initMenuExplorer() {
         </div>
 
         ${hasHotCold ? `
-          <p class="cz-label">Temperature</p>
+          <p class="cz-label" id="cz-label-temp">Temperature</p>
           ${segmented('temp', [{ value: 'Iced', label: 'Iced' }, { value: 'Hot', label: 'Hot' }], selectedTemp)}
         ` : ''}
 
         ${hasSizes ? `
-          <p class="cz-label">Size</p>
+          <p class="cz-label" id="cz-label-size">Size</p>
           ${segmented('size', [{ value: 'M', label: 'Medium', sub: `16 oz · ₱${priceM}` }, { value: 'L', label: 'Large', sub: `22 oz · ₱${priceL}` }], selectedSize)}
         ` : ''}
 
@@ -409,13 +413,14 @@ export function initMenuExplorer() {
           <ul class="cz-addons">
             ${addOnsList.map((a) => `
               <li>
-                <button type="button" class="cz-addon" data-addon-id="${escapeHtml(a.id)}" role="checkbox" aria-checked="false">
+                <label class="cz-addon">
+                  <input type="checkbox" class="seg-input" value="${escapeHtml(a.id)}" />
                   <span class="cz-addon-name">${escapeHtml(a.name)}</span>
                   <span class="cz-addon-price">+₱${Number(a.price) || 0}</span>
                   <span class="cz-check" aria-hidden="true">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12.5 10 17 19 7.5"></polyline></svg>
                   </span>
-                </button>
+                </label>
               </li>
             `).join('')}
           </ul>
@@ -431,7 +436,6 @@ export function initMenuExplorer() {
             Add to order · <span class="cz-total"></span>
           </button>
         </div>
-      </div>
     `;
 
     // Update in place, so the segmented highlights slide instead of redrawing
@@ -443,27 +447,22 @@ export function initMenuExplorer() {
     };
 
     modal.querySelectorAll('.cz-seg').forEach((seg) => {
-      seg.querySelectorAll('.cz-seg-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          seg.querySelectorAll('.cz-seg-btn').forEach((b) => {
-            b.classList.toggle('active', b === btn);
-            b.setAttribute('aria-checked', String(b === btn));
-          });
-          if (seg.dataset.seg === 'temp') selectedTemp = btn.dataset.value;
-          if (seg.dataset.seg === 'size') selectedSize = btn.dataset.value;
-          refresh();
+      seg.addEventListener('change', (e) => {
+        const input = e.target;
+        seg.querySelectorAll('.cz-seg-btn').forEach((label) => {
+          label.classList.toggle('active', label.contains(input));
         });
+        if (seg.dataset.seg === 'temp') selectedTemp = input.value;
+        if (seg.dataset.seg === 'size') selectedSize = input.value;
+        refresh();
       });
     });
 
-    modal.querySelectorAll('.cz-addon').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const id = btn.dataset.addonId;
-        const on = !selectedAddOns.has(id);
-        if (on) selectedAddOns.add(id);
-        else selectedAddOns.delete(id);
-        btn.classList.toggle('is-checked', on);
-        btn.setAttribute('aria-checked', String(on));
+    modal.querySelectorAll('.cz-addon input').forEach((input) => {
+      input.addEventListener('change', () => {
+        if (input.checked) selectedAddOns.add(input.value);
+        else selectedAddOns.delete(input.value);
+        input.closest('.cz-addon').classList.toggle('is-checked', input.checked);
         refresh();
       });
     });
@@ -490,29 +489,14 @@ export function initMenuExplorer() {
         isDrink: true,
         categoryId: itemData.categoryId
       });
-      closeModal();
+      closeModal(modal);
     });
 
-    const onKey = (e) => {
-      if (e.key === 'Escape') closeModal();
-    };
-
-    function closeModal() {
-      modal.classList.remove('active');
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', onKey);
-    }
-
-    modal.querySelector('#customizer-close-btn').addEventListener('click', closeModal);
-    modal.onclick = (e) => {
-      if (e.target === modal) closeModal();
-    };
+    modal.querySelector('#customizer-close-btn').addEventListener('click', () => closeModal(modal));
 
     refresh();
-    // Next frame, so the sheet animates in from its closed position
-    requestAnimationFrame(() => modal.classList.add('active'));
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', onKey);
+    // Enters from its closed position through CSS @starting-style
+    openModal(modal);
   }
 
   render();

@@ -142,11 +142,21 @@
   justify-content: center;
   flex-shrink: 0;
   vertical-align: middle;
-  animation: doodleBob 4s ease-in-out infinite alternate;
 }
 
-.doodle-mug {
-  animation-delay: -1s;
+/* The doodles bob as the hero scrolls away rather than on an endless loop
+   (WCAG 2.2.2); still for reduced motion and without scroll timelines */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .hero-doodle {
+      animation: doodleBob ease-in-out 4 alternate both;
+      animation-timeline: view();
+    }
+
+    .doodle-mug {
+      animation-iteration-count: 3;
+    }
+  }
 }
 
 .doodle-food {
@@ -470,8 +480,13 @@
   position: absolute;
   inset: 0;
   background: var(--deep-navy-dark) var(--hero-photo-portrait) var(--hero-focus-portrait) / cover no-repeat;
-  /* A slow settle as the page opens */
-  animation: heroPhotoSettle 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* A slow settle as the page opens */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-photo {
+    animation: heroPhotoSettle 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
 
 /* Landscape screens get the wide crops, portrait ones (phones, upright

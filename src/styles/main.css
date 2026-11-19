@@ -155,10 +155,10 @@ main + .site-footer {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* No root font-size: index.html opts into the phone's own text size
+   (<meta name="text-scale">), which only works if 1rem is left alone */
 html {
-  scroll-behavior: smooth;
   scroll-padding-top: var(--header-height, 80px);
-  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -178,6 +178,28 @@ body {
   max-width: 100vw;
   position: relative;
   -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Even line lengths for headings; no one-word last line in body copy.
+   Named elements only: balancing everything (*) costs layout time */
+h2, h3, h4 {
+  text-wrap: balance;
+}
+
+p, li, dd, blockquote {
+  text-wrap: pretty;
+}
+
+/* Native controls (radios, checkboxes, the delivery textarea caret) in the
+   brand blue instead of the browser default */
+:root {
+  accent-color: var(--royal-blue);
 }
 
 /* Touch Device Tap Highlight & Focus Ring Polish */
@@ -612,11 +634,8 @@ main,
    `overlay` transition discretely so the exit plays before it leaves the
    top layer, where supported.
    ========================================================================== */
-body:has(dialog.nav-drawer[open]) {
-  overflow: hidden;
-}
-
-/* Stop scroll gestures on the sheet or backdrop chaining to the page */
+/* Stop scroll gestures on the sheet or backdrop chaining to the page (no
+   overflow: hidden on body: that drops the scrollbar and shifts the page) */
 .nav-drawer:modal {
   overscroll-behavior: contain;
 }
@@ -649,8 +668,11 @@ body:has(dialog.nav-drawer[open]) {
   transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1),
               opacity 0.2s ease,
               box-shadow 0.4s ease,
-              overlay 0.4s allow-discrete,
-              display 0.4s allow-discrete;
+              overlay 0.4s,
+              display 0.4s;
+  /* Its own declaration: inside the shorthand, browsers that don't know
+     allow-discrete would drop the whole transition */
+  transition-behavior: allow-discrete;
 }
 
 /* display is only set while open, so the UA's dialog:not([open]) { display: none } still applies */
@@ -667,8 +689,9 @@ body:has(dialog.nav-drawer[open]) {
   background: rgba(14, 26, 69, 0.32);
   opacity: 0;
   transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              overlay 0.4s allow-discrete,
-              display 0.4s allow-discrete;
+              overlay 0.4s,
+              display 0.4s;
+  transition-behavior: allow-discrete;
 }
 
 .nav-drawer[open]::backdrop {
@@ -1398,58 +1421,74 @@ body:has(dialog.nav-drawer[open]) {
 /* ==========================================================================
    ANIMATED POST DETAIL LIGHTBOX MODAL
    ========================================================================== */
-.polaroid-modal-backdrop {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  background: rgba(6, 12, 34, 0.88) !important;
-  backdrop-filter: blur(16px) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
-  z-index: 999999 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 16px !important;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.polaroid-modal-backdrop.is-active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.polaroid-modal-content {
-  position: relative;
-  max-width: 440px;
+/* The lightbox is a native modal <dialog> (main.js initPolaroidWall). Its
+   padding leaves room for the close button that sits over the card's corner */
+dialog.polaroid-modal-content {
+  position: fixed;
+  max-width: min(456px, calc(100% - 16px));
   width: 100%;
+  max-height: calc(100dvh - 24px);
   margin: auto;
-  max-height: calc(100vh - 40px);
-  transform: scale(0.92) translateY(16px);
+  padding: 12px 8px 0 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   opacity: 0;
   transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
-  will-change: transform, opacity;
 }
 
-.polaroid-modal-backdrop.is-active .polaroid-modal-content {
-  transform: scale(1) translateY(0);
+dialog.polaroid-modal-content[open]:not([data-closing]) {
   opacity: 1;
+}
+
+@starting-style {
+  dialog.polaroid-modal-content[open] {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog.polaroid-modal-content {
+    transform: scale(0.92) translateY(16px);
+  }
+
+  dialog.polaroid-modal-content[open]:not([data-closing]) {
+    transform: none;
+  }
+
+  @starting-style {
+    dialog.polaroid-modal-content[open] {
+      transform: scale(0.92) translateY(16px);
+    }
+  }
+}
+
+dialog.polaroid-modal-content::backdrop {
+  background: rgba(6, 12, 34, 0.88);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  overflow: hidden;
+  overscroll-behavior: contain;
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+dialog.polaroid-modal-content[open]:not([data-closing])::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  dialog.polaroid-modal-content[open]::backdrop {
+    opacity: 0;
+  }
 }
 
 .polaroid-modal-close {
   position: absolute;
-  top: -12px;
-  right: -8px;
+  top: 0;
+  right: 0;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -1677,9 +1716,11 @@ body:has(dialog.nav-drawer[open]) {
 }
 
 /* A short bump on My Order when something is added (cartDrawer.js) */
-.nav-cart-btn.is-bumping,
-.mobile-bar-cart-btn.is-bumping {
-  animation: cartBump 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+@media (prefers-reduced-motion: no-preference) {
+  .nav-cart-btn.is-bumping,
+  .mobile-bar-cart-btn.is-bumping {
+    animation: cartBump 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
 }
 
 @keyframes cartBump {
@@ -1713,55 +1754,86 @@ body:has(dialog.nav-drawer[open]) {
 /* ==========================================================================
    CHECKOUT CONFIRMATION MODAL
    ========================================================================== */
-.modal-backdrop {
+/* Checkout review and drink options: native modal <dialog>s
+   (src/utils/modalDialog.js). Enter with @starting-style, leave through
+   [data-closing]; the dimmed page is ::backdrop */
+dialog.modal-dialog-card {
+  /* Closed position; the phone bottom sheets change it */
+  --modal-off: scale(0.92) translateY(16px);
+
   position: fixed;
-  inset: 0;
-  background: rgba(16, 28, 71, 0.75);
-  backdrop-filter: blur(8px);
-  z-index: 1200;
-  display: flex;
-  align-items: safe center;
-  justify-content: center;
-  padding: 16px;
-  padding-top: max(16px, env(safe-area-inset-top));
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
-  opacity: 0;
-  pointer-events: none;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.32s ease;
-  will-change: opacity, backdrop-filter;
-}
-
-.modal-backdrop.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modal-dialog-card {
   background: #FFFFFF;
   color: var(--deep-navy);
   border-radius: var(--radius-lg);
-  max-width: 440px;
+  max-width: min(440px, calc(100% - 32px));
   width: 100%;
   max-height: calc(100dvh - 32px);
-  max-height: calc(100vh - 32px);
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   margin: auto;
   padding: 20px 22px;
   box-shadow: var(--shadow-lg);
   border: 1.5px solid #E2E8F0;
-  transform: scale(0.92) translateY(16px);
   opacity: 0;
   transition: transform 0.32s cubic-bezier(0.34, 1.35, 0.64, 1), opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform, opacity;
 }
 
-.modal-backdrop.active .modal-dialog-card {
-  transform: scale(1) translateY(0);
+dialog.modal-dialog-card[open]:not([data-closing]) {
   opacity: 1;
+}
+
+@starting-style {
+  dialog.modal-dialog-card[open] {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog.modal-dialog-card {
+    transform: var(--modal-off);
+  }
+
+  dialog.modal-dialog-card[open]:not([data-closing]) {
+    transform: none;
+  }
+
+  @starting-style {
+    dialog.modal-dialog-card[open] {
+      transform: var(--modal-off);
+    }
+  }
+}
+
+dialog.modal-dialog-card::backdrop {
+  background: rgba(16, 28, 71, 0.75);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+  opacity: 0;
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+dialog.modal-dialog-card[open]:not([data-closing])::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  dialog.modal-dialog-card[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+.visually-hidden:where(:not(:focus-within, :active)) {
+  position: absolute !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
 }
 
 .btn-archive-close,
@@ -1798,14 +1870,11 @@ body:has(dialog.nav-drawer[open]) {
 }
 
 @media (max-width: 480px) {
-  .modal-backdrop {
-    padding: 10px;
-  }
-  .modal-dialog-card {
+  dialog.modal-dialog-card {
     padding: 16px 16px 14px;
     border-radius: var(--radius-lg);
+    max-width: calc(100% - 20px);
     max-height: calc(100dvh - 20px);
-    max-height: calc(100vh - 20px);
   }
 }
 
@@ -1813,8 +1882,12 @@ body:has(dialog.nav-drawer[open]) {
    CHECKOUT REVIEW SHEET (cartDrawer.js showCheckoutModal)
    Grouped rows like an iOS review screen; a bottom sheet on phones.
    ========================================================================== */
-.modal-backdrop.checkout-backdrop {
+dialog.checkout-modal-card::backdrop {
   background: rgba(14, 26, 69, 0.45);
+}
+
+.cm-copy[data-copied] {
+  color: #15803D;
 }
 
 .modal-dialog-card.checkout-modal-card {
@@ -2031,24 +2104,23 @@ body:has(dialog.nav-drawer[open]) {
 
 /* Phones: rises from the bottom edge like the order sheet */
 @media (max-width: 640px) {
-  .modal-backdrop.checkout-backdrop {
-    padding: 0;
-    align-items: flex-end;
-  }
-
-  .modal-dialog-card.checkout-modal-card {
+  /* A sheet slides; it doesn't fade */
+  dialog.checkout-modal-card {
+    --modal-off: translateY(100%);
+    width: 100%;
     max-width: none;
-    margin: 0;
+    margin: auto 0 0;
     border-radius: 24px 24px 0 0;
     padding: 0 16px max(16px, env(safe-area-inset-bottom));
     max-height: calc(100dvh - 44px);
-    transform: translateY(100%);
     opacity: 1;
     transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .modal-backdrop.active .modal-dialog-card.checkout-modal-card {
-    transform: translateY(0);
+  @starting-style {
+    dialog.checkout-modal-card[open] {
+      opacity: 1;
+    }
   }
 
   .cm-grabber {
@@ -2066,17 +2138,54 @@ body:has(dialog.nav-drawer[open]) {
    ========================================================================== */
 /* iOS-style banners that drop in at the top, below the nav capsule, so they
    never cover the order total or the send button */
+/* A popover="manual" (cartStore.showToast): reset the UA popover box, which
+   would centre it with a border and canvas background */
 .toast-container {
   position: fixed;
-  top: calc(var(--header-height) + 4px);
-  left: 50%;
+  inset: calc(var(--header-height) + 4px) auto auto 50%;
   transform: translateX(-50%);
   width: min(380px, calc(100% - 32px));
-  z-index: 1200;
-  display: flex;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow: visible;
   flex-direction: column;
   gap: 8px;
   pointer-events: none;
+}
+
+.toast-container:popover-open {
+  display: flex;
+}
+
+.toast-close {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(120, 120, 128, 0.14);
+  color: #5A6987;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.toast-close:hover {
+  background: rgba(120, 120, 128, 0.24);
+  color: var(--deep-navy);
+}
+
+.toast-item.is-leaving {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toast-item.is-leaving {
+    transform: translateY(-12px);
+  }
 }
 
 .toast-item {
@@ -2092,8 +2201,13 @@ body:has(dialog.nav-drawer[open]) {
   align-items: center;
   gap: 12px;
   pointer-events: auto;
-  animation: toastSlideIn 0.45s cubic-bezier(0.34, 1.3, 0.64, 1);
   transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toast-item {
+    animation: toastSlideIn 0.45s cubic-bezier(0.34, 1.3, 0.64, 1);
+  }
 }
 
 .toast-icon {
@@ -2300,23 +2414,50 @@ body:has(dialog.nav-drawer[open]) {
   }
 }
 
-/* Reduced Motion Compliance */
+/* Reduced motion, case by case. No global 0.01ms reset: it made some effects
+   jump instead of calming them. Loops, pops, the hero settle and the toasts
+   only animate under no-preference in their own rules; the sheets and
+   dialogs fade instead of sliding (drawer.css, the dialog rules above).
+   Here the gliding pieces that are left move without the trip; colour and
+   opacity feedback stays. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  .nav-lens,
+  .mx-chip-lens {
+    transition-property: opacity;
   }
-  .toast-item {
-    animation: none !important;
-    transform: none !important;
+
+  .mx-board::before,
+  .cz-seg::before,
+  .spot-options-grid::before {
+    transition: none;
+  }
+
+  .nav-drawer,
+  .nav-drawer[open] {
+    transform: none;
+  }
+
+  @starting-style {
+    .nav-drawer[open] {
+      transform: none;
+    }
+    .nav-drawer[open] .nav-drawer-brand,
+    .nav-drawer[open] .nav-drawer-cta {
+      transform: none;
+    }
   }
 }
 
-/* Cross-Document View Transitions for Instant Page Navigation */
+/* Cross-Document View Transitions for Instant Page Navigation
+   (off for reduced motion) */
 @view-transition {
   navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
 }
 
 ::view-transition {
@@ -2515,4 +2656,35 @@ body:has(dialog.nav-drawer[open]) {
 .footer-col-title {
   text-transform: none;
   letter-spacing: -0.01em;
+}
+
+/* ==========================================================================
+   DEFERRED RENDERING
+   Sections that start well below the fold on every screen skip layout and
+   paint until they come near the viewport. contain-intrinsic-size holds
+   their place (auto: the real height once seen), so the scrollbar doesn't
+   jump. Not the hero or About, which can be in the first screen.
+   ========================================================================== */
+#reviews,
+#boards,
+#promos,
+#menu,
+#drops {
+  content-visibility: auto;
+}
+
+/* Phone heights (measured at 375px wide) */
+#reviews { contain-intrinsic-size: auto none auto 600px; }
+#boards { contain-intrinsic-size: auto none auto 360px; }
+#promos { contain-intrinsic-size: auto none auto 690px; }
+#menu { contain-intrinsic-size: auto none auto 320px; }
+#drops { contain-intrinsic-size: auto none auto 400px; }
+
+/* Wider layouts (measured at 1024px wide) */
+@media (min-width: 901px) {
+  #reviews { contain-intrinsic-size: auto none auto 1080px; }
+  #boards { contain-intrinsic-size: auto none auto 1000px; }
+  #promos { contain-intrinsic-size: auto none auto 725px; }
+  #menu { contain-intrinsic-size: auto none auto 910px; }
+  #drops { contain-intrinsic-size: auto none auto 690px; }
 }
