@@ -14,13 +14,7 @@ export default function LegalModal({ type, onClose }) {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleKeyDown);
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = originalOverflow;
-    };
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [type, onClose]);
 
   if (!type || !mounted) return null;
@@ -45,6 +39,7 @@ export default function LegalModal({ type, onClose }) {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '16px',
+        overscrollBehavior: 'contain',
         animation: 'legalFadeIn 0.2s ease-out forwards'
       }}
     >
@@ -96,6 +91,7 @@ export default function LegalModal({ type, onClose }) {
         <div style={{
           padding: '22px 24px',
           overflowY: 'auto',
+          overscrollBehavior: 'contain',
           WebkitOverflowScrolling: 'touch',
           fontSize: '0.86rem',
           lineHeight: '1.65',
@@ -108,14 +104,14 @@ export default function LegalModal({ type, onClose }) {
           {isTerms ? (
             <>
               <section>
-                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>1. Acceptance of Terms</h4>
+                <h3 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>1. Acceptance of Terms</h3>
                 <p style={{ margin: 0, textAlign: 'left' }}>
                   By accessing <strong>https://www.baia.cafe</strong> and participating in the <strong>BAIA Café Loyalty Program</strong>, you agree to these Terms. If you do not agree, you may freely browse the site without creating an account.
                 </p>
               </section>
 
               <section>
-                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>2. BAIA Café Loyalty Rules</h4>
+                <h3 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>2. BAIA Café Loyalty Rules</h3>
                 <ul style={{ margin: '0', paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', textAlign: 'left' }}>
                   <li><strong>Earning Stamps:</strong> Receive 1 digital stamp per qualifying handcrafted beverage purchased at BAIA Café by scanning the official daily standee QR code.</li>
                   <li><strong>Daily Limit:</strong> Maximum of 1 stamp per account per calendar day (Asia/Manila timezone).</li>
@@ -127,14 +123,14 @@ export default function LegalModal({ type, onClose }) {
               </section>
 
               <section>
-                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>3. User Security &amp; Fair Play</h4>
+                <h3 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>3. User Security &amp; Fair Play</h3>
                 <p style={{ margin: 0, textAlign: 'left' }}>
                   You are responsible for your account credentials. Tampering, attempting to forge QR tokens, or automating claims will result in immediate disqualification and account closure.
                 </p>
               </section>
 
               <section>
-                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>4. Governing Law &amp; Contact</h4>
+                <h3 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>4. Governing Law &amp; Contact</h3>
                 <p style={{ margin: 0, textAlign: 'left' }}>
                   These terms are governed by the laws of the Republic of the Philippines. For inquiries, email us at <a href="mailto:quibotmark@gmail.com" style={{ color: '#16255C', fontWeight: 600 }}>quibotmark@gmail.com</a> or visit us at Barangay Laurente, San Pascual, Burias Island, Masbate.
                 </p>
@@ -143,7 +139,7 @@ export default function LegalModal({ type, onClose }) {
           ) : (
             <>
               <section>
-                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>1. Information We Collect</h4>
+                <h3 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>1. Information We Collect</h3>
                 <ul style={{ margin: '0', paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', textAlign: 'left' }}>
                   <li><strong>Profile Info:</strong> Name, email address, and avatar provided via Google Sign-In or email OTP to identify your loyalty card.</li>
                   <li><strong>Zero Location / GPS Tracking:</strong> We do not track or store your device GPS location. In-store visits are verified purely by scanning the counter QR code.</li>
@@ -153,21 +149,21 @@ export default function LegalModal({ type, onClose }) {
               </section>
 
               <section>
-                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>2. How We Use Data</h4>
+                <h3 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>2. How We Use Data</h3>
                 <p style={{ margin: 0, textAlign: 'left' }}>
                   Your information is solely used to maintain your 10-stamp loyalty card, issue Wi-Fi passes, and notify baristas when you are eligible for rewards. We never sell, rent, or share personal data with third-party advertisers.
                 </p>
               </section>
 
               <section>
-                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>3. Secure Infrastructure</h4>
+                <h3 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>3. Secure Infrastructure</h3>
                 <p style={{ margin: 0, textAlign: 'left' }}>
                   We utilize enterprise cloud security including Google Identity Services (OAuth 2.0), Supabase (Row-Level Security PostgreSQL), and Vercel serverless hosting with end-to-end SSL encryption.
                 </p>
               </section>
 
               <section>
-                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>4. Data Deletion Rights</h4>
+                <h3 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>4. Data Deletion Rights</h3>
                 <p style={{ margin: 0, textAlign: 'left' }}>
                   You have full ownership of your data. You can delete your account anytime in the app or by emailing <a href="mailto:quibotmark@gmail.com" style={{ color: '#16255C', fontWeight: 600 }}>quibotmark@gmail.com</a>.
                 </p>

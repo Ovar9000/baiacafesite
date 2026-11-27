@@ -206,7 +206,11 @@ html:root .nav-menu-toggle.lg-glass {
 
 /* Desktop keeps its single glass bar; the pieces inside it are not glass */
 @media (min-width: 901px) {
-  html:root .site-header .lg-glass {
+  html:root .site-header .lg-glass,
+  html:root.lg-refract .site-header .lg-glass,
+  html:root .site-header.scrolled .lg-glass:not(.is-light),
+  html:root.lg-refract .site-header.scrolled .lg-glass:not(.is-light) {
+    --lg-tint: transparent;
     background: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -214,7 +218,8 @@ html:root .nav-menu-toggle.lg-glass {
     text-shadow: none;
   }
 
-  html:root .site-header .nav-loyalty-link.lg-glass {
+  html:root .site-header .nav-loyalty-link.lg-glass,
+  html:root .site-header.scrolled .nav-loyalty-link.lg-glass:not(.is-light) {
     border: 1px solid rgba(255, 255, 255, 0.2);
     background: rgba(0, 0, 0, 0.15);
   }

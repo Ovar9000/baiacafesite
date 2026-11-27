@@ -202,6 +202,17 @@ export function initLiquidGlass() {
   followTone(pieces);
 
   if (document.documentElement.classList.contains('lg-refract')) {
-    pieces.forEach(refract);
+    const refracted = new WeakSet();
+    const attachRefract = () => {
+      for (const el of pieces) {
+        if (refracted.has(el)) continue;
+        // Desktop header is a single bar; only build per-piece lenses for it below 901px
+        if (WIDE.matches && el.closest('.site-header')) continue;
+        refracted.add(el);
+        refract(el);
+      }
+    };
+    attachRefract();
+    WIDE.addEventListener('change', attachRefract);
   }
 }

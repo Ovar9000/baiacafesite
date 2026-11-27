@@ -9,6 +9,8 @@ export default function QrScanner({ onScan, onClose }) {
   const scannerRef = useRef(null);
   const isScannedRef = useRef(false);
   const fileInputRef = useRef(null);
+  const onScanRef = useRef(onScan);
+  onScanRef.current = onScan;
 
   const processDecodedText = (decodedText) => {
     if (isScannedRef.current) return;
@@ -32,7 +34,7 @@ export default function QrScanner({ onScan, onClose }) {
       }
     } catch (e) {}
 
-    onScan(token);
+    onScanRef.current?.(token);
   };
 
   useEffect(() => {
@@ -85,7 +87,12 @@ export default function QrScanner({ onScan, onClose }) {
       } catch (err) {
         console.error('Error starting live camera QR scanner:', err);
         setIsStarting(false);
-        setCameraError('Live camera not available over HTTP. Tap "Snap Photo with Camera" below to scan instantly!');
+        const isSecure = window.isSecureContext || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        setCameraError(
+          isSecure
+            ? 'Camera access is unavailable or blocked. Allow camera permission or tap "Snap Photo with Camera" below.'
+            : 'Live camera requires HTTPS on mobile. Tap "Snap Photo with Camera" below to scan instantly!'
+        );
       }
     };
 
@@ -100,7 +107,7 @@ export default function QrScanner({ onScan, onClose }) {
         } catch (e) {}
       }
     };
-  }, [onScan]);
+  }, []);
 
   const handleFileCapture = async (e) => {
     const file = e.target.files?.[0];

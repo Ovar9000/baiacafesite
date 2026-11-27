@@ -14,6 +14,13 @@ if (!supabaseAnonKey) {
   console.error('Missing VITE_SUPABASE_ANON_KEY — set it in Vercel environment variables.');
 }
 
+// Capture before createClient(), which may strip auth callback params via replaceState.
+export const IS_AUTH_CALLBACK = typeof window !== 'undefined' && (
+  window.location.search.includes('code=') ||
+  window.location.search.includes('token_hash=') ||
+  window.location.hash.includes('access_token=')
+);
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,

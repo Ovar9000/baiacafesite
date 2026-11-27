@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom';
-import { supabase } from '../lib/supabaseClient';
+import { supabase, IS_AUTH_CALLBACK } from '../lib/supabaseClient';
 import { calculateLoyaltyStatus, formatManilaDateTime, isBonusStamp, sortStampsAsc } from '../lib/loyaltyHelpers';
 import AuthModal from '../components/AuthModal';
 import LegalModal from '../components/LegalModal';
@@ -34,6 +34,37 @@ const RedemptionCountdown = lazy(() => import('../components/RedemptionCountdown
 // The last stamps this device saw, shown instantly while fresh ones load.
 // Display only: every stamp and reward is checked again by the server.
 const CARD_CACHE_KEY = 'baia_card_cache_v1';
+const WIFI_CACHE_KEY = 'baia_today_wifi_voucher';
+const MANILA_DAY_FMT = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Asia/Manila',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+});
+
+function readStoredSession() {
+  try {
+    const raw = localStorage.getItem(supabase.auth.storageKey);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.user?.id && parsed?.access_token ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function readTodayVoucherCache() {
+  try {
+    const raw = sessionStorage.getItem(WIFI_CACHE_KEY);
+    if (!raw) return null;
+    const cached = JSON.parse(raw);
+    if (cached && cached.date === MANILA_DAY_FMT.format(new Date())) return cached;
+    sessionStorage.removeItem(WIFI_CACHE_KEY);
+  } catch {
+    // ignore storage errors
+  }
+  return null;
+}
 
 function readCardCache(userId) {
   try {
@@ -61,13 +92,31 @@ function clearCardCache() {
 }
 
 export default function CardApp() {
-  const [user, setUser] = useState(null);
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [stamps, setStamps] = useState([]);
-  const [redemptions, setRedemptions] = useState([]);
+  const [initialBoot] = useState(() => {
+    const authCallback = IS_AUTH_CALLBACK;
+    const storedSession = readStoredSession();
+    const storedUser = storedSession?.user ?? null;
+    const cachedCard = storedUser ? readCardCache(storedUser.id) : null;
+    return {
+      authCallback,
+      session: storedSession,
+      user: storedUser,
+      stamps: cachedCard?.stamps || [],
+      redemptions: cachedCard?.redemptions || [],
+      dataReady: Boolean(cachedCard),
+      todayVoucher: storedUser ? readTodayVoucherCache() : null
+    };
+  });
+
+  const [user, setUser] = useState(initialBoot.user);
+  const [session, setSession] = useState(initialBoot.session);
+  // Only wait on auth while an OAuth / magic-link callback is exchanging its token
+  const [loading, setLoading] = useState(initialBoot.authCallback && !initialBoot.user);
+  const [stamps, setStamps] = useState(initialBoot.stamps);
+  const [redemptions, setRedemptions] = useState(initialBoot.redemptions);
   // True once this user's stamps are known (from the cache or the server)
-  const [dataReady, setDataReady] = useState(false);
+  const [dataReady, setDataReady] = useState(initialBoot.dataReady);
+  const bootedCacheUserRef = useRef(initialBoot.dataReady ? initialBoot.user?.id : null);
   const [errorMsg, setErrorMsg] = useState('');
   const [toastMsg, setToastMsg] = useState('');
   
@@ -86,7 +135,7 @@ export default function CardApp() {
   const [showArchiveModal, setShowArchiveModal] = useState(false);
 
   // Active Wi-Fi Voucher state
-  const [todayVoucher, setTodayVoucher] = useState(null);
+  const [todayVoucher, setTodayVoucher] = useState(initialBoot.todayVoucher);
   const [copiedVoucher, setCopiedVoucher] = useState(false);
 
   // Tutorial & Account Deletion Modals
@@ -95,21 +144,32 @@ export default function CardApp() {
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [cardLegalType, setCardLegalType] = useState(null);
 
-  // Fetch Supabase session on load
+  // Sync Supabase session (handles PKCE callback exchange, refreshes, and sign-outs)
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    let active = true;
+    const applySession = (nextSession) => {
+      if (!active) return;
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
       setLoading(false);
+      if (!nextSession) {
+        setStamps([]);
+        setRedemptions([]);
+        setTodayVoucher(null);
+        setDataReady(false);
+      }
+    };
+
+    supabase.auth.getSession().then(({ data: { session: s } }) => applySession(s));
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      applySession(s);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Fetch the user's stamps, redemptions and today's Wi-Fi code, all at once
@@ -119,12 +179,7 @@ export default function CardApp() {
     try {
       setErrorMsg('');
 
-      const todayManila = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Asia/Manila',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      }).format(new Date());
+      const todayManila = MANILA_DAY_FMT.format(new Date());
       const startOfDay = new Date(`${todayManila}T00:00:00+08:00`).toISOString();
       const endOfDay = new Date(`${todayManila}T23:59:59.999+08:00`).toISOString();
 
@@ -132,12 +187,12 @@ export default function CardApp() {
       const [stampsRes, redemptionsRes, voucherRes] = await Promise.all([
         supabase
           .from('stamps')
-          .select('*')
+          .select('id, awarded_at, kind')
           .eq('user_id', userId)
           .order('awarded_at', { ascending: false }),
         supabase
           .from('redemptions')
-          .select('*')
+          .select('id, redeemed_at')
           .eq('user_id', userId)
           .order('redeemed_at', { ascending: false }),
         supabase
@@ -162,26 +217,15 @@ export default function CardApp() {
       // Today's Wi-Fi code
       const voucherRows = voucherRes.data;
       if (voucherRows && voucherRows.length > 0) {
-        setTodayVoucher(voucherRows[0]);
-      } else {
-        // Check if cached in sessionStorage for TODAY only
-        const cachedStr = sessionStorage.getItem('baia_today_wifi_voucher');
-        if (cachedStr) {
-          try {
-            const cached = JSON.parse(cachedStr);
-            if (cached && cached.date === todayManila) {
-              setTodayVoucher(cached);
-            } else {
-              // Expired from previous day -> clean up!
-              sessionStorage.removeItem('baia_today_wifi_voucher');
-              setTodayVoucher(null);
-            }
-          } catch (e) {
-            setTodayVoucher(null);
-          }
-        } else {
-          setTodayVoucher(null);
+        const voucherWithDate = { ...voucherRows[0], date: todayManila };
+        setTodayVoucher(voucherWithDate);
+        try {
+          sessionStorage.setItem(WIFI_CACHE_KEY, JSON.stringify(voucherWithDate));
+        } catch {
+          // ignore storage errors
         }
+      } else {
+        setTodayVoucher(readTodayVoucherCache());
       }
     } catch (err) {
       console.error('Error loading loyalty data:', err);
@@ -197,13 +241,17 @@ export default function CardApp() {
       setDataReady(false);
       return;
     }
-    const cached = readCardCache(userId);
-    if (cached) {
-      setStamps(cached.stamps || []);
-      setRedemptions(cached.redemptions || []);
-      setDataReady(true);
+    if (bootedCacheUserRef.current === userId) {
+      bootedCacheUserRef.current = null;
     } else {
-      setDataReady(false);
+      const cached = readCardCache(userId);
+      if (cached) {
+        setStamps(cached.stamps || []);
+        setRedemptions(cached.redemptions || []);
+        setDataReady(true);
+      } else {
+        setDataReady(false);
+      }
     }
     loadLoyaltyData();
   }, [userId, loadLoyaltyData]);
@@ -333,17 +381,12 @@ export default function CardApp() {
 
       setToastMsg(data.message || 'Stamp successfully added to your card.');
       if (data.wifiVoucher) {
-        const todayManila = new Intl.DateTimeFormat('en-CA', {
-          timeZone: 'Asia/Manila',
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        }).format(new Date());
+        const todayManila = MANILA_DAY_FMT.format(new Date());
 
         const voucherWithDate = { ...data.wifiVoucher, date: todayManila };
         setTodayVoucher(voucherWithDate);
         try {
-          sessionStorage.setItem('baia_today_wifi_voucher', JSON.stringify(voucherWithDate));
+          sessionStorage.setItem(WIFI_CACHE_KEY, JSON.stringify(voucherWithDate));
         } catch (e) {}
       }
       await loadLoyaltyData();
@@ -362,17 +405,11 @@ export default function CardApp() {
   const loyaltyStatus = calculateLoyaltyStatus(stamps, redemptions);
 
   // Check if today's stamp or Wi-Fi voucher has already been claimed for current Manila date
-  const manilaDateFormatter = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Manila',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  });
-  const todayManila = manilaDateFormatter.format(new Date());
+  const todayManila = MANILA_DAY_FMT.format(new Date());
 
   const hasScannedToday = Boolean(todayVoucher) || stamps.some(s => {
     try {
-      const stampDate = manilaDateFormatter.format(new Date(s.awarded_at));
+      const stampDate = MANILA_DAY_FMT.format(new Date(s.awarded_at));
       return stampDate === todayManila;
     } catch (e) {
       return false;
@@ -460,12 +497,7 @@ export default function CardApp() {
       )}
 
       <main className="loyalty-main-content card-main">
-        {loading ? (
-          <div className="card-loading">
-            <div className="spinner-border" />
-            <p>Opening your card…</p>
-          </div>
-        ) : !user ? (
+        {!user && !loading ? (
           <div>
             <AuthModal onSuccess={(s) => {
               setSession(s);
@@ -483,32 +515,8 @@ export default function CardApp() {
               <div className="card-alert is-error" role="alert">{errorMsg}</div>
             )}
 
-            {!dataReady ? (
-              /* First visit on this device: the card's outline while the stamps load */
-              <section className="paper-card is-loading" aria-busy="true" aria-label="Loading your card">
-                <div className="paper-head">
-                  <div className="paper-brand">
-                    <span className="paper-brand-name">BAIA</span>
-                    <span className="paper-brand-line">Coffee by the Bay</span>
-                  </div>
-                </div>
-                <div className="paper-holder">
-                  <span className="paper-holder-name">
-                    {user.user_metadata?.full_name || user.email?.split('@')[0] || 'BAIA guest'}
-                  </span>
-                  <span className="paper-holder-email">{user.email}</span>
-                </div>
-                <ol className="stamp-row" aria-hidden="true">
-                  {Array.from({ length: 10 }).map((_, idx) => <li key={idx} className="stamp" />)}
-                </ol>
-                <div className="paper-foot">
-                  <p className="paper-progress">Checking your stamps…</p>
-                </div>
-              </section>
-            ) : (<>
-
             {/* A full card: the free coffee, ready to redeem */}
-            {loyaltyStatus.hasPendingReward && (
+            {dataReady && loyaltyStatus.hasPendingReward && (
               <section className="reward-ready" aria-labelledby="reward-ready-title">
                 <div className="reward-ready-head">
                   <span className="reward-ready-icon" aria-hidden="true"><Gift size={22} /></span>
@@ -555,8 +563,11 @@ export default function CardApp() {
 
             {/* The stamp card: printed on sand paper, stamped in BAIA blue ink */}
             <section
-              className={`paper-card ${isCompletedCard ? 'is-full' : ''}`}
-              aria-label={`Loyalty card ${activeCycleNumber}: ${displayProgress} of 10 stamps`}
+              className={`paper-card ${!dataReady ? 'is-loading' : isCompletedCard ? 'is-full' : ''}`}
+              aria-busy={!dataReady || undefined}
+              aria-label={dataReady
+                ? `Loyalty card ${activeCycleNumber}: ${displayProgress} of 10 stamps`
+                : 'Loading your loyalty card'}
             >
               <div className="paper-head">
                 <div className="paper-brand">
@@ -567,80 +578,89 @@ export default function CardApp() {
                   type="button"
                   className="paper-cycle-btn"
                   onClick={() => setShowArchiveModal(true)}
+                  disabled={!dataReady}
                   title="See your finished cards"
                 >
-                  <span>Card {activeCycleNumber}</span>
+                  <span>Card {dataReady ? activeCycleNumber : 1}</span>
                   <ChevronRight size={14} aria-hidden="true" />
                 </button>
               </div>
 
               <div className="paper-holder">
                 <span className="paper-holder-name">
-                  {user.user_metadata?.full_name || user.email?.split('@')[0] || 'BAIA guest'}
+                  {user
+                    ? (user.user_metadata?.full_name || user.email?.split('@')[0] || 'BAIA guest')
+                    : 'Signing you in…'}
                 </span>
-                <span className="paper-holder-email">{user.email}</span>
+                <span className="paper-holder-email">{user?.email || '\u00A0'}</span>
               </div>
 
-              <ol className="stamp-row">
-                {Array.from({ length: 10 }).map((_, idx) => {
-                  const slotNum = idx + 1;
-                  const isFilled = slotNum <= displayProgress;
-                  const isRewardSlot = slotNum === 10;
-                  const isBonusSlot = isFilled && !isCompletedCard && isBonusStamp(currentCycleStamps[idx]);
-                  const classes = [
-                    'stamp',
-                    isFilled ? 'is-inked' : '',
-                    isBonusSlot ? 'is-bonus' : '',
-                    isRewardSlot ? 'is-reward' : ''
-                  ].filter(Boolean).join(' ');
-                  const label = isBonusSlot
-                    ? `Stamp ${slotNum}: bonus stamp, on us`
-                    : isFilled
-                      ? `Stamp ${slotNum}: stamped`
-                      : isRewardSlot ? 'Stamp 10: free coffee' : `Stamp ${slotNum}: not yet`;
-                  return (
-                    <li
-                      key={idx}
-                      className={classes}
-                      style={{ '--tilt': `${STAMP_TILTS[idx]}deg`, '--i': idx }}
-                      aria-label={label}
-                      title={label}
-                    >
-                      {isBonusSlot ? (
-                        <>
-                          <Gift size={18} aria-hidden="true" />
-                          <span className="stamp-tag">+1</span>
-                        </>
-                      ) : isFilled ? (
-                        isRewardSlot
-                          ? <><Coffee size={18} aria-hidden="true" /><span className="stamp-tag">Free</span></>
-                          : <Coffee size={20} aria-hidden="true" />
-                      ) : isRewardSlot ? (
-                        <><Coffee size={16} aria-hidden="true" /><span className="stamp-tag">Free</span></>
-                      ) : (
-                        <span className="stamp-num" aria-hidden="true">{slotNum}</span>
-                      )}
-                    </li>
-                  );
-                })}
+              <ol className="stamp-row" aria-hidden={!dataReady || undefined}>
+                {!dataReady ? (
+                  Array.from({ length: 10 }).map((_, idx) => <li key={idx} className="stamp" />)
+                ) : (
+                  Array.from({ length: 10 }).map((_, idx) => {
+                    const slotNum = idx + 1;
+                    const isFilled = slotNum <= displayProgress;
+                    const isRewardSlot = slotNum === 10;
+                    const isBonusSlot = isFilled && !isCompletedCard && isBonusStamp(currentCycleStamps[idx]);
+                    const classes = [
+                      'stamp',
+                      isFilled ? 'is-inked' : '',
+                      isBonusSlot ? 'is-bonus' : '',
+                      isRewardSlot ? 'is-reward' : ''
+                    ].filter(Boolean).join(' ');
+                    const label = isBonusSlot
+                      ? `Stamp ${slotNum}: bonus stamp, on us`
+                      : isFilled
+                        ? `Stamp ${slotNum}: stamped`
+                        : isRewardSlot ? 'Stamp 10: free coffee' : `Stamp ${slotNum}: not yet`;
+                    return (
+                      <li
+                        key={idx}
+                        className={classes}
+                        style={{ '--tilt': `${STAMP_TILTS[idx]}deg`, '--i': idx }}
+                        aria-label={label}
+                        title={label}
+                      >
+                        {isBonusSlot ? (
+                          <>
+                            <Gift size={18} aria-hidden="true" />
+                            <span className="stamp-tag">+1</span>
+                          </>
+                        ) : isFilled ? (
+                          isRewardSlot
+                            ? <><Coffee size={18} aria-hidden="true" /><span className="stamp-tag">Free</span></>
+                            : <Coffee size={20} aria-hidden="true" />
+                        ) : isRewardSlot ? (
+                          <><Coffee size={16} aria-hidden="true" /><span className="stamp-tag">Free</span></>
+                        ) : (
+                          <span className="stamp-num" aria-hidden="true">{slotNum}</span>
+                        )}
+                      </li>
+                    );
+                  })
+                )}
               </ol>
 
               <div className="paper-foot">
                 <p className="paper-progress">
-                  {isCompletedCard
-                    ? 'Card full. Your free coffee is ready.'
-                    : `${stampsLeft} more ${stampsLeft === 1 ? 'drink' : 'drinks'} to a free coffee.`}
+                  {!dataReady
+                    ? (user ? 'Checking your stamps…' : 'Opening your card…')
+                    : isCompletedCard
+                      ? 'Card full. Your free coffee is ready.'
+                      : `${stampsLeft} more ${stampsLeft === 1 ? 'drink' : 'drinks'} to a free coffee.`}
                 </p>
-                <span className="paper-count">{displayProgress}/10</span>
+                <span className="paper-count">{dataReady ? `${displayProgress}/10` : '–/10'}</span>
               </div>
 
-              {(bonusWaitingOnNextCard || currentCardHasBonus || showFirstCardBonusTeaser) && (
+              {(!dataReady || bonusWaitingOnNextCard || currentCardHasBonus || showFirstCardBonusTeaser) && (
                 <p className="paper-note">
                   <Gift size={14} aria-hidden="true" />
                   <span>
-                    {bonusWaitingOnNextCard
+                    {dataReady && bonusWaitingOnNextCard
                       ? <><strong>+1 bonus stamp</strong> for finishing your first card. It's already on your next card.</>
-                      : currentCardHasBonus
+                      : dataReady && currentCardHasBonus
                         ? <><strong>+1 bonus stamp</strong> on us for finishing your first card.</>
                         : <>Finish this card and your next one starts with <strong>1 stamp on us</strong>.</>}
                   </span>
@@ -649,7 +669,7 @@ export default function CardApp() {
             </section>
 
             {/* Today's Wi-Fi code (shown again any time today) */}
-            {todayVoucher ? (
+            {dataReady && todayVoucher ? (
               <section className="wifi-tile" aria-labelledby="wifi-title">
                 <div className="wifi-head">
                   <span className="wifi-icon" aria-hidden="true"><Wifi size={18} /></span>
@@ -679,10 +699,11 @@ export default function CardApp() {
             ) : null}
 
             {/* Scan the counter standee (hidden once today's stamp is in) */}
-            {!hasScannedToday && (
+            {(!dataReady || !hasScannedToday) && (
               <button
                 type="button"
                 className="scan-btn"
+                disabled={!dataReady}
                 onClick={() => {
                   setScannerErrorMsg('');
                   setScannerStatusMsg('');
@@ -698,17 +719,21 @@ export default function CardApp() {
               </button>
             )}
 
-            {/* On the menu */}
+            {/* On the menu — always rendered immediately (LCP candidate) */}
             <a className="menu-tile" href="/#menu">
-              <img src="/images/classiccafe.webp" alt="" loading="lazy" />
+              <img
+                src="/images/classiccafe-card.webp"
+                alt=""
+                width="104"
+                height="112"
+                fetchPriority="high"
+              />
               <span className="menu-tile-text">
                 <strong>Spanish latte and sea salt cold brew</strong>
                 <span>Made at our bar on Laurente Beach.</span>
                 <span className="menu-tile-link">See the menu <ChevronRight size={14} aria-hidden="true" /></span>
               </span>
             </a>
-
-            </>)}
 
             <footer className="card-legal">
               <p className="card-legal-trust">
@@ -726,6 +751,7 @@ export default function CardApp() {
               <button
                 type="button"
                 className="card-delete-link"
+                disabled={!user}
                 onClick={() => setShowDeleteModal(true)}
               >
                 Delete my account and stamps

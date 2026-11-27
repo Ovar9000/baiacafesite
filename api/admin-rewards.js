@@ -58,17 +58,23 @@ export default async function handler(req, res) {
     }
 
     // 2. Fetch stamps and redemptions (bounded to prevent memory exhaustion)
-    const { data: stamps, error: sErr } = await supabaseAdmin
-      .from('stamps')
-      .select('user_id, awarded_at, staff_note')
-      .order('awarded_at', { ascending: false })
-      .limit(5000);
+    const [{ data: stamps, error: sErr }, { data: redemptions, error: rErr }] = await Promise.all([
+      supabaseAdmin
+        .from('stamps')
+        .select('user_id, awarded_at, staff_note')
+        .order('awarded_at', { ascending: false })
+        .limit(5000),
+      supabaseAdmin
+        .from('redemptions')
+        .select('user_id, redeemed_at, reward_type, milestone_number')
+        .order('redeemed_at', { ascending: false })
+        .limit(2000)
+    ]);
 
-    const { data: redemptions, error: rErr } = await supabaseAdmin
-      .from('redemptions')
-      .select('user_id, redeemed_at, reward_type, milestone_number')
-      .order('redeemed_at', { ascending: false })
-      .limit(2000);
+    if (sErr || rErr) {
+      console.error('Error fetching Supabase stamps/redemptions:', sErr || rErr);
+      return res.status(500).json({ error: 'Failed to fetch loyalty records from Supabase.' });
+    }
 
     // Group stamps and redemptions by user_id
     const userStampsMap = Object.groupBy(stamps || [], (s) => s.user_id);

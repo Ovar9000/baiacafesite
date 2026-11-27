@@ -116,8 +116,8 @@ section's own stylesheet.
 
 Lines stay short: ledes at most 52 characters wide, body at most 62.
 
-**One content column.** Everything sits in one column, 1280px wide at most
-including its side padding (16px on phones, 20→72px on bigger screens).
+**One content column.** Everything sits in one column, 1680px wide at most
+including its side padding (16px on phones, 20→40px on bigger screens).
 Section titles, ledes and content all start on the same left edge. Nothing
 inside a section narrows and re-centres itself.
 

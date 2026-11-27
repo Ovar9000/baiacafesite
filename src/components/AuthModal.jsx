@@ -123,6 +123,8 @@ export default function AuthModal({
         <img 
           src="/images/Logo.webp" 
           alt="BAIA Café" 
+          width="44"
+          height="44"
           style={{ width: '44px', height: '44px', objectFit: 'cover', borderRadius: '50%' }} 
         />
       </div>

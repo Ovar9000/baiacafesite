@@ -104,7 +104,7 @@ function initApp() {
   requestAnimationFrame(() => {
     setTimeout(() => {
       safeInit('menuExplorer', initMenuExplorer);
-      whenNear(document.getElementById('shore'), () => safeInit('boardsRental', initBoardsRental), '900px');
+      whenNear(document.getElementById('boards'), () => safeInit('boardsRental', initBoardsRental), '900px');
       safeInit('newDrops', initNewDrops);
       safeInit('communityWall', initCommunityWall);
       if (window.location.hash) {

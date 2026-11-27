@@ -553,10 +553,15 @@
   width: auto;
   padding: 0 14px;
   border-radius: var(--radius-pill);
-  background: rgba(120, 120, 128, 0.12);
+  background: rgba(120, 120, 128, 0.14);
+  color: var(--deep-navy);
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.88rem;
+}
+
+.mx-add--ask:hover {
+  background: rgba(120, 120, 128, 0.24);
 }
 
 .mx-empty {
@@ -882,7 +887,8 @@
    ========================================================================== */
 @media (min-width: 900px) {
   #menu-explorer-root {
-    max-width: 1180px;
+    max-width: none;
+    margin: 0;
   }
 
   .mx-top {

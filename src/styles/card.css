@@ -23,6 +23,10 @@
   --ink-speckle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 2.05'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background-color: var(--card-sand);
 }
@@ -33,23 +37,13 @@ body {
 }
 
 .loyalty-header {
+  min-height: 77px;
   border-bottom-color: var(--card-rule);
 }
 
 .card-main {
   flex: 1;
   padding: 20px 16px 32px;
-}
-
-.card-loading {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--card-ink-muted);
-  font-size: 0.95rem;
-}
-
-.card-loading p {
-  margin-top: 16px;
 }
 
 .card-stack {
@@ -259,8 +253,13 @@ body {
   transition: background-color 0.15s ease;
 }
 
-.paper-cycle-btn:hover {
+.paper-cycle-btn:hover:not(:disabled) {
   background: #FFFFFF;
+}
+
+.paper-cycle-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .paper-holder {
@@ -434,12 +433,17 @@ body {
   transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
-.scan-btn:hover {
+.scan-btn:hover:not(:disabled) {
   background: var(--card-blue-dark);
 }
 
-.scan-btn:active {
+.scan-btn:active:not(:disabled) {
   transform: scale(0.98);
+}
+
+.scan-btn:disabled {
+  opacity: 0.78;
+  cursor: default;
 }
 
 .scan-btn-icon {
@@ -563,6 +567,7 @@ body {
 }
 
 .menu-tile img {
+  display: block;
   width: 100%;
   height: 100%;
   min-height: 112px;

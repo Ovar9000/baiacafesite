@@ -102,44 +102,37 @@
   box-shadow: none !important;
 }
 
-/* Desktop Large (>= 1200px): Exactly 4 complete cards per screen width */
-/* At most three cards (newDrops.js LATEST_COUNT), so on laptops they always
-   fit in one centred row; phones and tablets swipe through them instead */
-.drop-card {
-  flex: 1 1 0;
-  min-width: 270px;
-  max-width: 360px;
-  scroll-snap-align: start;
-}
-
-@media (min-width: 1025px) {
+/* Desktop (> 900px): 3-column grid filling the single content column (matches .signature-row) */
+@media (min-width: 901px) {
   .drops-cards-grid {
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    overflow: visible;
+    padding: 8px 0 24px;
+    margin-bottom: 0;
+  }
+
+  .drop-card {
+    min-width: 0;
+    max-width: none;
   }
 }
 
-/* Tablet & Mobile (<= 1024px): Match boards reel margin & clean card widths without flush edge clipping */
-@media (max-width: 1024px) {
+/* Tablets and phones (<= 900px): full-bleed swipeable row with the next card peeking in */
+@media (max-width: 900px) {
   .drops-cards-grid {
-    gap: 16px;
-    padding: 14px 6px 32px 6px;
-    scroll-padding-inline: 6px;
-    margin-bottom: 12px;
+    gap: 14px;
+    margin: 0 calc(-1 * var(--container-padding)) 12px;
+    padding: 8px var(--container-padding) 24px;
+    scroll-padding-inline: var(--container-padding);
   }
   .drop-card {
-    flex: 0 0 clamp(280px, 78vw, 320px);
+    flex: 0 0 min(78vw, 320px);
+    min-width: 0;
     max-width: 320px;
+    scroll-snap-align: start;
   }
-  
-  
-}
-
-@media (max-width: 640px) {
-  .drop-card {
-    flex: 0 0 clamp(270px, 78vw, 310px);
-    max-width: 310px;
-  }
-  
 }
 
 /* Individual Drop Card */
@@ -233,9 +226,9 @@
 }
 
 .badge-event {
-  background: rgba(22, 37, 92, 0.9);
-  border: 1.5px solid var(--accent);
-  color: var(--accent);
+  background: rgba(14, 26, 69, 0.9);
+  border: 1px solid rgba(245, 233, 214, 0.35);
+  color: var(--cream);
 }
 
 .badge-giveaway {
@@ -308,15 +301,15 @@
 }
 
 .drop-time-pill {
-  background: rgba(16, 28, 75, 0.88);
+  background: rgba(14, 26, 69, 0.88);
   backdrop-filter: blur(8px);
-  color: var(--accent);
+  color: var(--cream);
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 700;
   padding: 4px 10px;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.22);
 }
 
 .drop-price-tag {
@@ -339,8 +332,8 @@
   position: absolute;
   bottom: 12px;
   left: 12px;
-  background: rgba(16, 28, 75, 0.94);
-  color: var(--accent);
+  background: rgba(14, 26, 69, 0.94);
+  color: var(--cream);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 800;
@@ -429,7 +422,8 @@
 }
 
 .btn-drop-order:hover {
-  background: var(--white);
+  background: var(--action-hover);
+  color: var(--on-action);
   transform: translateY(-2px);
 }
 
@@ -552,7 +546,7 @@
 
 .btn-drop-rsvp,
 .btn-drop-rsvp:hover {
-  color: var(--deep-navy);
+  color: var(--white);
 }
 
 .btn-drop-fb {

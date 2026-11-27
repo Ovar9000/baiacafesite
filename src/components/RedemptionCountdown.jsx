@@ -6,6 +6,7 @@ import { formatManilaDateTime } from '../lib/loyaltyHelpers';
 export default function RedemptionCountdown({ redemptionData, user, onClose }) {
   const TOTAL_SECONDS = 120;
   const [secondsLeft, setSecondsLeft] = useState(TOTAL_SECONDS);
+  const [fallbackRef] = useState(() => Math.floor(1000 + Math.random() * 9000));
 
   useEffect(() => {
     // Trigger celebratory confetti on redemption unlock
@@ -131,7 +132,7 @@ export default function RedemptionCountdown({ redemptionData, user, onClose }) {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span style={{ color: '#5A6987' }}>Ref ID:</span>
             <code style={{ background: '#E7DDCB', padding: '1px 6px', borderRadius: '4px', fontSize: '0.78rem' }}>
-              BAIA-{redemptionData?.redemptionId || Math.floor(1000 + Math.random() * 9000)}
+              BAIA-{redemptionData?.redemptionId || fallbackRef}
             </code>
           </div>
         </div>

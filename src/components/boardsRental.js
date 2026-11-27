@@ -90,7 +90,7 @@ export function renderCottageDetails(el) {
         </ul>
 
         <div class="cottage-actions">
-          <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow" style="background: #0084FF; color: #fff;">
+          <a href="https://m.me/thebaiacafe" target="_blank" rel="noopener" class="btn-primary-glow" style="background: #0068D6; color: #fff;">
             <span>Book via Facebook Messenger</span>
             <span aria-hidden="true">↗</span>
           </a>

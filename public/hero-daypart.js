@@ -5,6 +5,17 @@
  * also preloads its drinks poster.
  */
 (function () {
+  // Fast-path OAuth / magic-link callbacks that fall back to / before loading hero assets
+  if (
+    window.location.pathname === '/' &&
+    (window.location.search.indexOf('code=') !== -1 ||
+      window.location.hash.indexOf('access_token=') !== -1 ||
+      window.location.hash.indexOf('error=') !== -1)
+  ) {
+    window.location.replace('/card/' + window.location.search + window.location.hash);
+    return;
+  }
+
   // Manila is UTC+8 all year (no daylight saving)
   var hour = (Date.now() / 3600000 + 8) % 24;
   var part =

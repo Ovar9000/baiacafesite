@@ -2,8 +2,8 @@ import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 import { getDailyQrSecret, getSupabaseConfig, setCorsHeaders, isRateLimited, getClientIp, hashIp } from './_security.js';
 
-const CAFE_LAT = parseFloat(process.env.CAFE_LAT || '13.6218');
-const CAFE_LNG = parseFloat(process.env.CAFE_LNG || '123.1948');
+const CAFE_LAT = parseFloat(process.env.CAFE_LAT || '13.1362581');
+const CAFE_LNG = parseFloat(process.env.CAFE_LNG || '123.0233007');
 const CAFE_TIMEZONE = process.env.CAFE_TIMEZONE || 'Asia/Manila';
 const CAFE_OPEN_HOUR = parseInt(process.env.CAFE_OPEN_HOUR || '9', 10);
 const CAFE_CLOSE_HOUR = parseInt(process.env.CAFE_CLOSE_HOUR || '23', 10);
