@@ -1,0 +1,243 @@
+/* ==========================================================================
+   BAIA CAFE — Liquid glass
+   Behaviour (lens, moving light, press) is in src/components/liquidGlass.js.
+
+   Any element with .lg-glass is a thick piece of clear glass, with no
+   added lighting (no highlights, rim light or glow):
+   - a faint tint, so the page shows through in colour
+   - a fine edge, and two shadows: a tight contact shadow and a soft one,
+     so the glass floats above the page
+   - a press that swells under the finger and springs back
+   - Chromium only: a lens built for the piece's exact shape bends the page
+     behind its edges (--lg-lens)
+   - over the cream sections it turns to light glass with navy text
+
+   Used by: the phone header (BAIA pill, card button), the menu button, and
+   the hero's "Getting here" button.
+
+   Selectors start with html:root so they outrank main.css whatever order
+   the stylesheets load in (main.js also imports main.css).
+   ========================================================================== */
+
+:root {
+  /* A damped spring: overshoots a little, settles */
+  --spring: linear(0, 0.18 4%, 0.6 10%, 1.04 18%, 1.16 24%, 1.12 30%, 1.02 39%, 0.97 47%, 0.985 58%, 1.004 72%, 1);
+}
+
+html:root .lg-glass {
+  isolation: isolate;
+  border: 0;
+  color: var(--white);
+  background: var(--lg-tint, rgba(255, 255, 255, 0.06));
+  -webkit-backdrop-filter: blur(3px) saturate(170%);
+  backdrop-filter: blur(3px) saturate(170%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),  /* the glass edge */
+    0 1px 2px rgba(8, 14, 40, 0.28),            /* contact shadow */
+    0 12px 30px rgba(8, 14, 40, 0.3);           /* lifted off the page */
+  text-shadow: 0 1px 8px rgba(8, 14, 40, 0.45);
+  -webkit-tap-highlight-color: transparent;
+  /* The light/dark tone change is a slow cross-fade, not a blink */
+  --lg-tone-fade: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform 0.75s var(--spring),
+    color var(--lg-tone-fade),
+    background-color var(--lg-tone-fade),
+    box-shadow var(--lg-tone-fade),
+    text-shadow var(--lg-tone-fade),
+    -webkit-backdrop-filter var(--lg-tone-fade),
+    backdrop-filter var(--lg-tone-fade);
+}
+
+/* The name and icons follow the glass's text colour at the same pace */
+html:root .lg-glass .brand-wordmark,
+html:root .lg-glass svg {
+  transition: color var(--lg-tone-fade);
+}
+
+/* Pressed: the glass swells under the finger; release springs back */
+html:root .lg-glass.is-pressed {
+  transform: scale(1.08);
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.2),
+    color var(--lg-tone-fade),
+    background-color var(--lg-tone-fade),
+    box-shadow var(--lg-tone-fade),
+    backdrop-filter var(--lg-tone-fade);
+}
+
+html:root .lg-glass:focus-visible {
+  outline: 2px solid var(--golden-amber);
+  outline-offset: 3px;
+}
+
+/* Over the cream sections (liquidGlass.js adds .is-light): light glass with
+   navy text, frosted a little more so the words behind don't compete */
+html:root .lg-glass.is-light {
+  --lg-tint: rgba(255, 255, 255, 0.42);
+  color: var(--deep-navy);
+  text-shadow: none;
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  backdrop-filter: blur(10px) saturate(160%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+    0 1px 2px rgba(22, 37, 92, 0.16),
+    0 12px 30px rgba(22, 37, 92, 0.16);
+}
+
+html:root .lg-glass.is-light .brand-wordmark {
+  color: var(--deep-navy);
+}
+
+/* The name takes the glass's colour (white, or navy on light glass) */
+html:root .lg-glass .brand-wordmark {
+  color: inherit;
+}
+
+/* Chromium: the lens for this piece's shape (set by liquidGlass.js), with a
+   shared fallback lens until the script has built it */
+html:root.lg-refract .lg-glass {
+  backdrop-filter: var(--lg-lens, url(#lg-refract)) blur(1px) saturate(170%);
+}
+
+/* Once the page scrolls under the header, a little more blur keeps the
+   words passing behind from fighting the BAIA name */
+html:root .site-header.scrolled .lg-glass:not(.is-light) {
+  --lg-tint: rgba(14, 26, 69, 0.38);
+  -webkit-backdrop-filter: blur(4px) saturate(170%);
+  backdrop-filter: blur(4px) saturate(170%);
+}
+
+html:root.lg-refract .site-header.scrolled .lg-glass:not(.is-light) {
+  backdrop-filter: var(--lg-lens, url(#lg-refract)) blur(4px) saturate(170%);
+}
+
+html:root.lg-refract .lg-glass.is-light {
+  backdrop-filter: var(--lg-lens, url(#lg-refract)) blur(7px) saturate(160%);
+}
+
+/* --- Where the glass is used --------------------------------------------- */
+
+
+/* The hero's second button: a touch of navy so its white text reads on the
+   bright day and sunrise photos too */
+html:root .hero-cta-secondary.lg-glass {
+  --lg-tint: rgba(14, 26, 69, 0.3);
+}
+
+/* The menu button floats over every section, cream ones included */
+html:root .nav-menu-toggle.lg-glass:not(.is-light) {
+  --lg-tint: rgba(22, 37, 92, 0.35);
+}
+
+@media (hover: hover) {
+  html:root .nav-menu-toggle.lg-glass:not(.is-light):hover {
+    --lg-tint: rgba(22, 37, 92, 0.55);
+  }
+}
+
+/* The menu button stays out of the way over the hero and rises in once the
+   page scrolls (main.js adds .is-tucked near the top). A keyboard user who
+   tabs to it still sees it. */
+html:root .nav-menu-toggle.lg-glass.is-tucked:not(:focus-visible):not([aria-expanded="true"]) {
+  opacity: 0;
+  transform: translateY(calc(100% + 24px)) scale(0.9);
+  pointer-events: none;
+  transition:
+    transform 0.45s cubic-bezier(0.4, 0, 1, 1),
+    opacity 0.3s ease;
+}
+
+html:root .nav-menu-toggle.lg-glass {
+  transition:
+    transform 0.75s var(--spring),
+    opacity 0.35s ease,
+    color var(--lg-tone-fade),
+    background-color var(--lg-tone-fade),
+    box-shadow var(--lg-tone-fade),
+    backdrop-filter var(--lg-tone-fade);
+}
+
+/* Phones and tablets (where the nav links hide): the header bar splits into
+   two floating pieces, the BAIA pill and the loyalty-card button */
+@media (max-width: 900px) {
+  html:root .site-header .nav-container,
+  html:root .site-header.scrolled .nav-container {
+    padding: 0;
+    gap: 10px;
+    justify-content: space-between;
+    background: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+    pointer-events: none;
+  }
+
+  html:root .site-header .nav-container::before {
+    display: none;
+  }
+
+  html:root .site-header .lg-glass {
+    pointer-events: auto;
+  }
+
+  html:root .site-header .brand-logo-link {
+    height: 52px;
+    padding: 5px 18px 5px 5px;
+    gap: 9px;
+    border-radius: var(--radius-pill);
+  }
+
+  html:root .site-header .nav-loyalty-link {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  html:root .site-header .nav-loyalty-link .nav-icon-text {
+    display: none;
+  }
+
+  html:root .site-header .nav-loyalty-link svg {
+    width: 20px;
+    height: 20px;
+  }
+
+}
+
+/* Desktop keeps its single glass bar; the pieces inside it are not glass */
+@media (min-width: 901px) {
+  html:root .site-header .lg-glass {
+    background: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+    text-shadow: none;
+  }
+
+  html:root .site-header .nav-loyalty-link.lg-glass {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  html:root .site-header .nav-loyalty-link.lg-glass:hover {
+    border-color: var(--white);
+    color: var(--white);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:root .lg-glass,
+  html:root .lg-glass.is-pressed {
+    transform: none;
+    transition: color 0.3s ease, background-color 0.3s ease, opacity 0.3s ease;
+  }
+
+  html:root .nav-menu-toggle.lg-glass.is-tucked:not(:focus-visible):not([aria-expanded="true"]) {
+    transform: none;
+  }
+}

@@ -16,7 +16,8 @@
     "thumbs:wall": "node scripts/make-wall-thumbs.js",
     "images:optimize": "node scripts/optimize-images.js",
     "hero:models": "node scripts/build-hero-models.js",
-    "hero:poster": "node scripts/build-hero-poster.js"
+    "hero:poster": "node scripts/build-hero-poster.js",
+    "hero:inline": "node scripts/inline-hero-css.js"
   },
   "devDependencies": {
     "@gltf-transform/core": "^4.1.1",

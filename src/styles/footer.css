@@ -1,79 +1,86 @@
 /* ==========================================================================
-   BAIA CAFE — Footer: short on purpose
-     1. the visit card: open now?, the hours, the address, directions
-     2. Messenger and Instagram, side by side (and the loyalty card line)
-     3. one strip: the mark, the copyright, the legal links
-   One surface (the night-navy footer), one glass for the card and the
-   secondary buttons, one amber action (directions). Side by side on wide
-   screens, stacked on phones; the strip clears the phone's floating tab bar.
+   BAIA CAFE — Footer: Visit BAIA, the page's last section
+     1. a section header like every other one: "Visit BAIA" and the address
+     2. the hours card (open now?, hours, plus code, directions) beside
+        Messenger, Instagram and the loyalty-card line
+     3. one strip: the mark and copyright, then the other pages
+   It follows the page's rules (plans/brief.md, src/styles/system.css): the
+   same content column and left edge, the same title and lede sizes, the
+   same section spacing. One amber action: directions.
    ========================================================================== */
 
 .site-footer {
   --footer-glass: rgba(255, 255, 255, 0.06);
   --footer-glass-edge: rgba(255, 255, 255, 0.14);
   --footer-muted: rgba(245, 233, 214, 0.78);
-  --footer-pad: 22px;              /* the card's inner padding */
 
-  background: var(--depth-midnight-abyss, #0E1A45);
-  color: var(--white);
-  padding: 48px 0 0;
-  border-top: 4px solid var(--golden-amber);
   position: relative;
   overflow: hidden;
+  padding: var(--space-section, 96px) 0 0;
+  background: var(--depth-midnight-abyss, #0E1A45);
+  color: var(--white);
 }
 
+/* --- Header: the same as every section's -------------------------------- */
+.footer-head {
+  max-width: 760px;
+  margin: 0 0 var(--space-head, 40px);
+}
+
+.footer-title {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: var(--text-title, 2.5rem);
+  line-height: var(--leading-tight, 1.04);
+  letter-spacing: -0.025em;
+  color: var(--cream);
+  text-wrap: balance;
+}
+
+.footer-lede {
+  margin: var(--space-title-lede, 14px) 0 0;
+  max-width: var(--measure-lede, 52ch);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--text-lg, 1.2rem);
+  line-height: 1.5;
+  color: rgba(245, 233, 214, 0.86);
+  text-wrap: pretty;
+}
+
+/* --- The two columns, on the page's left edge ---------------------------- */
 .footer-top-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  gap: 24px 48px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px clamp(24px, 4vw, 56px);
   align-items: start;
-  max-width: 920px;
-  margin: 0 auto 40px;
+  margin: 0 0 clamp(48px, 5vw, 72px);
 }
 
-/* Headings: the same in both columns */
-.visit-card-title,
-.footer-col-title {
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 1.1rem;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: var(--white);
-  margin: 0;
-}
-
-/* ----------------------------------------------------------- Visit card */
+/* The hours card */
 .visit-card {
-  background: var(--footer-glass);
-  border: 1px solid var(--footer-glass-edge);
-  border-radius: var(--radius-xl);
-  padding: var(--footer-pad);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.visit-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 14px;
+  padding: 22px;
+  border-radius: var(--radius-lg);
+  background: var(--footer-glass);
+  border: 1px solid var(--footer-glass-edge);
 }
 
 .visit-status-pill {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   margin: 0;
-  font-size: 0.8rem;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: var(--text-sm, 0.94rem);
   font-weight: 700;
   color: var(--cream);
-  background: rgba(255, 255, 255, 0.08);
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
 }
 
 .visit-hours-list {
@@ -86,10 +93,10 @@
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 0.9rem;
-  line-height: 1.35;
-  padding: 7px 0;
+  padding: 10px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: var(--text-base, 1.06rem);
+  line-height: 1.35;
 }
 
 .visit-hours-list dt {
@@ -105,13 +112,14 @@
 
 .visit-address {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--text-sm, 0.94rem);
   line-height: 1.45;
-  color: var(--cream);
+  color: var(--footer-muted);
 }
 
 .visit-pluscode {
-  color: var(--footer-muted);
+  color: var(--cream);
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -120,31 +128,40 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 46px;
-  padding: 0 20px;
+  min-height: 48px;
+  padding: 0 22px;
   border-radius: var(--radius-pill);
   background: var(--golden-amber);
-  color: #1E1511;
-  font-weight: 800;
-  font-size: 0.95rem;
+  color: var(--deep-navy);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
   text-decoration: none;
-  transition: transform var(--duration-fast), filter var(--duration-fast);
+  transition: background-color var(--duration-fast);
 }
 
 .visit-directions-btn:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.05);
+  background: #FFB53D;
 }
 
-/* ---------------------------------------- Messenger, Instagram, loyalty */
-.footer-col-newsletter {
+/* Messenger, Instagram, and the loyalty card line */
+.footer-contact {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding-top: var(--footer-pad);   /* its heading level with "Visit us" */
+  gap: 14px;
 }
 
-/* The same glass button twice; only the icons carry their colours */
+.footer-col-title {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: var(--text-xl, 1.4rem);
+  line-height: var(--leading-snug, 1.3);
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--white);
+}
+
 .footer-buttons-stack {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -156,34 +173,32 @@
   align-items: center;
   justify-content: center;
   gap: 9px;
-  min-height: 46px;
+  min-height: 48px;
   padding: 0 14px;
   border-radius: var(--radius-pill);
   background: var(--footer-glass);
   border: 1px solid var(--footer-glass-edge);
   color: var(--white);
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 0.95rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
   text-decoration: none;
   white-space: nowrap;
-  transition: background-color var(--duration-fast), border-color var(--duration-fast), transform var(--duration-fast);
+  transition: background-color var(--duration-fast), border-color var(--duration-fast);
 }
 
 .footer-social-btn:hover {
   background: rgba(255, 255, 255, 0.11);
   border-color: rgba(255, 255, 255, 0.24);
-  transform: translateY(-1px);
 }
 
 .footer-social-btn.is-messenger svg { color: #2E9BFF; }
 .footer-social-btn.is-instagram svg { color: #FF5C93; }
 
-/* One quiet line for returning guests (the card itself lives at /card/) */
 .footer-loyalty-link {
   align-self: flex-start;
   color: var(--footer-muted);
-  font-size: 0.875rem;
+  font-size: var(--text-sm, 0.94rem);
   text-decoration: underline;
   text-decoration-color: rgba(245, 233, 214, 0.3);
   text-underline-offset: 4px;
@@ -195,22 +210,18 @@
   text-decoration-color: var(--golden-amber);
 }
 
-/* ----------------------------------------- The strip: mark, ©, legal */
+/* --- The strip ------------------------------------------------------------ */
 .footer-bottom-strip {
-  width: 100%;
+  padding: 18px 0 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 16px 0 18px;
-  background: rgba(0, 0, 0, 0.2);
 }
 
-/* The same width as the card and buttons above it */
-.footer-bottom-strip .footer-bottom-row {
-  max-width: calc(920px + 2 * var(--container-padding));
+.footer-bottom-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px 16px;
+  gap: 10px 24px;
 }
 
 .footer-copy-text {
@@ -218,9 +229,8 @@
   align-items: center;
   gap: 10px;
   margin: 0;
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.66);
-  line-height: 1.4;
+  font-size: var(--text-sm, 0.94rem);
+  color: var(--footer-muted);
 }
 
 .footer-logo-img {
@@ -231,67 +241,42 @@
   flex-shrink: 0;
 }
 
-.footer-social-links {
+.footer-links {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
-  gap: 4px 10px;
+  gap: 4px 22px;
 }
 
-.social-link {
+.footer-link {
+  padding: 6px 0;
+  font-size: var(--text-sm, 0.94rem);
+  font-weight: 600;
   color: var(--cream);
   text-decoration: none;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 700;
   white-space: nowrap;
-  padding: 6px 4px;
-  border-radius: var(--radius-sm);
   transition: color var(--duration-fast);
 }
 
-.social-link:hover {
+.footer-link:hover {
   color: var(--golden-amber);
 }
 
-.footer-sep {
-  color: rgba(255, 255, 255, 0.28);
-  user-select: none;
-  font-size: 0.8rem;
-}
-
-/* ---------------------------------------------------------------- Phones */
+/* --- Phones --------------------------------------------------------------- */
 @media (max-width: 768px) {
-  .site-footer {
-    --footer-pad: 18px;
-    padding-top: 32px;
-  }
-
   .footer-top-grid {
     grid-template-columns: 1fr;
-    gap: 22px;
-    margin-bottom: 28px;
+    gap: 36px;
   }
 
-  .footer-col-newsletter {
-    padding-top: 0;
-    gap: 10px;
+  /* Links first, copyright under them, all on the left edge; the bottom
+     padding clears the floating tab bar and menu button */
+  .footer-bottom-row {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 12px;
   }
 
   .footer-bottom-strip {
-    /* Clears the floating tab bar and menu button (54px, 12px off the edge) */
-    padding: 14px 0 calc(16px + 66px + env(safe-area-inset-bottom));
-  }
-
-  .footer-bottom-row {
-    flex-direction: column;
-    gap: 4px;
-  }
-}
-
-@media (max-width: 480px) {
-  /* No bullet dots on narrow phones, so none hangs between wrapped lines */
-  .footer-sep {
-    display: none;
+    padding: 16px 0 calc(max(12px, env(safe-area-inset-bottom)) + 54px + 28px);
   }
 }

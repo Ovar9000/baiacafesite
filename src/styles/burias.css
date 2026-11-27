@@ -1,0 +1,83 @@
+/* ==========================================================================
+   BAIA CAFE — Burias, through our lens
+   The island in our own photos, right after the hero (plans/brief.md).
+   One compact mosaic: a big photo, tall ones beside it, captions laid over
+   the bottom of each photo. Section padding and the header come from
+   system.css.
+   ========================================================================== */
+
+.burias-grid {
+  --row: clamp(150px, 14vw, 220px);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: var(--row);
+  grid-template-areas:
+    "milky  milky low   coral"
+    "milky  milky low   sundown"
+    "mounds dusk  dusk  sundown";
+  gap: clamp(8px, 1vw, 14px);
+}
+
+.shot-milky { grid-area: milky; }
+.shot-low { grid-area: low; }
+.shot-coral { grid-area: coral; }
+.shot-mounds { grid-area: mounds; }
+.shot-dusk { grid-area: dusk; }
+.shot-sundown { grid-area: sundown; }
+
+.burias-shot {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: #D9CDB8;
+}
+
+.burias-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Keep each photo's subject in frame at mosaic crops */
+.shot-milky img { object-position: 50% 70%; }
+.shot-coral img { object-position: 50% 40%; }
+.shot-dusk img { object-position: 50% 62%; }
+.shot-sundown img { object-position: 45% 60%; }
+
+/* Caption on a soft shade along the bottom of the photo */
+.burias-shot figcaption {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 36px 14px 12px;
+  background: linear-gradient(180deg, rgba(14, 26, 69, 0) 0%, rgba(14, 26, 69, 0.72) 100%);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: var(--leading-snug);
+  color: var(--white);
+  text-wrap: pretty;
+}
+
+@media (max-width: 640px) {
+  .burias-grid {
+    --row: 42vw;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "milky   milky"
+      "milky   milky"
+      "low     coral"
+      "low     mounds"
+      "sundown dusk"
+      "sundown dusk";
+    gap: 8px;
+  }
+
+  .burias-shot figcaption {
+    padding: 28px 10px 9px;
+    font-size: var(--text-xs);
+  }
+
+  .shot-dusk img { object-position: 42% 60%; }
+}

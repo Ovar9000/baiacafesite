@@ -4,6 +4,7 @@
 
 @import './fonts.css';
 @import './hero.css';
+@import './burias.css';
 @import './divider.css';
 @import './story.css';
 @import './promo-grid.css';
@@ -35,12 +36,13 @@
 
   /* Typography */
   --font-headline: 'Outfit', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
-  --font-display: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --font-display: 'Outfit', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
   --font-body: 'Outfit', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --font-tagline: 'DynaPuff', 'Outfit', system-ui, sans-serif;
   --font-script: 'Caveat', cursive;
   --font-fun: 'Playpen Sans', cursive;
-  --font-mono: 'Space Grotesk', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  --font-price: 'Space Grotesk', 'Outfit', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Outfit', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --font-price: 'Outfit', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
 
   /* Spacing Scale */
   --space-xs: 4px;
@@ -67,8 +69,9 @@
   --shadow-pop: 0 12px 0px var(--deep-navy);
 
   /* Layout */
-  --max-width: 1440px;
-  --container-padding: 20px;
+  --max-width: 1280px; /* the page's one content column, padding included */
+  /* 20px on tablets, growing to 72px on wide screens (phones: 16px below) */
+  --container-padding: clamp(20px, 5vw - 20px, 72px);
   --header-height: 80px;
 
   /* Transitions */
@@ -316,10 +319,11 @@ main,
 }
 
 /* Typography Utilities */
+/* The BAIA name: DynaPuff, the same face as the hero tagline */
 .wordmark {
-  font-family: var(--font-display);
-  font-weight: 900;
-  letter-spacing: -0.04em;
+  font-family: var(--font-tagline);
+  font-weight: 700;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
 }
 
@@ -523,8 +527,8 @@ main,
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.86rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  text-transform: none;
+  letter-spacing: 0;
   white-space: nowrap;
   padding: 9px 14px;
   border-radius: var(--radius-pill);
@@ -807,8 +811,8 @@ main,
   font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   user-select: none;
   transition: background-color 0.15s ease;
 }
@@ -979,8 +983,8 @@ main,
   font-family: var(--font-display);
   font-weight: 900;
   font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  text-transform: none;
+  letter-spacing: 0;
   padding: 0 16px;
   height: 38px;
   border-radius: var(--radius-pill);
@@ -2657,11 +2661,6 @@ dialog.checkout-modal-card::backdrop {
   color: var(--amber-contrast);
 }
 
-.visit-card-title,
-.footer-col-title {
-  text-transform: none;
-  letter-spacing: -0.01em;
-}
 
 /* ==========================================================================
    DEFERRED RENDERING

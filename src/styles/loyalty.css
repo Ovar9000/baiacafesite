@@ -115,7 +115,7 @@ body {
 }
 
 .loyalty-logo-title {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 1.1rem;
   letter-spacing: -0.02em;
@@ -205,7 +205,7 @@ body {
 }
 
 .card-holder-name {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-body);
   font-size: 1.25rem;
   font-weight: 700;
   color: #FFFFFF;
@@ -360,7 +360,7 @@ body {
 
 .stat-lifetime-value {
   font-weight: 700;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-body);
   color: #FFE699;
   font-size: 1.1rem;
 }
@@ -447,7 +447,7 @@ body {
 }
 
 .section-card-title {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-body);
   font-size: 1.05rem;
   font-weight: 700;
   color: #131314;
@@ -526,7 +526,7 @@ body {
 }
 
 .auth-card h3 {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-body);
   font-size: 1.35rem;
   font-weight: 800;
   color: #131314;
@@ -896,7 +896,7 @@ body {
 }
 
 .timer-seconds {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-body);
   font-size: 2rem;
   font-weight: 800;
   color: #131314;
@@ -944,7 +944,7 @@ body {
 }
 
 .standee-title {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-body);
   font-size: 1.6rem;
   font-weight: 800;
   color: #131314;

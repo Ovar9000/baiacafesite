@@ -5,6 +5,7 @@ import { initCartDrawer } from './components/cartDrawer.js';
 import { initNewDrops } from './components/newDrops.js';
 import { initCommunityWall } from './components/communityWall.js';
 import { initOpenStatus } from './components/openStatus.js';
+import { initLiquidGlass } from './components/liquidGlass.js';
 import { initGlassNav } from './components/glassNav.js';
 import { initNavDrawer } from './components/navDrawer.js';
 import { cartStore } from './components/cartStore.js';
@@ -91,6 +92,7 @@ function initApp() {
 
   safeInit('rootAuth', handleRootAuthCallback);
   safeInit('openStatus', initOpenStatus);
+  safeInit('liquidGlass', initLiquidGlass);
   safeInit('glassNav', initGlassNav);
   safeInit('navDrawer', initNavDrawer);
   safeInit('loyaltyPrefetch', initLoyaltyPrefetch);
@@ -113,8 +115,12 @@ function initApp() {
 
   // Scroll Header Glassmorphism Effect
   const header = document.getElementById('site-header');
+  // Phones: the round menu button waits off-screen while the hero is at
+  // rest, so the hero's buttons have the bottom of the screen to themselves
+  const menuToggle = document.querySelector('.nav-menu-toggle');
   const updateHeader = () => {
     header?.classList.toggle('scrolled', window.scrollY > 30);
+    menuToggle?.classList.toggle('is-tucked', window.scrollY < 60);
   };
   window.addEventListener('scroll', updateHeader, { passive: true });
   requestAnimationFrame(updateHeader);

@@ -58,3 +58,6 @@ models/hero/*.raw.glb
 .shoot-full.mjs
 social/
 
+
+# Full-size photo originals; the site serves the WebPs made from them
+photos/
