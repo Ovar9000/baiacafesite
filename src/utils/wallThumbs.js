@@ -31,3 +31,17 @@ export function thumbPathFor(photoUrl) {
   if (!base) return null;
   return THUMB_DIR + encodeURIComponent(base) + '.webp';
 }
+
+/**
+ * On phones (≤ 640px, matching main.css) the wall is a swipeable row of
+ * ~260px polaroids, far bigger than the 200px thumb, so they get the full
+ * photo there. Larger screens keep the thumb for the small cup tiles.
+ */
+export const WALL_ROW_MEDIA = '(max-width: 640px)';
+
+/** Tile image markup. Both arguments must already be HTML-attribute-escaped. */
+export function wallTileImgHTML(photoAttr, tileAttr) {
+  const img = `<img src="${tileAttr}" alt="BAIA Family guest photo" class="mosaic-photo-img" loading="lazy" />`;
+  if (!photoAttr || photoAttr === tileAttr) return img;
+  return `<picture><source media="${WALL_ROW_MEDIA}" srcset="${photoAttr}" />${img}</picture>`;
+}

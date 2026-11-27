@@ -496,6 +496,20 @@ describe('wall thumbnails', () => {
     assert.match(html, /<img src="\/images\/thumbs\/guest_x\.webp"/);
   });
 
+  it('phones load the full photo for the large swipe-row polaroids', () => {
+    const html = buildCommunityCardHTML({ photo_url: '/images/community/guest_x.jpg' }, 0);
+    assert.match(html, /<source media="\(max-width: 640px\)" srcset="\/images\/community\/guest_x\.jpg" \/>/);
+    const remote = buildCommunityCardHTML({ photo_url: 'https://scontent-mnl3-1.xx.fbcdn.net/a.jpg' }, 0);
+    assert.doesNotMatch(remote, /<picture>/);
+  });
+
+  it('every static wall tile in index.html has a full-size phone source', () => {
+    const html = read('index.html');
+    const tiles = html.match(/class="mosaic-photo-img"/g).length;
+    const sources = html.match(/<picture><source media="\(max-width: 640px\)" srcset="[^"]+" \/><img [^>]*class="mosaic-photo-img"/g) || [];
+    assert.equal(sources.length, tiles);
+  });
+
   it('every static wall tile in index.html points at an existing thumb', () => {
     const html = read('index.html');
     const srcs = [...html.matchAll(/<img\s+src="([^"]+)"[^>]*class="mosaic-photo-img"/g)].map((m) => m[1]);

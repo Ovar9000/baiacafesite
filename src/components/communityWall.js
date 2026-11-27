@@ -15,7 +15,7 @@
  */
 
 import { escapeHtml, sanitizeUrl } from '../utils/sanitize.js';
-import { thumbPathFor } from '../utils/wallThumbs.js';
+import { thumbPathFor, wallTileImgHTML } from '../utils/wallThumbs.js';
 import { applyWallLayout } from '../utils/wallLayout.js';
 import { whenNear } from '../utils/whenNear.js';
 
@@ -23,7 +23,7 @@ const MAX_HYDRATED_CARDS = 8;
 
 export function buildCommunityCardHTML(item) {
   const photo = String(item.photo_url || '');
-  // Tile shows a small local WebP when one exists; the lightbox keeps the full photo.
+  // Tile shows a small WebP when one exists (full photo on phones); the lightbox keeps the full photo.
   const tile = thumbPathFor(photo) || photo;
   // Show only what was actually posted; no placeholder praise or names.
   const quote = String(item.caption || '');
@@ -40,7 +40,7 @@ export function buildCommunityCardHTML(item) {
     ` data-permalink="${escapeHtml(sanitizeUrl(permalink, 'https://www.facebook.com/thebaiacafe'))}"` +
     ` data-community-hydrated="1" aria-label="View photo by ${escapeHtml(author)}">` +
     `<div class="mosaic-photo-frame">` +
-    `<img src="${escapeHtml(tile)}" alt="BAIA Family guest photo" class="mosaic-photo-img" loading="lazy" />` +
+    wallTileImgHTML(escapeHtml(photo), escapeHtml(tile)) +
     `</div></button>`
   );
 }

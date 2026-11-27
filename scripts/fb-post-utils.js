@@ -17,7 +17,7 @@
  * import this file safely.
  */
 
-import { thumbPathFor } from '../src/utils/wallThumbs.js';
+import { thumbPathFor, wallTileImgHTML } from '../src/utils/wallThumbs.js';
 
 export const FB_GRAPH_VERSION = 'v19.0';
 
@@ -241,7 +241,7 @@ export function buildCommunityCardHTML(item) {
     ` data-wall-id="${escapeHtmlAttr(item.id || '')}" data-photo="${photo}" data-quote="${quote}" data-author="${author}" data-meta="${meta}"` +
     ` data-permalink="${permalink}" data-community-hydrated="1" aria-label="View photo by ${author}">` +
     `<div class="mosaic-photo-frame">` +
-    `<img src="${tile}" alt="BAIA Family guest photo" class="mosaic-photo-img" loading="lazy" />` +
+    wallTileImgHTML(photo, tile) +
     `</div></button>`
   );
 }

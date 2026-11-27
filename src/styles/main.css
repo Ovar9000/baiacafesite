@@ -1287,6 +1287,11 @@ main,
   position: relative;
 }
 
+/* Phones swap in the full photo through <picture>; let the img size to the frame */
+.mosaic-photo-frame > picture {
+  display: contents;
+}
+
 .mosaic-photo-img {
   width: 100%;
   height: 100%;
