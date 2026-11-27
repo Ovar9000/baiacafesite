@@ -1,0 +1,137 @@
+/* ==========================================================================
+   BAIA CAFE — Design system: the rules every homepage section follows
+   (written up in plans/brief.md, "Type and spacing rules").
+
+   Loaded after main.css (see index.html), so these win over the older
+   per-section rules without !important. To change how all sections look,
+   change a token here rather than a section's own stylesheet.
+
+   Markup contract:
+     <section class="page-section" data-theme="…">
+       <div class="container">
+         <div class="section-head">
+           <h2 class="section-title">…</h2>
+           <p class="section-lede">…</p>
+         </div>
+         …content…
+   ========================================================================== */
+
+:root {
+  /* Type scale: steps of about 1.25 from a 17px body */
+  --text-xs: 0.8125rem;                                   /* 13px: meta, badges */
+  --text-sm: 0.9375rem;                                   /* 15px: captions, small UI */
+  --text-base: 1.0625rem;                                 /* 17px: body */
+  --text-lg: clamp(1.125rem, 1rem + 0.35vw, 1.3125rem);   /* 18→21px: section ledes */
+  --text-xl: clamp(1.25rem, 1.1rem + 0.45vw, 1.5rem);     /* 20→24px: card titles */
+  --text-title: clamp(2rem, 1.3rem + 2.7vw, 3.25rem);     /* 32→52px: section titles */
+  /* The hero tagline is the only size above this (hero.css) */
+
+  --leading-tight: 1.04;   /* titles */
+  --leading-snug: 1.3;     /* UI, card titles */
+  --leading-body: 1.6;     /* paragraphs */
+
+  --measure-lede: 52ch;
+  --measure-body: 62ch;
+
+  /* Spacing: one rhythm for the whole page */
+  --space-section: clamp(64px, 4.5vw + 40px, 120px);      /* top and bottom of a section */
+  --space-section-join: clamp(16px, 1.5vw + 8px, 32px);   /* top, when the section above has the same background */
+  --space-head: clamp(28px, 1.8vw + 20px, 48px);          /* section header to its content */
+  --space-title-lede: 14px;                               /* title to lede */
+}
+
+/* --- Sections ------------------------------------------------------------ */
+
+main > .page-section {
+  padding-top: var(--space-section);
+  padding-bottom: var(--space-section);
+}
+
+/* Sections alternate sand and navy (plans/brief.md, "Homepage order").
+   If two ever share a background, they read as one stretch: no double
+   padding between them */
+main > .page-section[data-theme="sand"] + .page-section[data-theme="sand"] {
+  padding-top: var(--space-section-join);
+}
+
+/* --- One content column --------------------------------------------------
+   Every section's header and content share the container's left edge.
+   The container caps at --max-width (main.css); nothing inside narrows
+   and re-centres itself. */
+
+/* --- Section headers: one style, one left edge ---------------------------- */
+
+main .page-section .section-head {
+  display: block;
+  max-width: 760px;
+  margin: 0 0 var(--space-head);
+  padding: 0;
+  text-align: left;
+}
+
+main .page-section .section-head .section-title {
+  display: block;
+  margin: 0;
+  max-width: 20ch;
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: var(--text-title);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.025em;
+  text-transform: none;
+  text-align: left;
+  text-shadow: none;
+  text-wrap: balance;
+  transform: none;
+}
+
+main .page-section .section-head .section-lede {
+  display: block;
+  margin: var(--space-title-lede) 0 0;
+  max-width: var(--measure-lede);
+  padding: 0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--text-lg);
+  line-height: 1.5;
+  text-align: left;
+  text-wrap: pretty;
+  opacity: 1;
+}
+
+/* Longer body copy that sits in a header (About) */
+main .page-section .section-head .section-lede.is-body {
+  max-width: var(--measure-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+
+/* Title and lede colour per background */
+main [data-theme="sand"] .section-head .section-title,
+main [data-theme="sand-deck"] .section-head .section-title {
+  color: var(--deep-navy);
+}
+
+main [data-theme="navy-deep"] .section-head .section-title,
+main [data-theme="ocean-depth"] .section-head .section-title {
+  color: var(--cream);
+}
+
+
+main [data-theme="sand"] .section-head .section-lede,
+main [data-theme="sand-deck"] .section-head .section-lede {
+  color: #3E4C70;
+}
+
+main [data-theme="navy-deep"] .section-head .section-lede,
+main [data-theme="ocean-depth"] .section-head .section-lede {
+  color: rgba(245, 233, 214, 0.86);
+}
+
+/* Sections whose old header carried its own wrapper spacing */
+main .page-section .section-head .promo-doodle-container {
+  display: block;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}

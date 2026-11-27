@@ -36,7 +36,7 @@
   font-weight: 900;
   font-size: clamp(1.9rem, 4vw, 2.6rem);
   line-height: 1.05;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: -0.035em;
   color: var(--deep-navy);
 }
@@ -226,16 +226,16 @@
 }
 
 .badge-drop {
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   font-weight: 900;
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .badge-event {
   background: rgba(22, 37, 92, 0.9);
-  border: 1.5px solid var(--golden-amber);
-  color: var(--golden-amber);
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
 }
 
 .badge-giveaway {
@@ -273,32 +273,32 @@
 }
 
 .badge-winner {
-  background: var(--golden-amber);
+  background: var(--action);
   border: 1px solid rgba(255, 255, 255, 0.6);
-  color: var(--deep-navy);
+  color: var(--on-action);
   font-weight: 900;
 }
 
 .tag-winner {
-  background: rgba(217, 119, 6, 0.9) !important;
+  background: var(--royal-blue) !important;
   color: #ffffff !important;
   font-weight: 800;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
 .status-winner {
-  color: var(--golden-amber) !important;
+  color: var(--accent) !important;
   font-weight: 800;
 }
 
 .btn-drop-winner {
-  background: var(--golden-amber) !important;
-  color: var(--deep-navy) !important;
+  background: var(--action) !important;
+  color: var(--on-action) !important;
   font-weight: 800 !important;
 }
 
 .btn-drop-winner:hover {
-  background: #fcd34d !important;
+  background: var(--action-hover) !important;
   transform: translateY(-2px);
   color: #0c1a63 !important;
 }
@@ -310,7 +310,7 @@
 .drop-time-pill {
   background: rgba(16, 28, 75, 0.88);
   backdrop-filter: blur(8px);
-  color: var(--amber-contrast);
+  color: var(--accent);
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 700;
@@ -323,8 +323,8 @@
   position: absolute;
   bottom: 12px;
   right: 12px;
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   font-family: var(--font-price, var(--font-headline));
   font-weight: 900;
   font-size: 1.15rem;
@@ -340,7 +340,7 @@
   bottom: 12px;
   left: 12px;
   background: rgba(16, 28, 75, 0.94);
-  color: var(--amber-contrast);
+  color: var(--accent);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 800;
@@ -371,7 +371,7 @@
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.1em;
-  color: var(--amber-contrast);
+  color: var(--accent);
 }
 
 .drop-card-title {
@@ -408,8 +408,8 @@
   flex: 1;
   height: 42px;
   min-height: 42px;
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   border: none;
   font-family: var(--font-display);
   font-weight: 900;

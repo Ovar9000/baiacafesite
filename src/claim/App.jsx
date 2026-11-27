@@ -21,6 +21,7 @@ import {
 import AuthModal from '../components/AuthModal';
 import QrScanner from '../components/QrScanner';
 import '../styles/loyalty.css';
+import '../styles/card.css';
 
 export default function ClaimApp() {
   const [session, setSession] = useState(null);
@@ -147,7 +148,7 @@ export default function ClaimApp() {
     return (
       <div className="loyalty-app-wrapper" style={{ justifyContent: 'center', alignItems: 'center' }}>
         <div style={{ textAlign: 'center', padding: '40px' }}>
-          <Loader2 className="animate-spin" size={36} color="#131314" style={{ margin: '0 auto 16px' }} />
+          <Loader2 className="animate-spin" size={36} color="#16255C" style={{ margin: '0 auto 16px' }} />
           <p style={{ color: 'var(--loyalty-text-muted)', fontSize: '0.9rem' }}>Loading claim verification...</p>
         </div>
       </div>
@@ -159,10 +160,10 @@ export default function ClaimApp() {
       {/* Header */}
       <header className="loyalty-header">
         <a href="/" className="loyalty-logo-lockup" title="Return to BAIA Café">
-          <img src="/images/Logo-black.webp" alt="BAIA Cafe Logo" className="loyalty-logo-img" />
+          <img src="/images/Logo.webp" alt="BAIA Cafe Logo" className="loyalty-logo-img" />
           <div className="loyalty-logo-title-group">
-            <div className="loyalty-logo-title">BAIA CAFÉ</div>
-            <div className="loyalty-logo-sub">STAMP DISPENSER</div>
+            <div className="loyalty-logo-title">BAIA</div>
+            <div className="loyalty-logo-sub">Collect your stamp</div>
           </div>
         </a>
       </header>
@@ -171,7 +172,7 @@ export default function ClaimApp() {
         {!user ? (
           <div>
             <AuthModal 
-              title="Claim Your Daily Coffee Stamp"
+              title="Claim your daily coffee stamp"
               subtitle="Sign in to record your stamp and earn free drinks & merchandise."
               onSuccess={(s) => {
                 setSession(s);
@@ -196,9 +197,9 @@ export default function ClaimApp() {
                   }}
                 />
 
-                <div style={{ background: '#FAF4EB', padding: '16px', borderRadius: '14px', border: '1px solid #E2E8F0', textAlign: 'left', marginTop: '20px', marginBottom: '20px' }}>
+                <div style={{ background: '#FAF4EB', padding: '16px', borderRadius: '14px', border: '1px solid #E7DDCB', textAlign: 'left', marginTop: '20px', marginBottom: '20px' }}>
                   <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--loyalty-navy)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <KeyRound size={16} color="#FB923C" />
+                    <KeyRound size={16} color="#1E4AFF" />
                     <span>Or enter QR token manually:</span>
                   </div>
                   <form onSubmit={handleManualClaimSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -220,8 +221,8 @@ export default function ClaimApp() {
                 <a
                   href="/card/"
                   style={{
-                    background: '#F1F5F9',
-                    color: '#475569',
+                    background: '#F3ECDF',
+                    color: '#4A5878',
                     textDecoration: 'none',
                     padding: '12px 20px',
                     borderRadius: '9999px',
@@ -242,9 +243,9 @@ export default function ClaimApp() {
                   width: '64px',
                   height: '64px',
                   borderRadius: '50%',
-                  background: '#F1F5F9',
-                  color: '#131314',
-                  border: '1px solid #E2E8F0',
+                  background: '#F3ECDF',
+                  color: '#16255C',
+                  border: '1px solid #E7DDCB',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -252,7 +253,7 @@ export default function ClaimApp() {
                 }}>
                   <Loader2 className="animate-spin" size={32} />
                 </div>
-                <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#131314', marginBottom: '8px' }}>
+                <h3 style={{ fontFamily: 'Outfit, sans-serif', color: '#16255C', marginBottom: '8px' }}>
                   {claimStatus === 'locating' ? 'Verifying Physical Location' : 'Claiming Drink Stamp'}
                 </h3>
                 <p style={{ fontSize: '0.88rem', color: 'var(--loyalty-text-muted)', maxWidth: '300px', margin: '0 auto' }}>
@@ -279,18 +280,18 @@ export default function ClaimApp() {
                   <CheckCircle2 size={42} />
                 </div>
 
-                <h2 style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--loyalty-navy)', fontSize: '1.45rem', marginBottom: '8px' }}>
+                <h2 style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--loyalty-navy)', fontSize: '1.45rem', marginBottom: '8px' }}>
                   Stamp Collected!
                 </h2>
 
-                <p style={{ fontSize: '0.92rem', color: '#475569', marginBottom: '20px', lineHeight: '1.4' }}>
+                <p style={{ fontSize: '0.92rem', color: '#4A5878', marginBottom: '20px', lineHeight: '1.4' }}>
                   {statusMessage}
                 </p>
 
                 {claimResult?.rewardUnlockedNow && (
                   <div style={{
-                    background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
-                    border: '2px solid #FCD34D',
+                    background: 'linear-gradient(135deg, #EEF2FF 0%, #E6ECFF 100%)',
+                    border: '2px solid #AFC2FF',
                     borderRadius: '16px',
                     padding: '16px',
                     marginBottom: '20px',
@@ -299,16 +300,16 @@ export default function ClaimApp() {
                     gap: '12px',
                     textAlign: 'left'
                   }}>
-                    <div style={{ padding: '10px', background: '#F59E0B', color: '#FFF', borderRadius: '12px' }}>
+                    <div style={{ padding: '10px', background: '#1E4AFF', color: '#FFF', borderRadius: '12px' }}>
                       <Gift size={24} />
                     </div>
                     <div>
-                       <h4 style={{ color: '#78350F', fontSize: '0.95rem', margin: '0 0 4px' }}>Milestone Reward Unlocked!</h4>
-                      <p style={{ color: '#92400E', fontSize: '0.8rem', margin: 0 }}>
+                       <h4 style={{ color: '#16255C', fontSize: '0.95rem', margin: '0 0 4px' }}>Milestone Reward Unlocked!</h4>
+                      <p style={{ color: '#16255C', fontSize: '0.8rem', margin: 0 }}>
                         You now have a free coffee reward ready to redeem at the counter!
                       </p>
                       {claimResult?.bonusAwarded && (
-                        <p style={{ color: '#92400E', fontSize: '0.8rem', margin: '6px 0 0', fontWeight: 700 }}>
+                        <p style={{ color: '#16255C', fontSize: '0.8rem', margin: '6px 0 0', fontWeight: 700 }}>
                           Plus 1 bonus stamp on us: your next card already has its first stamp.
                         </p>
                       )}
@@ -320,19 +321,19 @@ export default function ClaimApp() {
                 {claimResult?.wifiVoucher && (
                   <div style={{
                     background: '#FFFFFF',
-                    border: '1.5px solid #E2E8F0',
+                    border: '1.5px solid #E7DDCB',
                     borderRadius: '16px',
                     padding: '16px',
                     marginBottom: '20px',
                     textAlign: 'left',
-                    boxShadow: '0 4px 16px rgba(19, 19, 20, 0.06)'
+                    boxShadow: '0 4px 16px rgba(22, 37, 92, 0.06)'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                       <div style={{
                         width: '28px',
                         height: '28px',
                         borderRadius: '8px',
-                        background: '#131314',
+                        background: '#16255C',
                         color: '#FFF',
                         display: 'flex',
                         alignItems: 'center',
@@ -340,14 +341,14 @@ export default function ClaimApp() {
                       }}>
                         <Wifi size={16} />
                       </div>
-                      <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#131314', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#16255C', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         Free Beach Wi-Fi Voucher
                       </span>
                     </div>
 
                     <div style={{
-                      background: '#F8FAFC',
-                      border: '1.5px dashed #CBD5E1',
+                      background: '#FBF6EE',
+                      border: '1.5px dashed #D9CFBC',
                       borderRadius: '12px',
                       padding: '10px 14px',
                       display: 'flex',
@@ -356,8 +357,8 @@ export default function ClaimApp() {
                       marginBottom: '10px'
                     }}>
                       <div>
-                        <div style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 700 }}>HOTSPOT VOUCHER CODE</div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#131314', letterSpacing: '2.5px', fontFamily: 'monospace' }}>
+                        <div style={{ fontSize: '0.68rem', color: '#5A6987', fontWeight: 700 }}>HOTSPOT VOUCHER CODE</div>
+                        <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#16255C', letterSpacing: '2.5px', fontFamily: 'monospace' }}>
                           {claimResult.wifiVoucher.code}
                         </div>
                       </div>
@@ -371,7 +372,7 @@ export default function ClaimApp() {
                           }
                         }}
                         style={{
-                          background: copiedVoucher ? '#16A34A' : '#131314',
+                          background: copiedVoucher ? '#16A34A' : '#16255C',
                           color: '#FFFFFF',
                           border: 'none',
                           padding: '8px 14px',
@@ -382,7 +383,7 @@ export default function ClaimApp() {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '6px',
-                          boxShadow: '0 2px 6px rgba(19, 19, 20, 0.15)',
+                          boxShadow: '0 2px 6px rgba(22, 37, 92, 0.15)',
                           transition: 'background 0.2s ease'
                         }}
                       >
@@ -391,7 +392,7 @@ export default function ClaimApp() {
                       </button>
                     </div>
 
-                    <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
+                    <p style={{ fontSize: '0.76rem', color: '#5A6987', margin: 0, lineHeight: '1.4' }}>
                       <strong>1 Hour Duration</strong> • Valid for up to <strong>2 devices</strong> (phone + laptop). Connect to <em>"BAIA Free Wifi"</em> and paste this voucher code into the login portal.
                     </p>
                   </div>
@@ -421,8 +422,8 @@ export default function ClaimApp() {
                   <a
                     href="/"
                     style={{
-                      background: '#F1F5F9',
-                      color: '#475569',
+                      background: '#F3ECDF',
+                      color: '#4A5878',
                       textDecoration: 'none',
                       padding: '12px',
                       borderRadius: '9999px',
@@ -453,11 +454,11 @@ export default function ClaimApp() {
                   <AlertCircle size={36} />
                 </div>
 
-                <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#B91C1C', fontSize: '1.25rem', marginBottom: '8px' }}>
+                <h3 style={{ fontFamily: 'Outfit, sans-serif', color: '#B91C1C', fontSize: '1.25rem', marginBottom: '8px' }}>
                   Could Not Award Stamp
                 </h3>
 
-                <p style={{ fontSize: '0.88rem', color: '#475569', marginBottom: '24px', lineHeight: '1.5' }}>
+                <p style={{ fontSize: '0.88rem', color: '#4A5878', marginBottom: '24px', lineHeight: '1.5' }}>
                   {statusMessage}
                 </p>
 
@@ -486,8 +487,8 @@ export default function ClaimApp() {
                   <a
                     href="/card/"
                     style={{
-                      background: '#F1F5F9',
-                      color: '#475569',
+                      background: '#F3ECDF',
+                      color: '#4A5878',
                       textDecoration: 'none',
                       padding: '12px',
                       borderRadius: '9999px',

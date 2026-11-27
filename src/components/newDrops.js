@@ -128,9 +128,9 @@ export function initNewDrops() {
       .slice(0, LATEST_COUNT);
 
     container.innerHTML = `
-      <div class="drops-header-block">
-        <h2 class="drops-headline">What's new</h2>
-        <p class="drops-subtitle">
+      <div class="drops-header-block section-head">
+        <h2 class="drops-headline section-title">What's new</h2>
+        <p class="drops-subtitle section-lede">
           The latest from the kitchen and the shore.
           <a href="https://www.facebook.com/thebaiacafe" target="_blank" rel="noopener" class="drops-more-link">More on Facebook <span aria-hidden="true">&#8599;</span></a>
         </p>

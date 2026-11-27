@@ -37,7 +37,7 @@ export default function LegalModal({ type, onClose }) {
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(15, 23, 42, 0.78)',
+        background: 'rgba(22, 37, 92, 0.78)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         zIndex: 99999,
@@ -59,8 +59,8 @@ export default function LegalModal({ type, onClose }) {
           maxHeight: 'min(85vh, calc(100dvh - 32px))',
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: '0 25px 60px -12px rgba(15, 23, 42, 0.35)',
-          border: '1.5px solid rgba(19, 19, 20, 0.08)',
+          boxShadow: '0 25px 60px -12px rgba(22, 37, 92, 0.35)',
+          border: '1.5px solid rgba(22, 37, 92, 0.08)',
           overflow: 'hidden',
           textAlign: 'left',
           animation: 'legalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards'
@@ -69,17 +69,17 @@ export default function LegalModal({ type, onClose }) {
         {/* Header: Flush left-aligned matching the body's horizontal margin */}
         <div style={{
           padding: '22px 24px 18px',
-          borderBottom: '1px solid #F1F5F9',
+          borderBottom: '1px solid #F3ECDF',
           background: '#FAF4EB',
           textAlign: 'left'
         }}>
           <h2 
             id="legal-modal-title"
             style={{
-              fontFamily: 'Space Grotesk, sans-serif',
+              fontFamily: 'Outfit, sans-serif',
               fontSize: '1.35rem',
               fontWeight: 800,
-              color: '#131314',
+              color: '#16255C',
               margin: '0 0 4px',
               lineHeight: 1.25,
               textAlign: 'left'
@@ -87,7 +87,7 @@ export default function LegalModal({ type, onClose }) {
           >
             {isTerms ? 'Terms of Service' : 'Privacy Policy'}
           </h2>
-          <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748B', textAlign: 'left' }}>
+          <p style={{ margin: 0, fontSize: '0.78rem', color: '#5A6987', textAlign: 'left' }}>
             BAIA Café • San Pascual, Burias Island
           </p>
         </div>
@@ -108,14 +108,14 @@ export default function LegalModal({ type, onClose }) {
           {isTerms ? (
             <>
               <section>
-                <h4 style={{ color: '#131314', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>1. Acceptance of Terms</h4>
+                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>1. Acceptance of Terms</h4>
                 <p style={{ margin: 0, textAlign: 'left' }}>
                   By accessing <strong>https://www.baia.cafe</strong> and participating in the <strong>BAIA Café Loyalty Program</strong>, you agree to these Terms. If you do not agree, you may freely browse the site without creating an account.
                 </p>
               </section>
 
               <section>
-                <h4 style={{ color: '#131314', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>2. BAIA Café Loyalty Rules</h4>
+                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>2. BAIA Café Loyalty Rules</h4>
                 <ul style={{ margin: '0', paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', textAlign: 'left' }}>
                   <li><strong>Earning Stamps:</strong> Receive 1 digital stamp per qualifying handcrafted beverage purchased at BAIA Café by scanning the official daily standee QR code.</li>
                   <li><strong>Daily Limit:</strong> Maximum of 1 stamp per account per calendar day (Asia/Manila timezone).</li>
@@ -127,23 +127,23 @@ export default function LegalModal({ type, onClose }) {
               </section>
 
               <section>
-                <h4 style={{ color: '#131314', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>3. User Security &amp; Fair Play</h4>
+                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>3. User Security &amp; Fair Play</h4>
                 <p style={{ margin: 0, textAlign: 'left' }}>
                   You are responsible for your account credentials. Tampering, attempting to forge QR tokens, or automating claims will result in immediate disqualification and account closure.
                 </p>
               </section>
 
               <section>
-                <h4 style={{ color: '#131314', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>4. Governing Law &amp; Contact</h4>
+                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>4. Governing Law &amp; Contact</h4>
                 <p style={{ margin: 0, textAlign: 'left' }}>
-                  These terms are governed by the laws of the Republic of the Philippines. For inquiries, email us at <a href="mailto:quibotmark@gmail.com" style={{ color: '#131314', fontWeight: 600 }}>quibotmark@gmail.com</a> or visit us at Barangay Laurente, San Pascual, Burias Island, Masbate.
+                  These terms are governed by the laws of the Republic of the Philippines. For inquiries, email us at <a href="mailto:quibotmark@gmail.com" style={{ color: '#16255C', fontWeight: 600 }}>quibotmark@gmail.com</a> or visit us at Barangay Laurente, San Pascual, Burias Island, Masbate.
                 </p>
               </section>
             </>
           ) : (
             <>
               <section>
-                <h4 style={{ color: '#131314', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>1. Information We Collect</h4>
+                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>1. Information We Collect</h4>
                 <ul style={{ margin: '0', paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', textAlign: 'left' }}>
                   <li><strong>Profile Info:</strong> Name, email address, and avatar provided via Google Sign-In or email OTP to identify your loyalty card.</li>
                   <li><strong>Zero Location / GPS Tracking:</strong> We do not track or store your device GPS location. In-store visits are verified purely by scanning the counter QR code.</li>
@@ -153,23 +153,23 @@ export default function LegalModal({ type, onClose }) {
               </section>
 
               <section>
-                <h4 style={{ color: '#131314', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>2. How We Use Data</h4>
+                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>2. How We Use Data</h4>
                 <p style={{ margin: 0, textAlign: 'left' }}>
                   Your information is solely used to maintain your 10-stamp loyalty card, issue Wi-Fi passes, and notify baristas when you are eligible for rewards. We never sell, rent, or share personal data with third-party advertisers.
                 </p>
               </section>
 
               <section>
-                <h4 style={{ color: '#131314', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>3. Secure Infrastructure</h4>
+                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>3. Secure Infrastructure</h4>
                 <p style={{ margin: 0, textAlign: 'left' }}>
                   We utilize enterprise cloud security including Google Identity Services (OAuth 2.0), Supabase (Row-Level Security PostgreSQL), and Vercel serverless hosting with end-to-end SSL encryption.
                 </p>
               </section>
 
               <section>
-                <h4 style={{ color: '#131314', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>4. Data Deletion Rights</h4>
+                <h4 style={{ color: '#16255C', fontWeight: 700, fontSize: '0.96rem', margin: '0 0 6px', textAlign: 'left' }}>4. Data Deletion Rights</h4>
                 <p style={{ margin: 0, textAlign: 'left' }}>
-                  You have full ownership of your data. You can delete your account anytime in the app or by emailing <a href="mailto:quibotmark@gmail.com" style={{ color: '#131314', fontWeight: 600 }}>quibotmark@gmail.com</a>.
+                  You have full ownership of your data. You can delete your account anytime in the app or by emailing <a href="mailto:quibotmark@gmail.com" style={{ color: '#16255C', fontWeight: 600 }}>quibotmark@gmail.com</a>.
                 </p>
               </section>
             </>
@@ -179,8 +179,8 @@ export default function LegalModal({ type, onClose }) {
         {/* Footer with action button */}
         <div style={{
           padding: '14px 24px',
-          borderTop: '1px solid #F1F5F9',
-          background: '#F8FAFC',
+          borderTop: '1px solid #F3ECDF',
+          background: '#FBF6EE',
           display: 'flex',
           justifyContent: 'flex-end'
         }}>
@@ -188,7 +188,7 @@ export default function LegalModal({ type, onClose }) {
             type="button"
             onClick={onClose}
             style={{
-              background: '#131314',
+              background: '#16255C',
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '9999px',
@@ -197,7 +197,7 @@ export default function LegalModal({ type, onClose }) {
               fontWeight: 700,
               fontSize: '0.84rem',
               cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(19, 19, 20, 0.2)'
+              boxShadow: '0 2px 8px rgba(22, 37, 92, 0.2)'
             }}
           >
             Close

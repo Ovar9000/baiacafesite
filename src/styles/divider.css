@@ -17,26 +17,15 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* The rows drift as the strip scrolls through the viewport, so they move
-   only while the visitor scrolls: no endless loop running beside the
-   content (WCAG 2.2.2), and none at all for reduced motion. The strip is a
-   scroll container (overflow: hidden), so the rows follow its named view
-   timeline rather than view(). Static where scroll timelines are missing. */
+/* The waves drift slowly on their own, like water at the shore. Compositor
+   only (transform), and still for anyone who asks for reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .divider-strip {
-      view-timeline: --divider-strip block;
-    }
+  .checker-row {
+    animation: checkerBgScroll 7s linear infinite;
+  }
 
-    .checker-row {
-      animation: checkerBgScroll linear 8 both;
-      animation-timeline: --divider-strip;
-    }
-
-    .wave-svg-row {
-      animation: waveBgScroll linear 10 both;
-      animation-timeline: --divider-strip;
-    }
+  .wave-svg-row {
+    animation: waveBgScroll 6s linear infinite;
   }
 }
 

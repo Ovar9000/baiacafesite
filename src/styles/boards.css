@@ -31,7 +31,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: var(--golden-amber);
+  color: var(--accent);
   margin-bottom: 12px;
 }
 
@@ -40,7 +40,7 @@
   font-weight: 900;
   font-size: clamp(2.4rem, 5vw, 3.8rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: -0.01em;
   color: var(--white);
   margin-bottom: 14px;
@@ -116,7 +116,7 @@
 
 .cottage-partner {
   font-size: 0.85rem;
-  color: var(--golden-amber);
+  color: var(--accent);
   font-weight: 700;
   margin-bottom: 16px;
 }
@@ -148,7 +148,7 @@
   font-family: var(--font-display);
   font-weight: 900;
   font-size: 1.4rem;
-  color: var(--golden-amber);
+  color: var(--accent);
 }
 
 .rate-cap {
@@ -250,7 +250,7 @@
 }
 
 .cottage-teaser-link {
-  color: var(--golden-amber);
+  color: var(--accent);
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 0.95rem;
@@ -318,7 +318,7 @@
   font-weight: 700;
   font-size: 0.85rem;
   letter-spacing: 0.04em;
-  color: var(--amber-contrast);
+  color: var(--accent);
   margin-bottom: 8px;
 }
 

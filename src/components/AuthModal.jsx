@@ -5,8 +5,8 @@ import LegalModal from './LegalModal';
 
 export default function AuthModal({ 
   onSuccess, 
-  title = "Join BAIA Café Loyalty", 
-  subtitle = "Collect stamps & enjoy free handcrafted coffee on every visit." 
+  title = "Your BAIA loyalty card", 
+  subtitle = "One stamp a day with your drink, and a free coffee every 10 stamps." 
 }) {
   const [email, setEmail] = useState('');
   const [otpCode, setOtpCode] = useState('');
@@ -121,9 +121,9 @@ export default function AuthModal({
     <div className="auth-card">
       <div className="auth-header-icon">
         <img 
-          src="/images/baia-cup-black.webp" 
+          src="/images/Logo.webp" 
           alt="BAIA Café" 
-          style={{ width: '28px', height: '28px', objectFit: 'contain' }} 
+          style={{ width: '44px', height: '44px', objectFit: 'cover', borderRadius: '50%' }} 
         />
       </div>
 
@@ -134,11 +134,11 @@ export default function AuthModal({
       <div className="auth-perks-strip">
         <div className="auth-perk-badge">
           <Coffee size={13} className="auth-perk-icon" />
-          <span>Free Coffee at 10 Stamps</span>
+          <span>Free coffee at 10 stamps</span>
         </div>
         <div className="auth-perk-badge">
           <Wifi size={13} className="auth-perk-icon" />
-          <span>Daily Wi-Fi Pass</span>
+          <span>Wi-Fi code with every scan</span>
         </div>
       </div>
 
@@ -220,7 +220,7 @@ export default function AuthModal({
               disabled={emailSending}
             />
             <button type="submit" className="btn-submit-otp" disabled={emailSending}>
-              {emailSending ? 'Sending link...' : 'Send Sign-In Link →'}
+              {emailSending ? 'Sending link…' : 'Email me a sign-in link'}
             </button>
           </form>
 
@@ -251,20 +251,20 @@ export default function AuthModal({
       {step === 'check-email' && (
         <div style={{ textAlign: 'center', padding: '6px 0' }}>
           <div style={{
-            background: '#FAF4EB',
-            border: '1.5px dashed #FB923C',
+            background: '#FFFFFF',
+            border: '1.5px dashed rgba(30, 74, 255, 0.45)',
             borderRadius: '16px',
             padding: '18px 14px',
             marginBottom: '18px',
             fontSize: '0.88rem',
-            color: '#131314',
+            color: '#16255C',
             lineHeight: '1.5'
           }}>
-            Open the email from <strong>Supabase / BAIA Café</strong> and tap <strong>"Sign in"</strong> to open your loyalty card automatically.
+            Open the sign-in email we just sent and tap <strong>Sign in</strong>. Your card opens on its own.
           </div>
 
-          <div style={{ fontSize: '0.8rem', color: '#64748B', marginBottom: '14px' }}>
-            Or enter the 6-digit verification code below if provided in your email:
+          <div style={{ fontSize: '0.8rem', color: '#5A6987', marginBottom: '14px' }}>
+            Or type the 6-digit code from the email:
           </div>
 
           <form onSubmit={handleVerifyOtp} className="email-otp-form">
@@ -283,7 +283,7 @@ export default function AuthModal({
               autoFocus
             />
             <button type="submit" className="btn-submit-otp" disabled={otpVerifying || otpCode.length < 6}>
-              {otpVerifying ? 'Verifying...' : 'Verify Code & Open Card →'}
+              {otpVerifying ? 'Checking…' : 'Open my card'}
             </button>
           </form>
 
@@ -291,16 +291,16 @@ export default function AuthModal({
             <button 
               type="button" 
               onClick={() => { setStep('input-email'); setErrorMsg(''); setInfoMsg(''); }} 
-              style={{ background: 'none', border: 'none', color: '#64748B', fontSize: '0.78rem', cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: '#5A6987', fontSize: '0.78rem', cursor: 'pointer' }}
             >
               ← Back
             </button>
-            <span style={{ color: '#CBD5E1' }}>•</span>
+            <span style={{ color: '#D9CFBC' }}>•</span>
             <button 
               type="button" 
               onClick={handleSendEmailLink} 
               disabled={emailSending}
-              style={{ background: 'none', border: 'none', color: '#131314', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: '#16255C', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}
             >
               Resend link
             </button>
@@ -310,7 +310,7 @@ export default function AuthModal({
 
       <div className="auth-trust-badge">
         <ShieldCheck size={13} />
-        <span>Official BAIA Café Authentication</span>
+        <span>Sign-in is handled securely for BAIA</span>
       </div>
 
       {/* In-App Legal Notice Popup (Keeps user in sign-up flow without interrupting) */}

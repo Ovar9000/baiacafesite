@@ -1,44 +1,73 @@
 /* ==========================================================================
-   BAIA CAFE — Hero: the shore photo with the brand headline over it
+   BAIA CAFE — Hero: the beach as it looks right now
+   The time-of-day photo and "Coffee by the Bay", nothing else. The words
+   sit top-left, where every photo has open sky (or dark canopy at night).
+   On upright screens the buttons drop to the sand at the bottom, so the
+   scene between stays clear. See plans/brief.md.
+   The critical copy of these rules is inlined in index.html
+   (<style id="critical-hero-css">): run `npm run hero:inline` after editing.
    ========================================================================== */
 
 .hero-section {
   position: relative;
   min-height: calc(100vh - 28px);
   min-height: calc(100dvh - 28px);
-  height: auto;
-  padding-top: calc(var(--header-height) + clamp(16px, 2.5vh, 32px));
-  padding-bottom: clamp(16px, 2.5vh, 32px);
-  background: radial-gradient(120% 80% at 75% 40%, #2949ff 0%, var(--electric-blue) 60%, #152bb5 100%);
+  padding-top: calc(var(--header-height) + clamp(28px, 7vh, 80px));
+  padding-bottom: clamp(40px, 8vh, 88px);
+  background: var(--deep-navy-dark);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   width: 100%;
-  max-width: 100vw;
   box-sizing: border-box;
 }
 
-/* Hero Layout Grid */
 .hero-grid {
-  display: grid;
-  grid-template-columns: 1.15fr 0.95fr;
-  align-items: center;
-  gap: var(--space-2xl);
   position: relative;
   z-index: 2;
   width: 100%;
-  box-sizing: border-box;
 }
 
-/* Hero Left Content Column */
 .hero-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  max-width: 640px;
-  width: 100%;
-  box-sizing: border-box;
+  max-width: 820px;
+  color: var(--white);
+  text-shadow: 0 2px 20px rgba(14, 26, 69, 0.5);
+}
+
+/* The one loud thing on the page */
+.hero-tagline {
+  margin: 0;
+  font-family: var(--font-tagline);
+  font-weight: 700;
+  /* Sized by the window's height as well as its width, so short wide
+     windows don't fill the top half with words and squeeze the scene */
+  font-size: clamp(3.4rem, min(10.5vw, 15vh), 8.25rem);
+  /* DynaPuff's round letters and long y tails need a full line each */
+  line-height: 1.02;
+  letter-spacing: 0;
+  color: var(--cream);
+  text-wrap: balance;
+}
+
+/* Screen readers get the tagline as one phrase; the letters are for show */
+.hero-tagline .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Words hold together; each letter can move on its own */
+.tl-w {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.tl-l {
+  display: inline-block;
 }
 
 /* Shared with the footer Visit card */
@@ -50,394 +79,63 @@
   flex-shrink: 0;
 }
 [data-open-state="open"] .hero-status-dot { background: #4ADE80; box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25); }
-[data-open-state="closing-soon"] .hero-status-dot { background: var(--golden-amber); box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.25); }
+[data-open-state="closing-soon"] .hero-status-dot { background: #F5A623; box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.25); }
 [data-open-state="closed"] .hero-status-dot { background: #F87171; }
 
-/* Dominant Vertical-Focus Tagline (Fat Seed Inspiration) */
-.hero-headline.hero-vertical-focus {
-  margin-bottom: 16px;
-  position: relative;
-  z-index: 1;
-  width: 100%;
-}
-
-.tagline-stack {
+.hero-cta-row {
   display: flex;
-  flex-direction: column;
-  gap: 0px;
-  width: 100%;
-}
-
-.tagline-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  line-height: 0.90;
-  letter-spacing: -0.035em;
-  white-space: nowrap;
-}
-
-.tagline-row .letter-chunky {
-  font-family: var(--font-headline);
-  font-weight: 900;
-  font-size: clamp(3.0rem, min(8.5vw, 9.5vh), 5.4rem);
-  text-transform: uppercase;
-  color: var(--white);
-}
-
-.row-coffee .letter-chunky {
-  color: var(--white);
-}
-
-.row-food .letter-chunky {
-  color: var(--white);
-}
-
-.ampersand-chunky {
-  font-family: var(--font-headline);
-  font-weight: 900;
-  font-size: clamp(2.8rem, min(8.0vw, 9.0vh), 5.0rem);
-  color: var(--golden-amber);
-  margin-left: 2px;
-}
-
-.row-vibes .letter-chunky {
-  color: var(--amber-contrast);
-  letter-spacing: -0.01em;
-}
-
-.row-crafted-bay {
-  display: flex;
-  align-items: baseline;
+  flex-wrap: wrap;
   gap: 12px;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-  margin-top: 0px;
+  margin-top: clamp(22px, 3.2vh, 32px);
+  text-shadow: none;
 }
 
-.script-crafted-fatseed {
-  font-family: var(--font-script);
-  font-weight: 700;
-  font-size: clamp(3.2rem, min(9.0vw, 10.2vh), 5.8rem);
-  color: #ff6b9d;
-  transform: rotate(-4deg);
-  display: inline-block;
-  line-height: 0.82;
-}
-
-.bay-chunky {
-  font-family: var(--font-headline);
-  font-weight: 900;
-  font-size: clamp(2.4rem, min(6.8vw, 7.8vh), 4.4rem);
-  text-transform: uppercase;
-  color: var(--white);
-  letter-spacing: -0.01em;
-}
-
-/* Whimsical Hand-Drawn SVG Doodles */
-.hero-doodle {
-  position: relative !important;
+.hero-cta-primary,
+.hero-cta-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  vertical-align: middle;
+  min-block-size: 48px;
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: transform 0.15s ease, background-color 0.2s ease;
 }
 
-/* The doodles bob as the hero scrolls away rather than on an endless loop
-   (WCAG 2.2.2); still for reduced motion and without scroll timelines */
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .hero-doodle {
-      animation: doodleBob ease-in-out 4 alternate both;
-      animation-timeline: view();
-    }
-
-    .doodle-mug {
-      animation-iteration-count: 3;
-    }
-  }
+.hero-cta-primary {
+  background: var(--action);
+  color: var(--on-action);
 }
 
-.doodle-food {
-  animation-delay: -1.8s;
+.hero-cta-secondary {
+  background: rgba(14, 26, 69, 0.45);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--white);
 }
 
-.hero-doodle.doodle-sparkle,
-.doodle-sparkle {
-  position: relative !important;
-  animation-delay: -2.5s;
+.hero-cta-primary:active,
+.hero-cta-secondary:active {
+  transform: scale(0.97);
 }
 
-@keyframes doodleBob {
-  0% { transform: translateY(0) rotate(0deg); }
-  100% { transform: translateY(-6px) rotate(6deg); }
+.hero-cta-primary:focus-visible,
+.hero-cta-secondary:focus-visible {
+  outline: 3px solid var(--cream);
+  outline-offset: 3px;
 }
 
-/* ==========================================================================
-   RESPONSIVE BREAKPOINTS (Mobile Pacing: Headline + Photo First Read)
-   ========================================================================== */
-@media (max-width: 1024px) {
-  .hero-section {
-    min-height: calc(100dvh - 28px);
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-top: calc(var(--header-height) + clamp(16px, 2.8vh, 28px));
-    padding-bottom: clamp(20px, 3.5vh, 32px);
-    padding-left: clamp(1rem, 4vw, 2.5rem);
-    padding-right: clamp(1rem, 4vw, 2.5rem);
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-
-  .hero-grid {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 1 1 auto;
-    width: 100%;
-    min-height: 0;
-    padding: 0;
-    gap: clamp(28px, 4.5vh, 44px);
-  }
-
-  /* Sibling 1: Headline Block — centered lockup */
-  .hero-content.headline-block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    flex: 0 0 auto;
-    margin-bottom: 0;
-    text-align: center;
-  }
-
-  .hero-headline.hero-vertical-focus {
-    order: 1;
-    margin-top: 0;
-    margin-bottom: 0;
-    width: 100%;
-    text-align: center;
-  }
-
-  .tagline-stack {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(4px, 0.8vh, 8px);
-    align-items: center;
-    width: fit-content;
-    margin: 0 auto;
-  }
-
-  .tagline-row {
-    justify-content: center;
-    align-items: center;
-    gap: clamp(8px, 2vw, 12px);
-    line-height: 0.95;
-    white-space: nowrap;
-  }
-
-  .tagline-row .letter-chunky {
-    font-size: clamp(2.8rem, 8.5vw, 4.2rem);
-  }
-
-  .ampersand-chunky {
-    font-size: clamp(2.6rem, 8.0vw, 3.8rem);
-  }
-
-  .script-crafted-fatseed {
-    font-size: clamp(3.2rem, 9.8vw, 4.6rem);
-  }
-
-  .bay-chunky {
-    font-size: clamp(2.3rem, 7.0vw, 3.4rem);
-  }
-
-  .row-crafted-bay {
-    justify-content: center;
-    align-items: baseline;
-    gap: clamp(8px, 1.8vw, 12px);
-    margin-top: 0px;
-    white-space: nowrap;
-  }
-}
-
-@media (max-width: 640px) {
-  .hero-section {
-    min-height: calc(100dvh - 28px);
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    align-items: center;
-    padding-top: calc(var(--header-height) + clamp(12px, 2.2vh, 22px));
-    padding-bottom: clamp(16px, 3vh, 26px);
-    padding-left: clamp(1rem, 4vw, 1.5rem);
-    padding-right: clamp(1rem, 4vw, 1.5rem);
-  }
-
-  .hero-grid {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(22px, 4vh, 36px);
-    width: 100%;
-  }
-
-  .hero-content.headline-block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    text-align: center;
-  }
-
-  .hero-headline.hero-vertical-focus {
-    margin-top: 0;
-    margin-bottom: 0;
-    width: 100%;
-    text-align: center;
-  }
-
-  .tagline-stack {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(4px, 0.8vh, 7px);
-    align-items: center;
-    width: fit-content;
-    margin: 0 auto;
-  }
-
-  .tagline-row {
-    line-height: 0.95;
-    gap: clamp(6px, 1.8vw, 10px);
-    white-space: nowrap;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .tagline-row .letter-chunky {
-    font-size: clamp(2.45rem, 9.6vw, 3.25rem);
-  }
-
-  .ampersand-chunky {
-    font-size: clamp(2.35rem, 9.0vw, 3.0rem);
-  }
-
-  .script-crafted-fatseed {
-    font-size: clamp(2.85rem, 11.4vw, 3.8rem);
-  }
-
-  .bay-chunky {
-    font-size: clamp(2.05rem, 8.0vw, 2.75rem);
-  }
-
-  .row-crafted-bay {
-    justify-content: center;
-    align-items: baseline;
-    gap: clamp(6px, 1.6vw, 10px);
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    margin-top: 0px;
-  }
-
-  .hero-doodle.doodle-mug {
-    width: clamp(28px, 7.5vw, 36px);
-    height: clamp(28px, 7.5vw, 36px);
-  }
-
-  .hero-doodle.doodle-food {
-    width: clamp(28px, 7.5vw, 36px);
-    height: clamp(28px, 7.5vw, 36px);
-  }
-
-  .hero-doodle.doodle-sparkle {
-    width: clamp(18px, 5.0vw, 24px);
-    height: clamp(18px, 5.0vw, 24px);
-    position: relative !important;
-  }
-}
-
-@media (max-height: 700px) and (max-width: 640px) {
-  .hero-section {
-    padding-top: calc(var(--header-height) + clamp(4px, 1vh, 8px));
-    padding-bottom: clamp(6px, 1.5vh, 14px);
-  }
-
-  .hero-content.headline-block {
-    margin-bottom: 0;
-  }
-
-  .hero-grid {
-    gap: clamp(0.4rem, 1.5vh, 1rem);
-  }
-
-  .tagline-row .letter-chunky {
-    font-size: clamp(1.85rem, 8.2vw, 2.4rem);
-  }
-
-  .ampersand-chunky {
-    font-size: clamp(1.75rem, 7.6vw, 2.25rem);
-  }
-
-  .script-crafted-fatseed {
-    font-size: clamp(1.95rem, 8.4vw, 2.5rem);
-  }
-
-  .bay-chunky {
-    font-size: clamp(1.45rem, 6.4vw, 1.95rem);
-  }
-
-  .tagline-stack {
-    gap: 3px;
-  }
-}
-
-@media (max-height: 500px) and (orientation: landscape) {
-  .hero-section {
-    min-height: calc(100vh - 28px);
-    min-height: calc(100dvh - 28px);
-    height: auto;
-    padding-top: calc(var(--header-height) + 6px);
-    padding-bottom: 14px;
-    overflow: visible;
-  }
-
-  .hero-grid {
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    align-items: center;
-    gap: clamp(12px, 3vw, 24px);
-    height: auto;
-  }
-
-  .hero-content.headline-block {
-    margin-bottom: 0;
-  }
-
-  .tagline-row .letter-chunky {
-    font-size: clamp(1.4rem, 4.2vw, 1.85rem);
-  }
-
-  .ampersand-chunky {
-    font-size: clamp(1.3rem, 3.8vw, 1.75rem);
-  }
-
-  .script-crafted-fatseed {
-    font-size: clamp(1.5rem, 4.5vw, 2.0rem);
-  }
-
-  .bay-chunky {
-    font-size: clamp(1.2rem, 3.5vw, 1.55rem);
-  }
+@media (hover: hover) {
+  .hero-cta-primary:hover { background: var(--action-hover); }
+  .hero-cta-secondary:hover { background: rgba(14, 26, 69, 0.65); }
 }
 
 /* ==========================================================================
-   TIME OF DAY HERO
+   TIME OF DAY
    public/hero-daypart.js sets <html data-daypart> from Manila time before the
    page paints; only the matching photo is ever downloaded. Without the script
    the daytime photo shows.
@@ -472,22 +170,12 @@
   --hero-focus-wide: 60% 90%;
 }
 
-.hero-section {
-  background: var(--deep-navy-dark);
-}
-
 .hero-photo {
   position: absolute;
   inset: 0;
   background: var(--deep-navy-dark) var(--hero-photo-portrait) var(--hero-focus-portrait) / cover no-repeat;
 }
 
-/* A slow settle as the page opens */
-@media (prefers-reduced-motion: no-preference) {
-  .hero-photo {
-    animation: heroPhotoSettle 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-}
 
 /* Landscape screens get the wide crops, portrait ones (phones, upright
    tablets) the tall ones; hero-daypart.js preloads by the same test */
@@ -498,55 +186,168 @@
   }
 }
 
-@keyframes heroPhotoSettle {
-  from { transform: scale(1.06); opacity: 0.6; }
-  to { transform: scale(1); opacity: 1; }
-}
 
-/* Shade behind the headline (left on wide screens) and a fade into the wave */
+/* Shade behind the words (top-left); the rest of the photo keeps its colour */
 .hero-scrim {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(14, 26, 69, 0.62) 0%, rgba(14, 26, 69, 0.38) 38%, rgba(14, 26, 69, 0) 64%),
-    linear-gradient(180deg, rgba(14, 26, 69, 0) 72%, rgba(14, 26, 69, 0.55) 100%);
+    linear-gradient(180deg, rgba(14, 26, 69, 0.62) 0%, rgba(14, 26, 69, 0.3) 32%, rgba(14, 26, 69, 0) 55%),
+    linear-gradient(90deg, rgba(14, 26, 69, 0.4) 0%, rgba(14, 26, 69, 0) 50%);
 }
 
-.hero-grid {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.tagline-stack {
-  text-shadow: 0 2px 24px rgba(14, 26, 69, 0.45);
-}
-
-/* Phones and tablets: headline over the sky at the top, the scene below */
-@media (max-width: 1024px) {
-  .hero-section {
-    justify-content: flex-start;
-  }
-
-  /* Keep the headline up in the sky rather than centred on the photo */
-  .hero-grid {
-    flex: 0 0 auto;
-    align-items: center;
-    padding-top: clamp(8px, 3vh, 32px);
-  }
-
+/* Upright screens (phones): the shade only needs to cover the sky */
+@media (max-aspect-ratio: 1/1) {
   .hero-scrim {
     background:
-      linear-gradient(180deg, rgba(14, 26, 69, 0.62) 0%, rgba(14, 26, 69, 0.34) 30%, rgba(14, 26, 69, 0) 52%),
-      linear-gradient(180deg, rgba(14, 26, 69, 0) 76%, rgba(14, 26, 69, 0.5) 100%);
+      linear-gradient(180deg, rgba(14, 26, 69, 0.7) 0%, rgba(14, 26, 69, 0.38) 34%, rgba(14, 26, 69, 0) 56%),
+      linear-gradient(0deg, rgba(14, 26, 69, 0.55) 0%, rgba(14, 26, 69, 0) 22%);
+  }
+
+  /* Tagline up in the sky, buttons down on the sand; the scene between them
+     stays clear. The menu button stays away until the page scrolls
+     (main.js), so the buttons can sit low on the sand. */
+  .hero-section {
+    padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 14px));
+  }
+
+  .hero-grid {
+    flex: 1 1 auto;
+    display: flex;
+  }
+
+  .hero-content {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    max-width: none;
+  }
+
+  .hero-cta-row {
+    margin-top: auto;
   }
 }
 
-/* Landscape phones: one column, headline left like the desktop */
-@media (max-height: 500px) and (orientation: landscape) {
-  .hero-grid {
-    display: flex;
-    align-items: flex-start;
+@media (max-width: 640px) {
+  .hero-tagline {
+    font-size: clamp(3.2rem, 15.5vw, 4.6rem);
   }
+
+  .hero-cta-row > * {
+    flex: 1 1 0;
+    padding-inline: 16px;
+  }
+}
+
+/* Landscape phones: less height, so a smaller tagline */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero-tagline {
+    font-size: clamp(2.6rem, 9vh + 2vw, 4rem);
+  }
+
+  .hero-cta-row {
+    margin-top: 14px;
+  }
+}
+
+/* ==========================================================================
+   MOTION: one sequence as the page opens, then a slow ambient life.
+   1. the photo settles, then drifts slowly like a camera on the sand
+   2. the tagline's letters float up out of the water, one after another,
+      then keep bobbing in a slow wave
+   3. the buttons arrive last
+   4. at night, fireflies glow around the lantern tree
+   5. scrolling away lifts the words off the photo
+   Nothing moves for anyone who asks for reduced motion.
+   ========================================================================== */
+.hero-glints {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: none;
+  pointer-events: none;
+}
+
+.hero-glints i {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s, 4px);
+  height: var(--s, 4px);
+  border-radius: 50%;
+  background: #FFE9A8;
+  box-shadow: 0 0 10px 3px rgba(255, 210, 110, 0.55);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-photo {
+    animation:
+      heroPhotoSettle 1.6s cubic-bezier(0.16, 1, 0.3, 1) both,
+      heroDrift 28s ease-in-out 1.6s infinite alternate;
+  }
+
+  .tl-l {
+    animation:
+      tlRise 0.95s cubic-bezier(0.3, 1.45, 0.5, 1) calc(150ms + var(--i) * 45ms) both,
+      tlBob 3.6s ease-in-out calc(1.5s + var(--i) * 110ms) infinite alternate;
+  }
+
+  .hero-cta-row {
+    animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.95s both;
+  }
+
+  [data-daypart="night"] .hero-glints {
+    display: block;
+  }
+
+  .hero-glints i {
+    animation: glint var(--d, 6s) ease-in-out var(--dl, 0s) infinite;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .hero-content {
+      animation: heroLift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 80vh;
+    }
+  }
+}
+
+@keyframes heroPhotoSettle {
+  from { transform: scale(1.08); opacity: 0.5; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes heroDrift {
+  from { transform: scale(1); }
+  to { transform: scale(1.07) translate(-1.2%, -0.8%); }
+}
+
+@keyframes tlRise {
+  0% { opacity: 0; transform: translateY(0.5em) rotate(8deg) scale(0.85); filter: blur(6px); }
+  55% { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+
+@keyframes tlBob {
+  from { transform: translateY(0); }
+  to { transform: translateY(-0.05em); }
+}
+
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes glint {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  40% { opacity: 0.95; transform: translate(calc(var(--dx) * 0.4), -10px) scale(1); }
+  70% { opacity: 0.6; }
+  100% { opacity: 0; transform: translate(var(--dx), -28px) scale(0.7); }
+}
+
+@keyframes heroLift {
+  to { transform: translateY(-14vh); opacity: 0; }
 }

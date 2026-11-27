@@ -51,7 +51,7 @@
   font-size: clamp(1.9rem, 3.8vw, 3.2rem);
   line-height: 1.05;
   letter-spacing: -0.01em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--deep-navy);
   display: block;
 }
@@ -188,8 +188,8 @@
   top: 5px;
   right: 25px;
   left: auto;
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   padding: 8px 16px;
   border-radius: var(--radius-md);
   border: 2px dashed var(--deep-navy);
@@ -294,8 +294,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(245, 166, 35, 0.2);
-  color: var(--amber-contrast);
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 800;
@@ -304,7 +304,7 @@
   padding: 6px 18px;
   border-radius: var(--radius-sm);
   margin-bottom: 14px;
-  border: 1px solid rgba(245, 166, 35, 0.4);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
 .events-title {
@@ -370,7 +370,7 @@
 .event-card-date {
   font-family: var(--font-mono);
   font-size: 0.85rem;
-  color: var(--amber-contrast);
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -384,8 +384,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 0.9rem;
@@ -400,7 +400,7 @@
 
 .btn-event-rsvp:hover {
   transform: translateY(-2px);
-  background: #f7b743;
+  background: var(--action-hover);
 }
 
 @media (max-width: 1024px) {
