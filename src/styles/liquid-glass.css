@@ -10,7 +10,7 @@
    - a press that swells under the finger and springs back
    - Chromium only: a lens built for the piece's exact shape bends the page
      behind its edges (--lg-lens)
-   - over the cream sections it turns to light glass with navy text
+   - over the cream sections the glass deepens to navy; text stays white
 
    Used by: the phone header (BAIA pill, card button), the menu button, and
    the hero's "Getting here" button.
@@ -67,29 +67,24 @@ html:root .lg-glass.is-pressed {
 }
 
 html:root .lg-glass:focus-visible {
-  outline: 2px solid var(--golden-amber);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
-/* Over the cream sections (liquidGlass.js adds .is-light): light glass with
-   navy text, frosted a little more so the words behind don't compete */
+/* Over the cream sections (liquidGlass.js adds .is-light): the text and the
+   BAIA name stay white everywhere; only the glass deepens to a navy tint so
+   the white still reads on the light page. The tint cross-fades slowly. */
 html:root .lg-glass.is-light {
-  --lg-tint: rgba(255, 255, 255, 0.42);
-  color: var(--deep-navy);
-  text-shadow: none;
-  -webkit-backdrop-filter: blur(10px) saturate(160%);
-  backdrop-filter: blur(10px) saturate(160%);
+  --lg-tint: rgba(22, 37, 92, 0.62);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.55),
-    0 1px 2px rgba(22, 37, 92, 0.16),
-    0 12px 30px rgba(22, 37, 92, 0.16);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 1px 2px rgba(22, 37, 92, 0.2),
+    0 12px 30px rgba(22, 37, 92, 0.22);
 }
 
-html:root .lg-glass.is-light .brand-wordmark {
-  color: var(--deep-navy);
-}
-
-/* The name takes the glass's colour (white, or navy on light glass) */
+/* The name takes the glass's colour: always white */
 html:root .lg-glass .brand-wordmark {
   color: inherit;
 }
@@ -113,7 +108,7 @@ html:root.lg-refract .site-header.scrolled .lg-glass:not(.is-light) {
 }
 
 html:root.lg-refract .lg-glass.is-light {
-  backdrop-filter: var(--lg-lens, url(#lg-refract)) blur(7px) saturate(160%);
+  backdrop-filter: var(--lg-lens, url(#lg-refract)) blur(7px) saturate(140%);
 }
 
 /* --- Where the glass is used --------------------------------------------- */

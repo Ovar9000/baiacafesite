@@ -40,9 +40,12 @@
   margin: 0;
   font-family: var(--font-tagline);
   font-weight: 700;
-  font-size: clamp(3.4rem, 10.5vw, 8.25rem);
-  line-height: 0.92;
-  letter-spacing: -0.01em;
+  /* Sized by the window's height as well as its width, so short wide
+     windows don't fill the top half with words and squeeze the scene */
+  font-size: clamp(3.4rem, min(10.5vw, 15vh), 8.25rem);
+  /* DynaPuff's round letters and long y tails need a full line each */
+  line-height: 1.02;
+  letter-spacing: 0;
   color: var(--cream);
   text-wrap: balance;
 }
@@ -76,7 +79,7 @@
   flex-shrink: 0;
 }
 [data-open-state="open"] .hero-status-dot { background: #4ADE80; box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25); }
-[data-open-state="closing-soon"] .hero-status-dot { background: var(--golden-amber); box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.25); }
+[data-open-state="closing-soon"] .hero-status-dot { background: #F5A623; box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.25); }
 [data-open-state="closed"] .hero-status-dot { background: #F87171; }
 
 .hero-cta-row {
@@ -103,8 +106,8 @@
 }
 
 .hero-cta-primary {
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
 }
 
 .hero-cta-secondary {
@@ -127,7 +130,7 @@
 }
 
 @media (hover: hover) {
-  .hero-cta-primary:hover { background: #FFB53D; }
+  .hero-cta-primary:hover { background: var(--action-hover); }
   .hero-cta-secondary:hover { background: rgba(14, 26, 69, 0.65); }
 }
 

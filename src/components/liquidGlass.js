@@ -15,9 +15,10 @@
  *  2. Press. .is-pressed swells the glass under the finger; releasing springs
  *     it back with a little overshoot (the spring easing is in the CSS).
  *
- *  3. Tone. Like real glass it takes on what's behind it: over the cream
- *     sections a piece turns to light glass with navy text (.is-light);
- *     over the photo and the navy sections it stays clear with white text.
+ *  3. Tone. Over the cream sections the glass deepens to a navy tint
+ *     (.is-light) so its white text and the BAIA name still read; over the
+ *     photo and the navy sections it stays clear. The text never changes
+ *     colour.
  */
 
 const SVG_NS = 'http://www.w3.org/2000/svg';

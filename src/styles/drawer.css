@@ -22,7 +22,7 @@
 }
 
 @starting-style {
-  .cart-drawer-panel[open]::backdrop {
+  .cart-drawer-panel[open]:not([data-closing])::backdrop {
     opacity: 0;
   }
 }
@@ -72,7 +72,7 @@
 }
 
 @starting-style {
-  .cart-drawer-panel[open] {
+  .cart-drawer-panel[open]:not([data-closing]) {
     transform: var(--sheet-off);
   }
 }
@@ -90,10 +90,20 @@
   }
 
   @starting-style {
-    .cart-drawer-panel[open] {
+    .cart-drawer-panel[open]:not([data-closing]) {
       opacity: 0;
     }
   }
+}
+
+/* Leaving: quicker than arriving, and accelerating away rather than
+   settling, so the sheet gets out of the way */
+.cart-drawer-panel[data-closing] {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 1, 1), opacity 0.2s ease;
+}
+
+.cart-drawer-panel[data-closing]::backdrop {
+  transition-duration: 0.25s;
 }
 
 .cart-drawer-panel.is-dragging {
@@ -698,7 +708,7 @@
 
 .delivery-details-card {
   background: #FFFBEB;
-  border-top: 2px solid var(--golden-amber);
+  border-top: 2px solid var(--accent);
   padding: 12px 20px 14px;
   display: flex;
   flex-direction: column;
@@ -741,7 +751,7 @@
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  color: #B45309;
+  color: var(--accent);
   font-size: 0.8rem;
   line-height: 1;
 }
@@ -772,14 +782,14 @@
   flex-shrink: 0;
   font-size: 0.8rem;
   line-height: 1;
-  color: #B45309;
+  color: var(--accent);
 }
 
 .delivery-details-title {
   font-family: var(--font-mono);
   font-size: 0.725rem;
   font-weight: 800;
-  color: #92400E;
+  color: var(--deep-navy);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -843,8 +853,8 @@
 .delivery-field select:focus,
 .delivery-field textarea:focus {
   outline: none;
-  border-color: var(--golden-amber);
-  box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.2);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
 /* Custom dropdown (replaces native select popup) */
@@ -877,8 +887,8 @@
 .dd-wrap.open .dd-btn,
 .dd-btn:focus-visible {
   outline: none;
-  border-color: var(--golden-amber);
-  box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.25);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
 .dd-btn:disabled {
@@ -904,7 +914,7 @@
 .dd-chevron {
   flex-shrink: 0;
   font-size: 0.8rem;
-  color: #B45309;
+  color: var(--accent);
   transition: transform 0.18s ease;
   line-height: 1;
 }
@@ -970,7 +980,7 @@
   flex-shrink: 0;
   width: 16px;
   font-weight: 900;
-  color: #D97706;
+  color: var(--accent);
 }
 
 .dd-label {
@@ -982,8 +992,8 @@
   flex-shrink: 0;
   font-size: 0.7rem;
   font-weight: 700;
-  color: #B45309;
-  background: #FEF3C7;
+  color: var(--accent);
+  background: #E6ECFF;
   padding: 2px 8px;
   border-radius: var(--radius-sm);
   white-space: nowrap;

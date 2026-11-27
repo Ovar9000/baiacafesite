@@ -41,13 +41,24 @@ island is the spectacle.
 
 ## Look
 
+One palette everywhere, card included: bay blues on sand. No orange, no
+black. Blue next to orange was harsh; one family keeps every page feeling
+like the same place.
+
 | Token | Value | Use |
 | --- | --- | --- |
-| BAIA blue | `#1E4AFF` | The logo colour. Links, highlights, the brand. |
+| BAIA blue | `#1E4AFF` | The logo colour. Buttons on sand and white; links. |
 | Bay navy | `#16255C` | Text, dark sections. |
-| Sand | `#F5E9D6` | The page's paper. |
+| Night navy | `#0E1A45` | The footer and the deepest backgrounds. |
+| Sand | `#F5E9D6` | The page's paper. Buttons on navy and on the photo. |
+| Light bay blue | `#AFC2FF` | Small coloured text and focus rings on navy. |
 | White | `#FFFFFF` | Cards, polaroid frames. |
-| Golden hour | `#F5A623` | Only on things you tap to act (Order, Add). |
+
+**Actions** use one token, `--action`, that adapts to what it sits on: BAIA
+blue with white text on sand and white, sand with navy text on navy and on
+the hero photo. `--accent` does the same for small coloured text. The only
+other colours are the open/closing/closed status dots and the hero's
+fireflies.
 
 **Type.** DynaPuff (the BAIA letters font) for the tagline, and only there.
 Outfit for everything else, at a few weights. Caveat only as handwriting on
@@ -79,6 +90,12 @@ a blink. On desktop the header stays one bar and does not change tone.
 as the others: title and address as the header, then the hours card beside
 Messenger, Instagram and the loyalty line, then one strip with the
 copyright and the other pages.
+
+**Loyalty card** (`/card/`). A paper stamp card, like the printed card at
+the counter: sand paper, navy ink, ten printed circles, each stamp pressed
+in BAIA blue ink. The page around it is the same sand and navy as the
+homepage, with the blue BAIA logo, so going from the site to the card
+never jumps to black. Same 10-stamp rules; bonus stamps sit on top.
 
 ## Type and spacing rules
 

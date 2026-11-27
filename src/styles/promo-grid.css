@@ -355,8 +355,8 @@
 .signature-btn {
   border: none;
   border-radius: var(--radius-pill);
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 0.85rem;
@@ -367,7 +367,7 @@
 }
 
 .signature-btn:hover {
-  background: #FFB733;
+  background: var(--action-hover);
 }
 
 .signature-btn:active {

@@ -28,8 +28,14 @@
   --sand-light: #FAF4EB;
   --hot-pink: #9F1239; /* WCAG AA High Contrast Crimson Pink */
   --hot-pink-bright: #E8237A;
-  --golden-amber: #F5A623;
-  --amber-contrast: #FFE699; /* 7.5:1 High Contrast against Electric Blue */
+  /* One palette: bay blues on sand (plans/brief.md, "Look"). No orange.
+     The action colour adapts to what it sits on: BAIA blue with white text
+     on sand and white, sand with navy text on navy and the photo (the dark
+     contexts below). --accent is for small coloured text, rules and focus. */
+  --action: #1E4AFF;
+  --action-hover: #1538D4;
+  --on-action: #FFFFFF;
+  --accent: #1E4AFF;
   --white: #FFFFFF;
   --text-dark: #16255C;
   --text-muted: #5A6987;
@@ -87,6 +93,21 @@
   --depth-navy-deep: #0E1A45;
   --depth-navy-twilight: #0E1A45;
   --depth-midnight-abyss: #0E1A45;
+}
+
+/* Dark contexts: the hero photo, the navy sections, the header bar and the
+   phone tab bar. Actions turn to sand with navy text; accents to a light
+   bay blue */
+[data-theme="surface-blue"],
+[data-theme="navy-deep"],
+[data-theme="midnight"],
+[data-theme="ocean-depth"],
+.site-header,
+.mobile-sticky-bar {
+  --action: #F5E9D6;
+  --action-hover: #FFFFFF;
+  --on-action: #16255C;
+  --accent: #AFC2FF;
 }
 
 /* ==========================================================================
@@ -218,7 +239,7 @@ a, button, input, select, textarea, [role="button"], [tabindex], label, summary 
 
 /* Accessible Focus States for Desktop Keyboard Users */
 :focus-visible {
-  outline: 3px solid var(--golden-amber) !important;
+  outline: 3px solid var(--accent) !important;
   outline-offset: 3px !important;
   border-radius: 4px;
 }
@@ -228,8 +249,8 @@ a, button, input, select, textarea, [role="button"], [tabindex], label, summary 
   position: absolute;
   top: -120px;
   left: 16px;
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 0.95rem;
@@ -341,7 +362,7 @@ main,
 }
 
 .script-accent.amber {
-  color: var(--amber-contrast);
+  color: var(--accent);
 }
 
 .script-accent.cream {
@@ -455,7 +476,7 @@ main,
 }
 
 .nav-menu-toggle:focus-visible {
-  outline: 2px solid var(--golden-amber);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
@@ -939,7 +960,7 @@ main,
 }
 
 [data-open-state="open"] .nav-drawer-status-dot { background: #22C55E; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2); }
-[data-open-state="closing-soon"] .nav-drawer-status-dot { background: var(--golden-amber); box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.2); }
+[data-open-state="closing-soon"] .nav-drawer-status-dot { background: #F5A623; box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.2); }
 [data-open-state="closed"] .nav-drawer-status-dot { background: #EF4444; }
 
 /* Right: Action Buttons */
@@ -977,8 +998,8 @@ main,
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   border: none;
   font-family: var(--font-display);
   font-weight: 900;
@@ -1035,8 +1056,8 @@ main,
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   font-family: var(--font-display);
   font-weight: 900;
   font-size: 1.05rem;
@@ -1089,9 +1110,9 @@ main,
 }
 
 .trust-pill-highlight {
-  background: rgba(245, 166, 35, 0.2);
-  border: 1px solid var(--golden-amber);
-  color: var(--amber-contrast);
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  border: 1px solid var(--accent);
+  color: var(--accent);
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 800;
@@ -1125,18 +1146,18 @@ main,
   align-items: center;
   min-height: 32px;
   padding: 4px 12px;
-  background: rgba(245, 166, 35, 0.15);
-  color: var(--amber-contrast);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
   font-weight: 800;
   text-decoration: none;
-  border: 1px solid var(--golden-amber);
+  border: 1px solid var(--accent);
   border-radius: var(--radius-pill);
   transition: all var(--duration-fast);
 }
 
 .recreation-anchor:hover {
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
 }
 
 .mascot-title {
@@ -1172,9 +1193,9 @@ main,
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--golden-amber);
+  color: var(--accent);
   margin-bottom: 10px;
-  background: rgba(245, 166, 35, 0.12);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   padding: 4px 14px;
   border-radius: var(--radius-sm);
 }
@@ -1193,7 +1214,7 @@ main,
   font-family: var(--font-script);
   font-weight: 700;
   font-size: 1.25em;
-  color: var(--golden-amber);
+  color: var(--accent);
   text-transform: none;
   letter-spacing: normal;
 }
@@ -1453,7 +1474,7 @@ dialog.polaroid-modal-content[open]:not([data-closing]) {
 }
 
 @starting-style {
-  dialog.polaroid-modal-content[open] {
+  dialog.polaroid-modal-content[open]:not([data-closing]) {
     opacity: 0;
   }
 }
@@ -1468,7 +1489,7 @@ dialog.polaroid-modal-content[open]:not([data-closing]) {
   }
 
   @starting-style {
-    dialog.polaroid-modal-content[open] {
+    dialog.polaroid-modal-content[open]:not([data-closing]) {
       transform: scale(0.92) translateY(16px);
     }
   }
@@ -1489,7 +1510,7 @@ dialog.polaroid-modal-content[open]:not([data-closing])::backdrop {
 }
 
 @starting-style {
-  dialog.polaroid-modal-content[open]::backdrop {
+  dialog.polaroid-modal-content[open]:not([data-closing])::backdrop {
     opacity: 0;
   }
 }
@@ -1517,7 +1538,7 @@ dialog.polaroid-modal-content[open]:not([data-closing])::backdrop {
 
 .polaroid-modal-close:hover {
   transform: scale(1.1) rotate(90deg);
-  background: var(--amber-contrast);
+  background: var(--accent);
 }
 
 .polaroid-modal-close:active {
@@ -1576,7 +1597,7 @@ dialog.polaroid-modal-content[open]:not([data-closing])::backdrop {
 }
 
 .modal-stars {
-  color: #F59E0B;
+  color: var(--accent);
   font-size: 0.95rem;
   letter-spacing: 1px;
 }
@@ -1710,8 +1731,8 @@ dialog.polaroid-modal-content[open]:not([data-closing])::backdrop {
   padding: 0 20px;
   border: none;
   border-radius: var(--radius-pill);
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 0.95rem;
@@ -1791,8 +1812,13 @@ dialog.modal-dialog-card[open]:not([data-closing]) {
   opacity: 1;
 }
 
+/* Leaving: quick and accelerating away, no bounce */
+dialog.modal-dialog-card[open][data-closing] {
+  transition: transform 0.24s cubic-bezier(0.4, 0, 1, 1), opacity 0.2s ease;
+}
+
 @starting-style {
-  dialog.modal-dialog-card[open] {
+  dialog.modal-dialog-card[open]:not([data-closing]) {
     opacity: 0;
   }
 }
@@ -1807,7 +1833,7 @@ dialog.modal-dialog-card[open]:not([data-closing]) {
   }
 
   @starting-style {
-    dialog.modal-dialog-card[open] {
+    dialog.modal-dialog-card[open]:not([data-closing]) {
       transform: var(--modal-off);
     }
   }
@@ -1828,7 +1854,7 @@ dialog.modal-dialog-card[open]:not([data-closing])::backdrop {
 }
 
 @starting-style {
-  dialog.modal-dialog-card[open]::backdrop {
+  dialog.modal-dialog-card[open]:not([data-closing])::backdrop {
     opacity: 0;
   }
 }
@@ -2127,7 +2153,7 @@ dialog.checkout-modal-card::backdrop {
   }
 
   @starting-style {
-    dialog.checkout-modal-card[open] {
+    dialog.checkout-modal-card[open]:not([data-closing]) {
       opacity: 1;
     }
   }
@@ -2256,8 +2282,8 @@ dialog.checkout-modal-card::backdrop {
 }
 
 .toast-item.is-warning .toast-icon {
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
 }
 
 .toast-content h4 {
@@ -2474,17 +2500,17 @@ dialog.checkout-modal-card::backdrop {
 }
 
 :root {
-  --motion-duration-logo: 1.1s;
-  --motion-duration-page: 0.9s;
-  --motion-duration-fade: 0.6s;
+  --motion-duration-logo: 0.4s;
+  --motion-duration-page: 0.32s;
+  --motion-duration-fade: 0.2s;
   --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (max-width: 768px) {
   :root {
-    --motion-duration-logo: 0.75s;
-    --motion-duration-page: 0.70s;
-    --motion-duration-fade: 0.55s;
+    --motion-duration-logo: 0.4s;
+    --motion-duration-page: 0.32s;
+    --motion-duration-fade: 0.2s;
     --motion-ease-logo: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
@@ -2571,7 +2597,7 @@ dialog.checkout-modal-card::backdrop {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--amber-contrast);
+  color: var(--accent);
   line-height: 1.2;
   transform: none;
   text-shadow: none;
@@ -2591,7 +2617,7 @@ dialog.checkout-modal-card::backdrop {
   font-size: 1em;
   font-weight: inherit;
   line-height: inherit;
-  color: var(--golden-amber);
+  color: var(--accent);
   text-transform: inherit;
   letter-spacing: inherit;
   transform: none;
@@ -2600,8 +2626,8 @@ dialog.checkout-modal-card::backdrop {
 
 /* Photo wall on sand */
 .reviews-section .reviews-tag {
-  color: #92400E;
-  background: rgba(245, 166, 35, 0.16);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
 }
 .reviews-section .reviews-title {
   color: var(--deep-navy);
@@ -2658,7 +2684,7 @@ dialog.checkout-modal-card::backdrop {
 }
 
 .boards-tag {
-  color: var(--amber-contrast);
+  color: var(--accent);
 }
 
 

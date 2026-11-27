@@ -1,0 +1,1043 @@
+/* ==========================================================================
+   BAIA CAFE — The loyalty card page (/card/)
+   A paper stamp card, like the printed one at the counter: sand paper, navy
+   ink, ten printed circles, each stamp pressed in BAIA blue ink at its own
+   slight angle. The page around it is the homepage's sand and navy, with
+   BAIA blue for the actions (plans/brief.md, "Look" and "Loyalty card").
+   Loaded after loyalty.css, which still styles the shared pieces (header,
+   sign-in, dialogs) for the card and claim pages.
+   ========================================================================== */
+
+:root {
+  --card-navy: #16255C;
+  --card-navy-deep: #0E1A45;
+  --card-blue: #1E4AFF;
+  --card-blue-dark: #1538D4;
+  --card-sand: #F5E9D6;
+  --card-paper: #FBF4E6;
+  --card-ink-muted: #5A6987;
+  --card-rule: rgba(22, 37, 92, 0.14);
+
+  /* Paper grain and ink speckle, drawn once as tiny SVG noise tiles */
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .29 0 0 0 0 .18 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --ink-speckle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 2.05'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+}
+
+body {
+  background-color: var(--card-sand);
+}
+
+.loyalty-app-wrapper,
+.loyalty-header {
+  background: var(--card-sand);
+}
+
+.loyalty-header {
+  border-bottom-color: var(--card-rule);
+}
+
+.card-main {
+  flex: 1;
+  padding: 20px 16px 32px;
+}
+
+.card-loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--card-ink-muted);
+  font-size: 0.95rem;
+}
+
+.card-loading p {
+  margin-top: 16px;
+}
+
+.card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* --- Messages ------------------------------------------------------------ */
+.card-alert {
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.card-alert.is-ok {
+  background: #E6ECFF;
+  color: var(--card-navy);
+}
+
+.card-alert.is-error {
+  background: #FDECEC;
+  color: #9B1C1C;
+}
+
+.scanner-frame .card-alert {
+  margin-top: 12px;
+}
+
+/* --- Free coffee ready ------------------------------------------------------ */
+.reward-ready {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 20px;
+  background: var(--card-blue);
+  color: #FFFFFF;
+  box-shadow: 0 12px 28px -10px rgba(30, 74, 255, 0.55);
+}
+
+.reward-ready-head {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.reward-ready-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.reward-ready h2 {
+  margin: 2px 0 4px;
+  font-size: 1.12rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.reward-ready p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.reward-ready-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--card-sand);
+  color: var(--card-navy);
+  font: 700 0.98rem/1 'Outfit', sans-serif;
+  cursor: pointer;
+}
+
+.reward-confirm {
+  padding: 14px;
+  border-radius: 16px;
+  background: #FFFFFF;
+  color: var(--card-navy);
+  text-align: center;
+}
+
+.reward-confirm p {
+  margin: 0 0 12px;
+  color: var(--card-navy);
+  font-weight: 600;
+}
+
+.reward-confirm-actions,
+.delete-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-card-quiet,
+.btn-card-solid,
+.btn-card-danger {
+  flex: 1;
+  min-height: 44px;
+  border-radius: 9999px;
+  font: 700 0.92rem/1 'Outfit', sans-serif;
+  cursor: pointer;
+}
+
+.btn-card-quiet {
+  border: 1px solid var(--card-rule);
+  background: #FFFFFF;
+  color: var(--card-navy);
+}
+
+.btn-card-solid {
+  border: 0;
+  background: var(--card-blue);
+  color: #FFFFFF;
+}
+
+.btn-card-danger {
+  border: 0;
+  background: #C42525;
+  color: #FFFFFF;
+}
+
+:is(.btn-card-quiet, .btn-card-solid, .btn-card-danger, .reward-ready-btn):disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* --- The paper stamp card -------------------------------------------------- */
+.paper-card {
+  position: relative;
+  padding: 22px 20px 18px;
+  border-radius: 18px;
+  background-color: var(--card-paper);
+  background-image: var(--paper-grain);
+  color: var(--card-navy);
+  /* Lying on the table: a soft contact shadow and a wide one */
+  box-shadow:
+    0 1px 1px rgba(22, 37, 92, 0.08),
+    0 2px 4px rgba(22, 37, 92, 0.06),
+    0 18px 36px -14px rgba(22, 37, 92, 0.28);
+}
+
+/* The printed frame, a few millimetres in from the edge */
+.paper-card::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid var(--card-rule);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.paper-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.paper-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.paper-brand-name {
+  font-family: 'DynaPuff', 'Outfit', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 0.9;
+  color: var(--card-blue);
+}
+
+.paper-brand-line {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--card-ink-muted);
+}
+
+.paper-cycle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 34px;
+  padding: 0 10px 0 14px;
+  border: 1px solid var(--card-rule);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--card-navy);
+  font: 700 0.84rem/1 'Outfit', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.paper-cycle-btn:hover {
+  background: #FFFFFF;
+}
+
+.paper-holder {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 18px 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--card-rule);
+}
+
+.paper-holder-name {
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.paper-holder-email {
+  font-size: 0.82rem;
+  color: var(--card-ink-muted);
+  overflow-wrap: anywhere;
+}
+
+/* Ten printed circles, two rows of five */
+.stamp-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stamp {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(22, 37, 92, 0.32);
+  color: rgba(22, 37, 92, 0.42);
+}
+
+.stamp-num {
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.stamp-tag {
+  margin-top: 1px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+/* The tenth circle is printed solid: it's the free coffee */
+.stamp.is-reward:not(.is-inked) {
+  border-style: solid;
+  border-color: rgba(22, 37, 92, 0.45);
+  color: var(--card-navy);
+}
+
+/* A stamp: BAIA blue ink, pressed by hand, a little uneven */
+.stamp.is-inked {
+  border: 2.5px solid currentColor;
+  color: var(--card-blue);
+  background: rgba(30, 74, 255, 0.07);
+  transform: rotate(var(--tilt, 0deg));
+  -webkit-mask-image: var(--ink-speckle);
+  mask-image: var(--ink-speckle);
+  -webkit-mask-size: 90px 90px;
+  mask-size: 90px 90px;
+}
+
+.stamp.is-inked::after {
+  /* the inner ring of the rubber stamp */
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0.55;
+}
+
+.stamp.is-inked.is-bonus,
+.stamp.is-inked.is-reward {
+  color: var(--card-navy);
+  background: rgba(22, 37, 92, 0.07);
+}
+
+/* A stamp pressed while you watch (a new one after scanning) */
+@media (prefers-reduced-motion: no-preference) {
+  .stamp.is-inked {
+    animation: stampPress 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+}
+
+@keyframes stampPress {
+  from { opacity: 0; transform: rotate(var(--tilt, 0deg)) scale(1.35); }
+  to { opacity: 1; transform: rotate(var(--tilt, 0deg)) scale(1); }
+}
+
+.paper-foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.paper-progress {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.paper-count {
+  flex-shrink: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--card-blue);
+}
+
+.paper-card.is-full .paper-progress {
+  color: var(--card-blue);
+}
+
+.paper-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px dashed var(--card-rule);
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--card-ink-muted);
+}
+
+.paper-note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--card-blue);
+}
+
+.paper-note strong {
+  color: var(--card-navy);
+}
+
+/* --- Scan the standee: the page's one big action --------------------------- */
+.scan-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 18px 14px 14px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--card-blue);
+  color: #FFFFFF;
+  text-align: left;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 12px 26px -12px rgba(30, 74, 255, 0.6);
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.scan-btn:hover {
+  background: var(--card-blue-dark);
+}
+
+.scan-btn:active {
+  transform: scale(0.98);
+}
+
+.scan-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.scan-btn-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scan-btn-text strong {
+  font-size: 1.02rem;
+  font-weight: 800;
+}
+
+.scan-btn-text span {
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* --- Today's Wi-Fi code ----------------------------------------------------- */
+.wifi-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: #FFFFFF;
+  box-shadow: 0 6px 18px -10px rgba(22, 37, 92, 0.25);
+}
+
+.wifi-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wifi-head h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--card-navy);
+}
+
+.wifi-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #E6ECFF;
+  color: var(--card-blue);
+}
+
+.wifi-code-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 10px 10px 16px;
+  border-radius: 14px;
+  background: var(--card-sand);
+}
+
+.wifi-code {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  color: var(--card-navy);
+  overflow-wrap: anywhere;
+}
+
+.wifi-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--card-blue);
+  color: #FFFFFF;
+  font: 700 0.86rem/1 'Outfit', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.wifi-copy.is-copied {
+  background: var(--card-navy);
+}
+
+.wifi-help {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--card-ink-muted);
+}
+
+/* --- On the menu ---------------------------------------------------------- */
+.menu-tile {
+  display: grid;
+  grid-template-columns: 104px 1fr;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #FFFFFF;
+  color: var(--card-navy);
+  text-decoration: none;
+  box-shadow: 0 6px 18px -10px rgba(22, 37, 92, 0.25);
+}
+
+.menu-tile img {
+  width: 100%;
+  height: 100%;
+  min-height: 112px;
+  object-fit: cover;
+}
+
+.menu-tile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+}
+
+.menu-tile-text strong {
+  font-size: 0.98rem;
+  line-height: 1.25;
+}
+
+.menu-tile-text > span {
+  font-size: 0.84rem;
+  color: var(--card-ink-muted);
+}
+
+.menu-tile-text .menu-tile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: auto;
+  padding-top: 6px;
+  font-weight: 700;
+  color: var(--card-blue);
+}
+
+/* --- Small print ------------------------------------------------------------ */
+.card-legal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 4px;
+  font-size: 0.8rem;
+  color: var(--card-ink-muted);
+  text-align: center;
+}
+
+.card-legal p {
+  margin: 0;
+}
+
+.card-legal-trust {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-legal-links {
+  display: flex;
+  gap: 16px;
+}
+
+.card-legal .legal-footer-btn {
+  color: var(--card-navy);
+}
+
+.card-delete-link {
+  border: 0;
+  background: none;
+  color: var(--card-ink-muted);
+  font: 500 0.78rem/1.4 'Outfit', sans-serif;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* --- Dialogs: your cards, how it works, delete ------------------------------ */
+.card-sheet {
+  background: var(--card-sand);
+}
+
+.card-sheet .archive-modal-header {
+  background: var(--card-paper);
+  border-bottom-color: var(--card-rule);
+}
+
+.card-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-sheet-head h3 {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: var(--card-navy);
+}
+
+.card-sheet-head p {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: var(--card-ink-muted);
+}
+
+.card-sheet-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #E6ECFF;
+  color: var(--card-blue);
+}
+
+.archive-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-radius: 16px;
+  background: #FFFFFF;
+  text-align: center;
+}
+
+.archive-summary > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 10px;
+}
+
+.archive-summary > div + div {
+  border-left: 1px solid var(--card-rule);
+}
+
+.archive-summary strong {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--card-navy);
+}
+
+.archive-summary span {
+  font-size: 0.8rem;
+  color: var(--card-ink-muted);
+}
+
+.mini-card {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background-color: var(--card-paper);
+  background-image: var(--paper-grain);
+  color: var(--card-navy);
+  box-shadow: 0 1px 2px rgba(22, 37, 92, 0.08), 0 8px 18px -12px rgba(22, 37, 92, 0.3);
+}
+
+.mini-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 0.86rem;
+}
+
+.mini-card-head span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--card-ink-muted);
+}
+
+.mini-stamps {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+}
+
+.mini-stamp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  color: var(--card-blue);
+  background: rgba(30, 74, 255, 0.07);
+  transform: rotate(var(--tilt, 0deg));
+}
+
+.mini-card-reward {
+  margin: 10px 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--card-blue);
+}
+
+.mini-card.is-current {
+  background: #FFFFFF;
+}
+
+.mini-progress {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: rgba(22, 37, 92, 0.1);
+}
+
+.mini-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--card-blue);
+}
+
+.archive-empty {
+  padding: 22px 16px;
+  border: 1px dashed var(--card-rule);
+  border-radius: 16px;
+  text-align: center;
+  color: var(--card-ink-muted);
+}
+
+.archive-empty h4 {
+  margin: 8px 0 4px;
+  font-size: 0.98rem;
+  color: var(--card-navy);
+}
+
+.archive-empty p {
+  margin: 0 auto;
+  max-width: 260px;
+  font-size: 0.84rem;
+}
+
+/* How it works: three steps, in order */
+.guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 18px 20px 22px;
+  list-style: none;
+}
+
+.guide-steps li {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  background: #FFFFFF;
+}
+
+.guide-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--card-blue);
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.86rem;
+}
+
+.guide-steps h4 {
+  margin: 2px 0 4px;
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--card-navy);
+}
+
+.guide-steps p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--card-ink-muted);
+}
+
+.guide-steps strong {
+  color: var(--card-navy);
+}
+
+.delete-sheet {
+  max-width: 380px;
+  padding: 24px 20px;
+  text-align: center;
+  align-items: center;
+}
+
+.delete-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: #FDECEC;
+  color: #C42525;
+}
+
+.delete-sheet h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--card-navy);
+}
+
+.delete-sheet p {
+  margin: 0 0 20px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--card-ink-muted);
+}
+
+.delete-actions {
+  width: 100%;
+}
+
+/* The camera scanner */
+.scanner-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(14, 26, 69, 0.78);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.scanner-frame {
+  width: 100%;
+  max-width: 380px;
+}
+
+/* --- Sign-in (AuthModal, shared with /claim/) -------------------------------- */
+.auth-card {
+  background-color: var(--card-paper);
+  background-image: var(--paper-grain);
+  border: 0;
+  box-shadow:
+    0 1px 1px rgba(22, 37, 92, 0.08),
+    0 18px 36px -14px rgba(22, 37, 92, 0.28);
+}
+
+.auth-header-icon {
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 0;
+  box-shadow: 0 2px 8px rgba(22, 37, 92, 0.14);
+}
+
+.auth-perk-badge {
+  background: #FFFFFF;
+  border-color: var(--card-rule);
+}
+
+.auth-perk-icon {
+  color: var(--card-blue);
+}
+
+.auth-divider {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.btn-submit-otp {
+  background: var(--card-blue);
+  border-color: var(--card-blue);
+  border-radius: 9999px;
+  box-shadow: 0 8px 18px -10px rgba(30, 74, 255, 0.7);
+}
+
+.btn-submit-otp:hover:not(:disabled) {
+  background: var(--card-blue-dark);
+  border-color: var(--card-blue-dark);
+}
+
+.btn-oauth {
+  border-radius: 9999px;
+}
+
+.input-email {
+  border-radius: 9999px;
+  background: #FFFFFF;
+}
+
+.input-email:focus {
+  border-color: var(--card-blue);
+  box-shadow: 0 0 0 3px rgba(30, 74, 255, 0.15);
+}
+
+:focus-visible {
+  outline-color: var(--card-blue) !important;
+}
+
+/* --- Header on small phones: everything on one line -------------------------- */
+.loyalty-logo-title-group,
+.btn-loyalty-signout {
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .loyalty-header {
+    padding-inline: 16px;
+  }
+
+  #loyalty-header-actions {
+    gap: 6px !important;
+  }
+
+  .btn-loyalty-signout {
+    padding: 7px 12px;
+  }
+
+  .btn-loyalty-signout svg {
+    display: none;
+  }
+}
+
+/* A rubber stamp's line is heavier than an icon's */
+.stamp.is-inked svg {
+  stroke-width: 2.4;
+}
+
+/* Sign-in buttons: Outfit like the rest; Google as a plain white button so
+   the blue one is the only strong action */
+.btn-oauth,
+.btn-submit-otp {
+  font-family: 'Outfit', system-ui, sans-serif;
+}
+
+.btn-oauth.google {
+  background: #FFFFFF;
+  color: var(--card-navy);
+  border: 1px solid var(--card-rule);
+  box-shadow: 0 1px 2px rgba(22, 37, 92, 0.08);
+}
+
+.btn-oauth.google:hover:not(:disabled) {
+  background: #FFFFFF;
+  border-color: rgba(22, 37, 92, 0.3);
+}
+
+/* While a first visit loads: the card's printed outline, circles breathing */
+.paper-card.is-loading .stamp {
+  border-style: solid;
+  border-color: rgba(22, 37, 92, 0.1);
+  background: rgba(22, 37, 92, 0.05);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .paper-card.is-loading .stamp {
+    animation: stampWait 1.2s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes stampWait {
+  to { background: rgba(22, 37, 92, 0.1); }
+}
+
+.paper-card.is-loading .paper-progress {
+  color: var(--card-ink-muted);
+}
+
+.scanner-loading {
+  padding: 48px 20px;
+  border-radius: 20px;
+  background: var(--card-paper);
+  color: var(--card-navy);
+  font-weight: 600;
+  text-align: center;
+}

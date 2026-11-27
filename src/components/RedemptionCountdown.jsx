@@ -50,7 +50,7 @@ export default function RedemptionCountdown({ redemptionData, user, onClose }) {
             position: 'absolute',
             top: '16px',
             right: '16px',
-            background: '#F1F5F9',
+            background: '#F3ECDF',
             border: 'none',
             borderRadius: '50%',
             width: '32px',
@@ -59,7 +59,7 @@ export default function RedemptionCountdown({ redemptionData, user, onClose }) {
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            color: '#64748B'
+            color: '#5A6987'
           }}
           aria-label="Close redemption screen"
         >
@@ -89,7 +89,7 @@ export default function RedemptionCountdown({ redemptionData, user, onClose }) {
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
               style={{
-                stroke: secondsLeft > 30 ? '#FB923C' : '#EF4444'
+                stroke: secondsLeft > 30 ? '#1E4AFF' : '#EF4444'
               }}
             />
           </svg>
@@ -105,38 +105,38 @@ export default function RedemptionCountdown({ redemptionData, user, onClose }) {
           background: '#FAF4EB',
           borderRadius: '16px',
           padding: '16px',
-          border: '2px dashed #131314',
+          border: '2px dashed #16255C',
           marginBottom: '16px'
         }}>
-          <div style={{ display: 'inline-flex', padding: '10px', background: '#131314', color: '#FFF', borderRadius: '12px', marginBottom: '8px' }}>
+          <div style={{ display: 'inline-flex', padding: '10px', background: '#16255C', color: '#FFF', borderRadius: '12px', marginBottom: '8px' }}>
             <Coffee size={28} />
           </div>
-          <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#131314', fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase' }}>
+          <h3 style={{ fontFamily: 'Outfit, sans-serif', color: '#16255C', fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase' }}>
             FREE SPECIALTY COFFEE
           </h3>
-          <p style={{ fontSize: '0.82rem', color: '#475569', marginTop: '4px' }}>
+          <p style={{ fontSize: '0.82rem', color: '#4A5878', marginTop: '4px' }}>
             Milestone #{redemptionData?.milestoneNumber} Reward
           </p>
         </div>
 
-        <div style={{ fontSize: '0.85rem', color: '#334155', marginBottom: '18px', textAlign: 'left', background: '#F8FAFC', padding: '12px', borderRadius: '10px' }}>
+        <div style={{ fontSize: '0.85rem', color: '#334155', marginBottom: '18px', textAlign: 'left', background: '#FBF6EE', padding: '12px', borderRadius: '10px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span style={{ color: '#64748B' }}>Customer:</span>
-            <strong style={{ color: '#0F172A' }}>{user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Member'}</strong>
+            <span style={{ color: '#5A6987' }}>Customer:</span>
+            <strong style={{ color: '#16255C' }}>{user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Member'}</strong>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span style={{ color: '#64748B' }}>Time:</span>
+            <span style={{ color: '#5A6987' }}>Time:</span>
             <span>{formatManilaDateTime(redemptionData?.redeemedAt || new Date().toISOString())}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: '#64748B' }}>Ref ID:</span>
-            <code style={{ background: '#E2E8F0', padding: '1px 6px', borderRadius: '4px', fontSize: '0.78rem' }}>
+            <span style={{ color: '#5A6987' }}>Ref ID:</span>
+            <code style={{ background: '#E7DDCB', padding: '1px 6px', borderRadius: '4px', fontSize: '0.78rem' }}>
               BAIA-{redemptionData?.redemptionId || Math.floor(1000 + Math.random() * 9000)}
             </code>
           </div>
         </div>
 
-        <p style={{ fontSize: '0.78rem', color: '#64748B', marginBottom: '16px' }}>
+        <p style={{ fontSize: '0.78rem', color: '#5A6987', marginBottom: '16px' }}>
           Please show this screen to the cashier or barista when picking up your beverage.
         </p>
 
@@ -144,7 +144,7 @@ export default function RedemptionCountdown({ redemptionData, user, onClose }) {
           onClick={onClose}
           style={{
             width: '100%',
-            background: '#131314',
+            background: '#16255C',
             color: '#FFFFFF',
             border: 'none',
             padding: '12px',

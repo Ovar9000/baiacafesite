@@ -131,8 +131,8 @@
   min-height: 48px;
   padding: 0 22px;
   border-radius: var(--radius-pill);
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 1rem;
@@ -141,7 +141,7 @@
 }
 
 .visit-directions-btn:hover {
-  background: #FFB53D;
+  background: var(--action-hover);
 }
 
 /* Messenger, Instagram, and the loyalty card line */
@@ -207,7 +207,7 @@
 
 .footer-loyalty-link:hover {
   color: var(--cream);
-  text-decoration-color: var(--golden-amber);
+  text-decoration-color: var(--accent);
 }
 
 /* --- The strip ------------------------------------------------------------ */
@@ -258,7 +258,7 @@
 }
 
 .footer-link:hover {
-  color: var(--golden-amber);
+  color: var(--accent);
 }
 
 /* --- Phones --------------------------------------------------------------- */

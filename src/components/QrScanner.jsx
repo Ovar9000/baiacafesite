@@ -139,14 +139,14 @@ export default function QrScanner({ onScan, onClose }) {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ padding: '8px', background: '#F1F5F9', color: '#131314', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+          <div style={{ padding: '8px', background: '#F3ECDF', color: '#16255C', borderRadius: '10px', border: '1px solid #E7DDCB' }}>
             <Camera size={20} />
           </div>
           <div style={{ textAlign: 'left' }}>
-            <h4 style={{ margin: 0, fontSize: '0.95rem', color: '#131314', fontWeight: 700 }}>
+            <h4 style={{ margin: 0, fontSize: '0.95rem', color: '#16255C', fontWeight: 700 }}>
               Scan Counter Standee
             </h4>
-            <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>
+            <p style={{ margin: 0, fontSize: '0.75rem', color: '#5A6987' }}>
               Point camera at today's QR code
             </p>
           </div>
@@ -156,7 +156,7 @@ export default function QrScanner({ onScan, onClose }) {
           <button
             onClick={onClose}
             style={{
-              background: '#F1F5F9',
+              background: '#F3ECDF',
               border: 'none',
               borderRadius: '50%',
               width: '32px',
@@ -165,7 +165,7 @@ export default function QrScanner({ onScan, onClose }) {
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              color: '#475569'
+              color: '#4A5878'
             }}
           >
             <X size={16} />
@@ -181,7 +181,7 @@ export default function QrScanner({ onScan, onClose }) {
         maxHeight: '300px',
         borderRadius: '16px',
         overflow: 'hidden',
-        background: '#0F172A',
+        background: '#16255C',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -193,7 +193,7 @@ export default function QrScanner({ onScan, onClose }) {
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'rgba(15, 23, 42, 0.85)',
+            background: 'rgba(22, 37, 92, 0.85)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -201,7 +201,7 @@ export default function QrScanner({ onScan, onClose }) {
             color: '#FFFFFF',
             gap: '10px'
           }}>
-            <Loader2 className="animate-spin" size={32} color="#FB923C" />
+            <Loader2 className="animate-spin" size={32} color="#1E4AFF" />
             <span style={{ fontSize: '0.85rem' }}>Opening camera...</span>
           </div>
         )}
@@ -210,7 +210,7 @@ export default function QrScanner({ onScan, onClose }) {
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'rgba(15, 23, 42, 0.85)',
+            background: 'rgba(22, 37, 92, 0.85)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -218,7 +218,7 @@ export default function QrScanner({ onScan, onClose }) {
             color: '#FFFFFF',
             gap: '10px'
           }}>
-            <Loader2 className="animate-spin" size={32} color="#FB923C" />
+            <Loader2 className="animate-spin" size={32} color="#1E4AFF" />
             <span style={{ fontSize: '0.85rem' }}>Decoding QR Code...</span>
           </div>
         )}
@@ -234,11 +234,11 @@ export default function QrScanner({ onScan, onClose }) {
             alignItems: 'center',
             justifyContent: 'center',
             textAlign: 'center',
-            color: '#131314',
+            color: '#16255C',
             gap: '8px'
           }}>
-            <Camera size={32} color="#FB923C" />
-            <p style={{ fontSize: '0.82rem', lineHeight: '1.4', margin: 0, color: '#475569' }}>
+            <Camera size={32} color="#1E4AFF" />
+            <p style={{ fontSize: '0.82rem', lineHeight: '1.4', margin: 0, color: '#4A5878' }}>
               {cameraError}
             </p>
           </div>
@@ -261,7 +261,7 @@ export default function QrScanner({ onScan, onClose }) {
           onClick={() => fileInputRef.current?.click()}
           disabled={isScanningFile}
           style={{
-            background: '#131314',
+            background: '#16255C',
             color: '#FFFFFF',
             border: 'none',
             padding: '12px 16px',
@@ -273,14 +273,14 @@ export default function QrScanner({ onScan, onClose }) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: '8px',
-            boxShadow: '0 4px 12px rgba(19, 19, 20, 0.2)'
+            boxShadow: '0 4px 12px rgba(22, 37, 92, 0.2)'
           }}
         >
           <Camera size={18} />
           <span>Snap Photo with Camera</span>
         </button>
 
-        <div style={{ fontSize: '0.75rem', color: '#94A3B8' }}>
+        <div style={{ fontSize: '0.75rem', color: '#8A93AD' }}>
           Point camera at the acrylic standee at the pickup bar.
         </div>
       </div>

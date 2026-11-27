@@ -18,7 +18,7 @@
   align-items: center;
   gap: 8px;
   background: rgba(255, 255, 255, 0.12);
-  color: var(--golden-amber);
+  color: var(--accent);
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 700;
@@ -440,6 +440,11 @@
 }
 
 .mx-list {
+  /* A white surface inside the navy section: light-context actions */
+  --action: #1E4AFF;
+  --action-hover: #1538D4;
+  --on-action: #FFFFFF;
+  --accent: #1E4AFF;
   list-style: none;
   background: #FFFFFF;
   border-radius: var(--radius-lg);
@@ -486,8 +491,8 @@
   font-weight: 700;
   padding: 2px 7px;
   border-radius: var(--radius-sm);
-  background: #FFF4DC;
-  color: #9A5B00;
+  background: #E6ECFF;
+  color: #1538D4;
 }
 
 .mx-row-desc {
@@ -515,8 +520,8 @@
   height: 38px;
   border: none;
   border-radius: 50%;
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -525,7 +530,7 @@
 }
 
 .mx-add:hover {
-  background: #FFB733;
+  background: var(--action-hover);
 }
 
 .mx-add:active {
@@ -704,7 +709,7 @@
 }
 
 :is(.cz-seg-btn, .cz-addon, .spot-btn):has(.seg-input:focus-visible) {
-  outline: 3px solid var(--golden-amber);
+  outline: 3px solid var(--accent);
   outline-offset: -3px;
   border-radius: 8px;
 }
@@ -826,8 +831,8 @@
   min-height: 48px;
   border: none;
   border-radius: var(--radius-pill);
-  background: var(--golden-amber);
-  color: var(--deep-navy);
+  background: var(--action);
+  color: var(--on-action);
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1rem;
@@ -856,7 +861,7 @@
   }
 
   @starting-style {
-    dialog.modal-dialog-card.drink-customizer-card[open] {
+    dialog.modal-dialog-card.drink-customizer-card[open]:not([data-closing]) {
       opacity: 1;
     }
   }

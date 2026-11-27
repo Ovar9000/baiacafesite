@@ -1,16 +1,12 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom';
-import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabaseClient';
 import { calculateLoyaltyStatus, formatManilaDateTime, isBonusStamp, sortStampsAsc } from '../lib/loyaltyHelpers';
 import AuthModal from '../components/AuthModal';
-import QrScanner from '../components/QrScanner';
-import RedemptionCountdown from '../components/RedemptionCountdown';
 import LegalModal from '../components/LegalModal';
 import { 
   Coffee, 
-  Gift, 
-  Award, 
+  Gift,  
   LogOut, 
   ChevronRight, 
   QrCode, 
@@ -23,10 +19,46 @@ import {
   Check,
   HelpCircle,
   Trash2,
-  CheckCircle2,
   Sparkles
 } from 'lucide-react';
 import '../styles/loyalty.css';
+import '../styles/card.css';
+
+// Loaded only when needed, so opening the card stays light: the camera
+// scanner (the QR library is most of the page's weight) and the redemption
+// screen. The scanner is fetched in the background once the card is up.
+const loadQrScanner = () => import('../components/QrScanner');
+const QrScanner = lazy(loadQrScanner);
+const RedemptionCountdown = lazy(() => import('../components/RedemptionCountdown'));
+
+// The last stamps this device saw, shown instantly while fresh ones load.
+// Display only: every stamp and reward is checked again by the server.
+const CARD_CACHE_KEY = 'baia_card_cache_v1';
+
+function readCardCache(userId) {
+  try {
+    const cached = JSON.parse(localStorage.getItem(CARD_CACHE_KEY) || 'null');
+    return cached && cached.userId === userId ? cached : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeCardCache(userId, stamps, redemptions) {
+  try {
+    localStorage.setItem(CARD_CACHE_KEY, JSON.stringify({ userId, stamps, redemptions }));
+  } catch {
+    // storage full or blocked: the card still works, just without the head start
+  }
+}
+
+function clearCardCache() {
+  try {
+    localStorage.removeItem(CARD_CACHE_KEY);
+  } catch {
+    // nothing to clear
+  }
+}
 
 export default function CardApp() {
   const [user, setUser] = useState(null);
@@ -34,6 +66,8 @@ export default function CardApp() {
   const [loading, setLoading] = useState(true);
   const [stamps, setStamps] = useState([]);
   const [redemptions, setRedemptions] = useState([]);
+  // True once this user's stamps are known (from the cache or the server)
+  const [dataReady, setDataReady] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [toastMsg, setToastMsg] = useState('');
   
@@ -78,89 +112,101 @@ export default function CardApp() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch user stamps & redemptions from Supabase
+  // Fetch the user's stamps, redemptions and today's Wi-Fi code, all at once
+  const userId = user?.id;
   const loadLoyaltyData = useCallback(async () => {
-    if (!user) return;
+    if (!userId) return;
     try {
       setErrorMsg('');
 
-      // Fetch real stamps
-      const { data: stampsData, error: sErr } = await supabase
-        .from('stamps')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('awarded_at', { ascending: false });
+      const todayManila = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Manila',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).format(new Date());
+      const startOfDay = new Date(`${todayManila}T00:00:00+08:00`).toISOString();
+      const endOfDay = new Date(`${todayManila}T23:59:59.999+08:00`).toISOString();
 
-      if (sErr) throw sErr;
-      setStamps(stampsData || []);
-
-      // Fetch real redemptions
-      const { data: redemptionsData, error: rErr } = await supabase
-        .from('redemptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('redeemed_at', { ascending: false });
-
-      if (rErr) throw rErr;
-      setRedemptions(redemptionsData || []);
-
-      // Fetch today's active Wi-Fi voucher
-      try {
-        const todayManila = new Intl.DateTimeFormat('en-CA', {
-          timeZone: 'Asia/Manila',
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        }).format(new Date());
-
-        const startOfDay = new Date(`${todayManila}T00:00:00+08:00`).toISOString();
-        const endOfDay = new Date(`${todayManila}T23:59:59.999+08:00`).toISOString();
-
-        const { data: voucherRows } = await supabase
+      // One round trip instead of three: the queries don't depend on each other
+      const [stampsRes, redemptionsRes, voucherRes] = await Promise.all([
+        supabase
+          .from('stamps')
+          .select('*')
+          .eq('user_id', userId)
+          .order('awarded_at', { ascending: false }),
+        supabase
+          .from('redemptions')
+          .select('*')
+          .eq('user_id', userId)
+          .order('redeemed_at', { ascending: false }),
+        supabase
           .from('wifi_vouchers')
           .select('code, duration_hours, device_limit, claimed_at')
-          .eq('claimed_by', user.id)
+          .eq('claimed_by', userId)
           .gte('claimed_at', startOfDay)
           .lte('claimed_at', endOfDay)
           .order('claimed_at', { ascending: false })
-          .limit(1);
+          .limit(1)
+          .then((res) => res, () => ({ data: null }))
+      ]);
 
-        if (voucherRows && voucherRows.length > 0) {
-          setTodayVoucher(voucherRows[0]);
-        } else {
-          // Check if cached in sessionStorage for TODAY only
-          const cachedStr = sessionStorage.getItem('baia_today_wifi_voucher');
-          if (cachedStr) {
-            try {
-              const cached = JSON.parse(cachedStr);
-              if (cached && cached.date === todayManila) {
-                setTodayVoucher(cached);
-              } else {
-                // Expired from previous day -> clean up!
-                sessionStorage.removeItem('baia_today_wifi_voucher');
-                setTodayVoucher(null);
-              }
-            } catch (e) {
+      if (stampsRes.error) throw stampsRes.error;
+      if (redemptionsRes.error) throw redemptionsRes.error;
+      const stampsData = stampsRes.data || [];
+      const redemptionsData = redemptionsRes.data || [];
+      setStamps(stampsData);
+      setRedemptions(redemptionsData);
+      writeCardCache(userId, stampsData, redemptionsData);
+
+      // Today's Wi-Fi code
+      const voucherRows = voucherRes.data;
+      if (voucherRows && voucherRows.length > 0) {
+        setTodayVoucher(voucherRows[0]);
+      } else {
+        // Check if cached in sessionStorage for TODAY only
+        const cachedStr = sessionStorage.getItem('baia_today_wifi_voucher');
+        if (cachedStr) {
+          try {
+            const cached = JSON.parse(cachedStr);
+            if (cached && cached.date === todayManila) {
+              setTodayVoucher(cached);
+            } else {
+              // Expired from previous day -> clean up!
+              sessionStorage.removeItem('baia_today_wifi_voucher');
               setTodayVoucher(null);
             }
-          } else {
+          } catch (e) {
             setTodayVoucher(null);
           }
+        } else {
+          setTodayVoucher(null);
         }
-      } catch (vErr) {
-        setTodayVoucher(null);
       }
     } catch (err) {
       console.error('Error loading loyalty data:', err);
       setErrorMsg('Could not refresh card stamps.');
+    } finally {
+      setDataReady(true);
     }
-  }, [user]);
+  }, [userId]);
 
+  // Show the last-known card at once, then refresh it from the server
   useEffect(() => {
-    if (user) {
-      loadLoyaltyData();
+    if (!userId) {
+      setDataReady(false);
+      return;
     }
-  }, [user, loadLoyaltyData]);
+    const cached = readCardCache(userId);
+    if (cached) {
+      setStamps(cached.stamps || []);
+      setRedemptions(cached.redemptions || []);
+      setDataReady(true);
+    } else {
+      setDataReady(false);
+    }
+    loadLoyaltyData();
+  }, [userId, loadLoyaltyData]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -170,6 +216,7 @@ export default function CardApp() {
     setRedemptions([]);
     setTodayVoucher(null);
     sessionStorage.removeItem('baia_today_wifi_voucher');
+    clearCardCache();
   };
 
   const handleDeleteAccount = async () => {
@@ -197,6 +244,7 @@ export default function CardApp() {
       setRedemptions([]);
       setTodayVoucher(null);
       sessionStorage.removeItem('baia_today_wifi_voucher');
+      clearCardCache();
       setToastMsg('Your account and stamp data have been permanently deleted.');
       setTimeout(() => setToastMsg(''), 4000);
     } catch (err) {
@@ -275,13 +323,13 @@ export default function CardApp() {
         return;
       }
 
-      try {
-        confetti({
+      import('canvas-confetti')
+        .then(({ default: confetti }) => confetti({
           particleCount: 100,
           spread: 80,
           origin: { y: 0.5 }
-        });
-      } catch (e) {}
+        }))
+        .catch(() => {});
 
       setToastMsg(data.message || 'Stamp successfully added to your card.');
       if (data.wifiVoucher) {
@@ -373,38 +421,49 @@ export default function CardApp() {
 
   const headerActionsEl = typeof document !== 'undefined' ? document.getElementById('loyalty-header-actions') : null;
 
+  // Each stamp lands at its own slight angle, like a rubber stamp pressed by hand
+  const STAMP_TILTS = [-8, 5, -3, 9, -6, 4, -10, 7, -2, -5];
+
+  // Fetch the scanner in the background once the card is up, so tapping
+  // Scan at the counter opens the camera without waiting on the network
+  useEffect(() => {
+    if (!dataReady || hasScannedToday) return undefined;
+    const whenIdle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1500));
+    const cancelIdle = window.cancelIdleCallback || clearTimeout;
+    const id = whenIdle(() => { loadQrScanner().catch(() => {}); });
+    return () => cancelIdle(id);
+  }, [dataReady, hasScannedToday]);
+  const stampsLeft = loyaltyStatus.stampsUntilNextMilestone;
+
   return (
     <>
-      {/* Dynamic Header Actions rendered into persistent header shell */}
+      {/* Header actions, rendered into the static header shell */}
       {headerActionsEl && ReactDOM.createPortal(
         <>
-          <button 
-            type="button" 
-            onClick={() => setShowTutorialModal(true)} 
-            className="btn-loyalty-signout" 
-            title="How It Works"
+          <button
+            type="button"
+            onClick={() => setShowTutorialModal(true)}
+            className="btn-loyalty-signout"
+            title="How your card works"
           >
             <HelpCircle size={14} />
-            <span>How It Works</span>
+            <span>How it works</span>
           </button>
           {user && (
-            <button onClick={handleSignOut} className="btn-loyalty-signout" title="Sign Out">
+            <button onClick={handleSignOut} className="btn-loyalty-signout" title="Sign out">
               <LogOut size={14} />
-              <span>Sign Out</span>
+              <span>Sign out</span>
             </button>
           )}
         </>,
         headerActionsEl
       )}
 
-      {/* Main Content Area */}
-      <main className="loyalty-main-content" style={{ flex: 1, padding: '20px 16px' }}>
+      <main className="loyalty-main-content card-main">
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <div className="card-loading">
             <div className="spinner-border" />
-            <p style={{ color: 'var(--loyalty-text-muted)', marginTop: '16px', fontSize: '0.9rem' }}>
-              Loading your loyalty card...
-            </p>
+            <p>Opening your card…</p>
           </div>
         ) : !user ? (
           <div>
@@ -414,342 +473,193 @@ export default function CardApp() {
             }} />
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <div className="card-stack">
 
-            {/* Live Scan Floating Toast / Status */}
             {toastMsg && (
-              <div style={{
-                background: '#F0FDF4',
-                border: '1.5px solid #86EFAC',
-                color: '#15803D',
-                borderRadius: '16px',
-                padding: '14px 18px',
-                fontSize: '0.88rem',
-                fontWeight: 700,
-                textAlign: 'center',
-                boxShadow: '0 4px 14px rgba(21, 128, 61, 0.12)',
-                animation: 'pulse-glow 2s infinite'
-              }}>
-                {toastMsg}
-              </div>
+              <div className="card-alert is-ok" role="status">{toastMsg}</div>
             )}
 
-            {/* Error Message Alert */}
             {errorMsg && (
-              <div style={{
-                background: '#FEF2F2',
-                border: '1.5px solid #FCA5A5',
-                color: '#B91C1C',
-                borderRadius: '16px',
-                padding: '14px 18px',
-                fontSize: '0.88rem',
-                fontWeight: 600,
-                textAlign: 'center',
-                boxShadow: '0 4px 14px rgba(185, 28, 28, 0.08)'
-              }}>
-                {errorMsg}
-              </div>
+              <div className="card-alert is-error" role="alert">{errorMsg}</div>
             )}
-            
-            {/* 1. Milestone Reward Unlocked Info Tile */}
-            {loyaltyStatus.hasPendingReward && (
-              <div style={{
-                background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
-                border: '2px solid #F59E0B',
-                borderRadius: '20px',
-                padding: '18px 20px',
-                boxShadow: '0 8px 24px rgba(245, 158, 11, 0.25)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '14px',
-                animation: 'pulse-glow 2.5s infinite'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <div style={{
-                    width: '46px',
-                    height: '46px',
-                    borderRadius: '14px',
-                    background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                    color: '#FFFFFF',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    boxShadow: '0 4px 12px rgba(217, 119, 6, 0.35)'
-                  }}>
-                    <Gift size={24} />
+
+            {!dataReady ? (
+              /* First visit on this device: the card's outline while the stamps load */
+              <section className="paper-card is-loading" aria-busy="true" aria-label="Loading your card">
+                <div className="paper-head">
+                  <div className="paper-brand">
+                    <span className="paper-brand-name">BAIA</span>
+                    <span className="paper-brand-line">Coffee by the Bay</span>
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#B45309', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '2px' }}>
-                      Milestone Reward Ready
-                    </div>
-                    <h4 style={{ fontSize: '1.02rem', color: '#78350F', fontWeight: 800, margin: '0 0 3px', lineHeight: '1.2' }}>
-                      Free Specialty Coffee Unlocked
-                    </h4>
-                    <p style={{ fontSize: '0.8rem', color: '#92400E', margin: 0, lineHeight: '1.4' }}>
-                      Ready to order? Activate your reward at the counter with your barista to redeem.
-                    </p>
+                </div>
+                <div className="paper-holder">
+                  <span className="paper-holder-name">
+                    {user.user_metadata?.full_name || user.email?.split('@')[0] || 'BAIA guest'}
+                  </span>
+                  <span className="paper-holder-email">{user.email}</span>
+                </div>
+                <ol className="stamp-row" aria-hidden="true">
+                  {Array.from({ length: 10 }).map((_, idx) => <li key={idx} className="stamp" />)}
+                </ol>
+                <div className="paper-foot">
+                  <p className="paper-progress">Checking your stamps…</p>
+                </div>
+              </section>
+            ) : (<>
+
+            {/* A full card: the free coffee, ready to redeem */}
+            {loyaltyStatus.hasPendingReward && (
+              <section className="reward-ready" aria-labelledby="reward-ready-title">
+                <div className="reward-ready-head">
+                  <span className="reward-ready-icon" aria-hidden="true"><Gift size={22} /></span>
+                  <div>
+                    <h2 id="reward-ready-title">Your free coffee is ready</h2>
+                    <p>Redeem it at the counter when you order, then show this screen to the barista.</p>
                   </div>
                 </div>
 
                 {!showRedeemConfirm ? (
                   <button
                     type="button"
+                    className="reward-ready-btn"
                     onClick={() => setShowRedeemConfirm(true)}
-                    style={{
-                      width: '100%',
-                      background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
-                      color: '#FFFFFF',
-                      border: 'none',
-                      padding: '12px 18px',
-                      borderRadius: '14px',
-                      fontWeight: 700,
-                      fontSize: '0.88rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      cursor: 'pointer',
-                      boxShadow: '0 4px 12px rgba(180, 83, 9, 0.25)'
-                    }}
                   >
-                    <Sparkles size={16} />
-                    <span>Redeem Free Coffee with Barista →</span>
+                    <Sparkles size={16} aria-hidden="true" />
+                    <span>Redeem at the counter</span>
                   </button>
                 ) : (
-                  <div style={{
-                    background: '#FFFFFF',
-                    border: '1.5px solid #F59E0B',
-                    borderRadius: '14px',
-                    padding: '14px',
-                    textAlign: 'center'
-                  }}>
-                    <p style={{ fontSize: '0.82rem', color: '#78350F', fontWeight: 600, margin: '0 0 10px' }}>
-                      Are you currently at the BAIA drink counter placing your order?
-                    </p>
-                    <div style={{ display: 'flex', gap: '8px' }}>
+                  <div className="reward-confirm">
+                    <p>Are you at the counter ordering now?</p>
+                    <div className="reward-confirm-actions">
                       <button
                         type="button"
+                        className="btn-card-quiet"
                         onClick={() => setShowRedeemConfirm(false)}
                         disabled={redeeming}
-                        style={{
-                          flex: 1,
-                          background: '#F1F5F9',
-                          color: '#475569',
-                          border: 'none',
-                          padding: '10px',
-                          borderRadius: '10px',
-                          fontWeight: 600,
-                          fontSize: '0.82rem',
-                          cursor: 'pointer'
-                        }}
                       >
-                        Cancel
+                        Not yet
                       </button>
                       <button
                         type="button"
+                        className="btn-card-solid"
                         onClick={handleRedeemReward}
                         disabled={redeeming}
-                        style={{
-                          flex: 1.5,
-                          background: '#131314',
-                          color: '#FFFFFF',
-                          border: 'none',
-                          padding: '10px',
-                          borderRadius: '10px',
-                          fontWeight: 700,
-                          fontSize: '0.82rem',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '6px'
-                        }}
                       >
-                        {redeeming ? 'Redeeming...' : 'Yes, Activate Now →'}
+                        {redeeming ? 'Redeeming…' : 'Yes, redeem now'}
                       </button>
                     </div>
                   </div>
                 )}
-              </div>
+              </section>
             )}
 
-            {/* 2. Signature BAIA Ocean Blue Digital Card */}
-            <div className={`digital-card ${isCompletedCard ? 'completed-cycle' : ''}`}>
-              <div className="card-top-row">
-                <div>
-                  <div className="card-holder-name">
-                    {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Shore Member'}
-                  </div>
-                  <div className="card-member-since">
-                    {user.email}
-                  </div>
+            {/* The stamp card: printed on sand paper, stamped in BAIA blue ink */}
+            <section
+              className={`paper-card ${isCompletedCard ? 'is-full' : ''}`}
+              aria-label={`Loyalty card ${activeCycleNumber}: ${displayProgress} of 10 stamps`}
+            >
+              <div className="paper-head">
+                <div className="paper-brand">
+                  <span className="paper-brand-name">BAIA</span>
+                  <span className="paper-brand-line">Coffee by the Bay</span>
                 </div>
-                
-                {/* Interactive Cycle Badge (Clean minimal typography, taps to reveal completed stamp cards) */}
                 <button
                   type="button"
+                  className="paper-cycle-btn"
                   onClick={() => setShowArchiveModal(true)}
-                  className="card-tier-badge"
-                  style={{
-                    cursor: 'pointer',
-                    background: 'rgba(255, 255, 255, 0.18)',
-                    border: '1px solid rgba(255, 255, 255, 0.35)',
-                    color: '#FFE699',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '5px 14px',
-                    borderRadius: '9999px',
-                    fontWeight: 700,
-                    fontSize: '0.75rem',
-                    letterSpacing: '0.3px'
-                  }}
-                  title="View Completed Card Collection"
+                  title="See your finished cards"
                 >
-                  <span>Cycle {activeCycleNumber}</span>
+                  <span>Card {activeCycleNumber}</span>
+                  <ChevronRight size={14} aria-hidden="true" />
                 </button>
               </div>
 
-              {/* 10-Stamp Visual Grid */}
-              <div className="stamp-grid-container">
-                <div className="stamp-grid-title">
-                  <span>{isCompletedCard ? '10/10 Stamps Completed' : 'Current Stamp Cycle'}</span>
-                  <span>{displayProgress} / 10 Stamps</span>
-                </div>
-
-                <div className="stamp-grid-slots">
-                  {Array.from({ length: 10 }).map((_, idx) => {
-                    const slotNum = idx + 1;
-                    const isFilled = slotNum <= displayProgress;
-                    const isRewardSlot = slotNum === 10;
-                    const isBonusSlot = isFilled && !isCompletedCard && isBonusStamp(currentCycleStamps[idx]);
-                    return (
-                      <div
-                        key={idx}
-                        className={`stamp-slot ${isFilled ? (isCompletedCard ? 'filled full-gold' : 'filled') : 'empty'} ${isBonusSlot ? 'bonus' : ''} ${isRewardSlot ? 'milestone-target' : ''}`}
-                        title={isBonusSlot ? 'First-card bonus stamp, on us' : isFilled ? `Stamp #${slotNum} earned` : `Stamp #${slotNum}`}
-                      >
-                        {isBonusSlot ? (
-                          <>
-                            <Gift />
-                            <span className="stamp-slot-badge">+1</span>
-                          </>
-                        ) : isFilled ? (
-                          <Coffee />
-                        ) : isRewardSlot ? (
-                          <Award size={18} style={{ color: '#F5A623' }} />
-                        ) : (
-                          <span>{slotNum}</span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {(bonusWaitingOnNextCard || currentCardHasBonus || showFirstCardBonusTeaser) && (
-                  <div className="stamp-grid-note">
-                    <Gift size={13} aria-hidden="true" />
-                    <span>
-                      {bonusWaitingOnNextCard
-                        ? <><strong>+1 bonus stamp</strong> for finishing your first card. It's already on your next card.</>
-                        : currentCardHasBonus
-                          ? <><strong>+1 bonus stamp</strong> on us for finishing your first card.</>
-                          : <>Finish this card and your next one starts with <strong>1 stamp on us</strong>.</>}
-                    </span>
-                  </div>
-                )}
+              <div className="paper-holder">
+                <span className="paper-holder-name">
+                  {user.user_metadata?.full_name || user.email?.split('@')[0] || 'BAIA guest'}
+                </span>
+                <span className="paper-holder-email">{user.email}</span>
               </div>
 
-              {/* Progress to Next Reward */}
-              <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.12)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '6px', color: 'rgba(255, 255, 255, 0.9)' }}>
+              <ol className="stamp-row">
+                {Array.from({ length: 10 }).map((_, idx) => {
+                  const slotNum = idx + 1;
+                  const isFilled = slotNum <= displayProgress;
+                  const isRewardSlot = slotNum === 10;
+                  const isBonusSlot = isFilled && !isCompletedCard && isBonusStamp(currentCycleStamps[idx]);
+                  const classes = [
+                    'stamp',
+                    isFilled ? 'is-inked' : '',
+                    isBonusSlot ? 'is-bonus' : '',
+                    isRewardSlot ? 'is-reward' : ''
+                  ].filter(Boolean).join(' ');
+                  const label = isBonusSlot
+                    ? `Stamp ${slotNum}: bonus stamp, on us`
+                    : isFilled
+                      ? `Stamp ${slotNum}: stamped`
+                      : isRewardSlot ? 'Stamp 10: free coffee' : `Stamp ${slotNum}: not yet`;
+                  return (
+                    <li
+                      key={idx}
+                      className={classes}
+                      style={{ '--tilt': `${STAMP_TILTS[idx]}deg`, '--i': idx }}
+                      aria-label={label}
+                      title={label}
+                    >
+                      {isBonusSlot ? (
+                        <>
+                          <Gift size={18} aria-hidden="true" />
+                          <span className="stamp-tag">+1</span>
+                        </>
+                      ) : isFilled ? (
+                        isRewardSlot
+                          ? <><Coffee size={18} aria-hidden="true" /><span className="stamp-tag">Free</span></>
+                          : <Coffee size={20} aria-hidden="true" />
+                      ) : isRewardSlot ? (
+                        <><Coffee size={16} aria-hidden="true" /><span className="stamp-tag">Free</span></>
+                      ) : (
+                        <span className="stamp-num" aria-hidden="true">{slotNum}</span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+
+              <div className="paper-foot">
+                <p className="paper-progress">
+                  {isCompletedCard
+                    ? 'Card full. Your free coffee is ready.'
+                    : `${stampsLeft} more ${stampsLeft === 1 ? 'drink' : 'drinks'} to a free coffee.`}
+                </p>
+                <span className="paper-count">{displayProgress}/10</span>
+              </div>
+
+              {(bonusWaitingOnNextCard || currentCardHasBonus || showFirstCardBonusTeaser) && (
+                <p className="paper-note">
+                  <Gift size={14} aria-hidden="true" />
                   <span>
-                    {isCompletedCard 
-                      ? <strong style={{ color: '#FFE699' }}>Reward Ready at Counter</strong>
-                      : <>Next Reward: <strong>Free Specialty Coffee</strong></>}
+                    {bonusWaitingOnNextCard
+                      ? <><strong>+1 bonus stamp</strong> for finishing your first card. It's already on your next card.</>
+                      : currentCardHasBonus
+                        ? <><strong>+1 bonus stamp</strong> on us for finishing your first card.</>
+                        : <>Finish this card and your next one starts with <strong>1 stamp on us</strong>.</>}
                   </span>
-                  <span style={{ color: '#FFE699', fontWeight: 700 }}>
-                    {isCompletedCard ? 'Completed' : `${loyaltyStatus.stampsUntilNextMilestone} drinks left`}
-                  </span>
-                </div>
-                <div style={{ height: '6px', background: 'rgba(255, 255, 255, 0.15)', borderRadius: '9999px', overflow: 'hidden' }}>
-                  <div 
-                    style={{ 
-                      height: '100%', 
-                      background: isCompletedCard ? 'linear-gradient(90deg, #F5A623, #FCD34D)' : 'linear-gradient(90deg, #FB923C, #F5A623)', 
-                      width: isCompletedCard ? '100%' : `${(loyaltyStatus.currentCycleProgress / 10) * 100}%`,
-                      transition: 'width 0.4s ease'
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
+                </p>
+              )}
+            </section>
 
-            {/* Active Beach Wi-Fi Voucher Tile (View again anytime today) */}
+            {/* Today's Wi-Fi code (shown again any time today) */}
             {todayVoucher ? (
-              <div style={{
-                background: '#FFFFFF',
-                border: '1.5px solid #E2E8F0',
-                borderRadius: '20px',
-                padding: '16px 18px',
-                boxShadow: '0 4px 16px rgba(19, 19, 20, 0.06)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '10px',
-                      background: '#F1F5F9',
-                      color: '#131314',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <Wifi size={18} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.68rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
-                        Active Today
-                      </div>
-                      <h4 style={{ fontSize: '0.96rem', color: '#131314', fontWeight: 700, margin: 0 }}>
-                        Beach Wi-Fi Voucher
-                      </h4>
-                    </div>
-                  </div>
-                  <span style={{
-                    fontSize: '0.72rem',
-                    color: '#16A34A',
-                    background: '#DCFCE7',
-                    padding: '3px 10px',
-                    borderRadius: '9999px',
-                    fontWeight: 700
-                  }}>
-                    Unlocked
-                  </span>
+              <section className="wifi-tile" aria-labelledby="wifi-title">
+                <div className="wifi-head">
+                  <span className="wifi-icon" aria-hidden="true"><Wifi size={18} /></span>
+                  <h2 id="wifi-title">Today's Wi-Fi code</h2>
                 </div>
-
-                <div style={{
-                  background: '#FAF4EB',
-                  border: '1px dashed rgba(19, 19, 20, 0.16)',
-                  borderRadius: '12px',
-                  padding: '10px 14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}>
-                  <div>
-                    <div style={{ fontSize: '0.66rem', color: '#64748B', fontWeight: 700, letterSpacing: '0.5px' }}>HOTSPOT CODE</div>
-                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#131314', letterSpacing: '2.5px', fontFamily: 'monospace' }}>
-                      {todayVoucher.code}
-                    </div>
-                  </div>
+                <div className="wifi-code-box">
+                  <span className="wifi-code">{todayVoucher.code}</span>
                   <button
                     type="button"
+                    className={`wifi-copy ${copiedVoucher ? 'is-copied' : ''}`}
                     onClick={() => {
                       if (navigator.clipboard) {
                         navigator.clipboard.writeText(todayVoucher.code);
@@ -757,340 +667,141 @@ export default function CardApp() {
                         setTimeout(() => setCopiedVoucher(false), 2200);
                       }
                     }}
-                    style={{
-                      background: copiedVoucher ? '#16A34A' : '#131314',
-                      color: '#FFFFFF',
-                      border: 'none',
-                      padding: '8px 14px',
-                      borderRadius: '8px',
-                      fontSize: '0.8rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                      boxShadow: '0 2px 6px rgba(19, 19, 20, 0.15)',
-                      transition: 'all 0.2s ease'
-                    }}
                   >
-                    {copiedVoucher ? <Check size={14} /> : <Copy size={14} />}
+                    {copiedVoucher ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
                     <span>{copiedVoucher ? 'Copied' : 'Copy'}</span>
                   </button>
                 </div>
-
-                <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
-                  Valid for up to <strong>2 devices</strong> (phone + laptop) • 1 hour duration. Connect to <em>"BAIA Free Wifi"</em> and enter this code.
+                <p className="wifi-help">
+                  Connect to <strong>“BAIA Free Wifi”</strong> and enter this code. It works for 1 hour on up to 2 devices.
                 </p>
-              </div>
+              </section>
             ) : null}
 
-            {/* 3. In-App Camera Scan Trigger (Hidden once already scanned today) */}
+            {/* Scan the counter standee (hidden once today's stamp is in) */}
             {!hasScannedToday && (
-              <button 
+              <button
                 type="button"
+                className="scan-btn"
                 onClick={() => {
                   setScannerErrorMsg('');
                   setScannerStatusMsg('');
                   setShowScannerModal(true);
                 }}
-                className="scan-cta-button"
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  background: 'linear-gradient(135deg, #1E1E22 0%, #131314 60%, #0C0C0D 100%)',
-                  border: '1.5px solid rgba(255, 255, 255, 0.12)',
-                  padding: '16px 20px',
-                  borderRadius: '20px',
-                  color: '#FFFFFF',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'transform 0.15s ease, box-shadow 0.15s ease'
-                }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <div style={{ 
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '14px',
-                    background: 'rgba(255, 255, 255, 0.15)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#FFE699',
-                    flexShrink: 0
-                  }}>
-                    <QrCode size={22} />
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 800, fontSize: '0.98rem', color: '#FFFFFF', letterSpacing: '0.2px' }}>
-                      Scan Counter Standee
-                    </div>
-                    <div style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.82)', marginTop: '2px' }}>
-                      Collect today's drink stamp &amp; Wi-Fi
-                    </div>
-                  </div>
-                </div>
-                
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.18)',
-                  padding: '6px 12px',
-                  borderRadius: '9999px',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  color: '#FFE699',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  flexShrink: 0
-                }}>
-                  <span>Scan</span>
-                  <ChevronRight size={14} />
-                </div>
+                <span className="scan-btn-icon" aria-hidden="true"><QrCode size={22} /></span>
+                <span className="scan-btn-text">
+                  <strong>Scan the counter standee</strong>
+                  <span>Get today's stamp and Wi-Fi code</span>
+                </span>
+                <ChevronRight size={18} aria-hidden="true" />
               </button>
             )}
 
-            {/* 4. Featured Specialty Coffee Spotlight */}
-            <div style={{
-              background: '#FFFFFF',
-              border: '1.5px solid #E2E8F0',
-              borderRadius: '20px',
-              overflow: 'hidden',
-              boxShadow: 'var(--loyalty-shadow)'
-            }}>
-              <div style={{ position: 'relative', height: '140px', overflow: 'hidden' }}>
-                <img 
-                  src="/images/classiccafe.webp" 
-                  alt="Featured BAIA Specialty Coffee" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                />
-                <div style={{
-                  position: 'absolute',
-                  top: '12px',
-                  left: '12px',
-                  background: 'rgba(19, 19, 20, 0.85)',
-                  backdropFilter: 'blur(6px)',
-                  color: '#FFE699',
-                  padding: '4px 10px',
-                  borderRadius: '9999px',
-                  fontSize: '0.72rem',
-                  fontWeight: 700,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}>
-                  <span>What's Brewing</span>
-                </div>
-              </div>
+            {/* On the menu */}
+            <a className="menu-tile" href="/#menu">
+              <img src="/images/classiccafe.webp" alt="" loading="lazy" />
+              <span className="menu-tile-text">
+                <strong>Spanish latte and sea salt cold brew</strong>
+                <span>Made at our bar on Laurente Beach.</span>
+                <span className="menu-tile-link">See the menu <ChevronRight size={14} aria-hidden="true" /></span>
+              </span>
+            </a>
 
-              <div style={{ padding: '16px' }}>
-                <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#131314', fontSize: '1rem', fontWeight: 700, marginBottom: '4px' }}>
-                  Signature Spanish Latte & Sea Salt Cold Brew
-                </h4>
-                <p style={{ fontSize: '0.8rem', color: '#64748B', lineHeight: '1.4', marginBottom: '12px' }}>
-                  Handcrafted with premium artisan beans in San Pascual, Burias Island. Every specialty handcrafted beverage earns 1 stamp.
-                </p>
-                <a 
-                  href="/#menu"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    color: '#131314',
-                    fontSize: '0.82rem',
-                    fontWeight: 700,
-                    textDecoration: 'none'
-                  }}
-                >
-                  <span>Explore Full Drink Menu</span>
-                  <ChevronRight size={14} />
-                </a>
-              </div>
-            </div>
+            </>)}
 
-            {/* 5. Bottom Footer Info & Terms */}
-            <div style={{ textAlign: 'center', padding: '12px 0 6px', fontSize: '0.75rem', color: '#94A3B8' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
-                <ShieldCheck size={14} />
-                <span>Verified in-store at BAIA Café • San Pascual, Burias Island</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                <button 
-                  type="button" 
-                  onClick={() => setCardLegalType('terms')} 
-                  className="legal-footer-btn"
-                >
+            <footer className="card-legal">
+              <p className="card-legal-trust">
+                <ShieldCheck size={14} aria-hidden="true" />
+                <span>Stamps are checked in store at BAIA, San Pascual, Burias Island.</span>
+              </p>
+              <p className="card-legal-links">
+                <button type="button" onClick={() => setCardLegalType('terms')} className="legal-footer-btn">
                   Terms of Service
                 </button>
-                <span>•</span>
-                <button 
-                  type="button" 
-                  onClick={() => setCardLegalType('privacy')} 
-                  className="legal-footer-btn"
-                >
+                <button type="button" onClick={() => setCardLegalType('privacy')} className="legal-footer-btn">
                   Privacy Policy
                 </button>
-              </div>
-              <div style={{ marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setShowDeleteModal(true)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#94A3B8',
-                    fontSize: '0.7rem',
-                    cursor: 'pointer',
-                    textDecoration: 'underline'
-                  }}
-                >
-                  Delete Account &amp; Stamp Data
-                </button>
-              </div>
-            </div>
+              </p>
+              <button
+                type="button"
+                className="card-delete-link"
+                onClick={() => setShowDeleteModal(true)}
+              >
+                Delete my account and stamps
+              </button>
+            </footer>
 
           </div>
         )}
       </main>
 
-      {/* Stamp Card Collection Showcase Archive Modal */}
+      {/* Finished cards */}
       {showArchiveModal && (
         <div className="archive-modal-overlay">
-          <div className="archive-modal-card">
+          <div className="archive-modal-card card-sheet" role="dialog" aria-modal="true" aria-labelledby="archive-title">
             <div className="archive-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ padding: '8px', background: '#FEF3C7', color: '#D97706', borderRadius: '12px' }}>
-                  <Trophy size={20} />
-                </div>
+              <div className="card-sheet-head">
+                <span className="card-sheet-icon" aria-hidden="true"><Trophy size={20} /></span>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#131314', fontWeight: 800, fontFamily: 'Space Grotesk, sans-serif' }}>
-                    BAIA Café Collection
-                  </h3>
-                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>
-                    Your completed coffee journeys with BAIA
-                  </p>
+                  <h3 id="archive-title">Your cards</h3>
+                  <p>Every card you've filled at BAIA</p>
                 </div>
               </div>
-
               <button
                 type="button"
                 onClick={() => setShowArchiveModal(false)}
                 className="btn-archive-close"
-                aria-label="Close collection"
+                aria-label="Close your cards"
               >
                 <X size={16} strokeWidth={2.5} />
               </button>
             </div>
 
             <div className="archive-modal-body">
-              {/* Summary Ribbon */}
-              <div style={{
-                background: '#FFFFFF',
-                border: '1px solid #E2E8F0',
-                borderRadius: '16px',
-                padding: '14px 16px',
-                display: 'flex',
-                justifyContent: 'space-around',
-                textAlign: 'center'
-              }}>
+              <div className="archive-summary">
                 <div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#131314', fontFamily: 'Space Grotesk, sans-serif' }}>
-                    Cycle {activeCycleNumber}
-                  </div>
-                  <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Active Journey</div>
+                  <strong>Card {activeCycleNumber}</strong>
+                  <span>Filling now</span>
                 </div>
-                <div style={{ width: '1px', background: '#E2E8F0' }} />
                 <div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#D97706', fontFamily: 'Space Grotesk, sans-serif' }}>
-                    {numCompletedCycles}
-                  </div>
-                  <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>Completed Cards</div>
+                  <strong>{numCompletedCycles}</strong>
+                  <span>{numCompletedCycles === 1 ? 'Card finished' : 'Cards finished'}</span>
                 </div>
               </div>
 
-              {/* Completed Cards List */}
               {completedCycleCards.length > 0 ? (
                 completedCycleCards.map((card) => (
-                  <div key={card.cycleNumber} className="archive-item-card">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Award size={16} color="#F5A623" />
-                        <span style={{ fontWeight: 800, fontSize: '0.88rem', color: '#FFE699', letterSpacing: '0.5px' }}>
-                          CYCLE #{card.cycleNumber} COMPLETED
-                        </span>
-                      </div>
-                      <span style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.75)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Calendar size={12} />
-                        <span>{card.finishDate}</span>
-                      </span>
+                  <div key={card.cycleNumber} className="mini-card">
+                    <div className="mini-card-head">
+                      <strong>Card {card.cycleNumber}</strong>
+                      <span><Calendar size={12} aria-hidden="true" /> {card.finishDate}</span>
                     </div>
-
-                    {/* Mini 10 Golden Cups Row */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '4px', marginBottom: '12px' }}>
+                    <div className="mini-stamps" aria-hidden="true">
                       {Array.from({ length: 10 }).map((_, idx) => (
-                        <div
-                          key={idx}
-                          style={{
-                            aspectRatio: 1,
-                            borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #F5A623 0%, #D97706 100%)',
-                            color: '#FFF',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            border: '1px solid #FFE699'
-                          }}
-                        >
-                          {isBonusStamp(card.stamps[idx]) ? <Gift size={9} /> : <Coffee size={9} />}
-                        </div>
+                        <span key={idx} className="mini-stamp" style={{ '--tilt': `${STAMP_TILTS[idx]}deg` }}>
+                          {isBonusStamp(card.stamps[idx]) ? <Gift size={10} /> : <Coffee size={10} />}
+                        </span>
                       ))}
                     </div>
-
-                    {/* Reward Badge */}
-                    <div style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.18)',
-                      borderRadius: '10px',
-                      padding: '8px 12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between'
-                    }}>
-                      <span style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.9)' }}>
-                        Reward Unlocked:
-                      </span>
-                      <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#FFE699' }}>
-                        {card.rewardTitle}
-                      </span>
-                    </div>
+                    <p className="mini-card-reward">Earned: {card.rewardTitle}</p>
                   </div>
                 ))
               ) : (
-                <div style={{ textAlign: 'center', padding: '24px 16px', background: '#FFFFFF', borderRadius: '18px', border: '1px dashed #CBD5E1' }}>
-                  <Coffee size={32} color="#94A3B8" style={{ margin: '0 auto 10px' }} />
-                  <h4 style={{ color: '#131314', fontSize: '0.95rem', marginBottom: '4px' }}>
-                    First Card In Progress
-                  </h4>
-                  <p style={{ fontSize: '0.78rem', color: '#64748B', maxWidth: '260px', margin: '0 auto' }}>
-                    Collect 10 stamps on your active card to add your first completed card to this showcase archive.
-                  </p>
+                <div className="archive-empty">
+                  <Coffee size={28} aria-hidden="true" />
+                  <h4>Your first card is still filling up</h4>
+                  <p>Finish 10 stamps and the card will be kept here.</p>
                 </div>
               )}
 
-              {/* Current Active Cycle Preview */}
-              <div className="archive-item-card current">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontWeight: 700, fontSize: '0.82rem', color: '#CBD5E1' }}>
-                    CURRENT CYCLE #{activeCycleNumber}
-                  </span>
-                  <span style={{ fontSize: '0.75rem', color: '#FB923C', fontWeight: 700 }}>
-                    {isCompletedCard ? '10/10 Ready to Redeem' : `${displayProgress}/10 Stamps`}
-                  </span>
+              <div className="mini-card is-current">
+                <div className="mini-card-head">
+                  <strong>Card {activeCycleNumber}</strong>
+                  <span>{isCompletedCard ? 'Full, ready to redeem' : `${displayProgress}/10 stamps`}</span>
                 </div>
-                <div style={{ height: '5px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '9999px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', background: '#FB923C', width: `${(displayProgress / 10) * 100}%` }} />
+                <div className="mini-progress" aria-hidden="true">
+                  <span style={{ width: `${(displayProgress / 10) * 100}%` }} />
                 </div>
               </div>
             </div>
@@ -1098,61 +809,29 @@ export default function CardApp() {
         </div>
       )}
 
-      {/* Live In-App Camera QR Scanner Modal */}
+      {/* In-app camera scanner */}
       {showScannerModal && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(15, 23, 42, 0.75)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '20px'
-        }}>
-          <div style={{ width: '100%', maxWidth: '380px' }}>
-            <QrScanner
-              onScan={handleInAppScan}
-              onClose={() => setShowScannerModal(false)}
-            />
-
+        <div className="scanner-overlay">
+          <div className="scanner-frame">
+            <Suspense fallback={<div className="scanner-loading">Opening the camera…</div>}>
+              <QrScanner
+                onScan={handleInAppScan}
+                onClose={() => setShowScannerModal(false)}
+              />
+            </Suspense>
             {scannerStatusMsg && (
-              <div style={{
-                marginTop: '12px',
-                background: '#F0FDF4',
-                border: '1px solid #86EFAC',
-                color: '#15803D',
-                borderRadius: '12px',
-                padding: '10px',
-                fontSize: '0.85rem',
-                textAlign: 'center',
-                fontWeight: 600
-              }}>
-                {scannerStatusMsg}
-              </div>
+              <div className="card-alert is-ok" role="status">{scannerStatusMsg}</div>
             )}
-
             {scannerErrorMsg && (
-              <div style={{
-                marginTop: '12px',
-                background: '#FEF2F2',
-                border: '1px solid #FCA5A5',
-                color: '#B91C1C',
-                borderRadius: '12px',
-                padding: '10px',
-                fontSize: '0.85rem',
-                textAlign: 'center'
-              }}>
-                {scannerErrorMsg}
-              </div>
+              <div className="card-alert is-error" role="alert">{scannerErrorMsg}</div>
             )}
           </div>
         </div>
       )}
 
-      {/* Live Animated Barista Redemption Countdown */}
+      {/* Barista redemption countdown */}
       {activeRedemption && (
+        <Suspense fallback={null}>
         <RedemptionCountdown
           redemptionData={activeRedemption}
           user={user}
@@ -1161,149 +840,89 @@ export default function CardApp() {
             loadLoyaltyData();
           }}
         />
+        </Suspense>
       )}
-      {/* BAIA Café Loyalty Tutorial Modal (Accessible via 'How It Works' in header) */}
+
+      {/* How it works (from the header) */}
       {showTutorialModal && (
         <div className="archive-modal-overlay">
-          <div className="archive-modal-card" style={{ maxWidth: '440px' }}>
+          <div className="archive-modal-card card-sheet" role="dialog" aria-modal="true" aria-labelledby="guide-title" style={{ maxWidth: '440px' }}>
             <div className="archive-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ padding: '8px', background: '#FAF4EB', color: '#131314', borderRadius: '12px', border: '1px solid rgba(19, 19, 20, 0.08)' }}>
-                  <HelpCircle size={20} />
-                </div>
+              <div className="card-sheet-head">
+                <span className="card-sheet-icon" aria-hidden="true"><HelpCircle size={20} /></span>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#131314', fontWeight: 800, fontFamily: 'Space Grotesk, sans-serif' }}>
-                    BAIA Café Loyalty Guide
-                  </h3>
-                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>
-                    How your stamps, Wi-Fi, and rewards work
-                  </p>
+                  <h3 id="guide-title">How your card works</h3>
+                  <p>Stamps, Wi-Fi and your free coffee</p>
                 </div>
               </div>
-
               <button
                 type="button"
                 onClick={() => setShowTutorialModal(false)}
                 className="btn-archive-close"
-                aria-label="Close guide"
+                aria-label="Close the guide"
               >
                 <X size={16} strokeWidth={2.5} />
               </button>
             </div>
 
-            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', gap: '12px', background: '#FAF4EB', padding: '12px 14px', borderRadius: '14px', border: '1px solid rgba(19, 19, 20, 0.08)' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#131314', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
-                  1
-                </div>
+            <ol className="guide-steps">
+              <li>
+                <span className="guide-num" aria-hidden="true">1</span>
                 <div>
-                  <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: '#131314', margin: '0 0 2px' }}>
-                    1 Drink = 1 Daily Stamp
-                  </h5>
-                  <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
-                    Purchase any handcrafted specialty beverage, then tap <strong>Scan Counter Standee</strong> at our pickup bar.
-                  </p>
+                  <h4>One drink, one stamp a day</h4>
+                  <p>Buy any handcrafted drink, then tap <strong>Scan the counter standee</strong> at the pickup bar.</p>
                 </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', background: '#FAF4EB', padding: '12px 14px', borderRadius: '14px', border: '1px solid rgba(19, 19, 20, 0.08)' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#131314', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
-                  2
-                </div>
+              </li>
+              <li>
+                <span className="guide-num" aria-hidden="true">2</span>
                 <div>
-                  <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: '#131314', margin: '0 0 2px' }}>
-                    Free Beach Wi-Fi with Every Scan
-                  </h5>
-                  <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
-                    Every daily scan dispenses a 1-hour access voucher for <strong>"BAIA Free Wifi"</strong> valid for up to 2 devices (phone + laptop).
-                  </p>
+                  <h4>Free Wi-Fi with every scan</h4>
+                  <p>Each daily scan gives you a 1-hour code for <strong>“BAIA Free Wifi”</strong>, for up to 2 devices (phone and laptop).</p>
                 </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', background: '#FAF4EB', padding: '12px 14px', borderRadius: '14px', border: '1px solid rgba(19, 19, 20, 0.08)' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#131314', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
-                  3
-                </div>
+              </li>
+              <li>
+                <span className="guide-num" aria-hidden="true">3</span>
                 <div>
-                  <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: '#131314', margin: '0 0 2px' }}>
-                    Free Coffee Every 10 Stamps
-                  </h5>
-                  <p style={{ fontSize: '0.76rem', color: '#64748B', margin: 0, lineHeight: '1.4' }}>
-                    Complete 10 stamps to unlock your reward. Activate it when ordering and show your screen to the barista to redeem. Finish your first card and we add 1 bonus stamp to your next one.
-                  </p>
+                  <h4>A free coffee every 10 stamps</h4>
+                  <p>Fill the card to unlock your reward. Redeem it when you order and show your screen to the barista. Finish your first card and we add 1 bonus stamp to your next one.</p>
                 </div>
-              </div>
-
-            </div>
+              </li>
+            </ol>
           </div>
         </div>
       )}
 
-      {/* Self-Service Account & Data Deletion Modal */}
+      {/* Delete account and data */}
       {showDeleteModal && (
         <div className="archive-modal-overlay">
-          <div className="archive-modal-card" style={{ maxWidth: '380px', textAlign: 'center', padding: '24px 20px' }}>
-            <div style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '50%',
-              background: '#FEE2E2',
-              color: '#DC2626',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '14px'
-            }}>
-              <Trash2 size={22} />
-            </div>
-            <h3 style={{ color: '#131314', margin: '0 0 8px', fontSize: '1.1rem', fontWeight: 800 }}>
-              Delete Loyalty Account?
-            </h3>
-            <p style={{ fontSize: '0.82rem', color: '#64748B', lineHeight: '1.5', margin: '0 0 20px' }}>
-              This will permanently delete your account, earned stamps, active Wi-Fi vouchers, and reward history. This action cannot be undone.
+          <div className="archive-modal-card card-sheet delete-sheet" role="alertdialog" aria-modal="true" aria-labelledby="delete-title">
+            <span className="delete-icon" aria-hidden="true"><Trash2 size={22} /></span>
+            <h3 id="delete-title">Delete your account?</h3>
+            <p>
+              This permanently deletes your account, your stamps, any active Wi-Fi codes and your reward history. It can't be undone.
             </p>
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div className="delete-actions">
               <button
                 type="button"
+                className="btn-card-quiet"
                 onClick={() => setShowDeleteModal(false)}
                 disabled={deletingAccount}
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: '12px',
-                  border: '1px solid #CBD5E1',
-                  background: '#FFFFFF',
-                  color: '#475569',
-                  fontWeight: 600,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer'
-                }}
               >
                 Cancel
               </button>
               <button
                 type="button"
+                className="btn-card-danger"
                 onClick={handleDeleteAccount}
                 disabled={deletingAccount}
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  background: '#DC2626',
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer'
-                }}
               >
-                {deletingAccount ? 'Deleting...' : 'Yes, Delete'}
+                {deletingAccount ? 'Deleting…' : 'Yes, delete'}
               </button>
             </div>
           </div>
         </div>
       )}
-      {/* In-App Legal Notice Popup */}
+
       <LegalModal type={cardLegalType} onClose={() => setCardLegalType(null)} />
     </>
   );
